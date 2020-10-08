@@ -50,7 +50,7 @@ run-through of elements (the actual semantics) or starting after the first
 set. This ambiguity is present in all the different potential names for this
 function: `repeated(times:)`, `cycled(repetitions:)`, etc.
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **Rust:** The `cycle` method repeats an iterator's elements forever. I don’t see
 anything that matches the `cycled(times:)` behavior.

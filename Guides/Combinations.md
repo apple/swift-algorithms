@@ -74,7 +74,7 @@ Swift API guidelines. A few other options were considered:
 - `k` is used a term of art for combinations and permutations, but isn't 
   widely used in programming contexts.
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **Rust/Ruby/Python:** Rust, Ruby, and Python all define functions with
 essentially the same semantics as the method described here.

@@ -82,7 +82,7 @@ to eventually land in the standard library.
 `partitioningIndex(where:)` is a slight generalization of a binary search, and
 is an O(_log n_) operation for random-access collections; O(_n_) otherwise.
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **C++:** The `<algorithm>` library defines `partition`, `stable_partition`, and
 `partition_point` functions with similar semantics to these. Notably, in the C++

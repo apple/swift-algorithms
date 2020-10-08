@@ -87,7 +87,7 @@ O(_n_) operation.
 
 See the ["Naming" section for `combinations(ofCount:)`](Combinations.md#naming) for detail.
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **C++:** The `<algorithm>` library defines a `next_permutation` function that
 advances an array of comparable values through their lexicographic orderings.

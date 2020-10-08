@@ -41,7 +41,7 @@ the first and second arguments conform.
 This method’s and type’s name match the term of art used in other languages and
 libraries.
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **Rust:** Rust provides a `chain` function that concatenates two iterators.
 

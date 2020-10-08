@@ -82,7 +82,7 @@ The operation performed by these methods is similar to other ways of breaking a 
 - `sliced`: *Not included in this package or the stdlib.* Breaks a collection into potentially overlapping subsequences.
 
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **Ruby:** Ruby’s `Enumerable` class defines `chunk_while` and `chunk`, which map
 to the proposed `chunked(by:)` and `chunked(on:)` methods.

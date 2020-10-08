@@ -58,7 +58,7 @@ collections. While `product` is precedented in other languages, the name has an
 unfortunate overlap with multiplication, where `product(numbers1, numbers2)`
 could be seen as producing an element-wise product.
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **Ruby:** You can call the `product` method on an array, passing one or more
 arrays to form n-ary tuples — passing a single array gives the same semantics as

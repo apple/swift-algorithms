@@ -74,7 +74,7 @@ returns a single random element. The `randomSample(count:)` name is chosen to
 align with `randomElement`, but be more distinguishable than something like
 `randomElements`. Other names considered include `sample` and `choose`.
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **C++:** As of C++17, the `<algorithm>` library includes a `sample` function
 that provides linear performance. This algorithm is stable for all source

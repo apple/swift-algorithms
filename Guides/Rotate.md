@@ -57,7 +57,7 @@ For the range-based overloads, the label could be omitted. That is, instead of
 using `subrange:`, the method could be called as 
 `numbers.rotate(0..<3, at: 2)`.
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **C++:** The `<algorithm>` library defines a `rotate` function with similar
 semantics to this one.

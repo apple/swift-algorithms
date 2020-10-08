@@ -38,7 +38,7 @@ extension Sequence {
 
 The `uniqued` methods are O(_n_) in both time and space complexity.
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **C+\+:** The `<algorithm>` library defines a `unique` function that removes
 consecutive equal elements.
