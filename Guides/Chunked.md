@@ -1,7 +1,7 @@
 # Chunked
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Chunked.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/AlgorithmsTests/ChunkedTests.swift)]
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/ChunkedTests.swift)]
 
 Break a collection into subsequences where consecutive elements pass a binary
 predicate, or where all elements in each chunk project to the same value.

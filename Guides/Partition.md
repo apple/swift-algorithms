@@ -1,7 +1,7 @@
 # Partition
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Partition.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/AlgorithmsTests/PartitionTests.swift)]
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/PartitionTests.swift)]
 
 Methods for performing a stable partition on mutable collections, and for 
 finding the partitioning index in an already partitioned collection.

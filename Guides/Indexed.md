@@ -1,7 +1,7 @@
 # Indexed
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Indexed.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/AlgorithmsTests/IndexedTests.swift)]
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/IndexedTests.swift)]
 
 The `enumerated` method, but pairing each element with its index instead of an
 incrementing integer counter.
