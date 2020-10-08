@@ -24,11 +24,11 @@ for (i, n) in numbers.indexed() {
 The `indexed` method returns an `Indexed` type:
 
 ```swift
-extension Sequence {
+extension Collection {
     func indexed() -> Indexed<Self>
 }
 ```
 
-`Indexed` scales from a sequence up to a random-access collection, depending on 
+`Indexed` scales from a collection up to a random-access collection, depending on 
 its base type.
 
