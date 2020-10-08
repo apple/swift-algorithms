@@ -68,7 +68,7 @@ extension Collection {
   ///
   ///     let names: Set = ["Sofia", "Camilla", "Martina", "Mateo", "Nicolás"]
   ///     var shorterIndices: [Set<String>.Index] = []
-  ///     for (i, name) in zip(names.indices, names) {
+  ///     for (i, name) in names.indexed() {
   ///         if name.count <= 5 {
   ///             shorterIndices.append(i)
   ///         }
