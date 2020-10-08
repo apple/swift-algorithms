@@ -149,7 +149,7 @@ extension Chain: Collection where Base1: Collection, Base2: Collection {
       } else {
         // The limit only has an effect here if it's "above" `i`
         if limit >= i {
-          return Index(first: limit)
+          return nil
         } else {
           return Index(
             second: base2.index(base2.startIndex, offsetBy: n - d))
@@ -193,7 +193,7 @@ extension Chain: Collection where Base1: Collection, Base2: Collection {
       if n <= d {
         return Index(second: base2.index(i, offsetBy: -n))
       } else {
-        return base1.index(base1.endIndex, offsetBy: -n - d, limitedBy: limit)
+        return base1.index(base1.endIndex, offsetBy: -(n - d), limitedBy: limit)
           .map(Index.init(first:))
       }
 
@@ -203,8 +203,12 @@ extension Chain: Collection where Base1: Collection, Base2: Collection {
         return base2.index(i, offsetBy: -n, limitedBy: limit)
           .map(Index.init(second:))
       } else {
-        return Index(
-          first: base1.index(base1.endIndex, offsetBy: -n - d))
+        // The limit only has an effect here if it's "below" `i`
+        if limit <= i {
+          return nil
+        } else {
+          return Index(first: base1.index(base1.endIndex, offsetBy: -(n - d)))
+        }
       }
     }
   }
