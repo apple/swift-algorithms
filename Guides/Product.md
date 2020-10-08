@@ -53,7 +53,7 @@ collection operations on the resulting wrapper are O(_m \* n_).
 
 ### Naming
 
-This function and the resulting collection provide the cartestian product of two
+This function and the resulting collection provide the cartesian product of two
 collections. While `product` is precedented in other languages, the name has an
 unfortunate overlap with multiplication, where `product(numbers1, numbers2)`
 could be seen as producing an element-wise product.
