@@ -1,7 +1,7 @@
 # Combinations
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Combinations.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/AlgorithmsTests/CombinationsTests.swift)]
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/CombinationsTests.swift)]
 
 A type that computes combinations of a collection’s elements.
 

@@ -1,7 +1,7 @@
 # Chain
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Chain.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/AlgorithmsTests/ChainTests.swift)]
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/ChainTests.swift)]
 
 Concatenates two collections with the same element type, one after another.
 

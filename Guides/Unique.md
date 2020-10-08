@@ -1,7 +1,7 @@
 # Unique
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Unique.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/AlgorithmsTests/UniqueTests.swift)]
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/UniqueTests.swift)]
 
 Methods to strip repeated elements from a sequence or collection.
 

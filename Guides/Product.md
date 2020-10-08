@@ -1,7 +1,7 @@
 # Product
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Product.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/AlgorithmsTests/ProductTests.swift)]
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/ProductTests.swift)]
 
 A function for iterating over every pair of elements in two different
 collections.
