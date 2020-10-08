@@ -1,7 +1,7 @@
 # Rotate
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Rotate.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/AlgorithmsTests/RotateTests.swift)]
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/RotateTests.swift)]
 
 A mutating method that rotates the elements of a collection to new positions.
 

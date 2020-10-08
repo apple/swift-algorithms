@@ -1,7 +1,7 @@
 # Random Sampling
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/RandomSample.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/AlgorithmsTests/RandomSampleTests.swift)]
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/RandomSampleTests.swift)]
 
 Operations for randomly selecting `k` elements without replacement from a
 sequence or collection.

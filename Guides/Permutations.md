@@ -1,7 +1,7 @@
 # Permutations
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Permutations.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/AlgorithmsTests/PermutationsTests.swift)]
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/PermutationsTests.swift)]
 
 A type that computes permutations of a collection’s elements, or of a subset of
 those elements.
