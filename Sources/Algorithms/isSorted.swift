@@ -39,4 +39,13 @@ extension Sequence where Element: Comparable {
         }
         return true
     }
+    
+    public func allEqual() -> Bool {
+        /// Returns Bool, indicating whether all the
+        /// elements in sequence are equal to each other.
+        ///
+        /// - Complexity: O(*n*), where *n* is the length of the sequence.
+
+        isSorted(by: ==)
+    }
 }
