@@ -70,7 +70,7 @@ extension Sequence where Element: Comparable {
     }
 }
 
-extension MutableCollection where Self: RandomAccessCollection, Index == Int {
+extension MutableCollection where Self: RandomAccessCollection {
     /// Rearranges this collection such that the 0...k range contains the first
     /// k sorted elements in this collection, using the given predicate as the
     /// comparison between elements.
@@ -101,7 +101,7 @@ extension MutableCollection where Self: RandomAccessCollection, Index == Int {
     }
 }
 
-extension MutableCollection where Self: RandomAccessCollection, Element: Comparable, Index == Int {
+extension MutableCollection where Self: RandomAccessCollection, Element: Comparable {
     /// Rearranges this collection such that the 0...k range contains the first
     /// k smallest elements in this collection.
     ///
@@ -133,11 +133,11 @@ extension MutableCollection where Self: RandomAccessCollection, Element: Compara
 // __partiallySort(_:by:)
 //===----------------------------------------------------------------------===//
 
-extension MutableCollection where Self: RandomAccessCollection, Index == Int {
+extension MutableCollection where Self: RandomAccessCollection {
     typealias Priority = (Element, Element) throws -> Bool
 
-    /// Partially sorts this array by using an in place heapsort that stops after we find the desired k amount
-    /// of elements. The heap is stored and processed in reverse order so that the array doesn't have to be flipped
+    /// Partially sorts this collection by using an in place heapsort that stops after we find the desired k amount
+    /// of elements. The heap is stored and processed in reverse order so that the collection doesn't have to be flipped
     /// once the final result is found.
     ///
     /// Complexity: O(k log n)
@@ -154,17 +154,17 @@ extension MutableCollection where Self: RandomAccessCollection, Index == Int {
         }
         var iterator = (0..<k).makeIterator()
         _ = iterator.next()
-        swapAt(count - 1, heapEndIndex)
+        swapAt(index(before: endIndex), index(startIndex, offsetBy: heapEndIndex))
         heapEndIndex += 1
         while let _ = iterator.next() {
             try siftDown(count - 1, by: areInIncreasingOrder, heapEndIndex: heapEndIndex)
-            swapAt(count - 1, heapEndIndex)
+            swapAt(index(before: endIndex), index(startIndex, offsetBy: heapEndIndex))
             heapEndIndex += 1
         }
     }
 
     /// Sifts down an element from this heap.
-    /// The heap is stored in reverse order, so sifting down will actually move the element up in the heap array.
+    /// The heap is stored in reverse order, so sifting down will actually move the element up in the heap.
     ///
     /// - Parameter i: The element index to sift down
     /// - Parameter by: The predicate to use when determining the priority of elements in the heap
@@ -174,7 +174,7 @@ extension MutableCollection where Self: RandomAccessCollection, Index == Int {
         guard indexToSwap != i else {
             return
         }
-        swapAt(i, indexToSwap)
+        swapAt(index(startIndex, offsetBy: i), index(startIndex, offsetBy: indexToSwap))
         try siftDown(indexToSwap, by: priority, heapEndIndex: heapEndIndex)
     }
 
@@ -199,7 +199,9 @@ extension MutableCollection where Self: RandomAccessCollection, Index == Int {
         guard child >= heapEndIndex else {
             return parent
         }
-        guard try priority(self[child], self[parent]) else {
+        let childElement = self[index(startIndex, offsetBy: child)]
+        let parentElement = self[index(startIndex, offsetBy: parent)]
+        guard try priority(childElement, parentElement) else {
             return parent
         }
         return child
