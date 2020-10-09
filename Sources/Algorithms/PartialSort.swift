@@ -174,7 +174,7 @@ extension MutableCollection where Self: RandomAccessCollection {
       return
     }
     var heapEndIndex = 0
-    for i in ((count / 2) + 1)..<count {
+    for i in (count / 2)..<count {
       try siftDown(i, by: areInIncreasingOrder, heapEndIndex: heapEndIndex)
     }
     var iterator = (0..<k).makeIterator()

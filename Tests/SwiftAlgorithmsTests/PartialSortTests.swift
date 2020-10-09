@@ -15,8 +15,58 @@ import Algorithms
 final class PartialSortTests: XCTestCase {
   func testEmpty() {
     let array = [Int]()
-
     XCTAssertEqual(array.partiallySorted(0), [])
+  }
+
+  func testPartialSortWithPriority() {
+    let array: [Int] = [20, 1, 4, 70, 100, 2, 3, 7, 90]
+
+    XCTAssertEqual(array.partiallySorted(0, by: >), array)
+    XCTAssertEqual(
+      array.partiallySorted(1, by: >),
+      [100, 1, 4, 3, 7, 20, 70, 90, 2]
+    )
+
+    XCTAssertEqual(
+      array.partiallySorted(5, by: >),
+      [100, 90, 70, 20, 7, 2, 4, 3, 1]
+    )
+
+    XCTAssertEqual(
+      array.partiallySorted(9, by: >),
+      [100, 90, 70, 20, 7, 4, 3, 2, 1]
+    )
+
+    XCTAssertEqual([1].partiallySorted(0, by: <), [1])
+    XCTAssertEqual([1].partiallySorted(0, by: >), [1])
+    XCTAssertEqual([1].partiallySorted(1, by: <), [1])
+    XCTAssertEqual([1].partiallySorted(1, by: >), [1])
+    XCTAssertEqual([0, 1].partiallySorted(1, by: <), [0, 1])
+    XCTAssertEqual([1, 0].partiallySorted(1, by: <), [0, 1])
+    XCTAssertEqual([1, 0].partiallySorted(2, by: <), [0, 1])
+    XCTAssertEqual([0, 1].partiallySorted(1, by: >), [1, 0])
+    XCTAssertEqual([1, 0].partiallySorted(1, by: >), [1, 0])
+    XCTAssertEqual([1, 0].partiallySorted(2, by: >), [1, 0])
+
+    XCTAssertEqual(
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].partiallySorted(5, by: <),
+      [1, 2, 3, 4, 7, 90, 70, 20, 100]
+    )
+
+    XCTAssertEqual(
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].partiallySorted(5, by: >),
+      [100, 90, 70, 20, 7, 2, 4, 3, 1]
+    )
+
+    XCTAssertEqual(
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].partiallySorted(5, by: >),
+      [100, 90, 70, 20, 7, 2, 4, 3, 1]
+    )
+
+    XCTAssertEqual(
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].partiallySorted(5, by: <),
+      [1, 2, 3, 4, 7, 90, 70, 20, 100]
+    )
   }
 
   func testPartialSortComparable() {
@@ -37,26 +87,6 @@ final class PartialSortTests: XCTestCase {
     XCTAssertEqual(
       array.partiallySorted(9),
       [1, 2, 3, 4, 7, 20, 70, 90, 100]
-    )
-  }
-
-  func testPartialSortComparableWithCustomPriority() {
-    let array: [Int] = [20, 1, 4, 70, 100, 2, 3, 7, 90]
-
-    XCTAssertEqual(array.partiallySorted(0, by: >), array)
-    XCTAssertEqual(
-      array.partiallySorted(1, by: >),
-      [100, 1, 4, 3, 7, 20, 70, 90, 2]
-    )
-
-    XCTAssertEqual(
-      array.partiallySorted(5, by: >),
-      [100, 90, 70, 20, 7, 2, 4, 3, 1]
-    )
-
-    XCTAssertEqual(
-      array.partiallySorted(9, by: >),
-      [100, 90, 70, 20, 7, 4, 3, 2, 1]
     )
   }
 
@@ -90,17 +120,5 @@ final class PartialSortTests: XCTestCase {
       array,
       [1, 2, 3, 4, 7, 20, 70, 90, 100]
     )
-  }
-
-  func testPartialSortDescendingArray() {
-    let array: [Int] = [100, 90, 70, 20, 7, 4, 3, 2, 1]
-
-    XCTAssertEqual(array.partiallySorted(9, by: >), array)
-  }
-
-  func testPartialSortAscendingArray() {
-    let array: [Int] = [1, 2, 3, 4, 7, 20, 70, 90, 100]
-
-    XCTAssertEqual(array.partiallySorted(9, by: <), array)
   }
 }
