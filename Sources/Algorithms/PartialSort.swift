@@ -148,9 +148,9 @@ extension MutableCollection where Self: RandomAccessCollection {
   typealias Priority = (Element, Element) throws -> Bool
 
   /// Partially sorts this collection by using an in-place heapsort that stops
-  /// after we find the desired k amount
-  /// of elements. The heap is stored and processed in reverse order so that
-  ///  the collection doesn't have to be flipped once the final result is found.
+  /// after we find the desired k amount of elements. The heap is stored and 
+  /// processed in reverse order so that the collection doesn't have to be 
+  /// flipped once the final result is found.
   ///
   /// Complexity: O(k log n)
   mutating func __partiallySort(
