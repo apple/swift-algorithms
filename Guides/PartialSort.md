@@ -17,7 +17,7 @@ let almostSorted = numbers.partiallySorted(3, <)
 
 ## Detailed Design
 
-This adds the in place `MutableCollection` method shown below:
+This adds the in-place `MutableCollection` method shown below:
 
 ```swift
 extension Sequence {
