@@ -161,33 +161,36 @@ extension MutableCollection where Self: RandomAccessCollection {
       Cannot partially sort with a negative amount of elements!
       """
     )
-
     assert(k <= count, """
       Cannot partially sort more than this Sequence's size!
       """
     )
 
-    guard k > 0 else {
+    guard isEmpty == false && k > 0 else {
       return
     }
-    guard isEmpty == false else {
-      return
-    }
+
     var heapEndIndex = 0
     for i in (count / 2)..<count {
       try siftDown(i, by: areInIncreasingOrder, heapEndIndex: heapEndIndex)
     }
-    var iterator = (0..<k).makeIterator()
-    _ = iterator.next()
-    swapAt(index(before: endIndex), index(startIndex, offsetBy: heapEndIndex))
+
+    swapAt(
+      index(before: endIndex), 
+      index(startIndex, offsetBy: heapEndIndex)
+    )
     heapEndIndex += 1
-    while let _ = iterator.next() {
+
+    for i in 1..<k {
       try siftDown(
         count - 1,
         by: areInIncreasingOrder,
         heapEndIndex: heapEndIndex
       )
-      swapAt(index(before: endIndex), index(startIndex, offsetBy: heapEndIndex))
+      swapAt(
+        index(before: endIndex), 
+        index(startIndex, offsetBy: heapEndIndex)
+      )
       heapEndIndex += 1
     }
   }
