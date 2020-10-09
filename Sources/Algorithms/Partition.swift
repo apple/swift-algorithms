@@ -42,7 +42,7 @@ extension MutableCollection {
       count: n - h,
       subrange: i..<subrange.upperBound,
       by: belongsInSecondPartition)
-    return rotate(subrange: j..<k, at: i)
+    return rotate(subrange: j..<k, toStartAt: i)
   }
   
   /// Moves all elements satisfying the given predicate into a suffix of the
