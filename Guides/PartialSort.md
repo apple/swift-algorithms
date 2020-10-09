@@ -47,7 +47,7 @@ Partially sorting is a O(_k log n_) operation, where _k_ is the number of elemen
 and _n_ is the length of the sequence.
 
 `partiallySort(_:by:)` is a slight generalization of a priority queue. It's implemented
-as an in line heapsort that stops after _k_ runs.
+as an in-place heapsort that stops after _k_ runs.
 
 ### Comparison with other languages
 
