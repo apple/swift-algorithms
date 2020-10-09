@@ -29,7 +29,7 @@ collection are always treated as separate values in the resulting combinations:
 ```swift
 let numbers2 = [20, 10, 10]
 for combo in numbers2.combinations(ofCount: 2) {
-    print(perm)
+    print(combo)
 }
 // [20, 10]
 // [20, 10]
