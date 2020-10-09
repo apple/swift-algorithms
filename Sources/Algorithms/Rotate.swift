@@ -43,6 +43,18 @@ extension MutableCollection where Self: BidirectionalCollection {
     return (f, l)
   }
   
+  /// Reverses the elements within the given subrange.
+  ///
+  /// This example reverses the numbers within the subrange at the start of the
+  /// `numbers` array:
+  ///
+  ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+  ///     numbers.reverse(subrange: 0..<4)
+  ///     // numbers == [40, 30, 20, 10, 50, 60, 70, 80]
+  ///
+  /// - Parameter subrange: The subrange of this collection to reverse.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of `subrange`.
   public mutating func reverse(subrange: Range<Index>) {
     if subrange.isEmpty { return }
     var lo = subrange.lowerBound
@@ -98,6 +110,27 @@ extension MutableCollection {
     return (p, q)
   }
 
+  /// Rotates the elements within the given subrange so that the element
+  /// at the specified index becomes the start of the subrange.
+  ///
+  /// Rotating a collection is equivalent to breaking the collection into two
+  /// sections at the index `newStart`, and then swapping those two sections.
+  /// In this example, the `numbers` array is rotated so that the element at
+  /// index `3` (`40`) is first:
+  ///
+  ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+  ///     let oldStart = numbers.rotate(subrange: 0..<4, toStartAt: 2)
+  ///     // numbers == [30, 40, 10, 20, 50, 60, 70, 80]
+  ///     // numbers[oldStart] == 10
+  ///
+  /// - Parameters:
+  ///   - subrange: The subrange of this collection to rotate.
+  ///   - newStart: The index of the element that should be at the start of
+  ///     `subrange` after rotating.
+  /// - Returns: The new index of the element that was at the start of
+  ///   `subrange` pre-rotation.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of `subrange`.
   @discardableResult
   public mutating func rotate(
     subrange: Range<Index>,
@@ -159,6 +192,24 @@ extension MutableCollection {
     return ret
   }
   
+  /// Rotates the elements of this collection so that the element
+  /// at the specified index becomes the start of the collection.
+  ///
+  /// Rotating a collection is equivalent to breaking the collection into two
+  /// sections at the index `newStart`, and then swapping those two sections.
+  /// In this example, the `numbers` array is rotated so that the element at
+  /// index `3` (`40`) is first:
+  ///
+  ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+  ///     let oldStart = numbers.rotate(toStartAt: 3)
+  ///     // numbers == [40, 50, 60, 70, 80, 10, 20, 30]
+  ///     // numbers[oldStart] == 10
+  ///
+  /// - Parameter newStart: The index of the element that should be first after
+  ///   rotating.
+  /// - Returns: The new index of the element that was first pre-rotation.
+  ///
+  /// - Complexity: O(*n*)
   @discardableResult
   public mutating func rotate(toStartAt newStart: Index) -> Index {
     rotate(subrange: startIndex..<endIndex, toStartAt: newStart)
@@ -166,6 +217,27 @@ extension MutableCollection {
 }
 
 extension MutableCollection where Self: BidirectionalCollection {
+  /// Rotates the elements within the given subrange so that the element
+  /// at the specified index becomes the start of the subrange.
+  ///
+  /// Rotating a collection is equivalent to breaking the collection into two
+  /// sections at the index `newStart`, and then swapping those two sections.
+  /// In this example, the `numbers` array is rotated so that the element at
+  /// index `3` (`40`) is first:
+  ///
+  ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+  ///     let oldStart = numbers.rotate(subrange: 0..<4, toStartAt: 2)
+  ///     // numbers == [30, 40, 10, 20, 50, 60, 70, 80]
+  ///     // numbers[oldStart] == 10
+  ///
+  /// - Parameters:
+  ///   - subrange: The subrange of this collection to rotate.
+  ///   - newStart: The index of the element that should be at the start of
+  ///     `subrange` after rotating.
+  /// - Returns: The new index of the element that was at the start of
+  ///   `subrange` pre-rotation.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of `subrange`.
   @discardableResult
   public mutating func rotate(
     subrange: Range<Index>,
