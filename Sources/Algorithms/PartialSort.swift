@@ -136,8 +136,8 @@ extension MutableCollection where Self: RandomAccessCollection, Element: Compara
 extension MutableCollection where Self: RandomAccessCollection, Index == Int {
     typealias Priority = (Element, Element) throws -> Bool
 
-    /// Partially sorts this array by using an in place heapsort that stops after we find the desired k amount
-    /// of elements. The heap is stored and processed in reverse order so that the array doesn't have to be flipped
+    /// Partially sorts this collection by using an in place heapsort that stops after we find the desired k amount
+    /// of elements. The heap is stored and processed in reverse order so that the collection doesn't have to be flipped
     /// once the final result is found.
     ///
     /// Complexity: O(k log n)
@@ -164,7 +164,7 @@ extension MutableCollection where Self: RandomAccessCollection, Index == Int {
     }
 
     /// Sifts down an element from this heap.
-    /// The heap is stored in reverse order, so sifting down will actually move the element up in the heap array.
+    /// The heap is stored in reverse order, so sifting down will actually move the element up in the heap.
     ///
     /// - Parameter i: The element index to sift down
     /// - Parameter by: The predicate to use when determining the priority of elements in the heap
