@@ -28,12 +28,12 @@ extension Sequence {
   ///
   /// If you need to sort a sequence but only need access to a prefix of its
   /// elements, using this method can give you a performance boost over sorting
-  ///  the entire sequence.
+  /// the entire sequence.
   ///
   /// - Parameter count: The k number of elements to partially sort.
   /// - Parameter areInIncreasingOrder: A predicate that returns true if its
   /// first argument should be ordered before its second argument;
-  ///  otherwise, false.
+  /// otherwise, false.
   ///
   /// - Complexity: O(k log n)
   public func partiallySorted(
@@ -64,7 +64,7 @@ extension Sequence where Element: Comparable {
   ///
   /// If you need to sort a sequence but only need access to a prefix of
   /// its elements, using this method can give you a performance boost over
-  ///  sorting the entire sequence.
+  /// sorting the entire sequence.
   ///
   /// - Parameter count: The k number of elements to partially sort
   /// in ascending order.
@@ -199,10 +199,11 @@ extension MutableCollection where Self: RandomAccessCollection {
   /// The heap is stored in reverse order, so sifting down will actually
   /// move the element up in the heap.
   ///
-  /// - Parameter i: The element index to sift down
+  /// - Parameter i: The element index to sift down.
   /// - Parameter by: The predicate to use when determining the priority
-  /// of elements in the heap
-  /// - Parameter heapEndIndex: The index in reverse order, where the heap ends.
+  /// of elements in the heap.
+  /// - Parameter heapEndIndex: The index, in reverse order, 
+  /// where the heap ends.
   private mutating func siftDown(
     _ i: Int,
     by priority: Priority,
