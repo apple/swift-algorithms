@@ -159,7 +159,7 @@ extension Collection {
     var current = startIndex
     while true {
       let next = index(after: current)
-      if next == endIndex { break }
+      guard next != endIndex else { break }
       
       if !belongInSameGroup(self[current], self[next]) {
         result.append(self[start..<next])

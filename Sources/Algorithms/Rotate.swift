@@ -56,7 +56,6 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of `subrange`.
   public mutating func reverse(subrange: Range<Index>) {
-    if subrange.isEmpty { return }
     var lo = subrange.lowerBound
     var hi = subrange.upperBound
     

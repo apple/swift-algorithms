@@ -44,7 +44,7 @@ extension Combinations: Sequence {
     internal init(_ combinations: Combinations) {
       self.base = combinations.base
       self.finished = combinations.k < 0
-      self.indexes = combinations.k < 0
+      self.indexes = finished
         ? []
         : Array(combinations.base.indices.prefix(combinations.k))
     }
@@ -78,7 +78,6 @@ extension Combinations: Sequence {
     
       let i = indexes.count - 1
       base.formIndex(after: &indexes[i])
-      if indexes[i] != base.endIndex { return }
 
       var j = i
       while indexes[i] == base.endIndex {
@@ -100,7 +99,7 @@ extension Combinations: Sequence {
     }
     
     public mutating func next() -> [Base.Element]? {
-      if finished { return nil }
+      guard !finished else { return nil }
       defer { advance() }
       return indexes.map { i in base[i] }
     }

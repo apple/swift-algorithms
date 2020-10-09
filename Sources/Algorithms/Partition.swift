@@ -26,23 +26,23 @@ extension MutableCollection {
     subrange: Range<Index>,
     by belongsInSecondPartition: (Element) throws-> Bool
   ) rethrows -> Index {
-    if n == 0 { return subrange.lowerBound }
-    if n == 1 {
-      return try belongsInSecondPartition(self[subrange.lowerBound])
-        ? subrange.lowerBound
-        : subrange.upperBound
+    switch n {
+    case 0,
+         1 where try belongsInSecondPartition(self[subrange.lowerBound]):
+      return subrange.lowerBound
+    case 1: return subrange.upperBound
+    default:
+      let h = n / 2, i = index(subrange.lowerBound, offsetBy: h)
+      let j = try stablePartition(
+        count: h,
+        subrange: subrange.lowerBound..<i,
+        by: belongsInSecondPartition)
+      let k = try stablePartition(
+        count: n - h,
+        subrange: i..<subrange.upperBound,
+        by: belongsInSecondPartition)
+      return rotate(subrange: j..<k, toStartAt: i)
     }
-    
-    let h = n / 2, i = index(subrange.lowerBound, offsetBy: h)
-    let j = try stablePartition(
-      count: h,
-      subrange: subrange.lowerBound..<i,
-      by: belongsInSecondPartition)
-    let k = try stablePartition(
-      count: n - h,
-      subrange: i..<subrange.upperBound,
-      by: belongsInSecondPartition)
-    return rotate(subrange: j..<k, toStartAt: i)
   }
   
   /// Moves all elements satisfying the given predicate into a suffix of the
