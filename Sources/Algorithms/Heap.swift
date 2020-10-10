@@ -10,65 +10,62 @@
 //===----------------------------------------------------------------------===//
 
 /// A heap view of a collection's elements.
-public struct Heap<Base: Collection> where Base.Element : Comparable {
-  /// The base collection.
-  public let base: Base
+public struct Heap<Base> where Base: Collection,
+                               Base.Element : Comparable {
+  private let base: Base
+  /** the permutation are stored as an array of indices into the base
+   * possibly there's a more efficient way to store them, for instance
+   * only storing transpositions.
+   * The heap condition holds for the elements that this array points to.
+   *
+  */
+  // TODO: If the base collection is modified, the heap condition can be
+  //   violated. Ideally we'd notice this and recreate the heap.
+  private var permutation: Array<Base.Index>
 
-  var indexes: [Base.Index]
+  /*
+   * comparator should return true if right-hand-side should go
+   * toward the root of the tree (in a max-heap, if lhs <= rhs)
+   * The comparator must be escaping because we are storing it, even though
+   *   under many conditions it should not have side effects or
+   *   require any outside knowlege.
+   */
+  private let comparator: (Base.Element, Base.Element) -> Bool
 
-  internal init(_ base: Base) {
+  /**
+   * internal init because the extension method on Collection creates a Heap.
+   * postcondition: the heap condition holds on the elements that indexes points to.
+   *                self.permutation.count == base.count
+   * note that this depends on base.indices being a range between two indices
+   *  with separation between each index of one.
+   * If base.indices were implemented as a RangeSet or something like that this
+   *  will not hold up.
+   * The comparator closure must be @escaping so we can hold on to it.
+   *   Ideally it would be good to make it side-effect free and non-escaping.
+   */
+  internal init(_ base: Base,
+                comparator: @escaping (Base.Element, Base.Element) -> Bool) {
     self.base = base
-    self.indexes = Array(base.indices)
+    self.permutation = Array(base.indices)
+    self.comparator = comparator
+    self.makeHeap(comparator: self.comparator)
   }
 
-  internal func doublePlusIncr(base: Base, x : Base.Index, increment: Int) -> Base.Index? {
-    let lastIndex = base.index(base.endIndex, offsetBy: -1)
-    let distance = base.distance(from: base.startIndex, to: x)
-    if let distance2 = base.index(x,
-                                  offsetBy: distance,
-                                  limitedBy: lastIndex) {
-      return base.index(distance2, offsetBy: increment, limitedBy: lastIndex)
-    } else {
-      return .none
-    }
-
-  }
-
-  /// 2*i + 1
-  public func leftChild(x : Base.Index) -> Base.Index? {
-    doublePlusIncr(base: base, x: x, increment: 1)
-  }
-
-  /// 2*i + 2
-  public func rightChild(x: Base.Index) -> Base.Index? {
-    doublePlusIncr(base: base, x: x, increment: 2)
-  }
-
-  /// .none for the root node, otherwise (i-1) / 2
-  public func parent(x: Base.Index) -> Base.Index? {
-    let distance = base.distance(from: base.startIndex, to: x)
-    if distance == 0 {
-      return .none
-    }
-
-    let (halfDistance, _) = (distance - 1).quotientAndRemainder(dividingBy: 2)
-
-    // if remainder == 0, left child,
-    // if remainder == 1, right child
-
-    return base.index(base.startIndex, offsetBy: halfDistance)
-  }
-
-  /* operations on array of indices */
-
-  /// swaps two entries in the array of indices
-  /// TODO: get the index type from [Base.Index]
-  mutating func swap(x: Int,
-                     y: Int) -> Bool {
-    if indexes.indices.contains(x) && indexes.indices.contains(y) {
-      let tmp = indexes[x]
-      indexes[x] = indexes[y]
-      indexes[y] = tmp
+  /** Swaps two entries in the array of indices
+   * Returns true if swap happened
+   *    otherwise false
+   * Will not swap if indices out of range
+   * Will not swap and will return false if indices are the same
+   *
+   */
+  mutating func swap(x: Array<Base.Index>.Index,
+                     y: Array<Base.Index>.Index) -> Bool {
+    if x != y &&
+        permutation.indices.contains(x) &&
+        permutation.indices.contains(y) {
+      let tmp = permutation[x]
+      permutation[x] = permutation[y]
+      permutation[y] = tmp
       return true
     } else {
       return false
@@ -76,13 +73,15 @@ public struct Heap<Base: Collection> where Base.Element : Comparable {
   }
 
   /**
-   * Returns translated value indirectly, through the indexes array.
+   * Returns translated value indirectly, through the permutation array.
    * self[0] is the root of the heap and is the max of the heap
+   * The heap condition holds for the rest of the elements.
+   * Note that this belongs to this heap itself.
    */
-  subscript(index: Int) -> Base.Element? {
+  subscript(index: Array<Base.Index>.Index) -> Base.Element? {
     get {
-      if indexes.indices.contains(index) {
-        let underlyingIndex = indexes[index]
+      if permutation.indices.contains(index) {
+        let underlyingIndex = permutation[index]
         return base[underlyingIndex]
       } else {
         return .none
@@ -90,22 +89,47 @@ public struct Heap<Base: Collection> where Base.Element : Comparable {
     }
   }
 
+  /**
+   * Returns and removes the root element.
+   * Returns .none if the heap is empty.
+   * Maintains the heap condition by rotating elements as needed.
+   * Precondition: the heap condition must hold for the elements in
+   *   the base condition whose indexes are in permutation.
+   * postcondition: if permutation is not empty,
+   *                    permutation has one fewer element.
+   *                    heap condition still applies.
+   */
   mutating func pop() -> Base.Element? {
-    if indexes.isEmpty {
+    if permutation.isEmpty {
       return .none
     }
     let result = self[0]
-    let lastIndex = indexes.popLast()
-    if !indexes.isEmpty, let x = lastIndex {
-      indexes[0] = x
-      heapThree(rootNodeIndex: 0)
+    let lastIndex = permutation.popLast()
+    if !permutation.isEmpty, let x = lastIndex {
+      permutation[0] = x
+      heapThree(rootNodeIndex: 0,
+                comparator: self.comparator)
     }
     return result
   }
   /// takes parent node in indexes array as argument.
   /// postcondition: parent node is greater than immediate chidren.
 
-  mutating func heapThree(rootNodeIndex: Int) {
+  /**
+   * Assigns root node to the max of the root and the two immediate children.
+   * Calls heapThree on a child node if it's been swapped into the root to
+   *   maintain the heap property on the whole sub-heap.
+   * Depends on Array<Base.Index>.Index behaving like an Int with multiplication
+   *   and addition, to get the child indexes
+   * Preconditions: the root node index must be valid, otherwise
+   *   self[rootNodeIndex]! below will fail at runtime.
+   * Postcondition: The heap condition will hold for the root node and its
+   *   recursive children.
+   *   The permutation array may be changed.
+   *   The base collection will be unchanged.
+   */
+  internal mutating func heapThree(rootNodeIndex: Array<Base.Index>.Index,
+                                   comparator: (Base.Element, Base.Element) -> Bool) {
 
     let leftChildIndex = 2 * rootNodeIndex + 1
     let rightChildIndex = 2 * rootNodeIndex + 2
@@ -115,91 +139,54 @@ public struct Heap<Base: Collection> where Base.Element : Comparable {
     let rightValueOptional = self[rightChildIndex]
 
     switch (leftValueOptional, rightValueOptional) {
-    case let (.some(leftValue), .some(rightValue)) where rootValue < rightValue && leftValue <= rightValue:
+    case let (.some(leftValue), .some(rightValue))
+          where comparator(rootValue, rightValue)
+                && comparator(leftValue, rightValue):
       let _ = swap(x: rightChildIndex, y: rootNodeIndex)
-      heapThree(rootNodeIndex: rightChildIndex)
-    case let (.some(leftValue), .some(rightValue)) where rootValue < leftValue && rightValue <= leftValue:
+      heapThree(rootNodeIndex: rightChildIndex, comparator: comparator)
+    case let (.some(leftValue), .some(rightValue))
+          where comparator(rootValue, leftValue)
+                && comparator(rightValue, leftValue):
       let _ = swap(x: leftChildIndex, y: rootNodeIndex)
-      heapThree(rootNodeIndex: leftChildIndex)
-        //swap root, left
+      heapThree(rootNodeIndex: leftChildIndex, comparator: comparator)
     case (.some(_), .some(_)):
-      // rootvalue > right and left values
       break
-    case let (.some(leftValue), .none) where rootValue < leftValue:
+    case let (.some(leftValue), .none)
+          where comparator(rootValue, leftValue):
       let _ = swap(x: leftChildIndex, y: rootNodeIndex)
-      heapThree(rootNodeIndex: leftChildIndex)
+      heapThree(rootNodeIndex: leftChildIndex, comparator: comparator)
     case (.some(_), .none):
-      // rootvalue > leftValue
       break
-    case let (.none, .some(rightValue)) where rootValue < rightValue:
+    case let (.none, .some(rightValue))
+          where comparator(rootValue, rightValue):
       let _ = swap(x: rightChildIndex, y: rootNodeIndex)
-      heapThree(rootNodeIndex: rightChildIndex)
-        //swap root, right
+      heapThree(rootNodeIndex: rightChildIndex, comparator: comparator)
     case (.none, .some(_)):
-      //rootvalue > rightValue
       break
     case (.none, .none) :
-      // rootvalue is only value
       break
     }
-    //    orders: root  < left  < right -> swap root, right
-    //          : left  < root  < right -> swap root, right
-    //          : root  < right < left  -> swap root, left
-    //          : right < root  < left  -> swap root, left
-    //          : right < left  < root  -> no swap
-    //          : left  < right < root  -> no swap
-    //  .none < everything
-    //  equal values go left < right < root
-
   }
 
-  func isHeapThree(rootNodeIndex: Int) -> Bool {
-    let leftChildIndex = 2 * rootNodeIndex + 1
-    let rightChildIndex = 2 * rootNodeIndex + 2
-
-    let rootValue = self[rootNodeIndex]!
-    let leftValueOptional = self[leftChildIndex]
-    let rightValueOptional = self[rightChildIndex]
-
-    switch (leftValueOptional, rightValueOptional) {
-    case let (.some(leftValue), .some(rightValue)):
-      return leftValue <= rootValue && rightValue <= rootValue
-    case let (.some(leftValue), .none):
-      return leftValue <= rootValue
-    case let (.none, .some(rightValue)):
-      return rightValue <= rootValue
-    case (.none, .none):
-      return true
-    }
-  }
-
-  func isHeapThreeAll() -> Bool {
-    var result: Bool = true
-    for nodeIndex in indexes.indices.reversed() {
-      let thisResult = isHeapThree(rootNodeIndex: nodeIndex)
-      assert(thisResult)
-      result = result && thisResult
-    }
-    return result
-//    indexes.indices.reversed().allSatisfy {isHeapThree(rootNodeIndex:$0)}
-  }
-  
   /// starts at last entry in last inner node
   /// calls heapThree on each
   /// works backward to beginning of array
-  mutating func makeHeap() {
-    for nodeIndex in indexes.indices.reversed() {
-      heapThree(rootNodeIndex: nodeIndex)
+  /// TODO: don't run on leaves
+  internal mutating func makeHeap(comparator: (Base.Element, Base.Element) -> Bool) {
+    for nodeIndex in permutation.indices.reversed() {
+      heapThree(rootNodeIndex: nodeIndex,
+                comparator: comparator)
     }
   }
 }
  
 //===----------------------------------------------------------------------===//
-// heap()
+// heap(comparator: @escaping (Element, Element) -> Bool) -> Heap<Self>
 //===----------------------------------------------------------------------===//
 
 extension Collection {
-  public func heap() -> Heap<Self> where Self: Comparable {
-    return Heap(self)
+  public func heap(comparator: @escaping (Element, Element) -> Bool) -> Heap<Self>
+    where Self: Comparable {
+    return Heap(self, comparator: comparator)
   }
 }
