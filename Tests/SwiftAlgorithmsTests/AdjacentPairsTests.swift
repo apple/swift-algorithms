@@ -25,7 +25,7 @@ final class AdjacentPairsTests: XCTestCase {
     
     func testLazyAdjacentPairs() {
       let list = "ABCDEF".unicodeScalars.lazy
-      let lazyPairs = list.lazy.adjacentPairs
+      let lazyPairs = list.adjacentPairs
       let expectedResult = [("A", "B"), ("B", "C"), ("C", "D"), ("D", "E"), ("E", "F")]
       
       XCTAssertEqual(lazyPairs.first?.trailing, "B")
