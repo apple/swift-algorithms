@@ -10,8 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 /// A heap view of a collection's elements.
-public struct Heap<Base> where Base: Collection,
-                               Base.Element : Comparable {
+public struct Heap<Base> where Base: Collection {
   private let base: Base
   /** the permutation are stored as an array of indices into the base
    * possibly there's a more efficient way to store them, for instance
@@ -112,8 +111,6 @@ public struct Heap<Base> where Base: Collection,
     }
     return result
   }
-  /// takes parent node in indexes array as argument.
-  /// postcondition: parent node is greater than immediate chidren.
 
   /**
    * Assigns root node to the max of the root and the two immediate children.
@@ -168,10 +165,11 @@ public struct Heap<Base> where Base: Collection,
     }
   }
 
-  /// starts at last entry in last inner node
-  /// calls heapThree on each
-  /// works backward to beginning of array
-  /// TODO: don't run on leaves
+  /** Creates a heap for a whole collection.
+   *  Starts at the last entry and works backward to beginning.
+   */
+  // TODO: don't run on leaves
+  //       it is straightforward to ignore the last n entries that have no children.
   internal mutating func makeHeap(comparator: (Base.Element, Base.Element) -> Bool) {
     for nodeIndex in permutation.indices.reversed() {
       heapThree(rootNodeIndex: nodeIndex,
@@ -185,8 +183,8 @@ public struct Heap<Base> where Base: Collection,
 //===----------------------------------------------------------------------===//
 
 extension Collection {
-  public func heap(comparator: @escaping (Element, Element) -> Bool) -> Heap<Self>
-    where Self: Comparable {
+  public func heap(comparator: @escaping (Element, Element) -> Bool)
+              -> Heap<Self> {
     return Heap(self, comparator: comparator)
   }
 }

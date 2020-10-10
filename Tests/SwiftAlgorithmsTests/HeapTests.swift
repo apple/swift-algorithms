@@ -17,7 +17,8 @@ final class HeapTests: XCTestCase {
   func testPopCharacters() {
     let arraysToTest = [
       "kdrienspeksanewerdof",
-      "ermdie,kdsap,erl;kamrek;qermdkll;rel;nsn8cvtt3w7flpr9ok2"
+      "ermdie,kdsap,erl;kamrek;qermdkll;rel;nsn8cvtt3w7flpr9ok2",
+      "Woven silk pyjamas exchanged for blue quartz."
     ]
 
     let comparators : [(Character, Character) -> Bool] =
@@ -33,7 +34,6 @@ final class HeapTests: XCTestCase {
             XCTAssert(comparator(newchar, old))
           }
           oldChar = newchar
-          print(newchar)
         }
       }
     }
@@ -59,7 +59,6 @@ final class HeapTests: XCTestCase {
             XCTAssert(comparator(newValue, old))
           }
           oldValue = newValue
-          print(newValue)
         }
       }
     }
