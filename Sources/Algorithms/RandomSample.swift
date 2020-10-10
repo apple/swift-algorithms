@@ -211,9 +211,7 @@ extension Sequence {
       let j = Int.random(in: 0..<result.count, using: &rng)
       result[j] = nextElement
     }
-    
-    // FIXME: necessary?
-    result.shuffle(using: &rng)
+
     return result
   }
   
