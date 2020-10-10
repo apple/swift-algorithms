@@ -13,6 +13,9 @@
 #if canImport(Glibc)
 @_implementationOnly
 import Glibc
+#elseif canImport(ucrt)
+@_implementationOnly
+import ucrt
 #elseif canImport(Darwin)
 @_implementationOnly
 import Darwin
