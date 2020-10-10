@@ -90,6 +90,18 @@ public struct Heap<Base: Collection> where Base.Element : Comparable {
     }
   }
 
+  mutating func pop() -> Base.Element? {
+    if indexes.isEmpty {
+      return .none
+    }
+    let result = self[0]
+    let lastIndex = indexes.popLast()
+    if !indexes.isEmpty, let x = lastIndex {
+      indexes[0] = x
+      heapThree(rootNodeIndex: 0)
+    }
+    return result
+  }
   /// takes parent node in indexes array as argument.
   /// postcondition: parent node is greater than immediate chidren.
 
@@ -103,10 +115,10 @@ public struct Heap<Base: Collection> where Base.Element : Comparable {
     let rightValueOptional = self[rightChildIndex]
 
     switch (leftValueOptional, rightValueOptional) {
-    case let (.some(leftValue), .some(rightValue)) where rootValue < rightValue && leftValue < rightValue:
+    case let (.some(leftValue), .some(rightValue)) where rootValue < rightValue && leftValue <= rightValue:
       let _ = swap(x: rightChildIndex, y: rootNodeIndex)
       heapThree(rootNodeIndex: rightChildIndex)
-    case let (.some(leftValue), .some(rightValue)) where rootValue < leftValue && rightValue < leftValue:
+    case let (.some(leftValue), .some(rightValue)) where rootValue < leftValue && rightValue <= leftValue:
       let _ = swap(x: leftChildIndex, y: rootNodeIndex)
       heapThree(rootNodeIndex: leftChildIndex)
         //swap root, left

@@ -123,4 +123,18 @@ final class HeapTests: XCTestCase {
     XCTAssert(heap.isHeapThreeAll())
 
   }
+
+
+  func testPop() {
+    let c = "kdrienspeksanewerdof"
+    let arrayUnderTest = c
+
+    var heap = Heap(arrayUnderTest)
+
+    heap.makeHeap()
+
+    while (!heap.indexes.isEmpty) {
+      print(heap.pop()!)
+    }
+  }
 }
