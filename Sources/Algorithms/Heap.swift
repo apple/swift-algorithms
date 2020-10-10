@@ -10,6 +10,15 @@
 //===----------------------------------------------------------------------===//
 
 /// A heap view of a collection's elements.
+
+// Some to-dos:
+// TODO: If the base collection is modified, the heap condition can be
+//   violated. Ideally we'd notice this and recreate the heap.
+// TODO: don't run `heapthree` on leaves in makeHeap
+//       it is straightforward to ignore the last n entries that have no children.
+// TODO: figure out if we can do better than creating an array of permutations.
+// TODO: figure out if we can store the comparator closure as non-escaping.
+
 public struct Heap<Base> where Base: Collection {
   private let base: Base
   /** the permutation are stored as an array of indices into the base
@@ -18,8 +27,7 @@ public struct Heap<Base> where Base: Collection {
    * The heap condition holds for the elements that this array points to.
    *
   */
-  // TODO: If the base collection is modified, the heap condition can be
-  //   violated. Ideally we'd notice this and recreate the heap.
+
   private var permutation: Array<Base.Index>
 
   /*
@@ -168,8 +176,6 @@ public struct Heap<Base> where Base: Collection {
   /** Creates a heap for a whole collection.
    *  Starts at the last entry and works backward to beginning.
    */
-  // TODO: don't run on leaves
-  //       it is straightforward to ignore the last n entries that have no children.
   internal mutating func makeHeap(comparator: (Base.Element, Base.Element) -> Bool) {
     for nodeIndex in permutation.indices.reversed() {
       heapThree(rootNodeIndex: nodeIndex,
