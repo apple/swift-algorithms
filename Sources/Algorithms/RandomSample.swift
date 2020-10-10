@@ -143,9 +143,7 @@ extension Collection {
         formIndex(after: &i)
       }
     }
-    
-    // FIXME: necessary?
-    result.shuffle(using: &rng)
+
     return result
   }
   
