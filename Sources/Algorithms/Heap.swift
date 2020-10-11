@@ -14,23 +14,21 @@
 // Some to-dos:
 // TODO: If the base collection is modified, the heap condition can be
 //   violated. Ideally we'd notice this and recreate the heap.
-// TODO: don't run `heapthree` on leaves in makeHeap
-//       it is straightforward to ignore the last n entries that have no children.
 // TODO: figure out if we can do better than creating an array of permutations.
 // TODO: figure out if we can store the comparator closure as non-escaping.
 
 public struct Heap<Base> where Base: Collection {
   private let base: Base
-  /** the permutation are stored as an array of indices into the base
-   * possibly there's a more efficient way to store them, for instance
+
+  /**
+   * The permutation as an array of indices into the base collection.
+   * Possibly there's a more efficient way to store them, for instance
    * only storing transpositions.
    * The heap condition holds for the elements that this array points to.
-   *
   */
-
   private var permutation: Array<Base.Index>
 
-  /*
+  /**
    * comparator should return true if right-hand-side should go
    * toward the root of the tree (in a max-heap, if lhs <= rhs)
    * The comparator must be escaping because we are storing it, even though
@@ -55,17 +53,20 @@ public struct Heap<Base> where Base: Collection {
     self.base = base
     self.permutation = Array(base.indices)
     self.comparator = comparator
+    self.collectionCount = base.count
+
     self.makeHeap(comparator: self.comparator)
   }
 
-  /** Swaps two entries in the array of indices
+  /**
+   * Swaps two entries in the array of indices
    * Returns true if swap happened
    *    otherwise false
    * Will not swap if indices out of range
    * Will not swap and will return false if indices are the same
    *
    */
-  mutating func swap(x: Array<Base.Index>.Index,
+  private mutating func swap(x: Array<Base.Index>.Index,
                      y: Array<Base.Index>.Index) -> Bool {
     if x != y &&
         permutation.indices.contains(x) &&
@@ -95,6 +96,27 @@ public struct Heap<Base> where Base: Collection {
       }
     }
   }
+
+  /**
+   * How many items are left in the heap.
+   * This is less than the number of items in the collection.
+   *  zero if the heap is empty or the base collection is empty
+   */
+  public var count : Int {
+    permutation.count
+  }
+
+  /**
+   * How many items have been consumed using pop().
+   */
+  public var consumedCount : Int {
+    base.count - permutation.count
+  }
+
+  /**
+   * The base collection count
+   */
+  public let collectionCount : Int
 
   /**
    * Returns and removes the root element.
@@ -173,11 +195,27 @@ public struct Heap<Base> where Base: Collection {
     }
   }
 
-  /** Creates a heap for a whole collection.
-   *  Starts at the last entry and works backward to beginning.
+  /**
+   * Creates a heap for a whole collection.
+   *  Starts at the last entry in the next-to-last rank of entries in
+   *  the binary tree and works backward to beginning.
    */
   internal mutating func makeHeap(comparator: (Base.Element, Base.Element) -> Bool) {
-    for nodeIndex in permutation.indices.reversed() {
+
+    let ceilLg2 = count.bitWidth - count.leadingZeroBitCount // if this is 0, count == 0
+
+    if ceilLg2 == 0 {
+      return
+    }
+
+    let floorLg2 = ceilLg2 - 1
+    // 2^(floor[lg2 n] - 1) is the index of the beginning of the last row
+    // TODO: The last entries in the next-to-last row may not have
+    //         children--you could also skip them at the expense of
+    //         more calculation.
+    let lastInternalEntry = 1 << floorLg2
+
+    for nodeIndex in (0..<lastInternalEntry).reversed() {
       heapThree(rootNodeIndex: nodeIndex,
                 comparator: comparator)
     }
