@@ -16,6 +16,10 @@
 extension Collection {
   /// Returns a collection for all contiguous windows of length size. The windows overlap.
   /// If the slice is shorter than `size`, the collection returns an empty subsequence.
+  ///
+  /// - Complexity: O(*n*). When iterating over the resulting collection,
+  ///   accessing each successive window has a complexity of O(*m*), where *m*
+  ///   is the length of the window.
   public func windows(size: Int) -> Windows<Self> {
     Windows(base: self, size: size)
   }
@@ -37,21 +41,25 @@ public struct Windows<Base: Collection> {
   public let base: Base
   public let size: Int
   
-  public let startIndex: Index
-  public let endIndex: Index
+  private var firstUpperBound: Base.Index?
+  
+  public var startIndex: Index {
+    if let upperBound = firstUpperBound {
+      return Index(lowerBound: base.startIndex, upperBound: upperBound)
+    } else {
+      return endIndex
+    }
+  }
+  
+  public var endIndex: Index {
+    Index(lowerBound: base.endIndex, upperBound: base.endIndex)
+  }
   
   public init(base: Base, size: Int) {
     precondition(size > 0, "Windows size must be greater than zero")
     self.base = base
     self.size = size
-    let limit = base.count - size
-    if limit > 0, let firstUpperBound = base.index(base.startIndex, offsetBy: size, limitedBy: base.endIndex) {
-      startIndex = Index(lowerBound: base.startIndex, upperBound: firstUpperBound)
-      endIndex = Index(lowerBound: base.endIndex, upperBound: base.endIndex)
-    } else {
-      startIndex = Index(lowerBound: base.startIndex, upperBound: base.startIndex)
-      endIndex = startIndex
-    }
+    self.firstUpperBound = base.index(base.startIndex, offsetBy: size, limitedBy: base.endIndex)
   }
 }
 
@@ -59,6 +67,7 @@ extension Windows: Collection {
   public subscript(index: Index) -> Base.SubSequence {
     base[index.lowerBound..<index.upperBound]
   }
+  
   public func index(after index: Index) -> Index {
     guard index.upperBound < base.endIndex else { return endIndex }
     return Index(lowerBound: base.index(after: index.lowerBound), upperBound: base.index(after: index.upperBound))
@@ -67,8 +76,11 @@ extension Windows: Collection {
 
 extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
   public func index(before index: Index) -> Index {
-    guard let lowerBound = base.index(index.lowerBound, offsetBy: -size, limitedBy: base.startIndex) else { return startIndex }
-    return Index(lowerBound: lowerBound, upperBound: index == endIndex ? index.upperBound : base.index(before: index.upperBound))
+    if index == endIndex {
+      return Index(lowerBound: base.index(index.lowerBound, offsetBy: -size), upperBound: index.upperBound)
+    } else {
+      return Index(lowerBound: base.index(before: index.lowerBound), upperBound: base.index(before: index.upperBound))
+    }
   }
 }
 

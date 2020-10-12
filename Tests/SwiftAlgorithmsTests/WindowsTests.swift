@@ -70,5 +70,15 @@ final class WindowsTests: XCTestCase {
       let w2 = a.windows(size: 3)
       XCTAssertEqualSequences(w2.last ?? [], [3, 4, 5])
     }
+    
+    do {
+      let a = [0, 1, 2, 3, 4, 5].windows(size: 2)
+      var i = a.startIndex
+      a.formIndex(after: &i)
+      a.formIndex(after: &i)
+      a.formIndex(before: &i)
+      XCTAssertEqualSequences(a[i], [1, 2])
+    }
+
   }
 }

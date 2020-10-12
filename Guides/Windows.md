@@ -29,15 +29,20 @@ extension Collection {
 
 If a size larger than the collection length is specified, an empty collection is returned. Due to this 
 behaviour the indexes must be calculated on initialisation as we have to be able to compare the 
-`upperBound` in each window slice.
+`upperBound` and allow `Collection` correctly calculate `isEmpty`  .
 
 ```swift
 [1, 2, 3].windows(size: 5).isEmpty // true
 ```
 
+The resulting `Windows` type is a collection, with conditional conformance to the 
+`BidirectionalCollection`, and `RandomAccessCollection`  when the base collection
+conforms.
+
 ### Complexity
 
-O(_N_) time and O(_1_) space complexity.
+The algorithm is O(_N_) time and O(_1_) space complexity.
+Calling `[1, 2, 3].windows(size: k)` would result in O(_k_). 
 
 ### Naming
 
