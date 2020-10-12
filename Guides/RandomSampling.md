@@ -95,7 +95,7 @@ unstable implementation of `randomSample` explicitly shuffles the elements
 before returning them. 
 
 To see the bias without shuffling, consider the following example that uses a
-hypothetical `randomElementsUnshuffled` method. When selecting three out of 
+hypothetical `randomSampleUnshuffled` method. When selecting three out of 
 four elements from an array, whenever any of the first three elements are 
 included in the result, they are always in their original positions. Elements 
 selected after the initial `count` are in randomly selected positions.
@@ -104,19 +104,19 @@ selected after the initial `count` are in randomly selected positions.
 // This shows the behavior WITHOUT post-sample shuffling.
 // Selecting 3/4 elements, there are only four possible outcomes:
 let source = [10, 20, 30, 40]
-source.randomElementsUnshuffled(count: 3)  // [10, 20, 30]
-source.randomElementsUnshuffled(count: 3)  // [40, 20, 30]
-source.randomElementsUnshuffled(count: 3)  // [10, 40, 30]
-source.randomElementsUnshuffled(count: 3)  // [10, 20, 40]
+source.randomSampleUnshuffled(count: 3)  // [10, 20, 30]
+source.randomSampleUnshuffled(count: 3)  // [40, 20, 30]
+source.randomSampleUnshuffled(count: 3)  // [10, 40, 30]
+source.randomSampleUnshuffled(count: 3)  // [10, 20, 40]
 ```
 
-The proposed `randomElements` method has no positional bias:
+The proposed `randomSample` method has no positional bias:
 
 ```swift
 // The current behavior shuffles the elements, erasing the bias:
 let source = [10, 20, 30, 40]
-source.randomElements(count: 3)  // [20, 30, 10]
-source.randomElements(count: 3)  // [40, 20, 30]
+source.randomSample(count: 3)  // [20, 30, 10]
+source.randomSample(count: 3)  // [40, 20, 30]
 // ...several more possible outcomes
 ```
 
