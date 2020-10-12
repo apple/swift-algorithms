@@ -209,7 +209,20 @@ extension Chain: Collection where Base1: Collection, Base2: Collection {
     }
   }
   
-  // TODO: Add distance(from:to:)
+  public func distance(from start: Index, to end: Index) -> Int {
+    switch (start.position, end.position) {
+    case let (.first(i), .first(j)):
+      return base1.distance(from: i, to: j)
+    case let (.second(i), .second(j)):
+      return base2.distance(from: i, to: j)
+    case let (.first(i), .second(j)):
+      return base1.distance(from: i, to: base1.endIndex)
+        + base2.distance(from: base2.startIndex, to: j)
+    case let (.second(i), .first(j)):
+      return base2.distance(from: i, to: base2.startIndex)
+        + base1.distance(from: base1.endIndex, to: j)
+    }
+  }
 }
 
 extension Chain: BidirectionalCollection
