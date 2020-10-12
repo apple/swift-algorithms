@@ -24,14 +24,11 @@ extension Collection {
 public struct Windows<Base: Collection> {
   
   public struct Index: Comparable {
-    
     internal var lowerBound: Base.Index
     internal var upperBound: Base.Index
-    
     public static func == (lhs: Index, rhs: Index) -> Bool {
-      lhs.lowerBound == rhs.upperBound && lhs.upperBound == rhs.upperBound
+      lhs.lowerBound == rhs.lowerBound && lhs.upperBound == rhs.upperBound
     }
-    
     public static func < (lhs: Index, rhs: Index) -> Bool {
       lhs.upperBound < rhs.upperBound
     }
@@ -55,16 +52,13 @@ public struct Windows<Base: Collection> {
       startIndex = Index(lowerBound: base.startIndex, upperBound: base.startIndex)
       endIndex = startIndex
     }
-    
   }
 }
 
 extension Windows: Collection {
-  
   public subscript(index: Index) -> Base.SubSequence {
     base[index.lowerBound..<index.upperBound]
   }
-  
   public func index(after index: Index) -> Index {
     guard index.upperBound < base.endIndex else { return endIndex }
     return Index(lowerBound: base.index(after: index.lowerBound), upperBound: base.index(after: index.upperBound))
@@ -72,7 +66,6 @@ extension Windows: Collection {
 }
 
 extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
-  
   public func index(before index: Index) -> Index {
     guard let lowerBound = base.index(index.lowerBound, offsetBy: -size, limitedBy: base.startIndex) else { return startIndex }
     return Index(lowerBound: lowerBound, upperBound: index == endIndex ? index.upperBound : base.index(before: index.upperBound))
@@ -80,7 +73,6 @@ extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
 }
 
 extension Windows: RandomAccessCollection where Base: RandomAccessCollection {}
-
 extension Windows: Equatable where Base: Equatable {}
 extension Windows: Hashable where Base: Hashable, Base.Index: Hashable {}
 extension Windows.Index: Hashable where Base.Index: Hashable {}
