@@ -31,10 +31,10 @@ public struct Windows<Base: Collection> {
     internal var lowerBound: Base.Index
     internal var upperBound: Base.Index
     public static func == (lhs: Index, rhs: Index) -> Bool {
-      lhs.lowerBound == rhs.lowerBound && lhs.upperBound == rhs.upperBound
+      lhs.lowerBound == rhs.lowerBound
     }
     public static func < (lhs: Index, rhs: Index) -> Bool {
-      lhs.upperBound < rhs.upperBound
+      lhs.lowerBound < rhs.lowerBound
     }
   }
   
