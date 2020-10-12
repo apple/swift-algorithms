@@ -31,14 +31,14 @@ final class WindowsTests: XCTestCase {
   }
   
   func testWindowsOfRange() {
-    let a = (0...100).map{ $0 }
+    let a = 0...100
     
     XCTAssertTrue(a.windows(size: 200).isEmpty)
     
     let w = a.windows(size: 10)
     
-    XCTAssertEqualSequences(w.first ?? [], 0..<10)
-    XCTAssertEqualSequences(w.last ?? [], 91..<101)
+    XCTAssertEqualSequences(w.first!, 0..<10)
+    XCTAssertEqualSequences(w.last!, 91..<101)
   }
   
   func testWindowsOfInt() {
@@ -73,7 +73,7 @@ final class WindowsTests: XCTestCase {
     XCTAssertEqualSequences(snd, [1, 2, 3, 4])
     
     let w2 = a.windows(size: 3)
-    XCTAssertEqualSequences(w2.last ?? [], [3, 4, 5])
+    XCTAssertEqualSequences(w2.last!, [3, 4, 5])
   }
   
   func testWindowsIndexAfterAndBefore() {
