@@ -54,6 +54,50 @@ extension Intersperse: Sequence {
   }
 }
 
+extension Intersperse: Collection where Base: Collection {
+  public struct Index: Comparable {
+    enum Kind {
+      case element
+      case separator
+    }
+    let index: Base.Index
+    let kind: Kind
+
+    public static func < (lhs: Index, rhs: Index) -> Bool {
+      if lhs.index < rhs.index { return true }
+      if lhs.index > rhs.index { return false }
+      if lhs.kind == .element, rhs.kind == .separator { return true }
+      return false
+    }
+  }
+
+  public var startIndex: Index {
+    Index(index: base.startIndex, kind: .element)
+  }
+
+  public var endIndex: Index {
+    Index(index: base.endIndex, kind: .element)
+  }
+
+  public func index(after i: Index) -> Index {
+    switch i.kind {
+    case .element where base.index(after: i.index) == base.endIndex:
+      return endIndex
+    case .element:
+      return Index(index: i.index, kind: .separator)
+    case .separator:
+      return Index(index: base.index(after: i.index), kind: .element)
+    }
+  }
+
+  public subscript(position: Index) -> Element {
+    switch position.kind {
+    case .element: return base[position.index]
+    case .separator: return separator
+    }
+  }
+}
+
 extension Sequence {
 
   /// Returns a sequence containing elements of this sequence with the given

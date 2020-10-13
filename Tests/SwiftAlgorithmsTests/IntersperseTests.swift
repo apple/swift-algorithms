@@ -28,4 +28,9 @@ final class IntersperseTests: XCTestCase {
   func testArrayEmpty() {
     XCTAssertEqualSequences([].interspersed(with: 0), [])
   }
+
+  func testCollection() {
+    let interspersed = ["A","B","C","D"].interspersed(with: "-")
+    XCTAssertEqual(interspersed.count, 7)
+  }
 }

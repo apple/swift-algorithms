@@ -30,7 +30,8 @@ extension Sequence {
 ```
 
 The new `Intersperse` type represents the sequence when the separator is
-inserted between each element.
+inserted between each element. It conforms to Collection when the underlying
+sequence conforms to Collection.
 
 ### Complexity
 
