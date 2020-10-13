@@ -18,9 +18,8 @@ extension Collection {
   /// windows overlap. If the slice is shorter than `size`, the collection
   /// returns an empty subsequence.
   ///
-  /// - Complexity: O(*n*). When iterating over the resulting collection,
-  ///   accessing each successive window has a complexity of O(*m*), where *m*
-  ///   is the length of the window.
+  /// - Complexity: O(*k*). When iterating over the resulting collection,
+  ///   accessing each successive window has a complexity of O(1).
   public func windows(size: Int) -> Windows<Self> {
     Windows(base: self, size: size)
   }
