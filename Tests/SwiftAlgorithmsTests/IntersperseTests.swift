@@ -33,4 +33,9 @@ final class IntersperseTests: XCTestCase {
     let interspersed = ["A","B","C","D"].interspersed(with: "-")
     XCTAssertEqual(interspersed.count, 7)
   }
+
+  func testBidirectionalCollection() {
+    let reversed = "ABCDE".interspersed(with: "-").reversed()
+    XCTAssertEqualSequences(reversed, "E-D-C-B-A")
+  }
 }

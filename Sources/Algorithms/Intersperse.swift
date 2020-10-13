@@ -98,6 +98,21 @@ extension Intersperse: Collection where Base: Collection {
   }
 }
 
+extension Intersperse: BidirectionalCollection
+  where Base: BidirectionalCollection
+{
+  public func index(before i: Index) -> Index {
+    switch i.kind {
+    case .element where i.index == base.endIndex:
+      return Index(index: base.index(before: i.index), kind: .element)
+    case .element:
+      return Index(index: base.index(before: i.index), kind: .separator)
+    case .separator:
+      return Index(index: i.index, kind: .element)
+    }
+  }
+}
+
 extension Sequence {
 
   /// Returns a sequence containing elements of this sequence with the given
