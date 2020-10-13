@@ -84,13 +84,17 @@ extension Chain: Collection where Base1: Collection, Base2: Collection {
       }
     }
   }
+  
+  /// Converts an index of `Base1` to the corresponding `Index` by mapping
+  /// `base1.endIndex` to `base2.startIndex`.
+  internal func convertIndex(_ i: Base1.Index) -> Index {
+    i == base1.endIndex ? Index(second: base2.startIndex) : Index(first: i)
+  }
 
   public var startIndex: Index {
-    // If `base1` is empty, then `base2.startIndex` is either a valid position
-    // of the first element in `base2` or equal to `base2.endIndex`.
-    return base1.isEmpty
-      ? Index(second: base2.startIndex)
-      : Index(first: base1.startIndex)
+    // if `base1` is empty, this will return `base2.startIndex` - if `base2` is
+    // also empty, this will correctly equal `base2.endIndex`
+    convertIndex(base1.startIndex)
   }
 
   public var endIndex: Index {
@@ -110,10 +114,7 @@ extension Chain: Collection where Base1: Collection, Base2: Collection {
     switch i.position {
     case let .first(i):
       assert(i != base1.endIndex)
-      let next = base1.index(after: i)
-      return next == base1.endIndex
-        ? Index(second: base2.startIndex)
-        : Index(first: next)
+      return convertIndex(base1.index(after: i))
     case let .second(i):
       return Index(second: base2.index(after: i))
     }
@@ -142,27 +143,27 @@ extension Chain: Collection where Base1: Collection, Base2: Collection {
   ) -> Index? {
     switch (i.position, limit.position) {
     case let (.first(i), .first(limit)):
-      let d = base1.distance(from: i, to: base1.endIndex)
-      if n < d {
+      if limit >= i {
+        // `limit` is relevant, so `base2` cannot be reached
         return base1.index(i, offsetBy: n, limitedBy: limit)
           .map(Index.init(first:))
+      } else if let j = base1.index(i, offsetBy: n, limitedBy: base1.endIndex) {
+        // the offset stays within the bounds of `base1`
+        return convertIndex(j)
       } else {
-        // The limit only has an effect here if it's "above" `i`
-        if limit >= i {
-          return Index(first: limit)
-        } else {
-          return Index(
-            second: base2.index(base2.startIndex, offsetBy: n - d))
-        }
+        // the offset overflows the bounds of `base1` by `n - d`
+        let d = base1.distance(from: i, to: base1.endIndex)
+        return Index(second: base2.index(base2.startIndex, offsetBy: n - d))
       }
     
     case let (.first(i), .second(limit)):
-      let d = base1.distance(from: i, to: base1.endIndex)
-      if n < d {
-        return Index(first: base1.index(i, offsetBy: n))
+      if let j = base1.index(i, offsetBy: n, limitedBy: base1.endIndex) {
+        // the offset stays within the bounds of `base1`
+        return convertIndex(j)
       } else {
-        return base2.index(
-          base2.startIndex, offsetBy: n - d, limitedBy: limit)
+        // the offset overflows the bounds of `base1` by `n - d`
+        let d = base1.distance(from: i, to: base1.endIndex)
+        return base2.index(base2.startIndex, offsetBy: n - d, limitedBy: limit)
           .map(Index.init(second:))
       }
       
@@ -189,22 +190,28 @@ extension Chain: Collection where Base1: Collection, Base2: Collection {
       return Index(first: base1.index(i, offsetBy: -n))
       
     case let (.second(i), .first(limit)):
-      let d = base2.distance(from: base2.startIndex, to: i)
-      if n <= d {
-        return Index(second: base2.index(i, offsetBy: -n))
+      if let j = base2.index(i, offsetBy: -n, limitedBy: base2.startIndex) {
+        // the offset stays within the bounds of `base2`
+        return Index(second: j)
       } else {
-        return base1.index(base1.endIndex, offsetBy: -n - d, limitedBy: limit)
+        // the offset overflows the bounds of `base2` by `n - d`
+        let d = base2.distance(from: base2.startIndex, to: i)
+        return base1.index(base1.endIndex, offsetBy: -(n - d), limitedBy: limit)
           .map(Index.init(first:))
       }
 
     case let (.second(i), .second(limit)):
-      let d = base2.distance(from: base2.startIndex, to: i)
-      if n <= d {
+      if limit <= i {
+        // `limit` is relevant, so `base1` cannot be reached
         return base2.index(i, offsetBy: -n, limitedBy: limit)
           .map(Index.init(second:))
+      } else if let j = base2.index(i, offsetBy: -n, limitedBy: base2.startIndex) {
+        // the offset stays within the bounds of `base2`
+        return Index(second: j)
       } else {
-        return Index(
-          first: base1.index(base1.endIndex, offsetBy: -n - d))
+        // the offset overflows the bounds of `base2` by `n - d`
+        let d = base2.distance(from: base2.startIndex, to: i)
+        return Index(first: base1.index(base1.endIndex, offsetBy: -(n - d)))
       }
     }
   }
