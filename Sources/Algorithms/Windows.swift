@@ -17,9 +17,9 @@ extension Collection {
   /// A collection for all contiguous windows of length size, the
   /// windows overlap.
   ///
-  /// - Complexity:  O(1) if the collection conforms to
-  /// `RandomAccessCollection`, otherwise O(*k*) where `k` is `size`.
-  /// Access to the next window is O(1).
+  /// - Complexity: O(*1*) if the collection conforms to
+  /// `RandomAccessCollection`, otherwise O(*k*) where `k` is `count`.
+  /// Access to the next window is O(*1*).
   ///
   /// - Parameter count: The number of elements in each window subsequence.
   ///
