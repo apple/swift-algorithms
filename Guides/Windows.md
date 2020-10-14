@@ -6,24 +6,24 @@
 Break a collection into overlapping contiguous window subsequences where
 elements are slices from the original collection.
 
-The `windows(size:)` method takes in a integer size and returns a collection of 
+The `windows(ofCount:)` method takes in a integer size and returns a collection of 
 subsequences.
 
 ```swift
 let swift = "swift"
 
-let windowed = swift.windows(size: 2) 
+let windowed = swift.windows(ofCount: 2) 
 // windowed == [ "sw", "wi", "if", "ft" ]
 ```
 
 ## Detailed Design
 
-The `windows(size:)` is added as a method on an extension of  `Collection`
+The `windows(ofCount:)` is added as a method on an extension of  `Collection`
 
 ```swift
 extension Collection {
-  public func windows(size: Int) -> Windows<Self> {
-    Windows(base: self, size: size)
+  public func windows(ofCount count: Int) -> Windows<Self> {
+    Windows(base: self, size: count)
   }
 }
 ```
@@ -42,7 +42,7 @@ conforms.
 
 ### Complexity
 
-The call to `windows(size: k)` is O(_1_) if the collection conforms to 
+The call to `windows(ofCount: k)` is O(_1_) if the collection conforms to 
 `RandomAccessCollection`, otherwise O(_k_). Access to the next window is O(_1_).
 
 ### Naming
