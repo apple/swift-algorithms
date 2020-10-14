@@ -14,14 +14,19 @@
 //===----------------------------------------------------------------------===//
 
 extension Collection {
-  /// Returns a collection for all contiguous windows of length size. The
-  /// windows overlap. If the slice is shorter than `size`, the collection
-  /// returns an empty subsequence.
   ///
-  /// - Complexity: O(*k*). When iterating over the resulting collection,
-  ///   accessing each successive window has a complexity of O(1).
-  public func windows(size: Int) -> Windows<Self> {
-    Windows(base: self, size: size)
+  ///
+  /// - Complexity:  O(1) if the collection conforms to
+  /// `RandomAccessCollection`, otherwise O(*k*) where `k` is `size`.
+  /// Access to the next window is O(1).
+  ///
+  /// - Parameter count: The number of elements in each window subsequence.
+  ///
+  /// - Returns: A collection for all contiguous windows of length size. The
+  /// windows overlap. If the collection is shorter than `size` the resulting
+  /// Windows collection will be empty.
+  public func windows(ofCount count: Int) -> Windows<Self> {
+    Windows(base: self, size: count)
   }
 }
 
@@ -30,13 +35,13 @@ public struct Windows<Base: Collection> {
   public let base: Base
   public let size: Int
   
-  private var fub: Base.Index?
+  private var firstUpperBound: Base.Index?
 
-  public init(base b: Base, size s: Int) {
-    precondition(s > 0, "Windows size must be greater than zero")
-    self.base = b
-    self.size = s
-    self.fub = base.index(b.startIndex, offsetBy: s, limitedBy: b.endIndex)
+  init(base: Base, size: Int) {
+    precondition(size > 0, "Windows size must be greater than zero")
+    self.base = base
+    self.size = size
+    self.firstUpperBound = base.index(base.startIndex, offsetBy: size, limitedBy: base.endIndex)
   }
 }
 
@@ -54,7 +59,7 @@ extension Windows: Collection {
   }
   
   public var startIndex: Index {
-    if let upperBound = fub {
+    if let upperBound = firstUpperBound {
       return Index(lowerBound: base.startIndex, upperBound: upperBound)
     } else {
       return endIndex
@@ -66,7 +71,8 @@ extension Windows: Collection {
   }
   
   public subscript(index: Index) -> Base.SubSequence {
-    base[index.lowerBound..<index.upperBound]
+    precondition(index.lowerBound != index.upperBound, "Windows index is out of range")
+    return base[index.lowerBound..<index.upperBound]
   }
   
   public func index(after index: Index) -> Index {
@@ -76,6 +82,10 @@ extension Windows: Collection {
       upperBound: base.index(after: index.upperBound)
     )
   }
+  
+  // TODO: Implement distance(from:to:), index(_:offsetBy:) and
+  // index(_:offsetBy:limitedBy:)
+
 }
 
 extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
@@ -94,9 +104,7 @@ extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
   }
 }
 
-extension Windows: RandomAccessCollection where Base: RandomAccessCollection {
-  // TODO: Implement distance(from:to:) and index(_:offsetBy:)
-}
+extension Windows: RandomAccessCollection where Base: RandomAccessCollection {}
 extension Windows: Equatable where Base: Equatable {}
 extension Windows: Hashable where Base: Hashable, Base.Index: Hashable {}
 extension Windows.Index: Hashable where Base.Index: Hashable {}
