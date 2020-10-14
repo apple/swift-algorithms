@@ -76,6 +76,7 @@ extension Windows: Collection {
   }
   
   public func index(after index: Index) -> Index {
+    precondition(index < endIndex, "Windows index is out of range")
     guard index.upperBound < base.endIndex else { return endIndex }
     return Index(
       lowerBound: base.index(after: index.lowerBound),
@@ -90,6 +91,7 @@ extension Windows: Collection {
 
 extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
   public func index(before index: Index) -> Index {
+    precondition(index > startIndex, "Windows index is out of range")
     if index == endIndex {
       return Index(
         lowerBound: base.index(index.lowerBound, offsetBy: -size),

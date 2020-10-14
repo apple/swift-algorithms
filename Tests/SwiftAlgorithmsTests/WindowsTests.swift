@@ -15,17 +15,7 @@ import Algorithms
 final class WindowsTests: XCTestCase {
   
   func testWindowsOfString() {
-    
-    do {
-      let a = [1, 2]
-      var i = a.startIndex // 0
-      a.formIndex(after: &i) // 1
-      a.formIndex(after: &i) // 2
-      a.formIndex(after: &i) // 3
-      a.formIndex(after: &i) // 4
-      print(i)
-    }
-    
+
     let s = "swift"
     let w = s.windows(ofCount: 2)
     var i = w.startIndex
@@ -40,7 +30,7 @@ final class WindowsTests: XCTestCase {
 
 //    w.index(after: w.endIndex) // ← Precondition failed: Windows index is out of range
 //    w.index(before: w.startIndex) // ← Precondition failed: Windows index is out of range
-//     w[i] // ← Precondition failed: Windows index is out of range
+//    w.formIndex(after: &i); w[i] // ← Precondition failed: Windows index is out of range
   }
   
   func testWindowsOfRange() {
