@@ -42,8 +42,8 @@ conforms.
 
 ### Complexity
 
-The call to `windows(size: k)` is O(_k_) and access to the next window is O(_1_). If the base 
-collection conforms to `RandomAccessCollection` then both are O(_1_).
+The call to `windows(size: k)` is O(_1_) if the collection conforms to 
+`RandomAccessCollection`, otherwise O(_k_). Access to the next window is O(_1_).
 
 ### Naming
 
