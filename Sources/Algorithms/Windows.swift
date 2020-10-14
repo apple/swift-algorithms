@@ -14,7 +14,8 @@
 //===----------------------------------------------------------------------===//
 
 extension Collection {
-  ///
+  /// A collection for all contiguous windows of length size, the
+  /// windows overlap.
   ///
   /// - Complexity:  O(1) if the collection conforms to
   /// `RandomAccessCollection`, otherwise O(*k*) where `k` is `size`.
@@ -22,8 +23,7 @@ extension Collection {
   ///
   /// - Parameter count: The number of elements in each window subsequence.
   ///
-  /// - Returns: A collection for all contiguous windows of length size. The
-  /// windows overlap. If the collection is shorter than `size` the resulting
+  /// - Returns: If the collection is shorter than `size` the resulting
   /// Windows collection will be empty.
   public func windows(ofCount count: Int) -> Windows<Self> {
     Windows(base: self, size: count)
