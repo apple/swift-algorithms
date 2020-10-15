@@ -32,4 +32,9 @@ final class ProductTests: XCTestCase {
     XCTAssertEqualSequences(product(1...10, "").reversed(), [], by: ==)
     XCTAssertEqualSequences(product("", 1...10).reversed(), [], by: ==)
   }
+  
+  func testProductDistanceFromTo() {
+    let p = product([1, 2], "abc")
+    XCTAssertEqual(p.distance(from: p.startIndex, to: p.endIndex), 6)
+  }
 }

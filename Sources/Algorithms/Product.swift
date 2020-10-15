@@ -120,7 +120,7 @@ extension Product2: Collection where Base1: Collection {
     }
     
     return base2[start.i2...].count + base2[..<end.i2].count
-      + base2.count * (base1.distance(from: start.i1, to: end.i1))
+      + base2.count * (base1.distance(from: start.i1, to: end.i1) - 1)
   }
 
   public subscript(position: Index) -> (Base1.Element, Base2.Element) {
