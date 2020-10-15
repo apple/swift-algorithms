@@ -1,7 +1,7 @@
-# Windows
+# SlidingWindows
 
-[[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Windows.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/WindowsTests.swift)]
+[[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/SlidingWindows.swift) | 
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/SlidingWindowsTests.swift)]
 
 Break a collection into overlapping contiguous window subsequences where
 elements are slices from the original collection.
@@ -22,8 +22,8 @@ The `windows(ofCount:)` is added as a method on an extension of  `Collection`
 
 ```swift
 extension Collection {
-  public func windows(ofCount count: Int) -> Windows<Self> {
-    Windows(base: self, size: count)
+  public func windows(ofCount count: Int) -> SlidingWindows<Self> {
+  SlidingWindows(base: self, size: count)
   }
 }
 ```
@@ -36,7 +36,7 @@ The first upper bound is computed eagerly because it determines if the collectio
 [1, 2, 3].windows(size: 5).isEmpty // true
 ```
 
-The resulting `Windows` type is a collection, with conditional conformance to the 
+The resulting `SlidingWindows` type is a collection, with conditional conformance to the 
 `BidirectionalCollection`, and `RandomAccessCollection`  when the base collection
 conforms.
 

@@ -12,7 +12,7 @@
 import XCTest
 import Algorithms
 
-final class WindowsTests: XCTestCase {
+final class SlidingWindowsTests: XCTestCase {
   
   func testWindowsOfString() {
 
@@ -28,9 +28,9 @@ final class WindowsTests: XCTestCase {
     w.formIndex(after: &i)
     XCTAssertEqualSequences(w[i], "ft")
 
-//    w.index(after: w.endIndex) // ← Precondition failed: Windows index is out of range
-//    w.index(before: w.startIndex) // ← Precondition failed: Windows index is out of range
-//    w.formIndex(after: &i); w[i] // ← Precondition failed: Windows index is out of range
+//    w.index(after: w.endIndex) // ← Precondition failed: SlidingWindows index is out of range
+//    w.index(before: w.startIndex) // ← Precondition failed: SlidingWindows index is out of range
+//    w.formIndex(after: &i); w[i] // ← Precondition failed: SlidingWindows index is out of range
   }
   
   func testWindowsOfRange() {

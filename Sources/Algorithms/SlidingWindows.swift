@@ -24,13 +24,13 @@ extension Collection {
   /// - Parameter count: The number of elements in each window subsequence.
   ///
   /// - Returns: If the collection is shorter than `size` the resulting
-  /// Windows collection will be empty.
-  public func windows(ofCount count: Int) -> Windows<Self> {
-    Windows(base: self, size: count)
+  /// SlidingWindows collection will be empty.
+  public func windows(ofCount count: Int) -> SlidingWindows<Self> {
+    SlidingWindows(base: self, size: count)
   }
 }
 
-public struct Windows<Base: Collection> {
+public struct SlidingWindows<Base: Collection> {
   
   public let base: Base
   public let size: Int
@@ -38,14 +38,14 @@ public struct Windows<Base: Collection> {
   private var firstUpperBound: Base.Index?
 
   init(base: Base, size: Int) {
-    precondition(size > 0, "Windows size must be greater than zero")
+    precondition(size > 0, "SlidingWindows size must be greater than zero")
     self.base = base
     self.size = size
     self.firstUpperBound = base.index(base.startIndex, offsetBy: size, limitedBy: base.endIndex)
   }
 }
 
-extension Windows: Collection {
+extension SlidingWindows: Collection {
   
   public struct Index: Comparable {
     internal var lowerBound: Base.Index
@@ -71,7 +71,7 @@ extension Windows: Collection {
   }
   
   public subscript(index: Index) -> Base.SubSequence {
-    precondition(index.lowerBound != index.upperBound, "Windows index is out of range")
+    precondition(index.lowerBound != index.upperBound, "SlidingWindows index is out of range")
     return base[index.lowerBound..<index.upperBound]
   }
   
@@ -89,7 +89,7 @@ extension Windows: Collection {
 
 }
 
-extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
+extension SlidingWindows: BidirectionalCollection where Base: BidirectionalCollection {
   public func index(before index: Index) -> Index {
     precondition(index > startIndex, "Incrementing past start index")
     if index == endIndex {
@@ -106,7 +106,7 @@ extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
   }
 }
 
-extension Windows: RandomAccessCollection where Base: RandomAccessCollection {}
-extension Windows: Equatable where Base: Equatable {}
-extension Windows: Hashable where Base: Hashable, Base.Index: Hashable {}
-extension Windows.Index: Hashable where Base.Index: Hashable {}
+extension SlidingWindows: RandomAccessCollection where Base: RandomAccessCollection {}
+extension SlidingWindows: Equatable where Base: Equatable {}
+extension SlidingWindows: Hashable where Base: Hashable, Base.Index: Hashable {}
+extension SlidingWindows.Index: Hashable where Base.Index: Hashable {}
