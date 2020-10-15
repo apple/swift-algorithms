@@ -91,27 +91,22 @@ extension Product2: Collection where Base1: Collection {
   }
   
   public var startIndex: Index {
-    base1.isEmpty || base2.isEmpty
-      ? endIndex
-      : Index(i1: base1.startIndex, i2: base2.startIndex)
+    Index(
+      i1: base2.isEmpty ? base1.endIndex : base1.startIndex,
+      i2: base2.startIndex)
   }
   
   public var endIndex: Index {
-    Index(i1: base1.endIndex, i2: base2.endIndex)
+    // `base2.startIndex` simplifies index calculations.
+    Index(i1: base1.endIndex, i2: base2.startIndex)
   }
   
   public func index(after i: Index) -> Index {
-    precondition(i.i1 != base1.endIndex && i.i2 != base2.endIndex,
-                 "Can't advance past endIndex")
+    precondition(i.i1 != base1.endIndex, "Can't advance past endIndex")
     let newIndex2 = base2.index(after: i.i2)
-    if newIndex2 < base2.endIndex {
-      return Index(i1: i.i1, i2: newIndex2)
-    }
-    
-    let newIndex1 = base1.index(after: i.i1)
-    return newIndex1 == base1.endIndex
-      ? endIndex
-      : Index(i1: newIndex1, i2: base2.startIndex)
+    return newIndex2 == base2.endIndex
+      ? Index(i1: base1.index(after: i.i1), i2: base2.startIndex)
+      : Index(i1: i.i1, i2: newIndex2)
   }
   
   // TODO: Implement index(_:offsetBy:) and index(_:offsetBy:limitedBy:)
@@ -125,7 +120,7 @@ extension Product2: Collection where Base1: Collection {
     }
     
     return base2[start.i2...].count + base2[..<end.i2].count
-      + base2.count * (base1.distance(from: start.i1, to: end.i1))
+      + base2.count * (base1.distance(from: start.i1, to: end.i1) - 1)
   }
 
   public subscript(position: Index) -> (Base1.Element, Base2.Element) {
@@ -140,12 +135,12 @@ extension Product2: BidirectionalCollection
     precondition(i != startIndex,
                  "Can't move before startIndex")
     if i.i2 == base2.startIndex {
+      return Index(
+        i1: base1.index(before: i.i1),
+        i2: base2.index(before: base2.endIndex))
+    } else {
       return Index(i1: i.i1, i2: base2.index(before: i.i2))
     }
-    
-    return Index(
-      i1: base1.index(before: i.i1),
-      i2: base2.index(before: base2.endIndex))
   }
 }
 
