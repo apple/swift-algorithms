@@ -6,24 +6,24 @@
 Break a collection into overlapping contiguous window subsequences where
 elements are slices from the original collection.
 
-The `windows(ofCount:)` method takes in a integer size and returns a collection of 
-subsequences.
+The `slidingWindows(ofCount:)` method takes in a integer size and returns a collection 
+of subsequences.
 
 ```swift
 let swift = "swift"
 
-let windowed = swift.windows(ofCount: 2) 
+let windowed = swift.slidingWindows(ofCount: 2) 
 // windowed == [ "sw", "wi", "if", "ft" ]
 ```
 
 ## Detailed Design
 
-The `windows(ofCount:)` is added as a method on an extension of  `Collection`
+The `slidingWindows(ofCount:)` is added as a method on an extension of  `Collection`
 
 ```swift
 extension Collection {
-  public func windows(ofCount count: Int) -> SlidingWindows<Self> {
-  SlidingWindows(base: self, size: count)
+  public func slidingWindows(ofCount count: Int) -> SlidingWindows<Self> {
+    SlidingWindows(base: self, size: count)
   }
 }
 ```
@@ -33,7 +33,7 @@ The first upper bound is computed eagerly because it determines if the collectio
 `startIndex` returns `endIndex`. 
 
 ```swift
-[1, 2, 3].windows(size: 5).isEmpty // true
+[1, 2, 3].slidingWindows(ofCount: 5).isEmpty // true
 ```
 
 The resulting `SlidingWindows` type is a collection, with conditional conformance to the 
@@ -42,14 +42,20 @@ conforms.
 
 ### Complexity
 
-The call to `windows(ofCount: k)` is O(_1_) if the collection conforms to 
+The call to `slidingWindows(ofCount: k)` is O(_1_) if the collection conforms to 
 `RandomAccessCollection`, otherwise O(_k_). Access to the next window is O(_1_).
 
 ### Naming
 
-The name `window` is adopted from the the commonly known sliding windows problem 
-or algorithm name. Alternatively this could be named `slidingWindows`, however I did 
-not feel the verbosity here was necessary.
+The type `SlidingWindows` takes its name from the algorithm, similarly the method takes
+it's name from it too  `slidingWindows(ofCount: k)`. 
+
+The label on the method `ofCount` was chosen to create a consistent feel to the API 
+available in swift-algorithms repository. Inspiration was taken from 
+`combinations(ofCount:)` and  `permutations(ofCount:)`.
+
+Previously the name `windows` was considered but was deemed to potentially create 
+ambiguity with the Windows operating system. 
 
 ### Comparison with other languages
 

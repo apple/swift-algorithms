@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
-// windows(size:)
+// slidingWindows(ofCount:)
 //===----------------------------------------------------------------------===//
 
 extension Collection {
@@ -25,7 +25,7 @@ extension Collection {
   ///
   /// - Returns: If the collection is shorter than `size` the resulting
   /// SlidingWindows collection will be empty.
-  public func windows(ofCount count: Int) -> SlidingWindows<Self> {
+  public func slidingWindows(ofCount count: Int) -> SlidingWindows<Self> {
     SlidingWindows(base: self, size: count)
   }
 }
