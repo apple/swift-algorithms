@@ -135,12 +135,12 @@ extension Product2: BidirectionalCollection
     precondition(i != startIndex,
                  "Can't move before startIndex")
     if i.i2 == base2.startIndex {
+      return Index(
+        i1: base1.index(before: i.i1),
+        i2: base2.index(before: base2.endIndex))
+    } else {
       return Index(i1: i.i1, i2: base2.index(before: i.i2))
     }
-    
-    return Index(
-      i1: base1.index(before: i.i1),
-      i2: base2.index(before: base2.endIndex))
   }
 }
 
