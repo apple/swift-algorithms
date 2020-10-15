@@ -97,7 +97,7 @@ extension Product2: Collection where Base1: Collection {
   }
   
   public var endIndex: Index {
-    // this representation makes index calculations simpler
+    // `base2.startIndex` simplifies index calculations.
     Index(i1: base1.endIndex, i2: base2.startIndex)
   }
   
