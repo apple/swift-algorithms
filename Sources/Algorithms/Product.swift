@@ -91,27 +91,22 @@ extension Product2: Collection where Base1: Collection {
   }
   
   public var startIndex: Index {
-    base1.isEmpty || base2.isEmpty
-      ? endIndex
-      : Index(i1: base1.startIndex, i2: base2.startIndex)
+    Index(
+      i1: base2.isEmpty ? base1.endIndex : base1.startIndex,
+      i2: base2.startIndex)
   }
   
   public var endIndex: Index {
-    Index(i1: base1.endIndex, i2: base2.endIndex)
+    // this representation makes index calculations simpler
+    Index(i1: base1.endIndex, i2: base2.startIndex)
   }
   
   public func index(after i: Index) -> Index {
-    precondition(i.i1 != base1.endIndex && i.i2 != base2.endIndex,
-                 "Can't advance past endIndex")
+    precondition(i.i1 != base1.endIndex, "Can't advance past endIndex")
     let newIndex2 = base2.index(after: i.i2)
-    if newIndex2 < base2.endIndex {
-      return Index(i1: i.i1, i2: newIndex2)
-    }
-    
-    let newIndex1 = base1.index(after: i.i1)
-    return newIndex1 == base1.endIndex
-      ? endIndex
-      : Index(i1: newIndex1, i2: base2.startIndex)
+    return newIndex2 == base2.endIndex
+      ? Index(i1: base1.index(after: i.i1), i2: base2.startIndex)
+      : Index(i1: i.i1, i2: newIndex2)
   }
   
   // TODO: Implement index(_:offsetBy:) and index(_:offsetBy:limitedBy:)
