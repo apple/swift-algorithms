@@ -38,6 +38,8 @@ extension Cycle: Sequence {
   }
 }
 
+extension Cycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
+
 //===----------------------------------------------------------------------===//
 // cycled()
 //===----------------------------------------------------------------------===//
@@ -71,13 +73,7 @@ extension Collection {
   public func cycled() -> Cycle<Self> {
     Cycle(base: self)
   }
-}
-
-//===----------------------------------------------------------------------===//
-// repeated(count:)
-//===----------------------------------------------------------------------===//
-
-extension Collection {
+  
   /// Returns a sequence that repeats the elements of this collection the
   /// specified number of times.
   ///

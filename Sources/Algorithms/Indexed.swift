@@ -56,8 +56,13 @@ extension Indexed: BidirectionalCollection where Base: BidirectionalCollection {
 }
 
 extension Indexed: RandomAccessCollection where Base: RandomAccessCollection {}
+extension Indexed: LazySequenceProtocol where Base: LazySequenceProtocol {}
 extension Indexed: Equatable where Base: Equatable {}
 extension Indexed: Hashable where Base: Hashable {}
+
+//===----------------------------------------------------------------------===//
+// indexed()
+//===----------------------------------------------------------------------===//
 
 extension Collection {
   /// Returns a collection of pairs *(i, x)*, where *i* represents an index of
