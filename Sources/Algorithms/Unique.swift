@@ -19,10 +19,8 @@ extension Sequence where Element: Hashable {
   public func uniqued() -> [Element] {
     var seen: Set<Element> = []
     var result: [Element] = []
-    for element in self {
-      if seen.insert(element).inserted {
+    for element in self where seen.insert(element).inserted {
         result.append(element)
-      }
     }
     return result
   }
@@ -37,10 +35,8 @@ extension Sequence {
   ) rethrows -> [Element] {
     var seen: Set<Subject> = []
     var result: [Element] = []
-    for element in self {
-      if seen.insert(try projection(element)).inserted {
+    for element in self  where seen.insert(try projection(element)).inserted{
         result.append(element)
-      }
     }
     return result
   }
