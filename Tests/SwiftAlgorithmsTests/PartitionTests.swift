@@ -61,6 +61,21 @@ final class PartitionTests: XCTestCase {
     }
   }
   
+  func testStablePartitionWithSubrange() {
+    for length in 10...20 {
+      let a = Array(0..<length)
+      for j in 0..<length {
+        var b = a
+        let partitionRange = 0..<j
+        let condition = { $0 < j - 1 }
+        let p = b.stablePartition(subrange: partitionRange, by: condition)
+        XCTAssertEqual(p, partitionRange.count > 0 ? 1 : 0)
+        XCTAssertEqualSequences(b[partitionRange.lowerBound..<p], a[partitionRange].filter { !condition($0) })
+        XCTAssertEqualSequences(b[p..<partitionRange.upperBound], a[partitionRange].filter(condition))
+      }
+    }
+  }
+  
   func testPartitioningIndex() {
     for i in 0..<7 {
       for j in i..<11 {

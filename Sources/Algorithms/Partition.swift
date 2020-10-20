@@ -61,7 +61,7 @@ extension MutableCollection {
     by belongsInSecondPartition: (Element) throws-> Bool
   ) rethrows -> Index {
     try stablePartition(
-      count: count,
+      count: self[subrange].count,
       subrange: subrange,
       by: belongsInSecondPartition)
   }
