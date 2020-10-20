@@ -39,4 +39,8 @@ final class CycleTests: XCTestCase {
     let empty2 = Array("Hello".cycled(times: 0))
     XCTAssert(empty2.isEmpty)
   }
+  
+  func testCycleLazy() {
+    XCTAssertLazy((1...4).lazy.cycled())
+  }
 }

@@ -69,4 +69,8 @@ final class PermutationsTests: XCTestCase {
     while numbers.nextPermutation() {}
     XCTAssertEqual([1, 2, 3, 4, 5, 6, 7], numbers)
   }
+  
+  func testPermutationsLazy() {
+    XCTAssertLazy("ABCD".lazy.permutations(ofCount: 2))
+  }
 }
