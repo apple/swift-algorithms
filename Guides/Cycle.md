@@ -33,10 +33,12 @@ extension Collection {
 ```
 
 The new `Cycle` type is a sequence only, given that the `Collection` protocol
-design makes infinitely large types impossible/impractical. Note that despite
-its name, the returned `FlattenSequence` will always have `Collection`
-conformance, and will have `BidirectionalCollection` conformance when called on
-a bidirectional collection.
+design makes infinitely large types impossible/impractical. `Cycle` also
+conforms to `LazySequenceProtocol` when the base type conforms.
+
+Note that despite its name, the returned `FlattenSequence` will always have
+`Collection` conformance, and will have `BidirectionalCollection` conformance
+when called on a bidirectional collection.
 
 ### Complexity
 
