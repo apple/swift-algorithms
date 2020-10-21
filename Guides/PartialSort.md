@@ -1,58 +1,51 @@
-# Partial Sort
+# Partial Sort (sortedPrefix)
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/PartialSort.swift) | 
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/PartialSortTests.swift)]
 
-Returns a collection such that the `0...k` range contains the first k sorted elements of a sequence. 
-The order of equal elements is not guaranteed to be preserved, and the order of the remaining elements is unspecified.
+Returns the first k elements of this collection when it's sorted.
 
-If you need to sort a sequence but only need access to a prefix of its elements, 
-using this method can give you a performance boost over sorting the entire sequence.
+If you need to sort a collection but only need access to a prefix of its
+elements, using this method can give you a performance boost over sorting 
+the entire collection. The order of equal elements is guaranteed to be
+preserved.
 
 ```swift
 let numbers = [7,1,6,2,8,3,9]
-let almostSorted = numbers.partiallySorted(3, <)
-// [1, 2, 3, 9, 7, 6, 8]
+let smallestThree = numbers.sortedPrefix(<)
+// [1, 2, 3]
 ```
 
 ## Detailed Design
 
-This adds the in-place `MutableCollection` method shown below:
+This adds the `Collection` method shown below:
 
 ```swift
-extension Sequence {
-    func partiallySort(_ count: Int, by areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows
+extension Collection {
+    public func sortedPrefix(_ count: Int, by areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows -> [Element]
 }
 ```
 
-Additionally, versions of this method that return a new array and abstractions for `Comparable` types are also provided:
+Additionally, a version of this method for `Comparable` types is also provided:
 
 ```swift
-extension MutableCollection where Self: RandomAccessCollection, Element: Comparable {
-    public mutating func partiallySort(_ count: Int)
-}
-
-extension Sequence {
-    public func partiallySorted(_ count: Int, by areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows -> [Element]
-}
-
-extension Sequence where Element: Comparable {
-    public func partiallySorted(_ count: Int) -> [Element]
+extension Collection where Element: Comparable {
+    public func sortedPrefix(_ count: Int) -> [Element]
 }
 ```
 
 ### Complexity
 
-Partially sorting is a O(_k log n_) operation, where _k_ is the number of elements to sort
-and _n_ is the length of the sequence.
+The algorithm used is based on [Soroush Khanlou's research on this matter](https://khanlou.com/2018/12/analyzing-complexity/). The total complexity is `O(k log k + nk)`, which will result in a runtime close to `O(n)` if k is a small amount. If k is a large amount (more than 10% of the collection), we fallback to sorting the entire array. Realistically, this means the worst case is actually `O(n log n)`.
 
-`partiallySort(_:by:)` is a slight generalization of a priority queue. It's implemented
-as an in-place heapsort that stops after _k_ runs.
+Here are some benchmarks we made that demonstrates how this implementation (SmallestM) behaves when k increases (before implementing the fallback):
+
+![Benchmark](https://i.imgur.com/F5UEQnl.png)
+![Benchmark 2](https://i.imgur.com/Bm9DKRc.png)
 
 ### Comparison with other languages
 
-**C++:** The `<algorithm>` library defines a `partial_sort` function with similar
-semantics to this one.
+**C++:** The `<algorithm>` library defines a `partial_sort` function where the entire array is returned.
 
 **Python:** Defines a `heapq` priority queue that can be used to manually 
 achieve the same result.
