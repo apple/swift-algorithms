@@ -7,60 +7,46 @@
 //
 // See https://swift.org/LICENSE.txt for license information
 //
+
+//===----------------------------------------------------------------------===//
+// sortedPrefix(_:by:)
 //===----------------------------------------------------------------------===//
 
-extension Sequence {
-  /// Returns the first k elements of this collection when it's sorted using
-  /// the given predicate as the comparison between elements.
-  ///
-  /// This example partially sorts an array of integers to retrieve its three
-  /// smallest values:
-  ///
-  ///     let numbers = [7,1,6,2,8,3,9]
-  ///     let smallestThree = numbers.sortedPrefix(3, <)
-  ///     // [1, 2, 3]
-  ///
-  /// If you need to sort a collection but only need access to a prefix of its
-  /// elements, using this method can give you a performance boost over sorting
-  /// the entire collection. The order of equal elements is guaranteed to be
-  /// preserved.
-  ///
-  /// - Parameter count: The k number of elements to partially sort.
-  /// - Parameter areInIncreasingOrder: A predicate that returns true if its
-  /// first argument should be ordered before its second argument;
-  /// otherwise, false.
-  ///
-  /// - Complexity: O(k log k + nk)
-  public func partiallySorted(
+extension Collection {
+
+  public func sortedPrefix(
     _ count: Int,
     by areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> [Element] {
-    var result = ContiguousArray(self)
-    try result.partiallySort(count, by: areInIncreasingOrder)
-    return Array(result)
+  ) rethrows -> [Self.Element] {
+    assert(count >= 0, """
+      Cannot prefix with a negative amount of elements!
+      """
+    )
+    assert(count <= self.count, """
+      Cannot prefix more than this Collection's size!
+      """
+    )
+
+    // If we're attempting to prefix more than 10% of the collection, it's faster to sort everything.
+    guard count < (self.count / 10) else {
+      return Array(try sorted(by: areInIncreasingOrder).prefix(count))
+    }
+
+    var result = try self.prefix(count).sorted(by: areInIncreasingOrder)
+    for e in self.dropFirst(count) {
+      if let last = result.last, try areInIncreasingOrder(last, e) { continue }
+      if let insertionIndex = try result.firstIndex  (where: { try areInIncreasingOrder(e, $0) }) {
+        result.insert(e, at: insertionIndex)
+        result.removeLast()
+      }
+    }
+    return result
   }
 }
 
-extension Sequence where Element: Comparable {
-  /// Returns the first k elements of this collection when it's sorted.
-  ///
-  /// This example partially sorts an array of integers to retrieve its three
-  /// smallest values:
-  ///
-  ///     let numbers = [7,1,6,2,8,3,9]
-  ///     let smallestThree = numbers.sortedPrefix(<)
-  ///     // [1, 2, 3]
-  ///
-  /// If you need to sort a sequence but only need access to a prefix of its
-  /// elements, using this method can give you a performance boost over sorting
-  /// the entire collection. The order of equal elements is guaranteed to be
-  /// preserved.
-  ///
-  /// - Parameter count: The k number of elements to partially sort
-  /// in ascending order.
-  ///
-  /// - Complexity: O(k log k + nk)
-  public func partiallySorted(_ count: Int) -> [Element] {
-    return partiallySorted(count, by: <)
+extension Collection where Element: Comparable {
+
+  public func sortedPrefix(_ count: Int) -> [Element] {
+    return sortedPrefix(count, by: <)
   }
 }

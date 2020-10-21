@@ -15,109 +15,77 @@ import Algorithms
 final class PartialSortTests: XCTestCase {
   func testEmpty() {
     let array = [Int]()
-    XCTAssertEqual(array.partiallySorted(0), [])
+    XCTAssertEqual(array.sortedPrefix(0), [])
   }
 
-  func testPartialSortWithPriority() {
+  func testSortedPrefixWithOrdering() {
     let array: [Int] = [20, 1, 4, 70, 100, 2, 3, 7, 90]
 
-    XCTAssertEqual(array.partiallySorted(0, by: >), array)
+    XCTAssertEqual(array.sortedPrefix(0, by: >), [])
     XCTAssertEqual(
-      array.partiallySorted(1, by: >),
-      [100, 1, 4, 3, 7, 20, 70, 90, 2]
+      array.sortedPrefix(1, by: >),
+      [100]
     )
 
     XCTAssertEqual(
-      array.partiallySorted(5, by: >),
-      [100, 90, 70, 20, 7, 2, 4, 3, 1]
+      array.sortedPrefix(5, by: >),
+      [100, 90, 70, 20, 7]
     )
 
     XCTAssertEqual(
-      array.partiallySorted(9, by: >),
+      array.sortedPrefix(9, by: >),
       [100, 90, 70, 20, 7, 4, 3, 2, 1]
     )
 
-    XCTAssertEqual([1].partiallySorted(0, by: <), [1])
-    XCTAssertEqual([1].partiallySorted(0, by: >), [1])
-    XCTAssertEqual([1].partiallySorted(1, by: <), [1])
-    XCTAssertEqual([1].partiallySorted(1, by: >), [1])
-    XCTAssertEqual([0, 1].partiallySorted(1, by: <), [0, 1])
-    XCTAssertEqual([1, 0].partiallySorted(1, by: <), [0, 1])
-    XCTAssertEqual([1, 0].partiallySorted(2, by: <), [0, 1])
-    XCTAssertEqual([0, 1].partiallySorted(1, by: >), [1, 0])
-    XCTAssertEqual([1, 0].partiallySorted(1, by: >), [1, 0])
-    XCTAssertEqual([1, 0].partiallySorted(2, by: >), [1, 0])
+    XCTAssertEqual([1].sortedPrefix(0, by: <), [])
+    XCTAssertEqual([1].sortedPrefix(0, by: >), [])
+    XCTAssertEqual([1].sortedPrefix(1, by: <), [1])
+    XCTAssertEqual([1].sortedPrefix(1, by: >), [1])
+    XCTAssertEqual([0, 1].sortedPrefix(1, by: <), [0])
+    XCTAssertEqual([1, 0].sortedPrefix(1, by: <), [0])
+    XCTAssertEqual([1, 0].sortedPrefix(2, by: <), [0, 1])
+    XCTAssertEqual([0, 1].sortedPrefix(1, by: >), [1])
+    XCTAssertEqual([1, 0].sortedPrefix(1, by: >), [1])
+    XCTAssertEqual([1, 0].sortedPrefix(2, by: >), [1, 0])
 
     XCTAssertEqual(
-      [1, 2, 3, 4, 7, 20, 70, 90, 100].partiallySorted(5, by: <),
-      [1, 2, 3, 4, 7, 90, 70, 20, 100]
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].sortedPrefix(5, by: <),
+      [1, 2, 3, 4, 7]
     )
 
     XCTAssertEqual(
-      [1, 2, 3, 4, 7, 20, 70, 90, 100].partiallySorted(5, by: >),
-      [100, 90, 70, 20, 7, 2, 4, 3, 1]
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].sortedPrefix(5, by: >),
+      [100, 90, 70, 20, 7]
     )
 
     XCTAssertEqual(
-      [1, 2, 3, 4, 7, 20, 70, 90, 100].partiallySorted(5, by: >),
-      [100, 90, 70, 20, 7, 2, 4, 3, 1]
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].sortedPrefix(5, by: >),
+      [100, 90, 70, 20, 7]
     )
 
     XCTAssertEqual(
-      [1, 2, 3, 4, 7, 20, 70, 90, 100].partiallySorted(5, by: <),
-      [1, 2, 3, 4, 7, 90, 70, 20, 100]
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].sortedPrefix(5, by: <),
+      [1, 2, 3, 4, 7]
     )
   }
 
-  func testPartialSortComparable() {
+  func testSortedPrefixComparable() {
     let array: [Int] = [20, 1, 4, 70, 100, 2, 3, 7, 90]
 
-    XCTAssertEqual(array.partiallySorted(0), array)
+    XCTAssertEqual(array.sortedPrefix(0), [])
 
     XCTAssertEqual(
-      array.partiallySorted(1),
-      [1, 90, 4, 70, 100, 7, 3, 2, 20]
+      array.sortedPrefix(1),
+      [1]
     )
 
     XCTAssertEqual(
-      array.partiallySorted(5),
-      [1, 2, 3, 4, 7, 90, 70, 20, 100]
+      array.sortedPrefix(5),
+      [1, 2, 3, 4, 7]
     )
 
     XCTAssertEqual(
-      array.partiallySorted(9),
-      [1, 2, 3, 4, 7, 20, 70, 90, 100]
-    )
-  }
-
-  func testPartialSortInPlaceComparable() {
-    let originalArray: [Int] = [20, 1, 4, 70, 100, 2, 3, 7, 90]
-    var array = originalArray
-
-    array.partiallySort(0)
-    XCTAssertEqual(array, originalArray)
-
-    array = originalArray
-
-    array.partiallySort(1)
-    XCTAssertEqual(
-      array,
-      [1, 90, 4, 70, 100, 7, 3, 2, 20]
-    )
-
-    array = originalArray
-
-    array.partiallySort(5)
-    XCTAssertEqual(
-      array,
-      [1, 2, 3, 4, 7, 90, 70, 20, 100]
-    )
-
-    array = originalArray
-
-    array.partiallySort(9)
-    XCTAssertEqual(
-      array,
+      array.sortedPrefix(9),
       [1, 2, 3, 4, 7, 20, 70, 90, 100]
     )
   }
