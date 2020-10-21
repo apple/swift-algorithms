@@ -45,7 +45,7 @@ Here are some benchmarks we made that demonstrates how this implementation (Smal
 
 ### Comparison with other languages
 
-**C++:** The `<algorithm>` library defines a `partial_sort` function where the entire array is returned.
+**C++:** The `<algorithm>` library defines a `partial_sort` function where the entire array is returned using a partial heap sort.
 
 **Python:** Defines a `heapq` priority queue that can be used to manually 
 achieve the same result.
