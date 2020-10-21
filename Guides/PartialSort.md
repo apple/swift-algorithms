@@ -5,7 +5,7 @@
 
 Returns the first k elements of this collection when it's sorted.
 
-If you need to sort a sequence but only need access to a prefix of its
+If you need to sort a collection but only need access to a prefix of its
 elements, using this method can give you a performance boost over sorting 
 the entire collection. The order of equal elements is guaranteed to be
 preserved.
