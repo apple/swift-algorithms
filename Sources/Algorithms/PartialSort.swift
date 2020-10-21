@@ -50,11 +50,12 @@ extension Collection {
 
     var result = try self.prefix(count).sorted(by: areInIncreasingOrder)
     for e in self.dropFirst(count) {
-      if let last = result.last, try areInIncreasingOrder(last, e) { continue }
-      if let insertionIndex = try result.firstIndex(where: { try areInIncreasingOrder(e, $0) }) {
-        result.insert(e, at: insertionIndex)
-        result.removeLast()
+      if let last = result.last, try areInIncreasingOrder(last, e) {
+        continue
       }
+      let insertionIndex = try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
+      result.removeLast()
+      result.insert(e, at: insertionIndex)
     }
 
     return result

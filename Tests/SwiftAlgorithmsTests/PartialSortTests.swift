@@ -67,6 +67,31 @@ final class PartialSortTests: XCTestCase {
       [1, 2, 3, 4, 7, 20, 70, 90, 100].sortedPrefix(5, by: <),
       [1, 2, 3, 4, 7]
     )
+
+    XCTAssertEqual(
+      [4, 5, 6, 1, 2, 3].sortedPrefix(3, by: <),
+      [1, 2, 3]
+    )
+
+    XCTAssertEqual(
+      [4, 5, 9, 8, 7, 6].sortedPrefix(3, by: <),
+      [4, 5, 6]
+    )
+
+    XCTAssertEqual(
+      [4, 3, 2, 1].sortedPrefix(1, by: <),
+      [1]
+    )
+
+    XCTAssertEqual(
+      [4, 2, 1, 3].sortedPrefix(3, by: >),
+      [4, 3, 2]
+    )
+
+    XCTAssertEqual(
+      [4, 2, 1, 3].sortedPrefix(3, by: <),
+      [1, 2, 3]
+    )
   }
 
   func testSortedPrefixComparable() {
