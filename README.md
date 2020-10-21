@@ -30,7 +30,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 #### Partial sorting
 
-- [`partiallySorted(_:by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/PartialSort.md): Sorts a sequence only up to a specific index, leaving the remaining elements unsorted.
+- [`sortedPrefix(_:by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/PartialSort.md): Returns the first k elements of a sorted collection.
 
 #### Other useful operations
 
