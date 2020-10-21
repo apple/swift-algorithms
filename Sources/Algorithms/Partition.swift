@@ -21,6 +21,7 @@ extension MutableCollection {
   /// - Complexity: O(*n* log *n*), where *n* is the number of elements.
   /// - Precondition:
   ///   `n == distance(from: range.lowerBound, to: range.upperBound)`
+  @usableFromInline
   internal mutating func stablePartition(
     count n: Int,
     subrange: Range<Index>,
@@ -56,12 +57,13 @@ extension MutableCollection {
   ///     all elements not satisfying it.
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
+  @inlinable
   public mutating func stablePartition(
     subrange: Range<Index>,
     by belongsInSecondPartition: (Element) throws-> Bool
   ) rethrows -> Index {
     try stablePartition(
-      count: self[subrange].count,
+      count: distance(from: subrange.lowerBound, to: subrange.upperBound),
       subrange: subrange,
       by: belongsInSecondPartition)
   }
@@ -75,6 +77,7 @@ extension MutableCollection {
   ///   all elements not satisfying it.
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
+  @inlinable
   public mutating func stablePartition(
     by belongsInSecondPartition: (Element) throws-> Bool
   ) rethrows -> Index {
@@ -93,6 +96,7 @@ extension MutableCollection {
   /// collection, returning the start position of the resulting suffix.
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
+  @inlinable
   public mutating func partition(
     subrange: Range<Index>,
     by belongsInSecondPartition: (Element) throws -> Bool
@@ -120,6 +124,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   /// collection, returning the start position of the resulting suffix.
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
+  @inlinable
   public mutating func partition(
     subrange: Range<Index>,
     by belongsInSecondPartition: (Element) throws -> Bool
@@ -178,6 +183,7 @@ extension Collection {
   ///
   /// - Complexity: O(log *n*), where *n* is the length of this collection if
   ///   the collection conforms to `RandomAccessCollection`, otherwise O(*n*).
+  @inlinable
   public func partitioningIndex(
     where belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {

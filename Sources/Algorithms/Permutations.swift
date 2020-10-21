@@ -33,16 +33,22 @@ public struct Permutations<Base: Collection> {
  
 extension Permutations: Sequence {
   public struct Iterator: IteratorProtocol {
+    @usableFromInline
     internal var base: Base
+    @usableFromInline
     internal var indexes: [Base.Index]
+    @usableFromInline
     internal var hasMorePermutations: Bool
+    @usableFromInline
     internal var countToChoose: Int = 0
         
     /// `true` if we're generating permutations of the full collection.
+    @usableFromInline
     internal var permutesFullCollection: Bool {
       countToChoose == indexes.count
     }
     
+    @usableFromInline
     internal init(_ base: Base) {
       self.base = base
       self.indexes = Array(base.indices)
@@ -50,6 +56,7 @@ extension Permutations: Sequence {
       self.hasMorePermutations = true
     }
     
+    @usableFromInline
     internal init(_ base: Base, count: Int) {
       self.base = base
       self.countToChoose = count
@@ -72,6 +79,7 @@ extension Permutations: Sequence {
     ///   is in ascending order.
     ///
     /// - Complexity: O(*n*), where *n* is the length of the collection.
+    @usableFromInline
     internal mutating func nextState() -> Bool {
       let edge = countToChoose - 1
 
@@ -101,6 +109,7 @@ extension Permutations: Sequence {
       return true
     }
     
+    @inlinable
     public mutating func next() -> [Base.Element]? {
       if !hasMorePermutations { return nil }
       
@@ -118,6 +127,7 @@ extension Permutations: Sequence {
     }
   }
   
+  @usableFromInline
   internal var permutesFullCollection: Bool {
     baseCount == countToChoose
   }
@@ -148,6 +158,7 @@ extension MutableCollection
   ///   is in ascending order according to `areInIncreasingOrder`.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
+  @usableFromInline
   internal mutating func nextPermutation() -> Bool {
     // ensure we have > 1 element in the collection
     if isEmpty { return false }

@@ -18,9 +18,19 @@ public struct Cycle<Base: Collection> {
 extension Cycle: Sequence {
   /// The iterator for a `Cycle` sequence.
   public struct Iterator: IteratorProtocol {
+    @usableFromInline
     let base: Base
+    
+    @usableFromInline
     var current: Base.Index
     
+    @usableFromInline
+    internal init(base: Base) {
+      self.base = base
+      self.current = base.startIndex
+    }
+    
+    @inlinable
     public mutating func next() -> Base.Element? {
       guard !base.isEmpty else { return nil }
       
@@ -34,7 +44,7 @@ extension Cycle: Sequence {
   }
   
   public func makeIterator() -> Iterator {
-    Iterator(base: base, current: base.startIndex)
+    Iterator(base: base)
   }
 }
 
