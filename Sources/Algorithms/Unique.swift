@@ -63,7 +63,7 @@ extension Sequence {
   ) rethrows -> [Element] {
     var seen: Set<Subject> = []
     var result: [Element] = []
-    for element in self  where seen.insert(try projection(element)).inserted{
+    for element in self  where seen.insert(try projection(element)).inserted {
         result.append(element)
     }
     return result
