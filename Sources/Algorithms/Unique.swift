@@ -14,16 +14,27 @@
 //===----------------------------------------------------------------------===//
 
 extension Sequence where Element: Hashable {
-  /// Returns an array with only the unique elements of this sequence, in the
-  /// order of the first occurence of each unique element.
-  public func uniqued() -> [Element] {
-    var seen: Set<Element> = []
-    var result: [Element] = []
-    for element in self where seen.insert(element).inserted {
-        result.append(element)
+    /// Returns an array with only  unique elements of this sequence, in the order of the first occurence of each unique element.
+    ///
+    /// In this example, `uniqued()` is used to include only names which are
+    /// unique
+    ///
+    ///     let animals = ["dog", "pig", "cat", "ox", "dog","cat"]
+    ///     let uniqued = animals.uniqued()
+    ///     print(uniqued)
+    ///     // Prints "["dog", "pig","cat", "ox"]"`
+    ///
+    /// - Returns: Returns an array with only the unique elements of this sequence
+    ///  .
+    /// - Complexity: O(*n*), where *n* is the length of the sequence.
+    public func uniqued() -> [Element] {
+        var seen: Set<Element> = []
+        var result: [Element] = []
+        for element in self where seen.insert(element).inserted {
+            result.append(element)
+        }
+        return result
     }
-    return result
-  }
 }
 
 extension Sequence {
