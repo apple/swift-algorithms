@@ -122,6 +122,7 @@ extension Combinations: Sequence {
   }
 }
 
+extension Combinations: LazySequenceProtocol where Base: LazySequenceProtocol {}
 extension Combinations: Equatable where Base: Equatable {}
 extension Combinations: Hashable where Base: Hashable {}
 

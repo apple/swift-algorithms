@@ -38,4 +38,8 @@ final class CombinationsTests: XCTestCase {
     XCTAssertEqualSequences([], "".combinations(ofCount: 5))
     XCTAssertEqualSequences([], "ABCD".combinations(ofCount: 5))
   }
+  
+  func testCombinationsLazy() {
+    XCTAssertLazy("ABC".lazy.combinations(ofCount: 1))
+  }
 }

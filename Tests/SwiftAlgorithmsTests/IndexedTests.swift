@@ -27,4 +27,8 @@ final class IndexedTests: XCTestCase {
     let indexOfI = si.last(where: { $0.element == "I" })!.index
     XCTAssertEqual("I", s[indexOfI])
   }
+  
+  func testIndexedLazy() {
+    XCTAssertLazy("ABCD".lazy.indexed())
+  }
 }

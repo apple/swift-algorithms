@@ -136,4 +136,8 @@ final class ChainTests: XCTestCase {
       XCTAssertEqual(chain.distance(from: start, to: end), distance)
     }
   }
+  
+  func testChainLazy() {
+    XCTAssertLazy([1, 2, 3].lazy.chained(with: [4, 5, 6]))
+  }
 }

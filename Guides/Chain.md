@@ -29,12 +29,12 @@ extension Sequence {
     public func chained<S: Sequence>(with other: S) -> Concatenation<Self, S>
         where Element == S.Element
 }
-
 ```
 
-The resulting `Chain` type is a sequence, with conditional conformance to the
-`Collection`, `BidirectionalCollection`, and `RandomAccessCollection`  when both
-the first and second arguments conform.
+The resulting `Chain` type is a sequence, with conditional conformance to
+`Collection`, `BidirectionalCollection`, and `RandomAccessCollection` when both
+the first and second arguments conform. `Chain` also conforms to
+`LazySequenceProtocol` when the first argument conforms.
 
 ### Naming
 
