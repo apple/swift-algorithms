@@ -18,14 +18,14 @@ extension Sequence where Element: Hashable {
   /// order of the first occurrence of each unique element.
   ///
   /// In this example, `uniqued()` is used to include only names which are
-  /// unique
+  /// unique.
   ///
   ///     let animals = ["dog", "pig", "cat", "ox", "dog","cat"]
   ///     let uniqued = animals.uniqued()
   ///     print(uniqued)
-  ///     // Prints "["dog", "pig","cat", "ox"]"`
+  ///     // Prints "["dog", "pig","cat", "ox"]"
   ///
-  /// - Returns: Returns an array with only the unique elements of this sequence
+  /// - Returns: An array with only the unique elements of this sequence.
   ///  .
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   public func uniqued() -> [Element] {
@@ -44,18 +44,19 @@ extension Sequence {
   /// unique element.
   ///
   /// In this example, `uniqued()` is used to include only names which are
-  /// unique
+  /// unique.
   ///
   ///     let animals = ["dog", "pig", "cat", "ox", "dog","cat"]
   ///     let uniqued = animals.(on: { $0.first })
   ///     print(uniqued)
-  ///     // Prints "["dog", "pig","cat", "ox"]"`
+  ///     // Prints "["dog", "pig","cat", "ox"]"
   ///
   /// - Parameter projection: A projecting closure. `projection` accepts an
   ///   element of this sequence as its parameter and returns a projected
   ///   value of the same  type.
   ///
-  /// - Returns: Returns an array with only the unique elements of this sequence
+  /// - Returns: An array with only the unique elements of this sequence, as
+  ///   determined by the result of `projection` for each element.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   public func uniqued<Subject: Hashable>(
