@@ -28,13 +28,13 @@ extension Sequence where Element: Hashable {
   /// - Returns: Returns an array with only the unique elements of this sequence
   ///  .
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
-    public func uniqued() -> [Element] {
-        var seen: Set<Element> = []
-        var result: [Element] = []
-        for element in self where seen.insert(element).inserted {
-            result.append(element)
-        }
-        return result
+  public func uniqued() -> [Element] {
+    var seen: Set<Element> = []
+    var result: [Element] = []
+    for element in self where seen.insert(element).inserted {
+        result.append(element)
+    }
+    return result
     }
 }
 
