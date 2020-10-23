@@ -15,67 +15,67 @@ import XCTest
 final class ChainTests: XCTestCase {
   // intentionally does not depend on `Chain.index(_:offsetBy:)` in order to
   // avoid making assumptions about the code being tested
-  func index<A, B>(atOffset offset: Int, in chain: Chain<A, B>) -> Chain<A, B>.Index {
+  func index<A, B>(atOffset offset: Int, in chain: Chain2<A, B>) -> Chain2<A, B>.Index {
     offset < chain.base1.count
       ? .init(first: chain.base1.index(chain.base1.startIndex, offsetBy: offset))
       : .init(second: chain.base2.index(chain.base2.startIndex, offsetBy: offset - chain.base1.count))
   }
   
   func testChainSequences() {
-    let run = (1...).prefix(10).chained(with: 20...)
+    let run = chain((1...).prefix(10), 20...)
     XCTAssertEqualSequences(run.prefix(20), Array(1...10) + (20..<30))
   }
   
   func testChainForwardCollection() {
     let s1 = Set(0...10)
     let s2 = Set(20...30)
-    let c = s1.chained(with: s2)
+    let c = chain(s1, s2)
     XCTAssertEqualSequences(c, Array(s1) + Array(s2))
   }
   
   func testChainBidirectionalCollection() {
     let s1 = "ABCDEFGHIJ"
     let s2 = "klmnopqrstuv"
-    let c = s1.chained(with: s2)
+    let c = chain(s1, s2)
     
     XCTAssertEqualSequences(c, "ABCDEFGHIJklmnopqrstuv")
     XCTAssertEqualSequences(c.reversed(), "ABCDEFGHIJklmnopqrstuv".reversed())
-    XCTAssertEqualSequences(s1.reversed().chained(with: s2), "JIHGFEDCBAklmnopqrstuv")
+    XCTAssertEqualSequences(chain(s1.reversed(), s2), "JIHGFEDCBAklmnopqrstuv")
   }
   
   func testChainIndexOffsetBy() {
     let s1 = "abcde"
     let s2 = "VWXYZ"
-    let chain = s1.chained(with: s2)
+    let c = chain(s1, s2)
     
-    for (startOffset, endOffset) in product(0...chain.count, 0...chain.count) {
-      let start = index(atOffset: startOffset, in: chain)
-      let end = index(atOffset: endOffset, in: chain)
+    for (startOffset, endOffset) in product(0...c.count, 0...c.count) {
+      let start = index(atOffset: startOffset, in: c)
+      let end = index(atOffset: endOffset, in: c)
       let distance = endOffset - startOffset
-      XCTAssertEqual(chain.index(start, offsetBy: distance), end)
+      XCTAssertEqual(c.index(start, offsetBy: distance), end)
     }
   }
   
   func testChainIndexOffsetByLimitedBy() {
     let s1 = "abcd"
     let s2 = "XYZ"
-    let chain = s1.chained(with: s2)
+    let c = chain(s1, s2)
     
-    for (startOffset, limitOffset) in product(0...chain.count, 0...chain.count) {
-      let start = index(atOffset: startOffset, in: chain)
-      let limit = index(atOffset: limitOffset, in: chain)
+    for (startOffset, limitOffset) in product(0...c.count, 0...c.count) {
+      let start = index(atOffset: startOffset, in: c)
+      let limit = index(atOffset: limitOffset, in: c)
       
       // verifies that the target index corresponding to each offset in `range`
       // can or cannot be reached from `start` using
-      // `chain.index(start, offsetBy: _, limitedBy: limit)`, depending on the
+      // `c.index(start, offsetBy: _, limitedBy: limit)`, depending on the
       // value of `beyondLimit`
       func checkTargetRange(_ range: ClosedRange<Int>, beyondLimit: Bool) {
         for targetOffset in range {
           let distance = targetOffset - startOffset
           
           XCTAssertEqual(
-            chain.index(start, offsetBy: distance, limitedBy: limit),
-            beyondLimit ? nil : index(atOffset: targetOffset, in: chain))
+            c.index(start, offsetBy: distance, limitedBy: limit),
+            beyondLimit ? nil : index(atOffset: targetOffset, in: c))
         }
       }
       
@@ -83,10 +83,10 @@ final class ChainTests: XCTestCase {
       if limit >= start {
         // the limit has an effect
         checkTargetRange(startOffset...limitOffset, beyondLimit: false)
-        checkTargetRange((limitOffset + 1)...(chain.count + 1), beyondLimit: true)
+        checkTargetRange((limitOffset + 1)...(c.count + 1), beyondLimit: true)
       } else {
         // the limit has no effect
-        checkTargetRange(startOffset...chain.count, beyondLimit: false)
+        checkTargetRange(startOffset...c.count, beyondLimit: false)
       }
       
       // backward
@@ -102,22 +102,22 @@ final class ChainTests: XCTestCase {
   }
   
   func testChainIndexOffsetAcrossBoundary() {
-    let chain = "abc".chained(with: "XYZ")
+    let c = chain("abc", "XYZ")
     
     do {
-      let i = chain.index(chain.startIndex, offsetBy: 3, limitedBy: chain.startIndex)
+      let i = c.index(c.startIndex, offsetBy: 3, limitedBy: c.startIndex)
       XCTAssertNil(i)
     }
     
     do {
-      let i = chain.index(chain.startIndex, offsetBy: 4)
-      let j = chain.index(i, offsetBy: -2)
-      XCTAssertEqual(chain[j], "c")
+      let i = c.index(c.startIndex, offsetBy: 4)
+      let j = c.index(i, offsetBy: -2)
+      XCTAssertEqual(c[j], "c")
     }
     
     do {
-      let i = chain.index(chain.startIndex, offsetBy: 3)
-      let j = chain.index(i, offsetBy: -1, limitedBy: i)
+      let i = c.index(c.startIndex, offsetBy: 3)
+      let j = c.index(i, offsetBy: -1, limitedBy: i)
       XCTAssertNil(j)
     }
   }
@@ -125,19 +125,19 @@ final class ChainTests: XCTestCase {
   func testChainDistanceFromTo() {
     let s1 = "abcde"
     let s2 = "VWXYZ"
-    let chain = s1.chained(with: s2)
+    let c = chain(s1, s2)
     
-    XCTAssertEqual(chain.count, s1.count + s2.count)
+    XCTAssertEqual(c.count, s1.count + s2.count)
     
-    for (startOffset, endOffset) in product(0...chain.count, 0...chain.count) {
-      let start = index(atOffset: startOffset, in: chain)
-      let end = index(atOffset: endOffset, in: chain)
+    for (startOffset, endOffset) in product(0...c.count, 0...c.count) {
+      let start = index(atOffset: startOffset, in: c)
+      let end = index(atOffset: endOffset, in: c)
       let distance = endOffset - startOffset
-      XCTAssertEqual(chain.distance(from: start, to: end), distance)
+      XCTAssertEqual(c.distance(from: start, to: end), distance)
     }
   }
   
   func testChainLazy() {
-    XCTAssertLazy([1, 2, 3].lazy.chained(with: [4, 5, 6]))
+    XCTAssertLazy(chain([1, 2, 3].lazy, [4, 5, 6]))
   }
 }
