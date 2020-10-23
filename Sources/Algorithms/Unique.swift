@@ -43,7 +43,7 @@ extension Sequence {
   /// unique element.
   ///
   ///     let animals = ["dog", "pig", "cat", "ox", "dog","cat"]
-  ///     let uniqued = animals.(on: { $0.first })
+  ///     let uniqued = animals(on: { $0.first })
   ///     print(uniqued)
   ///     // Prints "["dog", "pig","cat", "ox"]"
   ///
