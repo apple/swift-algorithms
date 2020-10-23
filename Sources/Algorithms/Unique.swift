@@ -17,9 +17,6 @@ extension Sequence where Element: Hashable {
   /// Returns an array with only  unique elements of this sequence, in the
   /// order of the first occurrence of each unique element.
   ///
-  /// In this example, `uniqued()` is used to include only names which are
-  /// unique.
-  ///
   ///     let animals = ["dog", "pig", "cat", "ox", "dog","cat"]
   ///     let uniqued = animals.uniqued()
   ///     print(uniqued)
@@ -44,9 +41,6 @@ extension Sequence {
   /// Returns an array with the unique elements of this sequence (as determined
   /// by the given projection), in the order of the first occurrence of each
   /// unique element.
-  ///
-  /// In this example, `uniqued()` is used to include only names which are
-  /// unique.
   ///
   ///     let animals = ["dog", "pig", "cat", "ox", "dog","cat"]
   ///     let uniqued = animals.(on: { $0.first })
