@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 /// A concatenation of two sequences with the same element type.
-public struct Chain<Base1: Sequence, Base2: Sequence>
+public struct Chain2<Base1: Sequence, Base2: Sequence>
   where Base1.Element == Base2.Element
 {
   /// The first sequence in this chain.
@@ -25,7 +25,7 @@ public struct Chain<Base1: Sequence, Base2: Sequence>
   }
 }
 
-extension Chain: Sequence {
+extension Chain2: Sequence {
   /// The iterator for a `Chain` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -35,7 +35,7 @@ extension Chain: Sequence {
     internal var iterator2: Base2.Iterator
     
     @usableFromInline
-    internal init(_ concatenation: Chain) {
+    internal init(_ concatenation: Chain2) {
       iterator1 = concatenation.base1.makeIterator()
       iterator2 = concatenation.base2.makeIterator()
     }
@@ -52,7 +52,7 @@ extension Chain: Sequence {
   }
 }
 
-extension Chain: Collection where Base1: Collection, Base2: Collection {
+extension Chain2: Collection where Base1: Collection, Base2: Collection {
   /// A position in a `Chain` collection.
   public struct Index: Comparable {
     // The internal index representation, which can either be an index of the
@@ -253,7 +253,7 @@ extension Chain: Collection where Base1: Collection, Base2: Collection {
   }
 }
 
-extension Chain: BidirectionalCollection
+extension Chain2: BidirectionalCollection
   where Base1: BidirectionalCollection, Base2: BidirectionalCollection
 {
   @inlinable
@@ -270,45 +270,56 @@ extension Chain: BidirectionalCollection
   }
 }
 
-extension Chain: RandomAccessCollection
+extension Chain2: RandomAccessCollection
   where Base1: RandomAccessCollection, Base2: RandomAccessCollection {}
-extension Chain: LazySequenceProtocol where Base1: LazySequenceProtocol {}
 
-extension Chain: Equatable where Base1: Equatable, Base2: Equatable {}
-extension Chain: Hashable where Base1: Hashable, Base2: Hashable {}
+extension Chain2: Equatable where Base1: Equatable, Base2: Equatable {}
+extension Chain2: Hashable where Base1: Hashable, Base2: Hashable {}
 
 //===----------------------------------------------------------------------===//
-// chained(with:)
+// chain(_:_:)
 //===----------------------------------------------------------------------===//
+
+/// Returns a new sequence that iterates over the two given sequences, one
+/// followed by the other.
+///
+/// You can pass any two sequences or collections that have the same element
+/// type as this sequence. This example chains a closed range of `Int` with an
+/// array of `Int`:
+///
+///     let small = 1...3
+///     let big = [100, 200, 300]
+///     for num in chain(small, big) {
+///         print(num)
+///     }
+///     // 1
+///     // 2
+///     // 3
+///     // 100
+///     // 200
+///     // 300
+///
+/// - Parameters:
+///   - s1: The first sequence.
+///   - s2: The second sequence.
+/// - Returns: A sequence that iterates first over the elements of `s1`, and
+///   then over the elements of `s2`.
+///
+/// - Complexity: O(1)
+public func chain<S1, S2>(_ s1: S1, _ s2: S2) -> Chain2<S1, S2> {
+  Chain2(base1: s1, base2: s2)
+}
+
+// MARK: - Deprecations
+
+@available(*, deprecated, renamed: "Chain2")
+public typealias Chain = Chain2
 
 extension Sequence {
-  /// Returns a new sequence that iterates over this sequence, followed by the
-  /// given sequence.
-  ///
-  /// You can pass a sequence or collection of any type that has the same
-  /// element type as this sequence. This example chains a closed range of `Int`
-  /// with an array of `Int`:
-  ///
-  ///     let small = 1...3
-  ///     let big = [100, 200, 300]
-  ///     for num in small.chained(with: big) {
-  ///         print(num)
-  ///     }
-  ///     // 1
-  ///     // 2
-  ///     // 3
-  ///     // 100
-  ///     // 200
-  ///     // 300
-  ///
-  /// - Parameter other: The sequence to iterate over after this sequence.
-  /// - Returns: A sequences that follows iteration of this sequence with
-  ///   `other`.
-  ///
-  /// - Complexity: O(1)
-  public func chained<S: Sequence>(with other: S) -> Chain<Self, S>
+  @available(*, deprecated, message: "Use the chain(_:_:) function, instead.")
+  public func chained<S: Sequence>(with other: S) -> Chain2<Self, S>
     where Element == S.Element
   {
-    Chain(base1: self, base2: other)
+    Chain2(base1: self, base2: other)
   }
 }
