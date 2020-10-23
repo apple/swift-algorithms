@@ -31,8 +31,7 @@ public func chain<S1, S2>(_ s1: S1, _ s2: S2) -> Chain2<S1, S2>
 
 The resulting `Chain2` type is a sequence, with conditional conformance to
 `Collection`, `BidirectionalCollection`, and `RandomAccessCollection` when both
-the first and second arguments conform. `Chain2` also conforms to
-`LazySequenceProtocol` when the first argument conforms.
+the first and second arguments conform.
 
 ### Naming
 
