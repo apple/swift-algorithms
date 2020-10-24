@@ -14,13 +14,13 @@
 //===----------------------------------------------------------------------===//
 
 extension Sequence where Element: Hashable {
-  /// Returns an array with only  unique elements of this sequence, in the
+  /// Returns an array with only the unique elements of this sequence, in the
   /// order of the first occurrence of each unique element.
   ///
-  ///     let animals = ["dog", "pig", "cat", "ox", "dog","cat"]
+  ///     let animals = ["dog", "pig", "cat", "ox", "dog", "cat"]
   ///     let uniqued = animals.uniqued()
   ///     print(uniqued)
-  ///     // Prints "["dog", "pig","cat", "ox"]"
+  ///     // Prints '["dog", "pig","cat", "ox"]'
   ///
   /// - Returns: An array with only the unique elements of this sequence.
   ///  .
@@ -42,10 +42,10 @@ extension Sequence {
   /// by the given projection), in the order of the first occurrence of each
   /// unique element.
   ///
-  ///     let animals = ["dog", "pig", "cat", "ox", "dog","cat"]
-  ///     let uniqued = animals(on: { $0.first })
+  ///     let animals = ["dog", "pig", "cat", "ox", "dog", "cat"]
+  ///     let uniqued = animals.uniqued(on: {$0.first})
   ///     print(uniqued)
-  ///     // Prints "["dog", "pig","cat", "ox"]"
+  ///     // Prints '["dog", "pig","cat", "ox"]'
   ///
   /// - Parameter projection: A projecting closure. `projection` accepts an
   ///   element of this sequence as its parameter and returns a projected
