@@ -49,7 +49,7 @@ extension Sequence {
   ///
   /// - Parameter projection: A projecting closure. `projection` accepts an
   ///   element of this sequence as its parameter  which is having the type of
-  ///   projecting element  and returns a projected value that may have the same
+  ///   projecting element and returns a projected value that may have the same
   ///   type having constraint `Hashable`.
   ///
   /// - Returns: An array with only the unique elements of this sequence, as
