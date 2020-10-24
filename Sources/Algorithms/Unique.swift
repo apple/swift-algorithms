@@ -42,14 +42,15 @@ extension Sequence {
   /// by the given projection), in the order of the first occurrence of each
   /// unique element.
   ///
-  ///     let animals = ["dog", "pig", "cat", "ox", "dog", "cat"]
+  ///     let animals = ["dog", "pig", "cat", "ox", "cow", "owl"]
   ///     let uniqued = animals.uniqued(on: {$0.first})
   ///     print(uniqued)
   ///     // Prints '["dog", "pig", "cat", "ox"]'
   ///
   /// - Parameter projection: A projecting closure. `projection` accepts an
-  ///   element of this sequence as its parameter and returns a projected
-  ///   value of the same type having constraint `Hashable`.
+  ///   element of this sequence as its parameter  which is having the type of
+  ///   projecting element  and returns a projected value that may have the same
+  ///   type having constraint `Hashable`.
   ///
   /// - Returns: An array with only the unique elements of this sequence, as
   ///   determined by the result of `projection` for each element.
