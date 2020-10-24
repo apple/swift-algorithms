@@ -20,7 +20,7 @@ extension Sequence where Element: Hashable {
   ///     let animals = ["dog", "pig", "cat", "ox", "dog", "cat"]
   ///     let uniqued = animals.uniqued()
   ///     print(uniqued)
-  ///     // Prints '["dog", "pig","cat", "ox"]'
+  ///     // Prints '["dog", "pig", "cat", "ox"]'
   ///
   /// - Returns: An array with only the unique elements of this sequence.
   ///  .
@@ -45,11 +45,11 @@ extension Sequence {
   ///     let animals = ["dog", "pig", "cat", "ox", "dog", "cat"]
   ///     let uniqued = animals.uniqued(on: {$0.first})
   ///     print(uniqued)
-  ///     // Prints '["dog", "pig","cat", "ox"]'
+  ///     // Prints '["dog", "pig", "cat", "ox"]'
   ///
   /// - Parameter projection: A projecting closure. `projection` accepts an
   ///   element of this sequence as its parameter and returns a projected
-  ///   value of the same  type.
+  ///   value of the same type having constraint `Hashable`.
   ///
   /// - Returns: An array with only the unique elements of this sequence, as
   ///   determined by the result of `projection` for each element.
