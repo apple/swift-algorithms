@@ -12,7 +12,9 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
-*No changes yet.*
+### Additions
+
+- The `sortedEndIndex(by:)` and `sortedEndIndex()` methods check when a collection stops being sorted.  The `rampedEndIndex(by:)` and `rampedEndIndex()` methods are variants that check for strict increases in rank, instead of non-decreases.
 
 ---
 
