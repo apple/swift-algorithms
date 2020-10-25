@@ -42,15 +42,18 @@ extension Sequence {
   /// by the given projection), in the order of the first occurrence of each
   /// unique element.
   ///
+  /// This example finds the elements of the `animals` array with unique
+  /// first characters:
+  ///
   ///     let animals = ["dog", "pig", "cat", "ox", "cow", "owl"]
   ///     let uniqued = animals.uniqued(on: {$0.first})
   ///     print(uniqued)
   ///     // Prints '["dog", "pig", "cat", "ox"]'
   ///
-  /// - Parameter projection: A projecting closure. `projection` accepts an
-  ///   element of this sequence as its parameter which is having the type of
-  ///   projecting element and returns a projected value that may have the same
-  ///   type having constraint `Hashable`.
+  /// - Parameter projection: A closure that transforms an element into the
+  ///   value to use for uniqueness. If `projection` returns the same value
+  ///   for two different elements, the second element will be excluded
+  ///   from the resulting array.
   ///
   /// - Returns: An array with only the unique elements of this sequence, as
   ///   determined by the result of `projection` for each element.
