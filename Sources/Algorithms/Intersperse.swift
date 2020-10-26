@@ -56,7 +56,7 @@ extension Intersperse: Sequence {
 
 extension Intersperse: Collection where Base: Collection {
   public struct Index: Comparable {
-    enum Kind {
+    enum Kind: Comparable {
       case element
       case separator
     }
@@ -64,10 +64,7 @@ extension Intersperse: Collection where Base: Collection {
     let kind: Kind
 
     public static func < (lhs: Index, rhs: Index) -> Bool {
-      if lhs.index < rhs.index { return true }
-      if lhs.index > rhs.index { return false }
-      if lhs.kind == .element, rhs.kind == .separator { return true }
-      return false
+      (lhs.index, lhs.kind) < (rhs.index, rhs.kind)
     }
   }
 
