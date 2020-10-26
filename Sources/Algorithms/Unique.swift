@@ -25,15 +25,9 @@ extension Sequence where Element: Hashable {
   /// - Returns: An array with only the unique elements of this sequence.
   ///  .
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  @inlinable
   public func uniqued() -> [Element] {
-    var seen: Set<Element> = []
-    var result: [Element] = []
-    for element in self {
-      if seen.insert(element).inserted {
-        result.append(element)
-      }
-    }
-    return result
+    uniqued(on: { $0 })
   }
 }
 
@@ -59,6 +53,7 @@ extension Sequence {
   ///   determined by the result of `projection` for each element.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  @inlinable
   public func uniqued<Subject: Hashable>(
     on projection: (Element) throws -> Subject
   ) rethrows -> [Element] {
