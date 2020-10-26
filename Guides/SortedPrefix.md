@@ -5,7 +5,7 @@
 
 Methods to measure how long a collection maintains being sorted, either along a given predicate or defaulting to the standard less-than operator, with variants for strictly-increasing sequences.
 
-(To-Do: put better explaination here.)
+(To-Do: put better explanation here.)
 
 ## Detailed Design
 
