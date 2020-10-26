@@ -12,7 +12,10 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
-*No changes yet.*
+### Additions
+
+- The `firstDelta(against: by:)` and `firstDelta(against:)` methods have been
+  added.  They find where two sequences start to differ.
 
 ---
 

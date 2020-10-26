@@ -28,6 +28,10 @@ Read more about the package, and the intent behind it, in the [announcement on s
 - [`randomStableSample(count:)`, `randomStableSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection, preserving their original relative order.
 - [`uniqued()`, `uniqued(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Unique.md): The unique elements of a collection, preserving their order.
 
+#### Comparisons
+
+- [`firstDelta(against: by:)`, `firstDelta(against:)`](./Guides/FirstDelta.md): Finds the first corresponding elements of two sequences after their common prefix.
+
 #### Other useful operations
 
 - [`chunked(by:)`, `chunked(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chunked.md): Eager and lazy operations that break a collection into chunks based on either a binary predicate or when the result of a projection changes.
