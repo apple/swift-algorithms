@@ -56,41 +56,40 @@ extension Intersperse: Sequence {
 
 extension Intersperse: Collection where Base: Collection {
   public struct Index: Comparable {
-    enum Kind: Comparable {
-      case element
+    enum Representation: Comparable {
+      case element(Base.Index)
       case separator(next: Base.Index)
     }
-    let index: Base.Index
-    let kind: Kind
+    let representation: Representation
 
     public static func < (lhs: Index, rhs: Index) -> Bool {
-      (lhs.index, lhs.kind) < (rhs.index, rhs.kind)
+      lhs.representation < rhs.representation
     }
   }
 
   public var startIndex: Index {
-    Index(index: base.startIndex, kind: .element)
+    Index(representation: .element(base.startIndex))
   }
 
   public var endIndex: Index {
-    Index(index: base.endIndex, kind: .element)
+    Index(representation: .element(base.endIndex))
   }
 
   public func index(after i: Index) -> Index {
-    switch i.kind {
-    case .element:
-      let next = base.index(after: i.index)
+    switch i.representation {
+    case let .element(index):
+      let next = base.index(after: index)
       return next == base.endIndex
         ? endIndex
-        : Index(index: i.index, kind: .separator(next: next))
-    case .separator(let next):
-      return Index(index: next, kind: .element)
+        : Index(representation: .separator(next: next))
+    case let .separator(next):
+      return Index(representation: .element(next))
     }
   }
 
   public subscript(position: Index) -> Element {
-    switch position.kind {
-    case .element: return base[position.index]
+    switch position.representation {
+    case .element(let index): return base[index]
     case .separator: return separator
     }
   }
@@ -100,13 +99,13 @@ extension Intersperse: BidirectionalCollection
   where Base: BidirectionalCollection
 {
   public func index(before i: Index) -> Index {
-    switch i.kind {
-    case .element where i.index == base.endIndex:
-      return Index(index: base.index(before: i.index), kind: .element)
-    case .element:
-      return Index(index: base.index(before: i.index), kind: .separator(next: i.index))
-    case .separator:
-      return Index(index: i.index, kind: .element)
+    switch i.representation {
+    case let .element(index) where index == base.endIndex:
+      return Index(representation: .element(base.index(before: index)))
+    case let .element(index):
+      return Index(representation: .separator(next: index))
+    case let .separator(next):
+      return Index(representation: .element(base.index(before: next)))
     }
   }
 }
