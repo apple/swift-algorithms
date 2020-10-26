@@ -71,4 +71,9 @@ final class ChunkedTests: XCTestCase {
     let lazyChunks = fruits.lazy.chunked(by: { $0.first == $1.first })
     validateFruitChunks(lazyChunks)
   }
+  
+  func testChunkedLazy() {
+    XCTAssertLazy(fruits.lazy.chunked(by: { $0.first == $1.first }))
+    XCTAssertLazy(fruits.lazy.chunked(on: { $0.first }))
+  }
 }

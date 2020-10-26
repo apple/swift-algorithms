@@ -12,13 +12,17 @@
 public struct Combinations<Base: Collection> {
   /// The collection to iterate over for combinations.
   public let base: Base
+  
+  @usableFromInline
   internal var k: Int
   
+  @usableFromInline
   internal init(_ base: Base, k: Int) {
     self.base = base
     self.k = base.count < k ? -1 : k
   }
 
+  @inlinable
   public var count: Int {
     func binomial(n: Int, k: Int) -> Int {
       switch k {
@@ -37,8 +41,13 @@ public struct Combinations<Base: Collection> {
 
 extension Combinations: Sequence {
   public struct Iterator: IteratorProtocol {
+    @usableFromInline
     internal let base: Base
+    
+    @usableFromInline
     internal var indexes: [Base.Index]
+    
+    @usableFromInline
     internal var finished: Bool
     
     internal init(_ combinations: Combinations) {
@@ -67,6 +76,7 @@ extension Combinations: Sequence {
     ///     [2, 3, 4] *
     ///     // Can't advance without needing to go past `base.endIndex`,
     ///     // so the iteration is finished.
+    @usableFromInline
     internal mutating func advance() {
       guard !indexes.isEmpty else {
         // Initial state for combinations of 0 elements is an empty array with
@@ -99,6 +109,7 @@ extension Combinations: Sequence {
       }
     }
     
+    @inlinable
     public mutating func next() -> [Base.Element]? {
       if finished { return nil }
       defer { advance() }
@@ -111,6 +122,7 @@ extension Combinations: Sequence {
   }
 }
 
+extension Combinations: LazySequenceProtocol where Base: LazySequenceProtocol {}
 extension Combinations: Equatable where Base: Equatable {}
 extension Combinations: Hashable where Base: Hashable {}
 
@@ -146,6 +158,7 @@ extension Collection {
   /// - Parameter k: The number of elements to include in each combination.
   ///
   /// - Complexity: O(1)
+  @inlinable
   public func combinations(ofCount k: Int) -> Combinations<Self> {
     assert(k >= 0, "Can't have combinations with a negative number of elements.")
     return Combinations(self, k: k)

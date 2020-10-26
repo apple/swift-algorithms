@@ -5,13 +5,14 @@
 
 Concatenates two collections with the same element type, one after another.
 
-This operation is available through the `chained(with:)` method on any sequence.
+This operation is available for any two sequences by calling the `chain(_:_:)`
+function.
 
 ```swift
-let numbers = [10, 20, 30].chained(with: 1...5)
+let numbers = chain([10, 20, 30], 1...5)
 // Array(numbers) == [10, 20, 30, 1, 2, 3, 4, 5]
-// 
-let letters = "abcde".chained(with: "FGHIJ")
+
+let letters = chain("abcde", "FGHIJ")
 // String(letters) == "abcdeFGHIJ"
 ```
 
@@ -21,25 +22,29 @@ the shared conformances of the two underlying types.
 
 ## Detailed Design
 
-The `chained(with:)` method is added as an extension method on the `Sequence`
-protocol:
+The `chain(_:_:)` function takes two sequences as arguments:
 
 ```swift
-extension Sequence {
-    public func chained<S: Sequence>(with other: S) -> Concatenation<Self, S>
-        where Element == S.Element
-}
-
+public func chain<S1, S2>(_ s1: S1, _ s2: S2) -> Chain2<S1, S2>
+    where S1.Element == S2.Element
 ```
 
-The resulting `Chain` type is a sequence, with conditional conformance to the
-`Collection`, `BidirectionalCollection`, and `RandomAccessCollection`  when both
+The resulting `Chain2` type is a sequence, with conditional conformance to
+`Collection`, `BidirectionalCollection`, and `RandomAccessCollection` when both
 the first and second arguments conform.
 
 ### Naming
 
-This method’s and type’s name match the term of art used in other languages and
-libraries.
+This function's and type's name match the term of art used in other languages
+and libraries.
+
+This operation was previously implemented as a `Sequence` method named
+`chained(with:)`, and was switched to a free function to align with APIs like
+`zip` and `product` after [a lengthy forum discussion][naming]. Alternative
+suggestions for method names include `appending(contentsOf:)`, `followed(by:)`,
+and `concatenated(to:)`.
+
+[naming]: https://forums.swift.org/t/naming-of-chained-with/40999/
 
 ### Comparison with other languages
 

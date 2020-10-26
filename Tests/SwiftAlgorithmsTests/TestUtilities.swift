@@ -65,3 +65,4 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   try XCTAssert(expression1().elementsEqual(expression2(), by: areEquivalent), message(), file: file, line: line)
 }
 
+func XCTAssertLazy<S: LazySequenceProtocol>(_: S) {}
