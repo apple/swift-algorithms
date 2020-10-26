@@ -65,25 +65,31 @@ extension Intersperse: Collection where Base: Collection {
     public static func < (lhs: Index, rhs: Index) -> Bool {
       lhs.representation < rhs.representation
     }
+
+    static func element(_ index: Base.Index) -> Self {
+      Self(representation: .element(index))
+    }
+
+    static func separator(next: Base.Index) -> Self {
+      Self(representation: .separator(next: next))
+    }
   }
 
   public var startIndex: Index {
-    Index(representation: .element(base.startIndex))
+    .element(base.startIndex)
   }
 
   public var endIndex: Index {
-    Index(representation: .element(base.endIndex))
+    .element(base.endIndex)
   }
 
   public func index(after i: Index) -> Index {
     switch i.representation {
     case let .element(index):
       let next = base.index(after: index)
-      return next == base.endIndex
-        ? endIndex
-        : Index(representation: .separator(next: next))
+      return next == base.endIndex ? endIndex : .separator(next: next)
     case let .separator(next):
-      return Index(representation: .element(next))
+      return .element(next)
     }
   }
 
@@ -101,11 +107,11 @@ extension Intersperse: BidirectionalCollection
   public func index(before i: Index) -> Index {
     switch i.representation {
     case let .element(index) where index == base.endIndex:
-      return Index(representation: .element(base.index(before: index)))
+      return .element(base.index(before: index))
     case let .element(index):
-      return Index(representation: .separator(next: index))
+      return .separator(next: index)
     case let .separator(next):
-      return Index(representation: .element(base.index(before: next)))
+      return .element(base.index(before: next))
     }
   }
 }
