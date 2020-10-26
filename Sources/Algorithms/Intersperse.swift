@@ -58,7 +58,7 @@ extension Intersperse: Collection where Base: Collection {
   public struct Index: Comparable {
     enum Kind: Comparable {
       case element
-      case separator
+      case separator(next: Base.Index)
     }
     let index: Base.Index
     let kind: Kind
@@ -78,12 +78,13 @@ extension Intersperse: Collection where Base: Collection {
 
   public func index(after i: Index) -> Index {
     switch i.kind {
-    case .element where base.index(after: i.index) == base.endIndex:
-      return endIndex
     case .element:
-      return Index(index: i.index, kind: .separator)
-    case .separator:
-      return Index(index: base.index(after: i.index), kind: .element)
+      let next = base.index(after: i.index)
+      return next == base.endIndex
+        ? endIndex
+        : Index(index: i.index, kind: .separator(next: next))
+    case .separator(let next):
+      return Index(index: next, kind: .element)
     }
   }
 
@@ -103,7 +104,7 @@ extension Intersperse: BidirectionalCollection
     case .element where i.index == base.endIndex:
       return Index(index: base.index(before: i.index), kind: .element)
     case .element:
-      return Index(index: base.index(before: i.index), kind: .separator)
+      return Index(index: base.index(before: i.index), kind: .separator(next: i.index))
     case .separator:
       return Index(index: i.index, kind: .element)
     }
