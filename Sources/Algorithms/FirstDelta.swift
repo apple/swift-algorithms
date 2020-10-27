@@ -88,3 +88,84 @@ extension Sequence where Element: Equatable {
     return firstDelta(against: possibleMirror, by: ==)
   }
 }
+
+//===----------------------------------------------------------------------===//
+// diverges(from: by:)
+//===----------------------------------------------------------------------===//
+
+extension Collection {
+  /// Finds the longest common prefix between this collection and the given
+  /// collection, using the given predicate as the equivalence test, returning
+  /// the past-the-end indexes of the respective subsequences.
+  ///
+  /// The predicate must be a *equivalence relation* over the elements. That
+  /// is, for any elements `a`, `b`, and `c`, the following conditions must
+  /// hold:
+  ///
+  /// - `areEquivalent(a, a)` is always `true`. (Reflexivity)
+  /// - `areEquivalent(a, b)` implies `areEquivalent(b, a)`. (Symmetry)
+  /// - If `areEquivalent(a, b)` and `areEquivalent(b, c)` are both `true`, then
+  ///   `areEquivalent(a, c)` is also `true`. (Transitivity)
+  ///
+  /// If one collection is a proper prefix of the other, its corresponding
+  /// member in the emitted result will be its source's `endIndex`.  If the two
+  /// collections are equivalent, both members of the emitted result will be
+  /// their sources' respective `endIndex`.
+  ///
+  /// - Parameters:
+  ///   - possibleMirror: A collection to compare to this collection.
+  ///   - areEquivalent: A predicate that returns `true` if its two arguments
+  ///     are equivalent; otherwise, `false`.
+  /// - Returns:  A two-element tuple `(x, y)` where *x* and *y* are the largest
+  ///   indices such that
+  ///   `self[..<x].elementsEqual(possibleMirror[..<y], by: areEquivalent)` is
+  ///   `true`.  Either one or both members may be its source's `endIndex`.
+  ///
+  /// - Complexity: O(*m*), where *m* is the lesser of the length of this
+  ///   collection and the length of `possibleMirror`.
+  @inlinable
+  public func diverges<PossibleMirror: Collection>(
+    from possibleMirror: PossibleMirror,
+    by areEquivalent: (Element, PossibleMirror.Element) throws -> Bool
+  ) rethrows -> (Index, PossibleMirror.Index) {
+    let (index1, index2) = try indices.firstDelta(against: possibleMirror.indices) {
+      try areEquivalent(self[$0], possibleMirror[$1])
+    }
+    return (index1 ?? endIndex, index2 ?? possibleMirror.endIndex)
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// diverges(from:)
+//===----------------------------------------------------------------------===//
+
+extension Collection where Element: Equatable {
+  /// Finds the longest common prefix between this collection and the given
+  /// collection, returning the past-the-end indexes of the respective
+  /// subsequences.
+  ///
+  /// If one collection is a proper prefix of the other, its corresponding
+  /// member in the emitted result will be its source's `endIndex`.  If the two
+  /// collections are equal, both members of the emitted result will be their
+  /// sources' respective `endIndex`.
+  ///
+  /// - Parameters:
+  ///   - possibleMirror: A collection to compare to this collection.
+  /// - Returns: A two-element tuple containing, upon finding the earliest
+  ///   diverging elements between this sequence and `possibleMirror`, those
+  ///   differing elements.  If at least one of the sequences ends before a
+  ///   difference is found, the corresponding member of the returned tuple is
+  ///   `nil`.
+  /// - Returns:  A two-element tuple `(x, y)` where *x* and *y* are the largest
+  ///   indices such that `self[..<x].elementsEqual(possibleMirror[..<y])` is
+  ///   `true`.  Either one or both members may be its source's `endIndex`.
+  ///
+  /// - Complexity: O(*m*), where *m* is the lesser of the length of this
+  ///   collection and the length of `possibleMirror`.
+  @inlinable
+  public func diverges<PossibleMirror: Collection>(
+    from possibleMirror: PossibleMirror
+  ) -> (Index, PossibleMirror.Index) where PossibleMirror.Element == Element {
+    return diverges(from: possibleMirror, by: ==)
+  }
+}

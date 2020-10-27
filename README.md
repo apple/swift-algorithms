@@ -31,6 +31,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 #### Comparisons
 
 - [`firstDelta(against: by:)`, `firstDelta(against:)`](./Guides/FirstDelta.md): Finds the first corresponding elements of two sequences after their common prefix.
+- [`diverges(from: by:)`, `diverges(from:)`](./Guides/FirstDelta.md): Finds the past-the-end indexes for two collections' common prefix.
 
 #### Other useful operations
 
