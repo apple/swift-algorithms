@@ -151,11 +151,6 @@ extension Collection where Element: Equatable {
   ///
   /// - Parameters:
   ///   - possibleMirror: A collection to compare to this collection.
-  /// - Returns: A two-element tuple containing, upon finding the earliest
-  ///   diverging elements between this sequence and `possibleMirror`, those
-  ///   differing elements.  If at least one of the sequences ends before a
-  ///   difference is found, the corresponding member of the returned tuple is
-  ///   `nil`.
   /// - Returns:  A two-element tuple `(x, y)` where *x* and *y* are the largest
   ///   indices such that `self[..<x].elementsEqual(possibleMirror[..<y])` is
   ///   `true`.  Either one or both members may be its source's `endIndex`.
