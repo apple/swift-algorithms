@@ -164,3 +164,77 @@ extension Collection where Element: Equatable {
     return diverges(from: possibleMirror, by: ==)
   }
 }
+
+//===----------------------------------------------------------------------===//
+// converges(with: by:)
+//===----------------------------------------------------------------------===//
+
+extension BidirectionalCollection {
+  /// Finds the longest common suffix between this collection and the given
+  /// collection, using the given predicate as the equivalence test, returning
+  /// the starting indexes of the respective subsequences.
+  ///
+  /// The predicate must be a *equivalence relation* over the elements. That
+  /// is, for any elements `a`, `b`, and `c`, the following conditions must
+  /// hold:
+  ///
+  /// - `areEquivalent(a, a)` is always `true`. (Reflexivity)
+  /// - `areEquivalent(a, b)` implies `areEquivalent(b, a)`. (Symmetry)
+  /// - If `areEquivalent(a, b)` and `areEquivalent(b, c)` are both `true`, then
+  ///   `areEquivalent(a, c)` is also `true`. (Transitivity)
+  ///
+  /// If one collection is a proper suffix of the other, its corresponding
+  /// member in the emitted result will be its source's `startIndex`.  If the
+  /// two collections are equivalent, both members of the emitted result will be
+  /// their sources' respective `startIndex`.
+  ///
+  /// - Parameters:
+  ///   - possibleMirror: A collection to compare to this collection.
+  ///   - areEquivalent: A predicate that returns `true` if its two arguments
+  ///     are equivalent; otherwise, `false`.
+  /// - Returns:  A two-element tuple `(x, y)` where *x* and *y* are the
+  ///   smallest indices such that
+  ///   `self[x...].elementsEqual(possibleMirror[y...], by: areEquivalent)` is
+  ///   `true`.  Either one or both members may be its source's `startIndex`.
+  ///
+  /// - Complexity: O(*m*), where *m* is the lesser of the length of this
+  ///   collection and the length of `possibleMirror`.
+  @inlinable
+  public func converges<PossibleMirror: BidirectionalCollection>(
+    with possibleMirror: PossibleMirror,
+    by areEquivalent: (Element, PossibleMirror.Element) throws -> Bool
+  ) rethrows -> (Index, PossibleMirror.Index) {
+    let (reversed1, reversed2) = try reversed().diverges(from: possibleMirror.reversed(), by: areEquivalent)
+    return (reversed1.base, reversed2.base)
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// converges(with:)
+//===----------------------------------------------------------------------===//
+
+extension BidirectionalCollection where Element: Equatable {
+  /// Finds the longest common suffix between this collection and the given
+  /// collection, returning the starting indexes of the respective subsequences.
+  ///
+  /// If one collection is a proper suffix of the other, its corresponding
+  /// member in the emitted result will be its source's `startIndex`.  If the
+  /// two collections are equal, both members of the emitted result will be
+  /// their sources' respective `startIndex`.
+  ///
+  /// - Parameters:
+  ///   - possibleMirror: A collection to compare to this collection.
+  /// - Returns:  A two-element tuple `(x, y)` where *x* and *y* are the
+  ///   smallest indices such that
+  ///   `self[x...].elementsEqual(possibleMirror[y...])` is `true`.  Either one
+  ///   or both members may be its source's `startIndex`.
+  ///
+  /// - Complexity: O(*m*), where *m* is the lesser of the length of this
+  ///   collection and the length of `possibleMirror`.
+  @inlinable
+  public func converges<PossibleMirror: BidirectionalCollection>(
+    with possibleMirror: PossibleMirror
+  ) -> (Index, PossibleMirror.Index) where PossibleMirror.Element == Element {
+    return converges(with: possibleMirror, by: ==)
+  }
+}

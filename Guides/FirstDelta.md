@@ -4,7 +4,9 @@
  [Tests](../Tests/SwiftAlgorithmsTests/FirstDeltaTests.swift)]
 
 Methods for finding the first place that two sequences differ.  There are
-variants for when both sequences are collections.
+variants for when both sequences are collections.  For bidirectional
+collections, there are related methods for finding where two sources become the
+same.
 
 The methods for finding the differences in sequences can be viewed as the
 common core operation for the Standard Library's `elementsEqual(_: by:)` and
@@ -16,9 +18,10 @@ common core operation for the Standard Library's `elementsEqual(_: by:)` and
 
 The element-returning methods are declared as extensions to `Sequence`.  The
 index-returning methods are declared as extensions to `Collection`.  The
-overloads that default comparisons to the standard equality operator are
-constrained to when the sources share the same `Element` type and said type
-conforms to `Equatable`.
+suffix-targeting methods are declared as extensions to
+`BidirectionalCollection`.  The overloads that default comparisons to the
+standard equality operator are constrained to when the sources share the same
+`Element` type and said type conforms to `Equatable`.
 
 ```swift
 extension Sequence {
@@ -44,6 +47,19 @@ extension Collection {
 extension Collection where Element: Equatable {
     func diverges<PossibleMirror: Collection>(
         from possibleMirror: PossibleMirror
+    ) -> (Index, PossibleMirror.Index) where PossibleMirror.Element == Element
+}
+
+extension BidirectionalCollection {
+   func converges<PossibleMirror: BidirectionalCollection>(
+       with possibleMirror: PossibleMirror,
+       by areEquivalent: (Element, PossibleMirror.Element) throws -> Bool
+   ) rethrows -> (Index, PossibleMirror.Index)
+}
+
+extension BidirectionalCollection where Element: Equatable {
+    func converges<PossibleMirror: BidirectionalCollection>(
+        with possibleMirror: PossibleMirror
     ) -> (Index, PossibleMirror.Index) where PossibleMirror.Element == Element
 }
 ```

@@ -12,7 +12,7 @@
 import XCTest
 import Algorithms
 
-/// Unit tests for the `firstDelta` and `diverges` methods.
+/// Unit tests for the `firstDelta`, `diverges`, and `converges` methods.
 final class FirstDeltaTests: XCTestCase {
   /// Check two empty sequences.
   func testEmptyVsEmpty() {
@@ -24,6 +24,10 @@ final class FirstDeltaTests: XCTestCase {
     let dualEmptyDivergence = empty.diverges(from: empty)
     XCTAssertEqual(dualEmptyDivergence.0, 0)
     XCTAssertEqual(dualEmptyDivergence.1, 0)
+
+    let dualEmptyConvergence = empty.converges(with: empty)
+    XCTAssertEqual(dualEmptyConvergence.0, 0)
+    XCTAssertEqual(dualEmptyConvergence.1, 0)
   }
 
   /// Check an empty sequence and a non-empty one.
@@ -43,6 +47,13 @@ final class FirstDeltaTests: XCTestCase {
     XCTAssertEqual(emptySingleDivergence.1, single.startIndex)
     XCTAssertEqual(singleEmptyDivergence.0, single.startIndex)
     XCTAssertEqual(singleEmptyDivergence.1, empty.endIndex)
+
+    let emptySingleConvergence = empty.converges(with: single),
+        singleEmptyConvergence = single.converges(with: empty)
+    XCTAssertEqual(emptySingleConvergence.0, empty.startIndex)
+    XCTAssertEqual(emptySingleConvergence.1, single.endIndex)
+    XCTAssertEqual(singleEmptyConvergence.0, single.endIndex)
+    XCTAssertEqual(singleEmptyConvergence.1, empty.startIndex)
   }
 
   /// Check identical non-empty sequences.
@@ -63,6 +74,13 @@ final class FirstDeltaTests: XCTestCase {
     XCTAssertEqual(dualSingleDivergence.1, single.endIndex)
     XCTAssertEqual(dualMultipleDivergence.0, multiple.endIndex)
     XCTAssertEqual(dualMultipleDivergence.1, multiple.endIndex)
+
+    let dualSingleConvergence = single.converges(with: single),
+        dualMultipleConvergence = multiple.converges(with: multiple)
+    XCTAssertEqual(dualSingleConvergence.0, single.startIndex)
+    XCTAssertEqual(dualSingleConvergence.1, single.startIndex)
+    XCTAssertEqual(dualMultipleConvergence.0, multiple.startIndex)
+    XCTAssertEqual(dualMultipleConvergence.1, multiple.startIndex)
   }
 
   /// Check a non-empty sequence and its prefix.
@@ -106,5 +124,25 @@ final class FirstDeltaTests: XCTestCase {
     let samples12Divergence = sample1.diverges(from: sample2)
     XCTAssertEqual(samples12Divergence.0, sample1.startIndex)
     XCTAssertEqual(samples12Divergence.1, sample2.startIndex)
+
+    let samples12Convergence = sample1.converges(with: sample2)
+    XCTAssertEqual(samples12Convergence.0, sample1.endIndex)
+    XCTAssertEqual(samples12Convergence.1, sample2.endIndex)
+  }
+
+  /// Check non-empty sequences for their suffixes.
+  func testSuffixes() {
+    let short = [4.4, 5.5, 6.6, 7.7], long = [1.1, 2.2, 3.3] + short
+    let shortLongConvergence = short.converges(with: long),
+        longShortConvergence = long.converges(with: short)
+    XCTAssertEqual(shortLongConvergence.0, short.startIndex)
+    XCTAssertEqual(shortLongConvergence.1, long.indices.dropFirst(3).first)
+    XCTAssertEqual(longShortConvergence.0, long.indices.dropFirst(3).first)
+    XCTAssertEqual(longShortConvergence.1, short.startIndex)
+
+    let sample1 = [7.7, 9.9, 11.11, 13.13], sample2 = [5.5, 7.7, 11.11, 13.13]
+    let samples12Convergence = sample1.converges(with: sample2)
+    XCTAssertEqual(samples12Convergence.0, 2)
+    XCTAssertEqual(samples12Convergence.1, 2)
   }
 }

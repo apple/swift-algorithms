@@ -17,7 +17,8 @@ package updates, you can specify your package dependency using
 - The `firstDelta(against: by:)` and `firstDelta(against:)` methods have been
   added.  They find where two sequences start to differ.  The
   `diverges(from: by:)` and `diverges(from:)` methods are the analogs for
-  collections.
+  collections.  The `converges(with: by:)` and `converges(with:)` flip the
+  search to identify where two bidirectional collections start to be the same.
 
 ---
 
