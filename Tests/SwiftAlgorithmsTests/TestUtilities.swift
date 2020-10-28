@@ -256,3 +256,14 @@ func validateIndexTraversals<C>(
     }
   }
 }
+
+func XCTAssertOrderedIndices<C: Collection>(
+  _ expression: @autoclosure () throws -> C,
+  _ message: @autoclosure () -> String = "",
+  file: StaticString = #file, line: UInt = #line
+) rethrows {
+  let collection = try expression()
+  for indices in collection.indices.combinations(ofCount: 2) {
+    XCTAssertLessThan(indices[0], indices[1], message(), file: file, line: line)
+  }
+}

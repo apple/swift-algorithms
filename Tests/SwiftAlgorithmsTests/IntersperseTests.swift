@@ -14,7 +14,9 @@ import Algorithms
 
 final class IntersperseTests: XCTestCase {
   func testString() {
-    XCTAssertEqualSequences("ABCDE".interspersed(with: "-"), "A-B-C-D-E")
+    let interspersed = "ABCDE".interspersed(with: "-")
+    XCTAssertEqualSequences(interspersed, "A-B-C-D-E")
+    XCTAssertOrderedIndices(interspersed)
   }
 
   func testStringEmpty() {
@@ -22,7 +24,9 @@ final class IntersperseTests: XCTestCase {
   }
 
   func testArray() {
-    XCTAssertEqualSequences([1,2,3,4].interspersed(with: 0), [1,0,2,0,3,0,4])
+    let interspersed = [1,2,3,4].interspersed(with: 0)
+    XCTAssertEqualSequences(interspersed, [1,0,2,0,3,0,4])
+    XCTAssertOrderedIndices(interspersed)
   }
 
   func testArrayEmpty() {
