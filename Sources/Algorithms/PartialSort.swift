@@ -7,6 +7,7 @@
 //
 // See https://swift.org/LICENSE.txt for license information
 //
+//===----------------------------------------------------------------------===//
 
 extension Collection {
   /// Returns the first k elements of this collection when it's sorted using
@@ -38,18 +39,17 @@ extension Collection {
       Cannot prefix with a negative amount of elements!
       """
     )
-    assert(count <= self.count, """
-      Cannot prefix more than this Collection's size!
-      """
-    )
+
+    // Make sure we are within bounds
+    let prefixCount = Swift.min(count, self.count)
 
     // If we're attempting to prefix more than 10% of the collection, it's faster to sort everything.
-    guard count < (self.count / 10) else {
-      return Array(try sorted(by: areInIncreasingOrder).prefix(count))
+    guard prefixCount < (self.count / 10) else {
+      return Array(try sorted(by: areInIncreasingOrder).prefix(prefixCount))
     }
 
-    var result = try self.prefix(count).sorted(by: areInIncreasingOrder)
-    for e in self.dropFirst(count) {
+    var result = try self.prefix(prefixCount).sorted(by: areInIncreasingOrder)
+    for e in self.dropFirst(prefixCount) {
       if let last = result.last, try areInIncreasingOrder(last, e) {
         continue
       }
