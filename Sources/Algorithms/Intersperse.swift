@@ -56,14 +56,21 @@ extension Intersperse: Sequence {
 
 extension Intersperse: Collection where Base: Collection {
   public struct Index: Comparable {
-    enum Representation: Comparable {
+    enum Representation: Equatable {
       case element(Base.Index)
       case separator(next: Base.Index)
     }
     let representation: Representation
 
     public static func < (lhs: Index, rhs: Index) -> Bool {
-      lhs.representation < rhs.representation
+      switch (lhs.representation, rhs.representation) {
+      case let (.element(li), .element(ri)),
+           let (.separator(next: li), .separator(next: ri)),
+           let (.element(li), .separator(next: ri)):
+        return li < ri
+      case let (.separator(next: li), .element(ri)):
+        return li <= ri
+      }
     }
 
     static func element(_ index: Base.Index) -> Self {
