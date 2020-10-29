@@ -19,6 +19,7 @@ final class SortedPrefixTests: XCTestCase {
     let empty = EmptyCollection<Double>()
     XCTAssertEqual(empty.sortedEndIndex(), empty.endIndex)
     XCTAssertEqual(empty.rampedEndIndex(), empty.endIndex)
+    XCTAssertEqual(empty.firstVariance(), empty.endIndex)
   }
 
   /// Check that single-element sequences are always increasing.
@@ -26,6 +27,7 @@ final class SortedPrefixTests: XCTestCase {
     let single = CollectionOfOne(1.1)
     XCTAssertEqual(single.sortedEndIndex(), single.endIndex)
     XCTAssertEqual(single.rampedEndIndex(), single.endIndex)
+    XCTAssertEqual(single.firstVariance(), single.endIndex)
   }
 
   /// Test for failures at second element.
@@ -33,6 +35,7 @@ final class SortedPrefixTests: XCTestCase {
     let sample = [4.4, -2.2, 0, 5.5]
     XCTAssertEqual(sample.sortedEndIndex(), sample.dropFirst().startIndex)
     XCTAssertEqual(sample.rampedEndIndex(), sample.dropFirst().startIndex)
+    XCTAssertEqual(sample.firstVariance(), sample.dropFirst().startIndex)
   }
 
   /// Test for failures after the second element.
@@ -47,6 +50,7 @@ final class SortedPrefixTests: XCTestCase {
     let repeated = repeatElement(5.5, count: 5)
     XCTAssertEqual(repeated.sortedEndIndex(), repeated.endIndex)
     XCTAssertEqual(repeated.rampedEndIndex(), repeated.dropFirst().startIndex)
+    XCTAssertEqual(repeated.firstVariance(), repeated.endIndex)
   }
 
   /// Check that a range is always increasing.

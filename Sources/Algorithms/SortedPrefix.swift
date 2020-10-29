@@ -86,6 +86,44 @@ extension Collection {
 }
 
 //===----------------------------------------------------------------------===//
+// firstVariance(by:)
+//===----------------------------------------------------------------------===//
+
+extension Collection {
+  /// Returns the index of the earliest element not equivalent to the first
+  /// element, using the given predicate as the equivalence test.
+  ///
+  /// The predicate must be a *equivalence relation* over the elements. That
+  /// is, for any elements `a`, `b`, and `c`, the following conditions must
+  /// hold:
+  ///
+  /// - `areEquivalent(a, a)` is always `true`. (Reflexivity)
+  /// - `areEquivalent(a, b)` implies `areEquivalent(b, a)`. (Symmetry)
+  /// - If `areEquivalent(a, b)` and `areEquivalent(b, c)` are both `true`, then
+  ///   `areEquivalent(a, c)` is also `true`. (Transitivity)
+  ///
+  /// Returns `endIndex` if the collection is shorter than two elements.
+  ///
+  /// - Parameter areEquivalent: A predicate that returns `true` if its two
+  ///   arguments are equivalent; otherwise, `false`.
+  /// - Returns: The index for the first element *x* in `dropFirst()` such that
+  ///   `areEquivalent(first!, x)` is `false`.  If there is no such element,
+  ///   `endIndex` is returned instead.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the collection.
+  @inlinable
+  public func firstVariance(
+    by areEquivalent: (Element, Element) throws -> Bool
+  ) rethrows -> Index {
+    guard let target = first else { return endIndex }
+
+    return try dropFirst().indexed().first(where: {
+      try !areEquivalent(target, $0.element)
+    })?.index ?? endIndex
+  }
+}
+
+//===----------------------------------------------------------------------===//
 // sortedEndIndex()
 // rampedEndIndex()
 //===----------------------------------------------------------------------===//
@@ -120,4 +158,22 @@ extension Collection where Element: Comparable {
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
   public func rampedEndIndex() -> Index { return rampedEndIndex(by: <) }
+}
+
+//===----------------------------------------------------------------------===//
+// firstVariance()
+//===----------------------------------------------------------------------===//
+
+extension Collection where Element: Equatable {
+  /// Returns the index of the earliest element not equal to the first one.
+  ///
+  /// Returns `endIndex` if the collection is shorter than two elements.
+  ///
+  /// - Returns: The index for the first element *x* in `dropFirst()` such that
+  ///   `first! == x` is `false`.  If there is no such element, `endIndex` is
+  ///   returned instead.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the collection.
+  @inlinable
+  public func firstVariance() -> Index { return firstVariance(by: ==) }
 }

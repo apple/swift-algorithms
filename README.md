@@ -32,6 +32,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 - [`sortedEndIndex(by:)`, `sortedEndIndex()`](./Guides/SortedPrefix.md): Reports when a collection stops being sorted.
 - [`rampedEndIndex(by:)`, `rampedEndIndex()`](./Guides/SortedPrefix.md): Reports when a collection stops being strictly increasing.
+- [`firstVariance(by:)`, `firstVariance()`](./Guides/SortedPrefix.md): Reports when a collection stops being at a constant value.
 - [`someSortedPosition(of: by:)`, `someSortedPosition(of:)`](./Guides/BinarySearch.md): Locates if and where a target value is within a sorted collection.
 - [`lowerSortedBound(around: by:)`, `lowerSortedBound(around:)`](./Guides/BinarySearch.md): Reports the lower bound for the equal-valued subsequence within a sorted collection that covers the targeted element.
 - [`upperSortedBound(around: by:)`, `upperSortedBound(around:)`](./Guides/BinarySearch.md): Reports the upper bound for the equal-valued subsequence within a sorted collection that covers the targeted element.
