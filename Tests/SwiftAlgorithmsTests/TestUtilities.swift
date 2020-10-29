@@ -267,3 +267,24 @@ func XCTAssertOrderedIndices<C: Collection>(
     XCTAssertLessThan(indices[0], indices[1], message(), file: file, line: line)
   }
 }
+
+func XCTAssertIndexDistances<C: Collection>(
+  _ expression: @autoclosure () throws -> C,
+  _ message: @autoclosure () -> String = "",
+  file: StaticString = #file, line: UInt = #line
+) rethrows {
+  let collection = try expression()
+  let indices = Array(collection.indices)
+  for pairs in indices.combinations(ofCount: 2) {
+    let start = pairs[0]
+    let end = pairs[1]
+    let startPosition = indices.firstIndex(of: pairs[0])!
+    let endPosition = indices.firstIndex(of: pairs[1])!
+    let distance = collection.distance(from: start, to: end)
+    XCTAssertEqual(distance, endPosition - startPosition, message(), file: file, line: line)
+  }
+  for pairs in zip(indices, 0...) {
+    let distance = collection.distance(from: pairs.0, to: collection.endIndex)
+    XCTAssertEqual(distance, collection.count - pairs.1, message(), file: file, line: line)
+  }
+}

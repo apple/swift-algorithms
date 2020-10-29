@@ -106,6 +106,20 @@ extension Intersperse: Collection where Base: Collection {
     case .separator: return separator
     }
   }
+
+  public func distance(from start: Index, to end: Index) -> Int {
+    switch (start.representation, end.representation) {
+    case let (.element(lhs), .separator(next: rhs)),
+         let (.element(lhs), .element(rhs)) where rhs == base.endIndex:
+      return (2 * base.distance(from: lhs, to: rhs)) - 1
+    case let (.element(lhs), .element(rhs)),
+         let (.separator(lhs), .separator(rhs)),
+         let (.separator(next: lhs), .element(rhs)) where rhs == base.endIndex:
+      return 2 * base.distance(from: lhs, to: rhs)
+    case let (.separator(next: lhs), .element(rhs)):
+      return (2 * base.distance(from: lhs, to: rhs)) + 1
+    }
+  }
 }
 
 extension Intersperse: BidirectionalCollection
