@@ -92,8 +92,8 @@ func validateIndexTraversals<C>(
   file: StaticString = #file, line: UInt = #line
 ) where C: BidirectionalCollection {
   for c in collections {
-    let indices = indices?(c) ?? (c.indices + [c.endIndex])
-    let count = indices.count - 1
+    let indicesIncludingEnd = indices?(c) ?? (c.indices + [c.endIndex])
+    let count = indicesIncludingEnd.count - 1
     
     XCTAssertEqual(
       c.count, count,
@@ -104,11 +104,11 @@ func validateIndexTraversals<C>(
       "Emptiness mismatch",
       file: file, line: line)
     XCTAssertEqual(
-      c.startIndex, indices.first,
+      c.startIndex, indicesIncludingEnd.first,
       "`startIndex` does not equal the first index",
       file: file, line: line)
     XCTAssertEqual(
-      c.endIndex, indices.last,
+      c.endIndex, indicesIncludingEnd.last,
       "`endIndex` does not equal the last index",
       file: file, line: line)
     
@@ -116,7 +116,7 @@ func validateIndexTraversals<C>(
     do {
       var index = c.startIndex
       
-      for (offset, expected) in indices.enumerated().dropFirst() {
+      for (offset, expected) in indicesIncludingEnd.enumerated().dropFirst() {
         c.formIndex(after: &index)
         XCTAssertEqual(
           index, expected,
@@ -132,7 +132,7 @@ func validateIndexTraversals<C>(
     do {
       var index = c.endIndex
 
-      for (offset, expected) in indices.enumerated().dropLast().reversed() {
+      for (offset, expected) in indicesIncludingEnd.enumerated().dropLast().reversed() {
         c.formIndex(before: &index)
         XCTAssertEqual(
           index, expected,
@@ -147,13 +147,13 @@ func validateIndexTraversals<C>(
     // `indices`
     for (offset, index) in c.indices.enumerated() {
       XCTAssertEqual(
-        index, indices[offset],
+        index, indicesIncludingEnd[offset],
         "Index mismatch at offset \(offset) in `indices`",
         file: file, line: line)
     }
     
     // index comparison
-    for (offsetA, a) in indices.enumerated() {
+    for (offsetA, a) in indicesIncludingEnd.enumerated() {
       XCTAssertEqual(
         a, a,
         "Index at offset \(offsetA) does not equal itself",
@@ -163,7 +163,7 @@ func validateIndexTraversals<C>(
         "Index at offset \(offsetA) is less than itself",
         file: file, line: line)
       
-      for (offsetB, b) in indices[..<offsetA].enumerated() {
+      for (offsetB, b) in indicesIncludingEnd[..<offsetA].enumerated() {
         XCTAssertNotEqual(
           a, b,
           "Index at offset \(offsetA) equals index at offset \(offsetB)",
@@ -178,8 +178,8 @@ func validateIndexTraversals<C>(
     }
     
     // `index(_:offsetBy:)` and `distance(from:to:)`
-    for (startOffset, start) in indices.enumerated() {
-      for (endOffset, end) in indices.enumerated() {
+    for (startOffset, start) in indicesIncludingEnd.enumerated() {
+      for (endOffset, end) in indicesIncludingEnd.enumerated() {
         let distance = endOffset - startOffset
         
         XCTAssertEqual(
@@ -200,8 +200,8 @@ func validateIndexTraversals<C>(
     }
     
     // `index(_:offsetBy:limitedBy:)`
-    for (startOffset, start) in indices.enumerated() {
-      for (limitOffset, limit) in indices.enumerated() {
+    for (startOffset, start) in indicesIncludingEnd.enumerated() {
+      for (limitOffset, limit) in indicesIncludingEnd.enumerated() {
         // verifies that the target index corresponding to each offset in
         // `range` can or cannot be reached from `start` using
         // `chain.index(start, offsetBy: _, limitedBy: limit)`, depending on the
@@ -221,7 +221,7 @@ func validateIndexTraversals<C>(
                 file: file, line: line)
             } else {
               XCTAssertEqual(
-                end, indices[targetOffset],
+                end, indicesIncludingEnd[targetOffset],
                 """
                 Index at offset \(startOffset) offset by \(distance) limited \
                 by index at offset \(limitOffset) does not equal index at \
