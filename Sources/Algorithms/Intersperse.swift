@@ -137,6 +137,9 @@ extension Intersperse: BidirectionalCollection
   }
 }
 
+extension Intersperse: RandomAccessCollection
+  where Base: RandomAccessCollection {}
+
 extension Sequence {
 
   /// Returns a sequence containing elements of this sequence with the given
