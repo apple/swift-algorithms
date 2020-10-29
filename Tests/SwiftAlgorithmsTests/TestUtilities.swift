@@ -274,7 +274,8 @@ func XCTAssertIndexDistances<C: Collection>(
   file: StaticString = #file, line: UInt = #line
 ) rethrows {
   let collection = try expression()
-  let indices = Array(collection.indices)
+  // Include the endIndex as it's a valid parameter to distance(from:to:).
+  let indices = Array(collection.indices) + [collection.endIndex]
   for pairs in indices.combinations(ofCount: 2) {
     let start = pairs[0]
     let end = pairs[1]
@@ -282,9 +283,5 @@ func XCTAssertIndexDistances<C: Collection>(
     let endPosition = indices.firstIndex(of: pairs[1])!
     let distance = collection.distance(from: start, to: end)
     XCTAssertEqual(distance, endPosition - startPosition, message(), file: file, line: line)
-  }
-  for pairs in zip(indices, 0...) {
-    let distance = collection.distance(from: pairs.0, to: collection.endIndex)
-    XCTAssertEqual(distance, collection.count - pairs.1, message(), file: file, line: line)
   }
 }
