@@ -145,6 +145,7 @@ func validateIndexTraversals<C>(
     }
     
     // `indices`
+    XCTAssertEqual(c.indices.count, count)
     for (offset, index) in c.indices.enumerated() {
       XCTAssertEqual(
         index, indicesIncludingEnd[offset],
