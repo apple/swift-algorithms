@@ -13,19 +13,19 @@ The inclusion-detection methods are declared as extensions to `Sequence`.  The
 overload that defaults comparisons to the standard less-than operator is
 constrained to when the `Element` type conforms to `Comparable`.
 
-A reported inclusion state is expressed with the `Inclusion` type.  This state
+A reported inclusion state is expressed with the `SetInclusion` type.  This state
 is based on the existence of elements that are shared, exclusive to the first
 sequence, and exclusive to the second sequence.  This includes all the
 degenerate combinations.  Convenience properties are included for easy tests.
 
 ```swift
-enum Inclusion {
+enum SetInclusion {
   case bothUninhabited, onlyFirstInhabited, onlySecondInhabited,
        dualExclusivesOnly, sharedOnly, firstExtendsSecond,
        secondExtendsFirst, dualExclusivesAndShared
 }
 
-extension Inclusion {
+extension SetInclusion {
   var hasExclusivesToFirst: Bool { get }
   var hasExclusivesToSecond: Bool { get }
   var hasSharedElements: Bool { get }
@@ -38,13 +38,13 @@ extension Sequence {
   func sortedOverlap<S: Sequence>(
     with other: S,
     by areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> Inclusion where S.Element == Element
+  ) rethrows -> SetInclusion where S.Element == Element
 }
 
 extension Sequence where Element: Comparable {
   func sortedOverlap<S: Sequence>(
     with other: S
-  ) -> Inclusion where S.Element == Element
+  ) -> SetInclusion where S.Element == Element
 }
 ```
 
