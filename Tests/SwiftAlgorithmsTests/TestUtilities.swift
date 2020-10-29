@@ -73,23 +73,26 @@ func XCTAssertLazy<S: LazySequenceProtocol>(_: S) {}
 /// `indices`, `count`, `isEmpty`, `index(before:)`, `index(after:)`,
 /// `index(_:offsetBy:)`, `index(_:offsetBy:limitedBy:)`, and
 /// `distance(from:to:)` by calling them with just about all possible input
-/// combinations. The return values are validated using the given `indices`
-/// function, which is the source of truth.
+/// combinations. When provided, the `indices` function is used to to test the
+/// collection methods against.
 ///
 /// - Parameters:
 ///   - collections: The collections to be validated.
 ///   - indices: A closure that returns the expected indices of the given
-///     collection, including its `endIndex`, in ascending order.
+///     collection, including its `endIndex`, in ascending order. Only use this
+///     parameter if you are able to compute the indices of the collection
+///     independently of the `Collection` conformance, e.g. by using the
+///     contents of the collection directly.
 ///
 /// - Complexity: O(*n*^3) for each collection, where *n* is the length of the
 ///   collection.
 func validateIndexTraversals<C>(
   _ collections: C...,
-  indices: (C) -> [C.Index],
+  indices: ((C) -> [C.Index])? = nil,
   file: StaticString = #file, line: UInt = #line
 ) where C: BidirectionalCollection {
   for c in collections {
-    let indices = indices(c)
+    let indices = indices?(c) ?? (c.indices + [c.endIndex])
     let count = indices.count - 1
     
     XCTAssertEqual(
