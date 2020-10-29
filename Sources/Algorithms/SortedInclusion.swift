@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 /// The manner two (multi-)sets may overlap, including degenerate cases.
-public enum Inclusion: UInt, CaseIterable {
+public enum SetInclusion: UInt, CaseIterable {
   /// Neither source had any elements.
   case bothUninhabited
   /// Only the first source had any elements.
@@ -29,7 +29,7 @@ public enum Inclusion: UInt, CaseIterable {
   case dualExclusivesAndShared
 }
 
-extension Inclusion {
+extension SetInclusion {
   /// Whether there are elements exclusive to the first source.
   @inlinable public var hasExclusivesToFirst: Bool { rawValue & 0x01 != 0 }
   /// Whether there are elements exclusive to the second source.
@@ -66,6 +66,11 @@ extension Sequence {
   ///   and `c` are incomparable, then `a` and `c` are also incomparable.
   ///   (Transitive incomparability)
   ///
+  /// - Precondition:
+  ///   - Both the receiver and `other` are sorted according to
+  ///     `areInIncreasingOrder`.
+  ///   - Both the receiver and `other` should be finite.
+  ///
   /// - Parameters:
   ///   - other: A sequence to compare to this sequence.
   ///   - areInIncreasingOrder:  A predicate that returns `true` if its first
@@ -78,7 +83,7 @@ extension Sequence {
   public func sortedOverlap<S: Sequence>(
     with other: S,
     by areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> Inclusion where S.Element == Element {
+  ) rethrows -> SetInclusion where S.Element == Element {
     var rawResult: UInt = 0, cache, otherCache: Element?, isDone = false
     var iterator = makeIterator(), otherIterator = other.makeIterator()
     while !isDone {
@@ -108,7 +113,7 @@ extension Sequence {
         isDone = rawResult == 0x07
       }
     }
-    return Inclusion(rawValue: rawResult)!
+    return SetInclusion(rawValue: rawResult)!
   }
 }
 
@@ -120,6 +125,10 @@ extension Sequence where Element: Comparable {
   /// Returns how this sequence and the given sequence overlap, assuming both
   /// are sorted.
   ///
+  /// - Precondition:
+  ///   - Both the receiver and `other` are sorted.
+  ///   - Both the receiver and `other` should be finite.
+  ///
   /// - Parameters:
   ///   - other: A sequence to compare to this sequence.
   /// - Returns: The degree of inclusion between the sequences.
@@ -127,7 +136,7 @@ extension Sequence where Element: Comparable {
   /// - Complexity: O(*m*), where *m* is the lesser of the length of the
   ///   sequence and the length of `other`.
   @inlinable
-  public func sortedOverlap<S: Sequence>(with other: S) -> Inclusion
+  public func sortedOverlap<S: Sequence>(with other: S) -> SetInclusion
   where S.Element == Element {
     return sortedOverlap(with: other, by: <)
   }

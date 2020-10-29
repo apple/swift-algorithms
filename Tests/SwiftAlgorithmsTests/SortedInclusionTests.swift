@@ -12,33 +12,33 @@
 import XCTest
 import Algorithms
 
-/// Unit tests for the `sortedOverlap` method and `Inclusion` type.
+/// Unit tests for the `sortedOverlap` method and `SetInclusion` type.
 final class SortedInclusionTests: XCTestCase {
-  /// Check the `Inclusion` type's properties.
+  /// Check the `SetInclusion` type's properties.
   func testInclusion() {
-    XCTAssertEqualSequences(Inclusion.allCases, [
+    XCTAssertEqualSequences(SetInclusion.allCases, [
       .bothUninhabited, .onlyFirstInhabited, .onlySecondInhabited,
       .dualExclusivesOnly, .sharedOnly, .firstExtendsSecond,
       .secondExtendsFirst, .dualExclusivesAndShared
     ])
 
-    XCTAssertEqualSequences(Inclusion.allCases.map(\.hasExclusivesToFirst), [
+    XCTAssertEqualSequences(SetInclusion.allCases.map(\.hasExclusivesToFirst), [
       false, true, false, true, false, true, false, true
     ])
-    XCTAssertEqualSequences(Inclusion.allCases.map(\.hasExclusivesToSecond), [
+    XCTAssertEqualSequences(SetInclusion.allCases.map(\.hasExclusivesToSecond), [
       false, false, true, true, false, false, true, true
     ])
-    XCTAssertEqualSequences(Inclusion.allCases.map(\.hasSharedElements), [
+    XCTAssertEqualSequences(SetInclusion.allCases.map(\.hasSharedElements), [
       false, false, false, false, true, true, true, true
     ])
 
-    XCTAssertEqualSequences(Inclusion.allCases.map(\.areIdentical), [
+    XCTAssertEqualSequences(SetInclusion.allCases.map(\.areIdentical), [
       true, false, false, false, true, false, false, false
     ])
-    XCTAssertEqualSequences(Inclusion.allCases.map(\.doesFirstIncludeSecond), [
+    XCTAssertEqualSequences(SetInclusion.allCases.map(\.doesFirstIncludeSecond), [
       true, true, false, false, true, true, false, false
     ])
-    XCTAssertEqualSequences(Inclusion.allCases.map(\.doesSecondIncludeFirst), [
+    XCTAssertEqualSequences(SetInclusion.allCases.map(\.doesSecondIncludeFirst), [
       true, false, true, false, true, false, true, false
     ])
   }
