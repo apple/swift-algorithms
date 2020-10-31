@@ -127,20 +127,34 @@ final class PartialSortTests: XCTestCase {
     assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 6)
     assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 20)
     assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 1000)
+    assertStability([0,0,0,0,0], withPrefix: 0)
+    assertStability([0,0,0,0,0], withPrefix: 1)
+    assertStability([0,0,0,0,0], withPrefix: 2)
+    assertStability([0,0,0,0,0], withPrefix: 5)
+    assertStability([0,0], withPrefix: 1)
+    assertStability([0,0], withPrefix: 2)
+    assertStability([0,1,0,1,0,1], withPrefix: 2)
+    assertStability([0,1,0,1,0,1], withPrefix: 6)
+    assertStability([0,0,0,1,1,1], withPrefix: 1)
+    assertStability([0,0,0,1,1,1], withPrefix: 3)
+    assertStability([0,0,0,1,1,1], withPrefix: 4)
+    assertStability([0,0,0,1,1,1], withPrefix: 6)
+    assertStability([1,1,1,0,0,0], withPrefix: 1)
+    assertStability([1,1,1,0,0,0], withPrefix: 3)
+    assertStability([1,1,1,0,0,0], withPrefix: 4)
+    assertStability([1,1,1,0,0,0], withPrefix: 6)
   }
 
   func assertStability(
     _ actual: [Int],
-    withPrefix prefixCount: Int,
-    file: StaticString = #file,
-    line: UInt = #line
+    withPrefix prefixCount: Int
   ) {
     let indexed = actual.enumerated()
-    let sorted = indexed.map { $0 } .sortedPrefix(prefixCount) { $0.element < $1.element }
+    let sorted = indexed.map { $0 }.sortedPrefix(prefixCount) { $0.element < $1.element }
 
     for element in Set(actual) {
       let filtered = sorted.filter { $0.element == element }.map(\.offset)
       XCTAssertEqual(filtered, filtered.sorted())
-      }
+    }
   }
 }
