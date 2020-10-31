@@ -107,6 +107,29 @@ extension Intersperse: Collection where Base: Collection {
     }
   }
 
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    switch (i.representation, distance.isMultiple(of: 2)) {
+    case (_, _) where distance == 0:
+      return i
+    case (.element(base.endIndex), true):
+      return .separator(next: base.index(base.endIndex, offsetBy: distance / 2))
+    case (.element(base.endIndex), false):
+      return .element(base.index(base.endIndex, offsetBy: (distance - 1) / 2))
+    case (let .element(index), true):
+      return .element(base.index(index, offsetBy: distance / 2))
+    case (let .element(index), false):
+      let index = base.index(index, offsetBy: (distance + 1) / 2)
+      return index == base.endIndex ? endIndex : .separator(next: index)
+    case (let .separator(next: index), true):
+      let index = base.index(index, offsetBy: distance / 2)
+      return index == base.endIndex ? endIndex : .separator(next: index)
+    case (let .separator(next: index), false):
+      return .element(base.index(index, offsetBy: (distance - 1) / 2))
+    }
+  }
+
+  // TODO: Implement index(_:offsetBy:limitedBy:)
+
   public func distance(from start: Index, to end: Index) -> Int {
     switch (start.representation, end.representation) {
     // Handling endIndex
