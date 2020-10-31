@@ -16,23 +16,25 @@ final class IntersperseTests: XCTestCase {
   func testString() {
     let interspersed = "ABCDE".interspersed(with: "-")
     XCTAssertEqualSequences(interspersed, "A-B-C-D-E")
-    XCTAssertOrderedIndices(interspersed)
-    XCTAssertIndexDistances(interspersed)
+    validateIndexTraversals(interspersed)
   }
 
   func testStringEmpty() {
-    XCTAssertEqualSequences("".interspersed(with: "-"), "")
+    let interspersed = "".interspersed(with: "-")
+    XCTAssertEqualSequences(interspersed, "")
+    validateIndexTraversals(interspersed)
   }
 
   func testArray() {
     let interspersed = [1,2,3,4].interspersed(with: 0)
     XCTAssertEqualSequences(interspersed, [1,0,2,0,3,0,4])
-    XCTAssertOrderedIndices(interspersed)
-    XCTAssertIndexDistances(interspersed)
+    validateIndexTraversals(interspersed)
   }
 
   func testArrayEmpty() {
-    XCTAssertEqualSequences([].interspersed(with: 0), [])
+    let interspersed = [].interspersed(with: 0)
+    XCTAssertEqualSequences(interspersed, [])
+    validateIndexTraversals(interspersed)
   }
 
   func testCollection() {
@@ -43,5 +45,6 @@ final class IntersperseTests: XCTestCase {
   func testBidirectionalCollection() {
     let reversed = "ABCDE".interspersed(with: "-").reversed()
     XCTAssertEqualSequences(reversed, "E-D-C-B-A")
+    validateIndexTraversals(reversed)
   }
 }

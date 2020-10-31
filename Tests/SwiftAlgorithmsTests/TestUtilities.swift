@@ -256,32 +256,3 @@ func validateIndexTraversals<C>(
     }
   }
 }
-
-func XCTAssertOrderedIndices<C: Collection>(
-  _ expression: @autoclosure () throws -> C,
-  _ message: @autoclosure () -> String = "",
-  file: StaticString = #file, line: UInt = #line
-) rethrows {
-  let collection = try expression()
-  for indices in collection.indices.combinations(ofCount: 2) {
-    XCTAssertLessThan(indices[0], indices[1], message(), file: file, line: line)
-  }
-}
-
-func XCTAssertIndexDistances<C: Collection>(
-  _ expression: @autoclosure () throws -> C,
-  _ message: @autoclosure () -> String = "",
-  file: StaticString = #file, line: UInt = #line
-) rethrows {
-  let collection = try expression()
-  // Include the endIndex as it's a valid parameter to distance(from:to:).
-  let indices = Array(collection.indices) + [collection.endIndex]
-  for pairs in indices.combinations(ofCount: 2) {
-    let start = pairs[0]
-    let end = pairs[1]
-    let startPosition = indices.firstIndex(of: pairs[0])!
-    let endPosition = indices.firstIndex(of: pairs[1])!
-    let distance = collection.distance(from: start, to: end)
-    XCTAssertEqual(distance, endPosition - startPosition, message(), file: file, line: line)
-  }
-}
