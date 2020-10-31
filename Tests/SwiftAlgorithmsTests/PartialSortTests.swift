@@ -114,4 +114,33 @@ final class PartialSortTests: XCTestCase {
       [1, 2, 3, 4, 7, 20, 70, 90, 100]
     )
   }
+  
+  func testSortedPrefixWithHugePrefix() {
+    XCTAssertEqual(
+      [4, 2, 1, 3].sortedPrefix(.max),
+      [1, 2, 3, 4]
+    )
+  }
+
+  func testStability() {
+    assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 3)
+    assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 6)
+    assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 20)
+    assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 1000)
+  }
+
+  func assertStability(
+    _ actual: [Int],
+    withPrefix prefixCount: Int,
+    file: StaticString = #file,
+    line: UInt = #line
+  ) {
+    let indexed = actual.enumerated()
+    let sorted = indexed.map { $0 } .sortedPrefix(prefixCount) { $0.element < $1.element }
+
+    for element in Set(actual) {
+      let filtered = sorted.filter { $0.element == element }.map(\.offset)
+      XCTAssertEqual(filtered, filtered.sorted())
+      }
+  }
 }
