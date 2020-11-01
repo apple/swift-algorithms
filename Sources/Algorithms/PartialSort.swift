@@ -43,7 +43,8 @@ extension Collection {
     // Make sure we are within bounds.
     let prefixCount = Swift.min(count, self.count)
 
-    // If we're attempting to prefix more than 10% of the collection, it's faster to sort everything.
+    // If we're attempting to prefix more than 10% of the collection, it's
+    // faster to sort everything.
     guard prefixCount < (self.count / 10) else {
       return Array(try sorted(by: areInIncreasingOrder).prefix(prefixCount))
     }
