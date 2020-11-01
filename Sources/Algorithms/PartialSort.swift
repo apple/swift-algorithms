@@ -40,7 +40,7 @@ extension Collection {
       """
     )
 
-    // Make sure we are within bounds
+    // Make sure we are within bounds.
     let prefixCount = Swift.min(count, self.count)
 
     // If we're attempting to prefix more than 10% of the collection, it's faster to sort everything.
