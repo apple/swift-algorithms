@@ -17,7 +17,7 @@ extension Collection {
   /// smallest values:
   ///
   ///     let numbers = [7,1,6,2,8,3,9]
-  ///     let smallestThree = numbers.sortedPrefix(3, <)
+  ///     let smallestThree = numbers.sortedPrefix(3, by: <)
   ///     // [1, 2, 3]
   ///
   /// If you need to sort a collection but only need access to a prefix of its
@@ -65,14 +65,14 @@ extension Collection {
 }
 
 extension Collection where Element: Comparable {
-  /// Returns the first k elements of this collection when it's sorted using
-  /// the given predicate as the comparison between elements.
+  /// Returns the first k elements of this collection when it's sorted in
+  /// ascending order.
   ///
   /// This example partially sorts an array of integers to retrieve its three
   /// smallest values:
   ///
   ///     let numbers = [7,1,6,2,8,3,9]
-  ///     let smallestThree = numbers.sortedPrefix(3, <)
+  ///     let smallestThree = numbers.sortedPrefix(3)
   ///     // [1, 2, 3]
   ///
   /// If you need to sort a collection but only need access to a prefix of its

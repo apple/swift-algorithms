@@ -12,7 +12,7 @@
 import XCTest
 import Algorithms
 
-final class PartialSortTests: XCTestCase {
+final class SortedPrefixTests: XCTestCase {
   func testEmpty() {
     let array = [Int]()
     XCTAssertEqual(array.sortedPrefix(0), [])

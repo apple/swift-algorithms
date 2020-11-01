@@ -30,7 +30,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 #### Partial sorting
 
-- [`sortedPrefix(_:by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/PartialSort.md): Returns the first k elements of a sorted collection.
+- [`sortedPrefix(_:by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SortedPrefix.md): Returns the first k elements of a sorted collection.
 
 #### Other useful operations
 
