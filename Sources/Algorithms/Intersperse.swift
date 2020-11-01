@@ -83,18 +83,17 @@ extension Intersperse: Collection where Base: Collection {
   }
 
   public var startIndex: Index {
-    .element(base.startIndex)
+    base.startIndex == base.endIndex ? endIndex : .element(base.startIndex)
   }
 
   public var endIndex: Index {
-    .element(base.endIndex)
+    .separator(next: base.endIndex)
   }
 
   public func index(after i: Index) -> Index {
     switch i.representation {
     case let .element(index):
-      let next = base.index(after: index)
-      return next == base.endIndex ? endIndex : .separator(next: next)
+      return .separator(next: base.index(after: index))
     case let .separator(next):
       return .element(next)
     }
@@ -109,20 +108,12 @@ extension Intersperse: Collection where Base: Collection {
 
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     switch (i.representation, distance.isMultiple(of: 2)) {
-    case (_, _) where distance == 0:
-      return i
-    case (.element(base.endIndex), true):
-      return .separator(next: base.index(base.endIndex, offsetBy: distance / 2))
-    case (.element(base.endIndex), false):
-      return .element(base.index(base.endIndex, offsetBy: (distance - 1) / 2))
     case (let .element(index), true):
       return .element(base.index(index, offsetBy: distance / 2))
     case (let .element(index), false):
-      let index = base.index(index, offsetBy: (distance + 1) / 2)
-      return index == base.endIndex ? endIndex : .separator(next: index)
+      return .separator(next: base.index(index, offsetBy: (distance + 1) / 2))
     case (let .separator(next: index), true):
-      let index = base.index(index, offsetBy: distance / 2)
-      return index == base.endIndex ? endIndex : .separator(next: index)
+      return .separator(next: base.index(index, offsetBy: distance / 2))
     case (let .separator(next: index), false):
       return .element(base.index(index, offsetBy: (distance - 1) / 2))
     }
@@ -132,18 +123,6 @@ extension Intersperse: Collection where Base: Collection {
 
   public func distance(from start: Index, to end: Index) -> Int {
     switch (start.representation, end.representation) {
-    // Handling endIndex
-    case (.element(base.endIndex), .element(base.endIndex)):
-      return 0
-    case let (.element(element), .element(base.endIndex)):
-      return 2 * base.distance(from: element, to: base.endIndex) - 1
-    case let (.element(base.endIndex), .element(element)):
-      return 2 * base.distance(from: base.endIndex, to: element) + 1
-    case let (.separator(next: separator), .element(base.endIndex)):
-      return 2 * base.distance(from: separator, to: base.endIndex)
-    case let (.element(base.endIndex), .separator(next: separator)):
-      return 2 * base.distance(from: base.endIndex, to: separator)
-    // Non-endIndex cases
     case let (.element(element), .separator(next: separator)):
       return 2 * base.distance(from: element, to: separator) - 1
     case let (.separator(next: separator), .element(element)):
@@ -160,8 +139,6 @@ extension Intersperse: BidirectionalCollection
 {
   public func index(before i: Index) -> Index {
     switch i.representation {
-    case let .element(index) where index == base.endIndex:
-      return .element(base.index(before: index))
     case let .element(index):
       return .separator(next: index)
     case let .separator(next):
