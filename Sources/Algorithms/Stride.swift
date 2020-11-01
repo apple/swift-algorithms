@@ -60,6 +60,11 @@ extension Stride: Collection {
       self.base = base
     }
     
+    init?(_ base: Base.Index?) {
+      guard let base = base else { return nil }
+      self.base = base
+    }
+    
     public static func < (lhs: Index, rhs: Index) -> Bool {
       lhs.base < rhs.base
     }
@@ -79,17 +84,34 @@ extension Stride: Collection {
   
   public func index(after i: Index) -> Index {
     precondition(i.base < base.endIndex, "Advancing past end index")
-    return base.index(i.base, offsetBy: stride, limitedBy: base.endIndex)
-      .map(Index.init) ?? endIndex
+    return index(i, offsetBy: 1, limitedBy: endIndex) ?? endIndex
   }
-  
+
   public func index(
     _ i: Index,
-    offsetBy distance: Int,
+    offsetBy n: Int,
     limitedBy limit: Index
   ) -> Index? {
-    base.index(i.base, offsetBy: distance * stride, limitedBy: limit.base)
-      .map(Index.init)
+    guard n != 0 else { return i }
+    guard limit != i else { return nil }
+    switch (i, n) {
+    case (endIndex, ..<0):
+      let baseEnd = base.index(base.endIndex, offsetBy: -((base.count - 1) % stride + 1))
+      return Index(base.index(baseEnd, offsetBy: (n - n.signum()) * stride, limitedBy: limit.base))
+    case (_, 1...):
+      let max = limit < i ? endIndex.base : limit.base
+      let idx = base.index(i.base, offsetBy: n * stride, limitedBy: max)
+      if let idx = idx {
+        return idx > max ? endIndex : Index(idx)
+      }
+      guard i >= limit || limit == endIndex else {
+        return nil
+      }
+      let isToEnd = distance(from: i, to: endIndex) == n
+      return isToEnd ? endIndex : nil
+    case _:
+      return Index(base.index(i.base, offsetBy: n * stride, limitedBy: limit.base))
+    }
   }
 
   public var count: Int {
@@ -99,37 +121,25 @@ extension Stride: Collection {
   
   public func distance(from start: Index, to end: Index) -> Int {
     let distance = base.distance(from: start.base, to: end.base)
-    return distance / stride + (distance % stride > 0 ? 1 : 0)
+    return distance / stride + (abs(distance % stride) > 0 ? distance.signum() : 0)
   }
   
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     precondition(distance <= 0 || i.base < base.endIndex, "Advancing past end index")
     precondition(distance >= 0 || i.base > base.startIndex, "Incrementing past start index")
-    return Index(base.index(i.base, offsetBy: distance * stride))
+    let limit = distance > 0 ? endIndex : startIndex
+    let idx = index(i, offsetBy: distance, limitedBy: limit)
+    precondition(idx != nil, "The distance \(distance) is not valid for this collection")
+    return idx!
   }
 }
 
 extension Stride: BidirectionalCollection
   where Base: RandomAccessCollection {
-  
+
   public func index(before i: Index) -> Index {
     precondition(i.base > base.startIndex, "Incrementing past start index")
-    if i == endIndex {
-      let count = base.count
-      precondition(count > 0, "Can't move before the starting index")
-      return Index(
-        base.index(base.endIndex, offsetBy: -((count - 1) % stride + 1))
-      )
-    } else {
-      guard let step = base.index(
-        i.base,
-        offsetBy: -stride,
-        limitedBy: startIndex.base
-      ) else {
-        fatalError("Incrementing past start index")
-      }
-      return Index(step)
-    }
+    return index(i, offsetBy: -1)
   }
 }
 

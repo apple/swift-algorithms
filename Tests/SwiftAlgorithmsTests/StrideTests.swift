@@ -89,59 +89,26 @@ final class StridingTests: XCTestCase {
   }
   
   func testIndexTraversals() {
+    let zero_to_one_hundered_range = 0...100
     validateIndexTraversals(
-      (0...100).striding(by: 10)
-//      (0...100).striding(by: 11)
-//      (0...100).striding(by: 101)
+      zero_to_one_hundered_range.striding(by: 10),
+      zero_to_one_hundered_range.striding(by: 11),
+      zero_to_one_hundered_range.striding(by: 101)
+    )
+    let zero_to_one_hundered_array = zero_to_one_hundered_range.map{ $0 }
+    validateIndexTraversals(
+      zero_to_one_hundered_array.striding(by: 10),
+      zero_to_one_hundered_array.striding(by: 11),
+      zero_to_one_hundered_array.striding(by: 101)
+    )
+    let string = "swift rocks".map(String.init)
+    validateIndexTraversals(
+      string.striding(by: 1),
+      string.striding(by: 2),
+      string.striding(by: 10)
     )
   }
-  
-  func testDistance() {
 
-    do {
-      let a = (0...100).striding(by: 11)
-      XCTAssertEqual(a.distance(from: a.startIndex, to: a.endIndex), a.count)
-      for (i, index) in a.indices.enumerated() {
-        XCTAssertEqual(a.distance(from: a.startIndex, to: index), i)
-      }
-      
-      var i = a.startIndex
-      a.formIndex(&i, offsetBy: 3)
-      XCTAssertEqual(a.distance(from: a.startIndex, to: i), 3)
-      XCTAssertEqual(a[i], 33)
-    }
-    
-    do {
-      
-      let a = (0...100).striding(by: 10)
-      XCTAssertEqual(a.distance(from: a.startIndex, to: a.endIndex), a.count)
-      
-      for (i, index) in a.indices.enumerated() {
-        XCTAssertEqual(a.distance(from: a.startIndex, to: index), i)
-      }
-      
-      var i = a.startIndex
-      a.formIndex(&i, offsetBy: 3)
-      XCTAssertEqual(a.distance(from: a.startIndex, to: i), 3)
-      XCTAssertEqual(a[i], 30)
-    }
-    
-    do {
-      
-      let a = (0...100).striding(by: 101)
-      XCTAssertEqual(a.distance(from: a.startIndex, to: a.endIndex), a.count)
-      
-      for (i, index) in a.indices.enumerated() {
-        XCTAssertEqual(a.distance(from: a.startIndex, to: index), i)
-      }
-      
-      var i = a.startIndex
-      a.formIndex(&i, offsetBy: 1)
-      XCTAssertEqual(a.distance(from: a.startIndex, to: i), a.count)
-      XCTAssertEqual(i, a.endIndex)
-//      a[i] // == Fatal error: Index out of range
-    }
-  }
   
   func testOffsetBy() {
     let a = (0...100).striding(by: 22)
