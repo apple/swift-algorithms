@@ -84,7 +84,7 @@ extension Stride: Collection {
   
   public func index(after i: Index) -> Index {
     precondition(i.base < base.endIndex, "Advancing past end index")
-    return index(i, offsetBy: 1, limitedBy: endIndex) ?? endIndex
+    return index(i, offsetBy: 1)
   }
 
   public func index(
