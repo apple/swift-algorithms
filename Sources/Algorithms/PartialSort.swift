@@ -53,7 +53,8 @@ extension Collection {
       if let last = result.last, try areInIncreasingOrder(last, e) {
         continue
       }
-      let insertionIndex = try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
+      let insertionIndex =
+        try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
       result.removeLast()
       result.insert(e, at: insertionIndex)
     }
