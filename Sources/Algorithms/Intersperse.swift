@@ -91,6 +91,7 @@ extension Intersperse: Collection where Base: Collection {
   }
 
   public func index(after i: Index) -> Index {
+    precondition(i != endIndex, "Can't advance past endIndex")
     switch i.representation {
     case let .element(index):
       return .separator(next: base.index(after: index))
@@ -138,6 +139,7 @@ extension Intersperse: BidirectionalCollection
   where Base: BidirectionalCollection
 {
   public func index(before i: Index) -> Index {
+    precondition(i != startIndex, "Can't move before startIndex")
     switch i.representation {
     case let .element(index):
       return .separator(next: index)
