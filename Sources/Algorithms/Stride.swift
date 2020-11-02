@@ -34,8 +34,8 @@ extension Collection {
 
 public struct Stride<Base: Collection> {
   
-  public let base: Base
-  public let stride: Int
+  let base: Base
+  let stride: Int
   
   init(base: Base, stride: Int) {
     precondition(stride > 0, "striding must be greater than zero")
