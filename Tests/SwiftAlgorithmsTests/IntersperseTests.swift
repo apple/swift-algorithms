@@ -13,6 +13,16 @@ import XCTest
 import Algorithms
 
 final class IntersperseTests: XCTestCase {
+  func testSequence() {
+    let interspersed = (1...).prefix(5).interspersed(with: 0)
+    XCTAssertEqualSequences(interspersed, [1,0,2,0,3,0,4,0,5])
+  }
+
+  func testSequenceEmpty() {
+    let interspersed = (1...).prefix(0).interspersed(with: 0)
+    XCTAssertEqualSequences(interspersed, [])
+  }
+
   func testString() {
     let interspersed = "ABCDE".interspersed(with: "-")
     XCTAssertEqualSequences(interspersed, "A-B-C-D-E")
