@@ -14,10 +14,10 @@ import Algorithms
 
 final class FirstTests: XCTestCase {
   func testFirstNonNil() {
-    XCTAssertNil([].firstNonNil(of: { $0 }))
-    XCTAssertNil(["A", "B", "C"].firstNonNil(of: { Int($0) }))
-    XCTAssertNil(["A", "B", "C"].firstNonNil(of: { _ in nil }))
-    XCTAssertEqual(["A", "B", "10"].firstNonNil(of: { Int($0) }), 10)
-    XCTAssertEqual(["20", "B", "10"].firstNonNil(of: { Int($0) }), 20)
+    XCTAssertNil([].firstNonNil { $0 })
+    XCTAssertNil(["A", "B", "C"].firstNonNil { Int($0) })
+    XCTAssertNil(["A", "B", "C"].firstNonNil { _ in nil })
+    XCTAssertEqual(["A", "B", "10"].firstNonNil { Int($0) }, 10)
+    XCTAssertEqual(["20", "B", "10"].firstNonNil { Int($0) }, 20)
   }
 }
