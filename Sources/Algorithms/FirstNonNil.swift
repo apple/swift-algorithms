@@ -15,7 +15,9 @@
 
 public extension Sequence {
     /// Returns the first element in `self` that `transform` maps to a `.some`.
-    func firstNonNil<Result>(_ transform: (Element) throws -> Result?) rethrows -> Result? {
+  func firstNonNil<Result>(
+    _ transform: (Element) throws -> Result?
+  ) rethrows -> Result? {
         for value in self {
             if let value = try transform(value) {
                 return value
