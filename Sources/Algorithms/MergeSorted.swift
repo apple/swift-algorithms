@@ -265,6 +265,69 @@ extension MergedSequence: Sequence, LazySequenceProtocol {
     return MergedIterator(firstBase.makeIterator(), secondBase.makeIterator(),
                           keeping: selection, by: areInIncreasingOrder)
   }
+
+  @inlinable
+  public var underestimatedCount: Int {
+    switch selection {
+    case .firstMinusSecond, .secondMinusFirst, .symmetricDifference,
+         .intersection:
+      // Can't even guesstimate these without reading elements.
+      fallthrough
+    case .nothing:
+      return 0
+    case .first:
+      return firstBase.underestimatedCount
+    case .second:
+      return secondBase.underestimatedCount
+    case .union:
+      return Swift.max(firstBase.underestimatedCount,
+                       secondBase.underestimatedCount)
+    case .sum:
+      return firstBase.underestimatedCount + secondBase.underestimatedCount
+    }
+  }
+
+  @inlinable
+  public func withContiguousStorageIfAvailable<R>(
+    _ body: (UnsafeBufferPointer<Element>) throws -> R
+  ) rethrows -> R? {
+    switch selection {
+    case .nothing:
+      return try body(UnsafeBufferPointer(start: nil, count: 0))
+    case .first:
+      return try firstBase.withContiguousStorageIfAvailable(body)
+    case .second:
+      return try secondBase.withContiguousStorageIfAvailable(body)
+    default:
+      return nil
+    }
+  }
+
+  @inlinable
+  public func _customContainsEquatableElement(_ element: Element) -> Bool? {
+    switch (selection, firstBase._customContainsEquatableElement(element),
+            secondBase._customContainsEquatableElement(element)) {
+    case (.nothing, _, _):
+      return false
+    case let (.intersection, contains1?, contains2?):
+      return contains1 && contains2
+    case let (.first, possiblyContains1, _):
+      return possiblyContains1
+    case let (.second, _, possiblyContains2):
+      return possiblyContains2
+    case let (.union, contains1?, contains2?),
+         let (.sum, contains1?, contains2?):
+      return contains1 || contains2
+    case (.union, true, _), (.union, _, true), (.sum, true, _), (.sum, _, true):
+      return true
+    default:
+      // - .intersection can't work if at least one is NIL.
+      // - .union and .sum can't work with dual NIL or one NIL and one FALSE.
+      // - .firstMinusSecond, .secondMinusFirst, and .symmetricDifference can't
+      //   work with just existence; they need the full counts.
+      return nil
+    }
+  }
 }
 
 //===----------------------------------------------------------------------===//

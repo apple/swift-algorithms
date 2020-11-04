@@ -42,6 +42,74 @@ final class MergeSortedTests: XCTestCase {
                       [false, true, true, true, true, false, true, true, true])
   }
 
+  /// Check the rough underestimated counts.
+  func testUnderestimatedCount() {
+    let empty = EmptyCollection<Double>(), single = CollectionOfOne(1.1),
+        repeated = repeatElement(5.5, count: 5)
+    let emptySelfMergers = SetCombination.allCases.map {
+      MergedSequence(empty, empty, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(emptySelfMergers.map(\.underestimatedCount), [
+      0, 0, 0, 0, 0, 0, 0, 0, 0
+    ])
+    
+    let emptySingleMergers = SetCombination.allCases.map {
+      MergedSequence(empty, single, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(emptySingleMergers.map(\.underestimatedCount), [
+      0, 0, 0, 0, 0, 0, 1, 1, 1
+    ])
+
+    let emptyRepeatedMergers = SetCombination.allCases.map {
+      MergedSequence(empty, repeated, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(emptyRepeatedMergers.map(\.underestimatedCount), [
+      0, 0, 0, 0, 0, 0, 5, 5, 5
+    ])
+
+    let singleEmptyMergers = SetCombination.allCases.map {
+      MergedSequence(single, empty, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(singleEmptyMergers.map(\.underestimatedCount), [
+      0, 0, 0, 0, 0, 1, 0, 1, 1
+    ])
+
+    let singleSelfMergers = SetCombination.allCases.map {
+      MergedSequence(single, single, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(singleSelfMergers.map(\.underestimatedCount), [
+      0, 0, 0, 0, 0, 1, 1, 1, 2
+    ])
+
+    let singleRepeatedMergers = SetCombination.allCases.map {
+      MergedSequence(single, repeated, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(singleRepeatedMergers.map(\.underestimatedCount), [
+      0, 0, 0, 0, 0, 1, 5, 5, 6
+    ])
+
+    let repeatedEmptyMergers = SetCombination.allCases.map {
+      MergedSequence(repeated, empty, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(repeatedEmptyMergers.map(\.underestimatedCount), [
+      0, 0, 0, 0, 0, 5, 0, 5, 5
+    ])
+
+    let repeatedSingleMergers = SetCombination.allCases.map {
+      MergedSequence(repeated, single, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(repeatedSingleMergers.map(\.underestimatedCount), [
+      0, 0, 0, 0, 0, 5, 1, 5, 6
+    ])
+
+    let repeatedSelfMergers = SetCombination.allCases.map {
+      MergedSequence(repeated, repeated, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(repeatedSelfMergers.map(\.underestimatedCount), [
+      0, 0, 0, 0, 0, 5, 5, 5, 10
+    ])
+  }
+
   /// Check results from using empty operands, and using the generating methods.
   func testEmpty() {
     let empty = EmptyCollection<Double>()
@@ -142,6 +210,84 @@ final class MergeSortedTests: XCTestCase {
     }
     XCTAssertEqualSequences(sample2To1Merger.map(Array.init), [
       [], s2, s1, all, [], s2, s1, all, all
+    ])
+  }
+
+  /// Check direct buffer access.
+  func testBufferAccess() {
+    let sample1 = [2, 2], sample2 = [3, 3, 3]
+    let sample1to2Mergers = SetCombination.allCases.map {
+      MergedSequence(sample1, sample2, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(sample1to2Mergers.map { merger in
+      merger.withContiguousStorageIfAvailable { buffer in
+        buffer.reduce(0, +)
+      }
+    }, [0, nil, nil, nil, nil, 4, 9, nil, nil])
+
+    let sample2to1Mergers = SetCombination.allCases.map {
+      MergedSequence(sample2, sample1, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(sample2to1Mergers.map { merger in
+      merger.withContiguousStorageIfAvailable { buffer in
+        buffer.reduce(0, +)
+      }
+    }, [0, nil, nil, nil, nil, 9, 4, nil, nil])
+  }
+
+  /// Check the containment implementation method, indirectly.
+  func testOptimizedContainment() {
+    // Both operands' type supports optimized containment tests.
+    let range1 = 0..<2, range2 = 1..<3
+    let range1to2Mergers = SetCombination.allCases.map {
+      MergedSequence(range1, range2, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(range1to2Mergers.map { $0.contains(0) }, [
+      false, true, false, true, false, true, false, true, true
+    ])
+    XCTAssertEqualSequences(range1to2Mergers.map { $0.contains(1) }, [
+      false, false, false, false, true, true, true, true, true
+    ])
+    XCTAssertEqualSequences(range1to2Mergers.map { $0.contains(2) }, [
+      false, false, true, true, false, false, true, true, true
+    ])
+    XCTAssertEqualSequences(range1to2Mergers.map { $0.contains(3) }, [
+      false, false, false, false, false, false, false, false, false
+    ])
+
+    // Exactly one operand's type supports optimized containment tests.
+    let sample1 = Array(range1)
+    let sampleRangeMergers = SetCombination.allCases.map {
+      MergedSequence(sample1, range2, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(sampleRangeMergers.map { $0.contains(0) }, [
+      false, true, false, true, false, true, false, true, true
+    ])
+    XCTAssertEqualSequences(sampleRangeMergers.map { $0.contains(1) }, [
+      false, false, false, false, true, true, true, true, true
+    ])
+    XCTAssertEqualSequences(sampleRangeMergers.map { $0.contains(2) }, [
+      false, false, true, true, false, false, true, true, true
+    ])
+    XCTAssertEqualSequences(sampleRangeMergers.map { $0.contains(3) }, [
+      false, false, false, false, false, false, false, false, false
+    ])
+
+    // Need to check both sides for the NIL-containment operand type.
+    let rangeSampleMergers = SetCombination.allCases.map {
+      MergedSequence(range2, sample1, keeping: $0, by: <)
+    }
+    XCTAssertEqualSequences(rangeSampleMergers.map { $0.contains(0) }, [
+      false, false, true, true, false, false, true, true, true
+    ])
+    XCTAssertEqualSequences(rangeSampleMergers.map { $0.contains(1) }, [
+      false, false, false, false, true, true, true, true, true
+    ])
+    XCTAssertEqualSequences(rangeSampleMergers.map { $0.contains(2) }, [
+      false, true, false, true, false, true, false, true, true
+    ])
+    XCTAssertEqualSequences(rangeSampleMergers.map { $0.contains(3) }, [
+      false, false, false, false, false, false, false, false, false
     ])
   }
 }
