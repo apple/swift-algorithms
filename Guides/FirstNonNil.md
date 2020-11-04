@@ -1,4 +1,4 @@
-# FirstNonNil
+# First Non-Nil
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/FirstNonNil.swift) | 
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/FirstNonNilTests.swift)]
