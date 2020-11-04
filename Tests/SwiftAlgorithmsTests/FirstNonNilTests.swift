@@ -12,7 +12,7 @@
 import XCTest
 import Algorithms
 
-final class FirstTests: XCTestCase {
+final class FirstNonNilTests: XCTestCase {
   func testFirstNonNil() {
     XCTAssertNil([].firstNonNil { $0 })
     XCTAssertNil(["A", "B", "C"].firstNonNil { Int($0) })

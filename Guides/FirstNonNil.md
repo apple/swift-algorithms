@@ -1,9 +1,7 @@
-# First
+# FirstNonNil
 
-[[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/First.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/FirstTests.swift)]
- 
- ## `firstNonNil`
+[[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/FirstNonNil.swift) | 
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/FirstNonNilTests.swift)]
 
 Retrieves the first `.some` encountered while applying the given transform.
 
@@ -22,7 +20,7 @@ This method is analogous to `first(where:)` in how it only consumes values until
 a `.some` is found, unlike using lazy operators, which will load any sequence into a collection
 before evaluating its transforms lazily.
 
-### Detailed Design
+## Detailed Design
 
 The `firstNonNil(_:)` method is added as an extension method on the `Sequence`
 protocol:
@@ -35,11 +33,11 @@ public extension Sequence {
 
 ```
 
-#### Naming
+### Naming
 
 This method’s name was selected for its comprehensibility. 
 
-#### Comparison with other languages
+### Comparison with other languages
 
 **Scala**: Scala provides a `collectFirst` function that finds the first element
 in a collection for which a partial function is defined.
