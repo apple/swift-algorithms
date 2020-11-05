@@ -49,10 +49,28 @@ struct SplitMix64: RandomNumberGenerator {
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
-  _ message: @autoclosure () -> String = "",
   file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
-  try XCTAssert(expression1().elementsEqual(expression2()), message(), file: file, line: line)
+  var iterator1 = try expression1().makeIterator()
+  var iterator2 = try expression2().makeIterator()
+  var offset = 0
+  
+  while true {
+    guard let element1 = iterator1.next() else {
+      if iterator2.next() != nil {
+        XCTFail("First sequence had fewer elements than the second", file: file, line: line)
+      }
+      return
+    }
+    
+    guard let element2 = iterator2.next() else {
+      XCTFail("First sequence had more elements than the second", file: file, line: line)
+      return
+    }
+    
+    XCTAssertEqual(element1, element2, "Elements not equal at offset \(offset)", file: file, line: line)
+    offset += 1
+  }
 }
 
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
