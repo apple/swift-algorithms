@@ -164,80 +164,90 @@ where Base1.Element == Base2.Element {
   }
 }
 
+/// Storage for a matching pair of elements, acknowledging the smaller.
+fileprivate enum MergedIteratorMarker<Element> {
+  /// Only the first source has any more elements.
+  case first(Element)
+  /// Only the second source has any more elements.
+  case second(Element)
+  /// A matching pair of elements, but not equivalent.
+  case nonMatching(Element, Element, firstIsLower: Bool)
+  /// A matching pair of equivalent elements.
+  case matching(Element, Element, useFirst: Bool)
+}
+
 private extension MergedIterator {
-  /// Advances the cache to the next state and indicates which component should
-  /// be used.
-  mutating func advanceCache() throws -> (useFirst: Bool, useSecond: Bool) {
+  /// Advances and returns the next corresponding pair of elements, or `nil` if
+  /// no more exist.
+  mutating func dualNext() throws -> MergedIteratorMarker<Element>? {
     while !isDone {
+      // Read in the next element(s), when required.
       if extractFromFirst {
         cache.0 = cache.0 ?? firstBase.next()
       }
       if extractFromSecond {
         cache.1 = cache.1 ?? secondBase.next()
       }
+
+      // The marker depends on the cached values' relative ranking.
       switch cache {
       case (nil, nil):
+        // No more elements to read.
         isDone = true
-      case (_?, nil):
+      case (let first?, nil):
+        // Only the first source has any more elements.
         if exclusivesFromFirst {
-          return (true, false)
-        }
-        isDone = true
-      case (nil, _?):
-        if exclusivesFromSecond {
-          return (false, true)
-        }
-        isDone = true
-      case let (first?, second?):
-        if try areInIncreasingOrder(first, second) {
-          if exclusivesFromFirst {
-            return (true, false)
-          }
           cache.0 = nil
-        } else if try areInIncreasingOrder(second, first) {
-          if exclusivesFromSecond {
-            return (false, true)
-          }
-          cache.1 = nil
+          return .first(first)
         } else {
-          if sharedFromFirst || sharedFromSecond {
-            return (true, true)
-          }
-          cache = (nil, nil)
+          // Don't unnecessarily read from a now-unused source.
+          isDone = true
         }
-      }
-    }
-    return (false, false)
-  }
-
-  /// Examines the cache's state and generates the next return value, or `nil`
-  /// if the state flags the end of the iteration.
-  mutating func generateNext(usingFirst: Bool, usingSecond: Bool) -> Element? {
-    switch (usingFirst, usingSecond) {
-    case (false, false):
-      assert(isDone)
-      return nil
-    case (true, false):
-      defer { cache.0 = nil }
-      return cache.0
-    case (false, true):
-      defer { cache.1 = nil }
-      return cache.1
-    case (true, true):
-      defer {
-        cache.0 = nil
-        if !(sharedFromFirst && sharedFromSecond) {
-          // When this isn't triggered, the shared value from the second source
-          // is retained until all of the equivalent values from the first
-          // source are exhausted, then the second source's versions will go.
-          // (They would go as exclusives-to-second, but that's OK becuase the
-          // only selection combination with both shared-from-first and -second
-          // also has exclusives-to-second.)
+      case (nil, let second?):
+        // Only the second source has any more elements.
+        if exclusivesFromSecond {
           cache.1 = nil
+          return .second(second)
+        } else {
+          // Don't unnecessarily read from a now-unused source.
+          isDone = true
+        }
+      case let (first?, second?):
+        // Return the smaller element, if allowed by the exclusive/shared flags.
+        if try areInIncreasingOrder(first, second) {
+          cache.0 = nil
+          if exclusivesFromFirst {
+            return .nonMatching(first, second, firstIsLower: true)
+          }
+        } else if try areInIncreasingOrder(second, first) {
+          cache.1 = nil
+          if exclusivesFromSecond {
+            return .nonMatching(first, second, firstIsLower: false)
+          }
+        } else {
+          cache = (nil, nil)
+          switch (sharedFromFirst, sharedFromSecond) {
+          case (true, true):
+            // Keep the second source's element in the cache, so it can be
+            // retrieved during `.sum`.  At that point, it would look like an
+            // exclusive-to-second, but that's OK because the only selection
+            // with both shared statuses as `true` also has exclusive-to-second
+            // as `true`.
+            cache.1 = second
+            fallthrough
+          case (true, false):
+            return .matching(first, second, useFirst: true)
+          case (false, true):
+            // Never reached because the selections that would trigger it make
+            // the sequence look like an exclusive-to-second instead.
+            return .matching(first, second, useFirst: false)
+          case (false, false):
+            break
+          }
         }
       }
-      return cache.0
     }
+    return nil
   }
 }
 
@@ -246,8 +256,15 @@ internal extension MergedIterator {
   /// exists; possibly throwing during the attempt.
   @usableFromInline
   mutating func throwingNext() throws -> Base2.Element? {
-    let (useFirstCache, useSecondCache) = try advanceCache()
-    return generateNext(usingFirst: useFirstCache, usingSecond: useSecondCache)
+    switch try dualNext() {
+    case .first(let element), .second(let element):
+      return element
+    case let .nonMatching(first, second, useFirst),
+         let .matching(first, second, useFirst):
+      return useFirst ? first : second
+    case .none:
+      return nil
+    }
   }
 }
 
