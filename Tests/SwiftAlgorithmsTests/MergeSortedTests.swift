@@ -290,6 +290,25 @@ final class MergeSortedTests: XCTestCase {
       false, false, false, false, false, false, false, false, false
     ])
   }
+
+  /// Check every combination for the array-returning merger method.
+  func testMoreNonlazyMerging() {
+    let range1 = 0..<10, range2 = 5..<15
+    let range1to2Mergers = SetCombination.allCases.map {
+      range1.mergeSorted(with: range2, keeping: $0)
+    }
+    XCTAssertEqualSequences(range1to2Mergers, [
+      [],
+      [0, 1, 2, 3, 4],
+      [10, 11, 12, 13, 14],
+      [0, 1, 2, 3, 4, 10, 11, 12, 13, 14],
+      [5, 6, 7, 8, 9],
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      [5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 11, 12, 13, 14]
+    ])
+  }
 }
 
 //-----------------------------------------------------------------------------/
