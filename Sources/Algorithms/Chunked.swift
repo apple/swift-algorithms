@@ -172,27 +172,28 @@ extension LazyCollectionProtocol {
 
 extension Collection {
   /// Returns a collection of subsequences of this collection, chunked by
-  /// the given predicate.
+  /// grouping elements that project to the same value according to the given
+  /// predicate.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  @inlinable
-  public func chunked(
-    by belongInSameGroup: (Element, Element) -> Bool
-  ) -> [SubSequence] {
+  @usableFromInline
+  internal func chunked<Subject>(
+    on projection: (Element) throws -> Subject,
+    by belongInSameGroup: (Subject, Subject) throws -> Bool
+  ) rethrows -> [SubSequence] {
     guard !isEmpty else { return [] }
     var result: [SubSequence] = []
     
     var start = startIndex
-    var current = startIndex
-    while true {
-      let next = index(after: current)
-      if next == endIndex { break }
-      
-      if !belongInSameGroup(self[current], self[next]) {
-        result.append(self[start..<next])
-        start = next
+    var subject = try projection(self[start])
+    
+    for (index, element) in indexed().dropFirst() {
+      let nextSubject = try projection(element)
+      if try !belongInSameGroup(subject, nextSubject) {
+        result.append(self[start..<index])
+        start = index
+        subject = nextSubject
       }
-      current = next
     }
     
     if start != endIndex {
@@ -201,6 +202,17 @@ extension Collection {
     
     return result
   }
+  
+  /// Returns a collection of subsequences of this collection, chunked by
+  /// the given predicate.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of this collection.
+  @inlinable
+  public func chunked(
+    by belongInSameGroup: (Element, Element) throws -> Bool
+  ) rethrows -> [SubSequence] {
+    try chunked(on: { $0 }, by: belongInSameGroup)
+  }
 
   /// Returns a collection of subsequences of this collection, chunked by
   /// grouping elements that project to the same value.
@@ -208,9 +220,8 @@ extension Collection {
   /// - Complexity: O(*n*), where *n* is the length of this collection.
   @inlinable
   public func chunked<Subject: Equatable>(
-    on projection: (Element) -> Subject
-  ) -> [SubSequence] {
-    chunked(by: { projection($0) == projection($1) })
+    on projection: (Element) throws -> Subject
+  ) rethrows -> [SubSequence] {
+    try chunked(on: projection, by: ==)
   }
 }
-
