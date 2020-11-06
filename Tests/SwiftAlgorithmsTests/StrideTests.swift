@@ -23,6 +23,18 @@ final class StridingTests: XCTestCase {
     XCTAssertEqualSequences(a.striding(by: 5), [0, 5, 10])
     XCTAssertEqualSequences(a.striding(by: 10), [0, 10])
     XCTAssertEqualSequences(a.striding(by: 11), [0])
+    
+    let s = (0...).prefix(11)
+    XCTAssertEqualSequences(s.striding(by: 1), (0...10))
+    XCTAssertEqualSequences(s.striding(by: 2), [0, 2, 4, 6, 8, 10])
+    XCTAssertEqualSequences(s.striding(by: 3), [0, 3, 6, 9])
+    XCTAssertEqualSequences(s.striding(by: 4), [0, 4, 8])
+    XCTAssertEqualSequences(s.striding(by: 5), [0, 5, 10])
+    XCTAssertEqualSequences(s.striding(by: 10), [0, 10])
+    XCTAssertEqualSequences(s.striding(by: 11), [0])
+    
+    let empty = (0...).prefix(0)
+    XCTAssertEqualSequences(empty.striding(by: 2), [])
   }
   
   func testStrideString() {
