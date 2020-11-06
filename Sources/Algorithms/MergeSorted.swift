@@ -173,7 +173,7 @@ fileprivate enum MergedIteratorMarker<Element> {
   /// A matching pair of elements, but not equivalent.
   case nonMatching(Element, Element, firstIsLower: Bool)
   /// A matching pair of equivalent elements.
-  case matching(Element, Element, useFirst: Bool)
+  case matching(Element, Element)
 }
 
 private extension MergedIterator {
@@ -235,12 +235,10 @@ private extension MergedIterator {
             // as `true`.
             cache.1 = second
             fallthrough
-          case (true, false):
-            return .matching(first, second, useFirst: true)
-          case (false, true):
-            // Never reached because the selections that would trigger it make
-            // the sequence look like an exclusive-to-second instead.
-            return .matching(first, second, useFirst: false)
+          case (true, false), (false, true):
+            // The second case above is never actually reached, because it'll
+            // look like an exclusive-to-second by access time.
+            return .matching(first, second)
           case (false, false):
             break
           }
@@ -259,9 +257,10 @@ internal extension MergedIterator {
     switch try dualNext() {
     case .first(let element), .second(let element):
       return element
-    case let .nonMatching(first, second, useFirst),
-         let .matching(first, second, useFirst):
+    case let .nonMatching(first, second, useFirst):
       return useFirst ? first : second
+    case let .matching(first, _):
+      return first
     case .none:
       return nil
     }
