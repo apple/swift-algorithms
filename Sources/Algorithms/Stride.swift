@@ -85,11 +85,6 @@ extension Stride: Collection where Base: Collection {
       self.base = base
     }
     
-    init?(_ base: Base.Index?) {
-      guard let base = base else { return nil }
-      self.base = base
-    }
-    
     public static func < (lhs: Index, rhs: Index) -> Bool {
       lhs.base < rhs.base
     }
@@ -122,7 +117,7 @@ extension Stride: Collection where Base: Collection {
     
     return n > 0
       ? offsetForward(i, offsetBy: n, limitedBy: limit)
-      : offsetBackward(i, offsetBy: n, limitedBy: limit)
+      : offsetBackward(i, offsetBy: -n, limitedBy: limit)
   }
   
   private func offsetForward(
@@ -160,15 +155,13 @@ extension Stride: Collection where Base: Collection {
     limitedBy limit: Index
   ) -> Index? {
     let distance = i == endIndex
-      ? -((base.count - 1) % stride + 1) + (n + 1) * stride
-      : n * stride
-    return Index(
-      base.index(
+      ? -((base.count - 1) % stride + 1) + (1 - n) * stride
+      : n * -stride
+    return base.index(
         i.base,
         offsetBy: distance,
         limitedBy: limit.base
-      )
-    )
+    ).map(Index.init)
   }
   
   public var count: Int {
