@@ -3,7 +3,7 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Stride.swift) | 
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/StrideTests.swift)]
 
-A type that steps over a collection’s elements by the specified amount.
+A type that steps over sequence elements by the specified amount.
 
 This is available through the `striding(by:)` method on any `Sequence`.
 
@@ -11,7 +11,7 @@ This is available through the `striding(by:)` method on any `Sequence`.
 (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
 ```
 
-If the stride is larger than the collection count, the resulting wrapper only contains the 
+If the stride is larger than the count, the resulting wrapper only contains the 
 first element.
 
 The stride amount must be a positive value.

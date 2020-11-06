@@ -14,7 +14,7 @@
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
-  /// Returns a collection stepping through the elements every `step` starting
+  /// Returns a sequence stepping through the elements every `step` starting
   /// at the first value. Any remainders of the stride will be trimmed.
   ///
   ///     (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
@@ -25,8 +25,8 @@ extension Sequence {
   /// O(_k_), where _k_ is the striding `step`.
   ///
   /// - Parameter step: The amount to step with each iteration.
-  /// - Returns: Returns a collection stepping through the elements by the
-  /// specified amount.
+  /// - Returns: Returns a sequence or collection for stepping through the
+  /// elements by the specified amount.
   public func striding(by step: Int) -> Stride<Self> {
     Stride(base: self, stride: step)
   }
