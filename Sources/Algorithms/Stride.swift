@@ -155,7 +155,7 @@ extension Stride: Collection where Base: Collection {
     limitedBy limit: Index
   ) -> Index? {
     let distance = i == endIndex
-      ? -((base.count - 1) % stride + 1) + (1 - n) * stride
+      ? -((base.count - 1) % stride + 1) + (n - 1) * -stride
       : n * -stride
     return base.index(
         i.base,
