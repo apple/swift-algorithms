@@ -5,7 +5,7 @@
 
 A type that steps over a collection’s elements by the specified amount.
 
-This is available through the `striding(by:)` method on any `Collection`.
+This is available through the `striding(by:)` method on any `Sequence`.
 
 ```swift
 (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
@@ -18,11 +18,11 @@ The stride amount must be a positive value.
 
 ## Detailed Design
 
-The `striding(by:)` method is declared as a `Collection` extension, and returns a 
+The `striding(by:)` method is declared as a `Sequence` extension, and returns a 
 `Stride` type:
 
 ```swift
-extension Collection {
+extension Sequence {
   public func striding(by step: Int) -> Stride<Self>
 }
 ```

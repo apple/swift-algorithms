@@ -13,7 +13,7 @@
 // striding(by:)
 //===----------------------------------------------------------------------===//
 
-extension Collection {
+extension Sequence {
   /// Returns a collection stepping through the elements every `step` starting
   /// at the first value. Any remainders of the stride will be trimmed.
   ///
@@ -32,7 +32,7 @@ extension Collection {
   }
 }
 
-public struct Stride<Base: Collection> {
+public struct Stride<Base: Sequence> {
   
   let base: Base
   let stride: Int
@@ -50,7 +50,29 @@ extension Stride {
   }
 }
 
-extension Stride: Collection {
+extension Stride: Sequence {
+  
+  public struct Iterator: IteratorProtocol {
+    
+    var iterator: Base.Iterator
+    let stride: Int
+    
+    public mutating func next() -> Base.Element? {
+      defer {
+        for _ in 0..<(stride - 1) {
+          guard iterator.next() != nil else { break }
+        }
+      }
+      return iterator.next()
+    }
+  }
+  
+  public func makeIterator() -> Stride<Base>.Iterator {
+    Iterator(iterator: base.makeIterator(), stride: stride)
+  }
+}
+
+extension Stride: Collection where Base: Collection {
   
   public struct Index: Comparable {
     

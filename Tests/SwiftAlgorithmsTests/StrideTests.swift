@@ -15,7 +15,7 @@ import Algorithms
 final class StridingTests: XCTestCase {
   
   func testStride() {
-    let a = (0...10)
+    let a = 0...10
     XCTAssertEqualSequences(a.striding(by: 1), (0...10))
     XCTAssertEqualSequences(a.striding(by: 2), [0, 2, 4, 6, 8, 10])
     XCTAssertEqualSequences(a.striding(by: 3), [0, 3, 6, 9])
@@ -48,7 +48,7 @@ final class StridingTests: XCTestCase {
     XCTAssertEqual(a[i], 2)
     a.formIndex(before: &i)
     XCTAssertEqual(a[i], 0)
-//    a.formIndex(before: &i) // Precondition failed: Advancing past start index
+//    a.formIndex(before: &i) // Precondition failed: Incrementing past start index
 //    a.index(after: a.endIndex) // Precondition failed: Advancing past end index
   }
   
