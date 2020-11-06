@@ -56,12 +56,15 @@ extension Stride: Sequence {
     
     var iterator: Base.Iterator
     let stride: Int
+    var striding: Bool = false
     
     public mutating func next() -> Base.Element? {
-      defer {
-        for _ in 0..<(stride - 1) {
-          guard iterator.next() != nil else { break }
-        }
+      guard striding else {
+        striding = true
+        return iterator.next()
+      }
+      for _ in 0..<stride - 1 {
+        guard iterator.next() != nil else { break }
       }
       return iterator.next()
     }
