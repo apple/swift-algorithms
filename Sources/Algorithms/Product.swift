@@ -132,15 +132,56 @@ extension Product2: Collection where Base1: Collection {
   
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
-    if start > end {
-      return -distance(from: end, to: start)
-    }
-    if start.i1 == end.i1 {
-      return base2[start.i2..<end.i2].count
-    }
+    guard start.i1 <= end.i1
+      else { return -distance(from: end, to: start) }
+    guard start.i1 != end.i1
+      else { return base2.distance(from: start.i2, to: end.i2) }
     
-    return base2[start.i2...].count + base2[..<end.i2].count
-      + base2.count * (base1.distance(from: start.i1, to: end.i1) - 1)
+    // The number of full cycles through `base2` between `start` and `end`,
+    // excluding the cycles that `start` and `end` are on.
+    let fullBase2Cycles = base1[start.i1..<end.i1].count - 1
+    
+    if start.i2 <= end.i2 {
+      //               start.i2
+      //                  v
+      // start.i1 > [l l l|c c c c c c r r r]
+      //            [l l l c c c c c c r r r] >
+      //                       ...            > `fullBase2Cycles` times
+      //            [l l l c c c c c c r r r] >
+      //   end.i1 > [l l l c c c c c c|r r r]
+      //                              ^
+      //                            end.i2
+      
+      let left = base2[..<start.i2].count
+      let center = base2[start.i2..<end.i2].count
+      let right = base2[end.i2...].count
+      
+      return center + right
+        + fullBase2Cycles * (left + center + right)
+        + left + center
+    } else {
+      //                           start.i2
+      //                              v
+      // start.i1 > [l l l c c c c c c|r r r]
+      //            [l l l c c c c c c r r r] >
+      //                       ...            > `fullBase2Cycles` times
+      //            [l l l c c c c c c r r r] >
+      //   end.i1 > [l l l|c c c c c c r r r]
+      //                  ^
+      //                end.i2
+      
+      let left = base2[..<end.i2].count
+      let right = base2[start.i2...].count
+      
+      // We can avoid traversing `base2[end.i2..<start.i2]` if `start` and `end`
+      // are on consecutive cycles.
+      guard fullBase2Cycles > 0 else { return right + left }
+      
+      let center = base2[end.i2..<start.i2].count
+      return right
+        + fullBase2Cycles * (left + center + right)
+        + left
+    }
   }
 
   @inlinable
