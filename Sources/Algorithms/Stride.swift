@@ -86,7 +86,7 @@ extension Stride: Collection {
     precondition(i.base < base.endIndex, "Advancing past end index")
     return index(i, offsetBy: 1)
   }
-
+  
   public func index(
     _ i: Index,
     offsetBy n: Int,
@@ -94,34 +94,65 @@ extension Stride: Collection {
   ) -> Index? {
     guard n != 0 else { return i }
     guard limit != i else { return nil }
-    switch (i, n) {
-    case (endIndex, ..<0):
-      let baseEnd = base.index(base.endIndex, offsetBy: -((base.count - 1) % stride + 1))
-      return Index(base.index(baseEnd, offsetBy: (n - n.signum()) * stride, limitedBy: limit.base))
-    case (_, 1...):
-      let max = limit < i ? endIndex.base : limit.base
-      let idx = base.index(i.base, offsetBy: n * stride, limitedBy: max)
-      if let idx = idx {
-        return idx > max ? endIndex : Index(idx)
+    
+    return n > 0
+      ? offsetForward(i, offsetBy: n, limitedBy: limit)
+      : offsetBackward(i, offsetBy: n, limitedBy: limit)
+  }
+  
+  private func offsetForward(
+    _ i: Index,
+    offsetBy n: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    if limit < i {
+      if let idx = base.index(
+        i.base,
+        offsetBy: n * stride,
+        limitedBy: base.endIndex
+      ) {
+        return Index(idx)
+      } else {
+        assert(distance(from: i, to: endIndex) == n, "Advancing past end index")
+        return endIndex
       }
-      guard i >= limit || limit == endIndex else {
-        return nil
-      }
-      let isToEnd = distance(from: i, to: endIndex) == n
-      return isToEnd ? endIndex : nil
-    case _:
-      return Index(base.index(i.base, offsetBy: n * stride, limitedBy: limit.base))
+    } else if let idx = base.index(
+      i.base,
+      offsetBy: n * stride,
+      limitedBy: limit.base
+    ) {
+      return Index(idx)
+    } else {
+      return distance(from: i, to: limit) == n
+        ? endIndex
+        : nil
     }
   }
-
+  
+  private func offsetBackward(
+    _ i: Index,
+    offsetBy n: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    let distance = i == endIndex
+      ? -((base.count - 1) % stride + 1) + (n + 1) * stride
+      : n * stride
+    return Index(
+      base.index(
+        i.base,
+        offsetBy: distance,
+        limitedBy: limit.base
+      )
+    )
+  }
+  
   public var count: Int {
-    let limit = base.count - 1
-    return limit / stride + (limit < 0 ? 0 : 1)
+    base.isEmpty ? 0 : (base.count - 1) / stride + 1
   }
   
   public func distance(from start: Index, to end: Index) -> Int {
     let distance = base.distance(from: start.base, to: end.base)
-    return distance / stride + (abs(distance % stride) > 0 ? distance.signum() : 0)
+    return distance / stride + (distance % stride).signum()
   }
   
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
