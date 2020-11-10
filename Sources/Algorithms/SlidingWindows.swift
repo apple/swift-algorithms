@@ -112,11 +112,15 @@ extension SlidingWindows: Collection {
   }
   
   private func offsetForward(_ i: Index, by distance: Int) -> Index {
-    offsetForward(i, by: distance, limitedBy: endIndex)!
+    guard let index = offsetForward(i, by: distance, limitedBy: endIndex)
+      else { fatalError("Index is out of bounds") }
+    return index
   }
   
   private func offsetBackward(_ i: Index, by distance: Int) -> Index {
-    offsetBackward(i, by: distance, limitedBy: startIndex)!
+    guard let index = offsetBackward(i, by: distance, limitedBy: startIndex)
+      else { fatalError("Index is out of bounds") }
+    return index
   }
   
   private func offsetForward(
