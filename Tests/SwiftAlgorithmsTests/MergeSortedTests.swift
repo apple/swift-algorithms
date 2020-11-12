@@ -130,6 +130,11 @@ final class MergeSortedTests: XCTestCase {
       empty.lazy.mergeSorted(with: empty.lazy, keeping: $0)
     }
     XCTAssertEqualSequences(emptyMergerDoubleLazy.map(Array.init), emptyResults)
+
+    // Quick collection checks
+    XCTAssertEqualSequences(emptyMergerDoubleLazy.map(\.isEmpty), [
+      true, true, true, true, true, true, true, true, true
+    ])
   }
 
   /// Check results from using one empty and one non-empty operand.
@@ -308,6 +313,54 @@ final class MergeSortedTests: XCTestCase {
       [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
       [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 11, 12, 13, 14]
     ])
+  }
+
+  /// Check index iteration and dereferencing.
+  func testIndices() {
+    let range1 = 0..<10, range2 = 5...15
+    let range1to2Mergers = SetCombination.allCases.map {
+      (MergedCollection(range1, range2, keeping: $0, by: <),
+       range1.mergeSorted(with: range2, keeping: $0))
+    }
+    XCTAssertEqualSequences(range1to2Mergers.map(\.0.isEmpty),
+                            range1to2Mergers.map(\.1.isEmpty))
+    XCTAssertEqualSequences(range1to2Mergers.map { doubleMerger in
+      doubleMerger.0.indices.map { doubleMerger.0[$0] }
+    }, range1to2Mergers.map(\.1))
+    XCTAssertEqualSequences(range1to2Mergers.map(\.0.iterationSteps
+                                                  .underestimatedCount), [
+      0, 0, 0, 0, 0, 10, 11, 11, 21
+    ])
+    XCTAssertEqualSequences(range1to2Mergers.map {
+      var i = $0.0.startIndex, result = [Int]()
+      result.reserveCapacity($0.0.underestimatedCount)
+      while i < $0.0.endIndex {
+        result.append($0.0[i])
+        $0.0.formIndex(after: &i)
+      }
+      return result
+    }, range1to2Mergers.map(\.1))
+
+    let range2to1Mergers = SetCombination.allCases.map {
+      (MergedCollection(range2, range1, keeping: $0, by: <),
+       range2.mergeSorted(with: range1, keeping: $0))
+    }
+    XCTAssertEqualSequences(range2to1Mergers.map { doubleMerger in
+      doubleMerger.0.indices.map { doubleMerger.0[$0] }
+    }, range2to1Mergers.map(\.1))
+    XCTAssertEqualSequences(range2to1Mergers.map(\.0.iterationSteps
+                                                  .underestimatedCount), [
+      0, 0, 0, 0, 0, 11, 10, 11, 21
+    ])
+    XCTAssertEqualSequences(range2to1Mergers.map {
+      var i = $0.0.startIndex, result = [Int]()
+      result.reserveCapacity($0.0.underestimatedCount)
+      while i < $0.0.endIndex {
+        result.append($0.0[i])
+        $0.0.formIndex(after: &i)
+      }
+      return result
+    }, range2to1Mergers.map(\.1))
   }
 }
 
