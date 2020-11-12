@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
-import Algorithms
+@testable import Algorithms
 
 final class SlidingWindowsTests: XCTestCase {
   
@@ -88,4 +88,22 @@ final class SlidingWindowsTests: XCTestCase {
     XCTAssertEqualSequences(a[i], [1, 2])
   }
   
+  func testWindowsIndexTraversals() {
+    validateIndexTraversals(
+      "".slidingWindows(ofCount: 1),
+      "a".slidingWindows(ofCount: 1),
+      "ab".slidingWindows(ofCount: 1),
+      "abc".slidingWindows(ofCount: 1),
+      "".slidingWindows(ofCount: 3),
+      "a".slidingWindows(ofCount: 3),
+      "abc".slidingWindows(ofCount: 3),
+      "abcdefgh".slidingWindows(ofCount: 3),
+      indices: { windows in
+        let endIndex = windows.base.endIndex
+        let indices = windows.base.indices + [endIndex]
+        return zip(indices, indices.dropFirst(windows.size))
+          .map { .init(lowerBound: $0, upperBound: $1) }
+          + [.init(lowerBound: endIndex, upperBound: endIndex)]
+      })
+  }
 }
