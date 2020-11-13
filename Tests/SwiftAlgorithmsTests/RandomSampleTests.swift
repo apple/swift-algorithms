@@ -26,11 +26,11 @@ func validateRandomSamples<S: Sequence>(
   }
 }
 
-let n = 100
-let k = 12
-let iterations = 10_000
-let c = 0..<n
-let s = sequence(first: 0, next: { $0 == n - 1 ? nil : $0 + 1 })
+private let n = 100
+private let k = 12
+private let iterations = 10_000
+private let c = 0..<n
+private let s = sequence(first: 0, next: { $0 == n - 1 ? nil : $0 + 1 })
 
 final class RandomSampleTests: XCTestCase {
   func testRandomStableSampleCollection() {

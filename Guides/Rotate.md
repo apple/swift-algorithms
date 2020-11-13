@@ -7,7 +7,7 @@ A mutating method that rotates the elements of a collection to new positions.
 
 ```swift
 var numbers = [10, 20, 30, 40, 50, 60]
-let p = numbers.rotate(at: 2)
+let p = numbers.rotate(toStartAt: 2)
 // numbers == [30, 40, 50, 60, 10, 20]
 // p == 4 -- numbers[p] == 10
 ```
@@ -18,9 +18,9 @@ variants that take a range:
 
 ```swift
 var numbers = [10, 20, 30, 40, 50, 60]
-numbers.rotate(subrange: 0..<3, at: 1)
+numbers.rotate(subrange: 0..<3, toStartAt: 1)
 // numbers = [20, 30, 10, 40, 50, 60]
-numbers.rotate(subrange: 3..<6, at: 4)
+numbers.rotate(subrange: 3..<6, toStartAt: 4)
 // numbers = [20, 30, 10, 50, 60, 40]
 ```
 
@@ -30,11 +30,11 @@ This adds the two `MutableCollection` methods shown above:
 
 ```swift
 extension MutableCollection {
-    mutating func rotate(at p: Index) -> Index
+    mutating func rotate(toStartAt p: Index) -> Index
 
     mutating func rotate(
         subrange: Range<Index>,
-        at p: Index
+        toStartAt p: Index
     ) -> Index
 }
 ```
@@ -49,13 +49,14 @@ the number of swaps required per element, so `rotate` would need to be a
 ### Naming
 
 The index parameter has been proposed as `shiftingToStart` in the past; this
-proposal uses the simpler `at` label. `shiftingToStart` introduces the idea of
-a "shift", which can sound like shifting just that single element to the
+version uses the `toStartAt` label, instead. `shiftingToStart` introduces the 
+idea of a "shift", which can sound like shifting just that single element to the
 beginning of the collection.
 
 For the range-based overloads, the label could be omitted. That is, instead of
 using `subrange:`, the method could be called as 
-`numbers.rotate(0..<3, at: 2)`.
+`numbers.rotate(0..<3, toStartAt: 2)`. The label is included here for 
+consistency with other range-based mutating methods.
 
 ### Comparison with other languages
 
@@ -65,5 +66,5 @@ semantics to this one.
 **Ruby:** You can rotate the elements of an array by a number of positions,
 either forward or backward (by passing a negative number). For zero-indexed
 collections, forward rotation by e.g. 3 elements is equivalent to
-`rotate(at: 3)`.
+`rotate(toStartAt: 3)`.
 

@@ -10,30 +10,62 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
-import Algorithms
+@testable import Algorithms
 
 final class ChainTests: XCTestCase {
   func testChainSequences() {
-    let run = (1...).prefix(10).chained(with: 20...)
+    let run = chain((1...).prefix(10), 20...)
     XCTAssertEqualSequences(run.prefix(20), Array(1...10) + (20..<30))
   }
   
   func testChainForwardCollection() {
     let s1 = Set(0...10)
     let s2 = Set(20...30)
-    let c = s1.chained(with: s2)
+    let c = chain(s1, s2)
     XCTAssertEqualSequences(c, Array(s1) + Array(s2))
   }
   
   func testChainBidirectionalCollection() {
     let s1 = "ABCDEFGHIJ"
     let s2 = "klmnopqrstuv"
-    let c = s1.chained(with: s2)
+    let c = chain(s1, s2)
     
     XCTAssertEqualSequences(c, "ABCDEFGHIJklmnopqrstuv")
     XCTAssertEqualSequences(c.reversed(), "ABCDEFGHIJklmnopqrstuv".reversed())
-    XCTAssertEqualSequences(s1.reversed().chained(with: s2), "JIHGFEDCBAklmnopqrstuv")
+    XCTAssertEqualSequences(chain(s1.reversed(), s2), "JIHGFEDCBAklmnopqrstuv")
   }
   
-  // TODO: Add tests that check distance and index(offsetBy:)
+  func testChainIndexTraversals() {
+    validateIndexTraversals(
+      chain("abcd", "XYZ"),
+      chain("abcd", ""),
+      chain("", "XYZ"),
+      chain("", ""),
+      indices: { chain in
+        chain.base1.indices.map { .init(first: $0) }
+          + chain.base2.indices.map { .init(second: $0) }
+          + [.init(second: chain.base2.endIndex)]
+      })
+  }
+  
+  func testChainIndexOffsetAcrossBoundary() {
+    let c = chain("abc", "XYZ")
+    
+    do {
+      let i = c.index(c.startIndex, offsetBy: 3, limitedBy: c.startIndex)
+      XCTAssertNil(i)
+    }
+    
+    do {
+      let i = c.index(c.startIndex, offsetBy: 4)
+      let j = c.index(i, offsetBy: -2)
+      XCTAssertEqual(c[j], "c")
+    }
+    
+    do {
+      let i = c.index(c.startIndex, offsetBy: 3)
+      let j = c.index(i, offsetBy: -1, limitedBy: i)
+      XCTAssertNil(j)
+    }
+  }
 }

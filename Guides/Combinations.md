@@ -29,7 +29,7 @@ collection are always treated as separate values in the resulting combinations:
 ```swift
 let numbers2 = [20, 10, 10]
 for combo in numbers2.combinations(ofCount: 2) {
-    print(perm)
+    print(combo)
 }
 // [20, 10]
 // [20, 10]
@@ -51,7 +51,8 @@ Since the `Combinations` type needs to store an array of the collection’s
 indices and mutate the array to generate each permutation, `Combinations` only
 has `Sequence` conformance. Adding `Collection` conformance would require
 storing the array in the index type, which would in turn lead to copying the
-array at every index advancement.
+array at every index advancement. `Combinations` does conform to
+`LazySequenceProtocol` when the base type conforms.
 
 ### Complexity
 

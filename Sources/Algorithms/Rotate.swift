@@ -29,6 +29,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Postcondition: For returned indices `(f, l)`:
   ///   `f == limit || l == limit`
+  @usableFromInline
   @discardableResult
   internal mutating func _reverse(
     subrange: Range<Index>, until limit: Index
@@ -43,6 +44,19 @@ extension MutableCollection where Self: BidirectionalCollection {
     return (f, l)
   }
   
+  /// Reverses the elements within the given subrange.
+  ///
+  /// This example reverses the numbers within the subrange at the start of the
+  /// `numbers` array:
+  ///
+  ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+  ///     numbers.reverse(subrange: 0..<4)
+  ///     // numbers == [40, 30, 20, 10, 50, 60, 70, 80]
+  ///
+  /// - Parameter subrange: The subrange of this collection to reverse.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of `subrange`.
+  @inlinable
   public mutating func reverse(subrange: Range<Index>) {
     if subrange.isEmpty { return }
     var lo = subrange.lowerBound
@@ -57,7 +71,7 @@ extension MutableCollection where Self: BidirectionalCollection {
 }
 
 //===----------------------------------------------------------------------===//
-// rotate(at:) / rotate(subrange:at:)
+// rotate(toStartAt:) / rotate(subrange:toStartAt:)
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection {
@@ -81,6 +95,7 @@ extension MutableCollection {
   ///   - distance(from: lhs.lowerBound, to: p) == distance(from:
   ///     rhs.lowerBound, to: q)
   ///   - p == lhs.upperBound || q == rhs.upperBound
+  @usableFromInline
   internal mutating func _swapNonemptySubrangePrefixes(
     _ lhs: Range<Index>, _ rhs: Range<Index>
   ) -> (Index, Index) {
@@ -98,10 +113,32 @@ extension MutableCollection {
     return (p, q)
   }
 
+  /// Rotates the elements within the given subrange so that the element
+  /// at the specified index becomes the start of the subrange.
+  ///
+  /// Rotating a collection is equivalent to breaking the collection into two
+  /// sections at the index `newStart`, and then swapping those two sections.
+  /// In this example, the `numbers` array is rotated so that the element at
+  /// index `3` (`40`) is first:
+  ///
+  ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+  ///     let oldStart = numbers.rotate(subrange: 0..<4, toStartAt: 2)
+  ///     // numbers == [30, 40, 10, 20, 50, 60, 70, 80]
+  ///     // numbers[oldStart] == 10
+  ///
+  /// - Parameters:
+  ///   - subrange: The subrange of this collection to rotate.
+  ///   - newStart: The index of the element that should be at the start of
+  ///     `subrange` after rotating.
+  /// - Returns: The new index of the element that was at the start of
+  ///   `subrange` pre-rotation.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of `subrange`.
+  @inlinable
   @discardableResult
   public mutating func rotate(
     subrange: Range<Index>,
-    at newStart: Index
+    toStartAt newStart: Index
   ) -> Index {
     var m = newStart, s = subrange.lowerBound
     let e = subrange.upperBound
@@ -159,17 +196,58 @@ extension MutableCollection {
     return ret
   }
   
+  /// Rotates the elements of this collection so that the element
+  /// at the specified index becomes the start of the collection.
+  ///
+  /// Rotating a collection is equivalent to breaking the collection into two
+  /// sections at the index `newStart`, and then swapping those two sections.
+  /// In this example, the `numbers` array is rotated so that the element at
+  /// index `3` (`40`) is first:
+  ///
+  ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+  ///     let oldStart = numbers.rotate(toStartAt: 3)
+  ///     // numbers == [40, 50, 60, 70, 80, 10, 20, 30]
+  ///     // numbers[oldStart] == 10
+  ///
+  /// - Parameter newStart: The index of the element that should be first after
+  ///   rotating.
+  /// - Returns: The new index of the element that was first pre-rotation.
+  ///
+  /// - Complexity: O(*n*)
+  @inlinable
   @discardableResult
-  public mutating func rotate(at newStart: Index) -> Index {
-    rotate(subrange: startIndex..<endIndex, at: newStart)
+  public mutating func rotate(toStartAt newStart: Index) -> Index {
+    rotate(subrange: startIndex..<endIndex, toStartAt: newStart)
   }
 }
 
 extension MutableCollection where Self: BidirectionalCollection {
+  /// Rotates the elements within the given subrange so that the element
+  /// at the specified index becomes the start of the subrange.
+  ///
+  /// Rotating a collection is equivalent to breaking the collection into two
+  /// sections at the index `newStart`, and then swapping those two sections.
+  /// In this example, the `numbers` array is rotated so that the element at
+  /// index `3` (`40`) is first:
+  ///
+  ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+  ///     let oldStart = numbers.rotate(subrange: 0..<4, toStartAt: 2)
+  ///     // numbers == [30, 40, 10, 20, 50, 60, 70, 80]
+  ///     // numbers[oldStart] == 10
+  ///
+  /// - Parameters:
+  ///   - subrange: The subrange of this collection to rotate.
+  ///   - newStart: The index of the element that should be at the start of
+  ///     `subrange` after rotating.
+  /// - Returns: The new index of the element that was at the start of
+  ///   `subrange` pre-rotation.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of `subrange`.
+  @inlinable
   @discardableResult
   public mutating func rotate(
     subrange: Range<Index>,
-    at newStart: Index
+    toStartAt newStart: Index
   ) -> Index {
     reverse(subrange: subrange.lowerBound..<newStart)
     reverse(subrange: newStart..<subrange.upperBound)
@@ -179,7 +257,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   }
 
   /// Rotates the elements of this collection so that the element
-  /// at the specified index moves to the front of the collection.
+  /// at the specified index becomes the start of the collection.
   ///
   /// Rotating a collection is equivalent to breaking the collection into two
   /// sections at the index `newStart`, and then swapping those two sections.
@@ -187,7 +265,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   /// index `3` (`40`) is first:
   ///
   ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
-  ///     let oldStart = numbers.rotate(at: 3)
+  ///     let oldStart = numbers.rotate(toStartAt: 3)
   ///     // numbers == [40, 50, 60, 70, 80, 10, 20, 30]
   ///     // numbers[oldStart] == 10
   ///
@@ -196,8 +274,28 @@ extension MutableCollection where Self: BidirectionalCollection {
   /// - Returns: The new index of the element that was first pre-rotation.
   ///
   /// - Complexity: O(*n*)
+  @inlinable
+  @discardableResult
+  public mutating func rotate(toStartAt newStart: Index) -> Index {
+    rotate(subrange: startIndex..<endIndex, toStartAt: newStart)
+  }
+}
+
+// Deprecations
+
+extension MutableCollection {
+  @available(*, deprecated, renamed: "rotate(subrange:toStartAt:)")
+  @discardableResult
+  public mutating func rotate(
+    subrange: Range<Index>,
+    at newStart: Index) -> Index
+  {
+    rotate(subrange: subrange, toStartAt: newStart)
+  }
+  
+  @available(*, deprecated, renamed: "rotate(toStartAt:)")
   @discardableResult
   public mutating func rotate(at newStart: Index) -> Index {
-    rotate(subrange: startIndex..<endIndex, at: newStart)
+    rotate(toStartAt: newStart)
   }
 }

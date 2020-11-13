@@ -18,7 +18,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 #### Combining collections
 
-- [`chained(with:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chain.md): Concatenates two collections with the same element type. 
+- [`chain(_:_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chain.md): Concatenates two collections with the same element type. 
 - [`product(_:_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Product.md): Iterates over all the pairs of two collections; equivalent to nested `for`-`in` loops.
 - [`cycled()`, `cycled(times:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Cycle.md): Repeats the elements of a collection forever or a set number of times.
 
@@ -32,6 +32,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 - [`chunked(by:)`, `chunked(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chunked.md): Eager and lazy operations that break a collection into chunks based on either a binary predicate or when the result of a projection changes.
 - [`indexed()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Indexed.md): Iterate over tuples of a collection's indices and elements. 
+- [`trimming(where:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Trim.md): Returns a slice by trimming elements from a collection's start and end. 
 - [`mergeSorted(with:keeping:by:)`, `mergeSorted(with:keeping:)`](./Guides/MergeSorted.md): Eager and lazy operations that take another sequence, assume that both the given sequence and the receiver are sorted according to the given predicate (defaults to `<`), and returns the given subset of the sequences' merger (also sorted).
 
 

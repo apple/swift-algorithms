@@ -25,18 +25,24 @@ public struct Product2<Base1: Sequence, Base2: Collection> {
 extension Product2: Sequence {
   /// The iterator for a `Product2` sequence.
   public struct Iterator: IteratorProtocol {
-    var i1: Base1.Iterator
-    var i2: Base2.Iterator
-    var element1: Base1.Element?
-    let base2: Base2
+    @usableFromInline
+    internal var i1: Base1.Iterator
+    @usableFromInline
+    internal var i2: Base2.Iterator
+    @usableFromInline
+    internal var element1: Base1.Element?
+    @usableFromInline
+    internal let base2: Base2
 
-    init(_ c: Product2) {
+    @usableFromInline
+    internal init(_ c: Product2) {
       self.base2 = c.base2
       self.i1 = c.base1.makeIterator()
       self.i2 = c.base2.makeIterator()
       self.element1 = nil
     }
     
+    @inlinable
     public mutating func next() -> (Base1.Element, Base2.Element)? {
       // This is the initial state, where i1.next() has never
       // been called, or the final state, where i1.next() has
@@ -78,56 +84,107 @@ extension Product2: Sequence {
 extension Product2: Collection where Base1: Collection {
   /// The index type for a `Product2` collection.
   public struct Index: Comparable {
-    var i1: Base1.Index
-    var i2: Base2.Index
+    @usableFromInline
+    internal var i1: Base1.Index
+    @usableFromInline
+    internal var i2: Base2.Index
     
+    @usableFromInline
+    internal init(i1: Base1.Index, i2: Base2.Index) {
+      self.i1 = i1
+      self.i2 = i2
+    }
+    
+    @inlinable
     public static func < (lhs: Index, rhs: Index) -> Bool {
       (lhs.i1, lhs.i2) < (rhs.i1, rhs.i2)
     }
   }
   
+  @inlinable
   public var count: Int {
     base1.count * base2.count
   }
   
+  @inlinable
   public var startIndex: Index {
-    base1.isEmpty || base2.isEmpty
-      ? endIndex
-      : Index(i1: base1.startIndex, i2: base2.startIndex)
+    Index(
+      i1: base2.isEmpty ? base1.endIndex : base1.startIndex,
+      i2: base2.startIndex)
   }
   
+  @inlinable
   public var endIndex: Index {
-    Index(i1: base1.endIndex, i2: base2.endIndex)
+    // `base2.startIndex` simplifies index calculations.
+    Index(i1: base1.endIndex, i2: base2.startIndex)
   }
   
+  @inlinable
   public func index(after i: Index) -> Index {
-    precondition(i.i1 != base1.endIndex && i.i2 != base2.endIndex,
-                 "Can't advance past endIndex")
+    precondition(i.i1 != base1.endIndex, "Can't advance past endIndex")
     let newIndex2 = base2.index(after: i.i2)
-    if newIndex2 < base2.endIndex {
-      return Index(i1: i.i1, i2: newIndex2)
-    }
-    
-    let newIndex1 = base1.index(after: i.i1)
-    return newIndex1 == base1.endIndex
-      ? endIndex
-      : Index(i1: newIndex1, i2: base2.startIndex)
+    return newIndex2 == base2.endIndex
+      ? Index(i1: base1.index(after: i.i1), i2: base2.startIndex)
+      : Index(i1: i.i1, i2: newIndex2)
   }
   
   // TODO: Implement index(_:offsetBy:) and index(_:offsetBy:limitedBy:)
   
+  @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
-    if start > end {
-      return -distance(from: end, to: start)
-    }
-    if start.i1 == end.i1 {
-      return base2[start.i2..<end.i2].count
-    }
+    guard start.i1 <= end.i1
+      else { return -distance(from: end, to: start) }
+    guard start.i1 != end.i1
+      else { return base2.distance(from: start.i2, to: end.i2) }
     
-    return base2[start.i2...].count + base2[..<end.i2].count
-      + base2.count * (base1.distance(from: start.i1, to: end.i1))
+    // The number of full cycles through `base2` between `start` and `end`,
+    // excluding the cycles that `start` and `end` are on.
+    let fullBase2Cycles = base1[start.i1..<end.i1].count - 1
+    
+    if start.i2 <= end.i2 {
+      //               start.i2
+      //                  v
+      // start.i1 > [l l l|c c c c c c r r r]
+      //            [l l l c c c c c c r r r] >
+      //                       ...            > `fullBase2Cycles` times
+      //            [l l l c c c c c c r r r] >
+      //   end.i1 > [l l l c c c c c c|r r r]
+      //                              ^
+      //                            end.i2
+      
+      let left = base2[..<start.i2].count
+      let center = base2[start.i2..<end.i2].count
+      let right = base2[end.i2...].count
+      
+      return center + right
+        + fullBase2Cycles * (left + center + right)
+        + left + center
+    } else {
+      //                           start.i2
+      //                              v
+      // start.i1 > [l l l c c c c c c|r r r]
+      //            [l l l c c c c c c r r r] >
+      //                       ...            > `fullBase2Cycles` times
+      //            [l l l c c c c c c r r r] >
+      //   end.i1 > [l l l|c c c c c c r r r]
+      //                  ^
+      //                end.i2
+      
+      let left = base2[..<end.i2].count
+      let right = base2[start.i2...].count
+      
+      // We can avoid traversing `base2[end.i2..<start.i2]` if `start` and `end`
+      // are on consecutive cycles.
+      guard fullBase2Cycles > 0 else { return right + left }
+      
+      let center = base2[end.i2..<start.i2].count
+      return right
+        + fullBase2Cycles * (left + center + right)
+        + left
+    }
   }
 
+  @inlinable
   public subscript(position: Index) -> (Base1.Element, Base2.Element) {
     return (base1[position.i1], base2[position.i2])
   }
@@ -136,16 +193,17 @@ extension Product2: Collection where Base1: Collection {
 extension Product2: BidirectionalCollection
   where Base1: BidirectionalCollection, Base2: BidirectionalCollection
 {
+  @inlinable
   public func index(before i: Index) -> Index {
     precondition(i != startIndex,
                  "Can't move before startIndex")
     if i.i2 == base2.startIndex {
+      return Index(
+        i1: base1.index(before: i.i1),
+        i2: base2.index(before: base2.endIndex))
+    } else {
       return Index(i1: i.i1, i2: base2.index(before: i.i2))
     }
-    
-    return Index(
-      i1: base1.index(before: i.i1),
-      i2: base2.index(before: base2.endIndex))
   }
 }
 

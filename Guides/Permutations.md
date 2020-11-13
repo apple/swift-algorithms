@@ -75,7 +75,8 @@ Since the `Permutations` type needs to store an array of the collection’s
 indices and mutate the array to generate each permutation, `Permutations` only
 has `Sequence` conformance. Adding `Collection` conformance would require
 storing the array in the index type, which would in turn lead to copying the
-array at every index advancement.
+array at every index advancement. `Combinations` does conform to
+`LazySequenceProtocol` when the base type conforms.
 
 ### Complexity
 
