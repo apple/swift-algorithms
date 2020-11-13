@@ -16,7 +16,7 @@ public struct SubSequenceFinder<Base: Collection, Other: Collection>
   internal var other: Other
   internal var firstRange: Range<Base.Index>?
   
-  internal init(base: Base, other: Other, allowingOverlaps: Bool) {
+  internal init(base: Base, other: Other) {
     self.base = base
     self.other = other
     self.firstRange = base.firstRange(of: other)
@@ -118,11 +118,10 @@ extension Collection where Element: Equatable {
     return nil
   }
   
-  public func allRanges<Other: Collection>(
-    of other: Other,
-    allowingOverlaps: Bool = true) -> SubSequenceFinder<Self, Other>
+  public func allRanges<Other: Collection>(of other: Other)
+    -> SubSequenceFinder<Self, Other>
   {
-    SubSequenceFinder(base: self, other: other, allowingOverlaps: allowingOverlaps)
+    SubSequenceFinder(base: self, other: other)
   }
 }
 
