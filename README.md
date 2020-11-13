@@ -32,6 +32,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 - [`chunked(by:)`, `chunked(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chunked.md): Eager and lazy operations that break a collection into chunks based on either a binary predicate or when the result of a projection changes.
 - [`indexed()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Indexed.md): Iterate over tuples of a collection's indices and elements. 
+- [`mergeSorted(with:keeping:by:)`, `mergeSorted(with:keeping:)`](./Guides/MergeSorted.md): Eager and lazy operations that take another sequence, assume that both the given sequence and the receiver are sorted according to the given predicate (defaults to `<`), and returns the given subset of the sequences' merger (also sorted).
 
 
 ## Adding Swift Algorithms as a Dependency
