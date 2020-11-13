@@ -362,6 +362,66 @@ final class MergeSortedTests: XCTestCase {
       return result
     }, range2to1Mergers.map(\.1))
   }
+
+  /// Check the differences when elements from the first sequence are filtered
+  /// out versus the second.
+  func testPropertyOrdering() {
+    let sample1 = [0, 2, 4, 6, 8, 10, 12].map { ($0, true) }
+    let sample2 = [0, 3, 6, 9, 12].map { ($0, false) }
+    let sample1to2Mergers = SetCombination.allCases.map {
+      MergedSequence(sample1, sample2, keeping: $0, by: { x, y in x.0 < y.0 })
+    }
+    XCTAssertEqualSequences(sample1to2Mergers.map { $0.map(\.0) }, [
+      [],
+      [2, 4, 8, 10],
+      [3, 9],
+      [2, 3, 4, 8, 9, 10],
+      [0, 6, 12],
+      [0, 2, 4, 6, 8, 10, 12],
+      [0, 3, 6, 9, 12],
+      [0, 2, 3, 4, 6, 8, 9, 10, 12],
+      [0, 0, 2, 3, 4, 6, 6, 8, 9, 10, 12, 12]
+    ])
+    XCTAssertEqualSequences(sample1to2Mergers.map { $0.map(\.1) }, [
+      [],
+      [true, true, true, true],
+      [false, false],
+      [true, false, true, true, false, true],
+      [true, true, true],
+      [true, true, true, true, true, true, true],
+      [false, false, false, false, false],
+      [true, true, false, true, true, true, false, true, true],
+      [true, false, true, false, true, true, false, true, false, true, true,
+       false]
+    ])
+
+    let sample2to1Mergers = SetCombination.allCases.map {
+      MergedSequence(sample2, sample1, keeping: $0, by: { x, y in x.0 < y.0 })
+    }
+    XCTAssertEqualSequences(sample2to1Mergers.map { $0.map(\.0) }, [
+      [],
+      [3, 9],
+      [2, 4, 8, 10],
+      [2, 3, 4, 8, 9, 10],
+      [0, 6, 12],
+      [0, 3, 6, 9, 12],
+      [0, 2, 4, 6, 8, 10, 12],
+      [0, 2, 3, 4, 6, 8, 9, 10, 12],
+      [0, 0, 2, 3, 4, 6, 6, 8, 9, 10, 12, 12]
+    ])
+    XCTAssertEqualSequences(sample2to1Mergers.map { $0.map(\.1) }, [
+      [],
+      [false, false],
+      [true, true, true, true],
+      [true, false, true, true, false, true],
+      [false, false, false],
+      [false, false, false, false, false],
+      [true, true, true, true, true, true, true],
+      [false, true, false, true, false, true, false, true, false],
+      [false, true, true, false, true, false, true, true, false, true, false,
+       true]
+    ])
+  }
 }
 
 //-----------------------------------------------------------------------------/
