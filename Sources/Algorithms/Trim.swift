@@ -11,22 +11,20 @@
 
 extension BidirectionalCollection {
 
-  /// Returns a `SubSequence` formed by discarding all elements at the start and end of the collection
-  /// which satisfy the given predicate.
+  /// Returns a `SubSequence` formed by discarding all elements at the start and
+  /// end of the collection which satisfy the given predicate.
   ///
-  /// This example uses `trimming(where:)` to get a substring without the white space at the
-  /// beginning and end of the string:
+  /// This example uses `trimming(where:)` to get a substring without the white
+  /// space at the beginning and end of the string:
   ///
-  ///  ```
-  ///  let myString = "  hello, world  "
-  ///  print(myString.trimming(where: \.isWhitespace)) // "hello, world"
-  ///  ```
+  ///     let myString = "  hello, world  "
+  ///     print(myString.trimming(where: \.isWhitespace)) // "hello, world"
   ///
-  /// - parameters:
-  ///    - predicate:  A closure which determines if the element should be omitted from the
-  ///                  resulting slice.
+  /// - Parameters:
+  ///    - predicate: A closure which determines if the element should be
+  ///                 omitted from the resulting slice.
   ///
-  /// - complexity: `O(n)`, where `n` is the length of this collection.
+  /// - Complexity: O(*n*), where *n* is the length of this collection.
   ///
   @inlinable
   public func trimming(
