@@ -73,13 +73,12 @@ extension LazyChunked: LazyCollectionProtocol {
     }
   }
 
-  /// Returns the index in the base collection for the first element that
-  /// doesn't match the current chunk.
+  /// Returns the index in the base collection of the end of the chunk starting
+  /// at the given index.
   @usableFromInline
-  internal func endOfChunk(from i: Base.Index) -> Base.Index {
-    guard i != base.endIndex else { return base.endIndex }
-    let subject = projection(base[i])
-    return base[base.index(after: i)...]
+  internal func endOfChunk(startingAt start: Base.Index) -> Base.Index {
+    let subject = projection(base[start])
+    return base[base.index(after: start)...]
       .firstIndex(where: { !belongInSameGroup(subject, projection($0)) })
       ?? base.endIndex
   }
@@ -91,20 +90,21 @@ extension LazyChunked: LazyCollectionProtocol {
   
   @inlinable
   public var endIndex: Index {
-    Index(lowerBound: base.endIndex, upperBound: base.endIndex)
+    Index(lowerBound: base.endIndex)
   }
   
   @inlinable
   public func index(after i: Index) -> Index {
-    let upperBound = i.upperBound ?? endOfChunk(from: i.lowerBound)
-    let end = endOfChunk(from: upperBound)
+    let upperBound = i.upperBound ?? endOfChunk(startingAt: i.lowerBound)
+    guard upperBound != base.endIndex else { return endIndex }
+    let end = endOfChunk(startingAt: upperBound)
     return Index(lowerBound: upperBound, upperBound: end)
   }
   
   @inlinable
   public subscript(position: Index) -> Base.SubSequence {
     let upperBound = position.upperBound
-      ?? endOfChunk(from: position.lowerBound)
+      ?? endOfChunk(startingAt: position.lowerBound)
     return base[position.lowerBound..<upperBound]
   }
 }
@@ -114,8 +114,8 @@ extension LazyChunked.Index: Hashable where Base.Index: Hashable {}
 extension LazyChunked: BidirectionalCollection
   where Base: BidirectionalCollection
 {
-  /// Returns the index in the base collection for the element that starts
-  /// the chunk ending at the given index.
+  /// Returns the index in the base collection of the start of the chunk ending
+  /// at the given index.
   @usableFromInline
   internal func startOfChunk(endingAt end: Base.Index) -> Base.Index {
     let indexBeforeEnd = base.index(before: end)
