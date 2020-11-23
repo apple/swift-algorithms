@@ -90,6 +90,96 @@ extension DeltasSequence: LazySequenceProtocol {
   }
 }
 
+/// A collection wrapper presenting the changes between each consecutive pair of
+/// elements, as evaluated by some closure.
+public typealias DeltasCollection<T: Collection, U> = DeltasSequence<T, U>
+
+extension DeltasSequence: Collection, LazyCollectionProtocol
+where Base: Collection {
+  @inlinable
+  public var startIndex: Base.Index {
+    let start = base.startIndex, end = base.endIndex
+    guard let second = base.index(start, offsetBy: +1, limitedBy: end),
+          second < end else {
+      // Need at least two wrapped elements to start.
+      return end
+    }
+
+    return start
+  }
+  @inlinable public var endIndex: Base.Index { base.endIndex }
+
+  @inlinable
+  public subscript(position: Base.Index) -> Element {
+    // If position is either base.end or base.indices.last, we get a crash.
+    return try! subtracter(base[base.index(after: position)], base[position])
+  }
+  @inlinable
+  public subscript(bounds: Range<Base.Index>)
+  -> DeltasSequence<Base.SubSequence, Element> {
+    guard bounds.upperBound < base.endIndex else {
+      return SubSequence(base[bounds.lowerBound...], via: subtracter)
+    }
+
+    return SubSequence(base[bounds.lowerBound ... bounds.upperBound],
+                       via: subtracter)
+  }
+
+  @inlinable
+  public func index(_ i: Base.Index, offsetBy distance: Int) -> Base.Index {
+    let endPoint = distance < 0 ? startIndex : endIndex
+    return index(i, offsetBy: distance, limitedBy: endPoint)!
+  }
+  public func index(
+    _ i: Base.Index, offsetBy distance: Int, limitedBy limit: Base.Index
+  ) -> Base.Index? {
+    guard let result = base.index(i, offsetBy: distance, limitedBy: limit)
+    else { return nil }
+
+    if case let end = base.endIndex, result < end,
+       base.index(after: result) == end {
+      // Landed on the forbidden last base element, skip past it in the
+      // direction of movement.
+      if distance > 0 {
+        return end
+      } else if distance < 0 {
+        return base.index(result, offsetBy: -1,
+                          limitedBy: Swift.max(base.startIndex, limit))
+      } else {
+        preconditionFailure("Used the forbidden base index value")
+      }
+    } else {
+      return result
+    }
+  }
+  @inlinable
+  public func distance(from start: Base.Index, to end: Base.Index) -> Int {
+    var rawResult = base.distance(from: start, to: end)
+    if case let baseEnd = base.endIndex, start == baseEnd || end == baseEnd {
+      // We went past the forbidden last element, so take it out of the distance
+      // calculation.
+      rawResult -= rawResult.signum()
+    }
+    return rawResult
+  }
+
+  @inlinable
+  public func index(after i: Base.Index) -> Base.Index {
+    return index(i, offsetBy: +1)
+  }
+}
+
+extension DeltasSequence: BidirectionalCollection
+where Base: BidirectionalCollection {
+  @inlinable
+  public func index(before i: Base.Index) -> Base.Index {
+    return index(i, offsetBy: -1)
+  }
+}
+
+extension DeltasSequence: RandomAccessCollection
+where Base: RandomAccessCollection {}
+
 //===----------------------------------------------------------------------===//
 // deltas(storingInto:via:)
 //===----------------------------------------------------------------------===//

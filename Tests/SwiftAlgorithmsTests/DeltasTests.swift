@@ -22,6 +22,8 @@ final class DeltasTests: XCTestCase {
     let emptyDeltas = empty.lazy.deltas(via: -)
     XCTAssertEqual(emptyDeltas.underestimatedCount, 0)
     XCTAssertEqualSequences(emptyDeltas, [])
+
+    XCTAssertTrue(emptyDeltas.isEmpty)
   }
 
   /// Check the differences for a single-element source.
@@ -32,6 +34,8 @@ final class DeltasTests: XCTestCase {
     let singleDeltas = single.lazy.deltas(via: -)
     XCTAssertEqual(singleDeltas.underestimatedCount, 0)
     XCTAssertEqualSequences(singleDeltas, [])
+
+    XCTAssertTrue(singleDeltas.isEmpty)
   }
 
   /// Check the differences for a two-element source.
@@ -42,6 +46,14 @@ final class DeltasTests: XCTestCase {
     let sampleDeltas = sample.lazy.deltas(via: /)
     XCTAssertEqual(sampleDeltas.underestimatedCount, 1)
     XCTAssertEqualSequences(sampleDeltas, [4])
+
+    XCTAssertFalse(sampleDeltas.isEmpty)
+    XCTAssertEqual(sampleDeltas.count, 1)
+    XCTAssertEqualSequences(sampleDeltas.indices.lazy.map { sampleDeltas[$0] },
+                            [4])
+    XCTAssertEqualSequences(sampleDeltas.indices.reversed().map {
+      sampleDeltas[$0]
+    }, [4])
   }
 
   /// Check the differences with longer sources.
@@ -57,6 +69,24 @@ final class DeltasTests: XCTestCase {
     XCTAssertEqualSequences(repeatsSubDeltas, [0, 0, 0, 0])
     XCTAssertEqualSequences(repeatsDivDeltas, [1, 1, 1, 1])
 
+    XCTAssertFalse(repeatsSubDeltas.isEmpty)
+    XCTAssertEqual(repeatsSubDeltas.count, 4)
+    XCTAssertEqualSequences(repeatsSubDeltas.indices.map {
+      repeatsSubDeltas[$0]
+    }, [0, 0, 0, 0])
+    XCTAssertEqualSequences(repeatsSubDeltas.indices.reversed().map {
+      repeatsSubDeltas[$0]
+    }, [0, 0, 0, 0])
+
+    XCTAssertFalse(repeatsDivDeltas.isEmpty)
+    XCTAssertEqual(repeatsDivDeltas.count, 4)
+    XCTAssertEqualSequences(repeatsDivDeltas.indices.map {
+      repeatsDivDeltas[$0]
+    }, [1, 1, 1, 1])
+    XCTAssertEqualSequences(repeatsDivDeltas.indices.reversed().map {
+      repeatsDivDeltas[$0]
+    }, [1, 1, 1, 1])
+
     let fibonacci = [1, 1, 2, 3, 5, 8],
         factorials = [1, 1, 2, 6, 24, 120, 720, 5040]
     XCTAssertEqualSequences(fibonacci.deltas(via: -), [0, 1, 1, 2, 3])
@@ -68,5 +98,14 @@ final class DeltasTests: XCTestCase {
     XCTAssertEqual(factorialDeltas.underestimatedCount, 7)
     XCTAssertEqualSequences(fibonacciDeltas, [0, 1, 1, 2, 3])
     XCTAssertEqualSequences(factorialDeltas, 1...7)
+
+    XCTAssertFalse(factorialDeltas.isEmpty)
+    XCTAssertTrue(factorialDeltas[factorialDeltas.endIndex...].isEmpty)
+    XCTAssertEqualSequences(factorialDeltas.prefix(3), 1...3)
+    XCTAssertEqual(factorialDeltas.distance(from: 1, to: 4), 3)
+    XCTAssertNil(factorialDeltas.index(4, offsetBy: +100,
+                                       limitedBy: factorialDeltas.endIndex))
+    XCTAssertNil(factorialDeltas.index(4, offsetBy: -100,
+                                       limitedBy: factorialDeltas.startIndex))
   }
 }
