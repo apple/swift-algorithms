@@ -108,4 +108,15 @@ final class DeltasTests: XCTestCase {
     XCTAssertNil(factorialDeltas.index(4, offsetBy: -100,
                                        limitedBy: factorialDeltas.startIndex))
   }
+
+  /// Check that `distance` works in both directions across the banned index.
+  func testMoreDistance() {
+    let sample = 0..<10, sampleDeltas = sample.lazy.deltas(via: -)
+    XCTAssertEqualSequences(sampleDeltas, repeatElement(1, count: 9))
+    XCTAssertEqual(sampleDeltas.distance(from: 2, to: 10), +7)  // Not +8
+    XCTAssertEqual(sampleDeltas.distance(from: 10, to: 2), -7)  // Not -8
+    XCTAssertEqual(sampleDeltas.distance(from: 10, to: 10), 0)
+    XCTAssertEqual(sampleDeltas.distance(from: 3, to: 7), +4)
+    XCTAssertEqual(sampleDeltas.distance(from: 7, to: 3), -4)
+  }
 }
