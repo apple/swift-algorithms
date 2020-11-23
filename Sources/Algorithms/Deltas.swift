@@ -298,3 +298,117 @@ extension LazySequenceProtocol {
     return DeltasSequence(elements, via: subtracter)
   }
 }
+
+//===----------------------------------------------------------------------===//
+// differences(), wrappedDifferences(), strides()
+//
+// (Note: Some Apple-SDK types use custom delta operations that share the same
+// operator/method names needed below.  They don't actually conform to the
+// corresponding protocols, and as such can't use the following methods.)
+//===----------------------------------------------------------------------===//
+
+extension Sequence where Element: AdditiveArithmetic {
+  /// Differentiates this sequence into a lazy sequence formed by the
+  /// differences between each pair of consecutive elements in order.
+  ///
+  /// This method uses `.lazy.deltas(via:)` with the closure being the `-`
+  /// operator.
+  ///
+  ///     let fib = [1, 1, 2, 3, 5, 8, 13, 21, 34]
+  ///     print(Array(fib.differences()))
+  ///     // Prints "[0, 1, 1, 2, 3, 5, 8, 13]"
+  ///
+  /// - Returns: A lazy sequence containing the differences, starting with the
+  ///   difference between the first and second elements, and ending with the
+  ///   difference between the next-to-last and last elements.  The result is
+  ///   empty if the receiver has less than two elements.
+  @inlinable
+  public func differences() -> DeltasSequence<Self, Element> {
+    return lazy.deltas(via: -)
+  }
+}
+
+extension Sequence where Element: SIMD, Element.Scalar: FloatingPoint {
+  /// Differentiates this sequence into a lazy sequence formed by the vector
+  /// differences between each pair of consecutive elements in order.
+  ///
+  /// This method uses `.lazy.deltas(via:)` with the closure being the `-`
+  /// operator.
+  ///
+  ///     let fibPairs: [SIMD2<Double>] = [[1, 1], [1, 2], [2, 3], [3, 5]]
+  ///     print(Array(fibPairs.differences()))
+  ///     // Prints "[SIMD2<Double>(0.0, 1.0), SIMD2<Double>(1.0, 1.0), SIMD2<Double>(1.0, 2.0)]"
+  ///
+  /// - Returns: A lazy sequence containing the vector-differences, starting
+  ///   with the difference between the first and second elements, and ending
+  ///   with the difference between the next-to-last and last elements.  The
+  ///   result is empty if the receiver has less than two elements.
+  @inlinable
+  public func differences() -> DeltasSequence<Self, Element> {
+    return lazy.deltas(via: -)
+  }
+}
+
+extension Sequence where Element: FixedWidthInteger {
+  /// Differentiates this sequence into a lazy sequence formed by the wrapped
+  /// differences between each pair of consecutive elements in order.
+  ///
+  /// This method uses `.lazy.deltas(via:)` with the closure being the `&-`
+  /// operator.
+  ///
+  ///     let fib = [1, 1, 2, 3, 5, 8, 13, 21, 34]
+  ///     print(Array(fib.wrappedDifferences()))
+  ///     // Prints "[0, 1, 1, 2, 3, 5, 8, 13]"
+  ///
+  /// - Returns: A lazy sequence containing the differences, starting with the
+  ///   wrapped-difference between the first and second elements, and ending
+  ///   with the wrapped-difference between the next-to-last and last elements.
+  ///   The result is empty if the receiver has less than two elements.
+  @inlinable
+  public func wrappedDifferences() -> DeltasSequence<Self, Element> {
+    return lazy.deltas(via: &-)
+  }
+}
+
+extension Sequence where Element: SIMD, Element.Scalar: FixedWidthInteger {
+  /// Differentiates this sequence into a lazy sequence formed by the vector
+  /// wrapped-differences between each pair of consecutive elements in order.
+  ///
+  /// This method uses `.lazy.deltas(via:)` with the closure being the `&-`
+  /// operator.
+  ///
+  ///     let fibPairs: [SIMD2<Int>] = [[1, 1], [1, 2], [2, 3], [3, 5], [5, 8]]
+  ///     print(Array(fibPairs.wrappedDifferences()))
+  ///     // Prints "[SIMD2<Int>(0, 1), SIMD2<Int>(1, 1), SIMD2<Int>(1, 2), SIMD2<Int>(2, 3)]"
+  ///
+  /// - Returns: A lazy sequence containing the vector-differences, starting
+  ///   with the wrapped-difference between the first and second elements, and
+  ///   ending with the wrapped-difference between the next-to-last and last
+  ///   elements.  The result is empty if the receiver has less than two
+  ///   elements.
+  @inlinable
+  public func wrappedDifferences() -> DeltasSequence<Self, Element> {
+    return lazy.deltas(via: &-)
+  }
+}
+
+extension Sequence where Element: Strideable {
+  /// Differentiates this sequence into a lazy sequence formed by the
+  /// strides between each pair of consecutive elements in order.
+  ///
+  /// This method uses `.lazy.deltas(via:)` with the closure being a call to the
+  /// `Strideable.distance(to:)` method.
+  ///
+  ///     let fib = [1, 1, 2, 3, 5, 8, 13, 21, 34]
+  ///     print(Array(fib.strides()))
+  ///     // Prints "[0, 1, 1, 2, 3, 5, 8, 13]"
+  ///
+  /// - Returns: A lazy sequence containing the strides, starting with the
+  ///   distance between the first and second elements, and ending with the
+  ///   distance between the next-to-last and last elements.  The result is
+  ///   empty if the receiver has less than two elements.
+  @inlinable
+  public func strides() -> DeltasSequence<Self, Element.Stride> {
+    return lazy.deltas() { $1.distance(to: $0) }
+  }
+}

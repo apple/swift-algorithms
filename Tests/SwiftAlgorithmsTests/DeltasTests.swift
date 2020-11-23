@@ -12,7 +12,8 @@
 import XCTest
 @testable import Algorithms
 
-/// Unit tests for the `deltas()` eager and lazy methods.
+/// Unit tests for the `deltas()`, both eager and lazy; `differences()`;
+/// `wrappedDifferences()`; and `strides()` methods.
 final class DeltasTests: XCTestCase {
   /// Check the differences for an empty source.
   func testEmpty() {
@@ -118,5 +119,27 @@ final class DeltasTests: XCTestCase {
     XCTAssertEqual(sampleDeltas.distance(from: 10, to: 10), 0)
     XCTAssertEqual(sampleDeltas.distance(from: 3, to: 7), +4)
     XCTAssertEqual(sampleDeltas.distance(from: 7, to: 3), -4)
+  }
+
+  /// Check the protocol-customized overloads.
+  func testCustoms() {
+    let fibInt = [1, 1, 2, 3, 5, 8, 13]
+    XCTAssertEqualSequences(fibInt.differences(), [0, 1, 1, 2, 3, 5])
+    XCTAssertEqualSequences(fibInt.wrappedDifferences(), [0, 1, 1, 2, 3, 5])
+    XCTAssertEqualSequences(fibInt.strides(), [0, 1, 1, 2, 3, 5])
+
+    let fibDouble = fibInt.map(Double.init)
+    XCTAssertEqualSequences(fibDouble.differences(), [0, 1, 1, 2, 3, 5])
+    XCTAssertEqualSequences(fibDouble.strides(), [0, 1, 1, 2, 3, 5])
+
+    let fibInts = zip(fibInt.dropLast(), fibInt.dropFirst()).map {
+      SIMD2($0.0, $0.1)
+    }
+    XCTAssertEqualSequences(fibInts.wrappedDifferences(),
+                            [[0, 1], [1, 1], [1, 2], [2, 3], [3, 5]])
+
+    let fibDoubles = fibInts.map(SIMD2<Double>.init)
+    XCTAssertEqualSequences(fibDoubles.differences(),
+                            [[0, 1], [1, 1], [1, 2], [2, 3], [3, 5]])
   }
 }
