@@ -13,8 +13,31 @@ import XCTest
 import Algorithms
 
 final class ScanTests: XCTestCase {
-  func testScan() {
-    XCTAssertEqualSequences((1...5).scan(0, +), [1, 3, 6, 10, 15])
-    XCTAssertEqualSequences([3, 4, 2, 3, 1].scan(.max, min), [3, 3, 2, 2, 1])
+  func testSequence() {
+    let scan = (1...).prefix(5).scan(0, +)
+    XCTAssertEqualSequences(scan, [1, 3, 6, 10, 15])
+  }
+
+  func testSequenceEmpty() {
+    let scan = (1...).prefix(0).scan(0, +)
+    XCTAssertEqualSequences(scan, [])
+  }
+
+  func testCollection() {
+    let scan = [3, 4, 2, 3, 1].scan(.max, min)
+    XCTAssertEqualSequences(scan, [3, 3, 2, 2, 1])
+    validateIndexTraversals(scan)
+  }
+
+  func testCollectionEmpty() {
+    let scan = EmptyCollection<Int>().scan(.max, min)
+    XCTAssertEqualSequences(scan, [])
+    validateIndexTraversals(scan)
+  }
+
+  func testBidirectionalCollection() {
+    let reversed = [1,2,3,4,5].scan(0, +).reversed()
+    XCTAssertEqualSequences(reversed, [15, 10, 6, 3, 1])
+    validateIndexTraversals(reversed)
   }
 }

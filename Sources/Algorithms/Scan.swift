@@ -37,6 +37,42 @@ extension Scan: Sequence {
   }
 }
 
+extension Scan: Collection where Base: Collection {
+  public var startIndex: Base.Index {
+    base.startIndex
+  }
+
+  public var endIndex: Base.Index {
+    base.endIndex
+  }
+
+  public subscript(position: Base.Index) -> Result {
+    base[...position].reduce(initial, transform)
+  }
+
+  public func index(after i: Base.Index) -> Base.Index {
+    base.index(after: i)
+  }
+
+  public func index(_ i: Base.Index, offsetBy distance: Int) -> Base.Index {
+    base.index(i, offsetBy: distance)
+  }
+
+  public func index(_ i: Base.Index, offsetBy distance: Int, limitedBy limit: Base.Index) -> Base.Index? {
+    base.index(i, offsetBy: distance, limitedBy: limit)
+  }
+
+  public func distance(from start: Base.Index, to end: Base.Index) -> Int {
+    base.distance(from: start, to: end)
+  }
+}
+
+extension Scan: BidirectionalCollection where Base: BidirectionalCollection {
+  public func index(before i: Base.Index) -> Base.Index {
+    base.index(before: i)
+  }
+}
+
 extension Sequence {
 
   /// Returns a sequence containing the results of combining the elements of
