@@ -11,13 +11,13 @@
 
 /// A sequence of applying a transform to the element of a sequence and the
 /// previously transformed result.
-public struct Scan<Result, Base: Sequence> {
+public struct Reductions<Result, Base: Sequence> {
   let base: Base
   let initial: Result
   let transform: (Result, Base.Element) -> Result
 }
 
-extension Scan: Sequence {
+extension Reductions: Sequence {
   public struct Iterator: IteratorProtocol {
     var iterator: Base.Iterator
     var current: Result
@@ -37,7 +37,7 @@ extension Scan: Sequence {
   }
 }
 
-extension Scan: Collection where Base: Collection {
+extension Reductions: Collection where Base: Collection {
   public var startIndex: Base.Index {
     base.startIndex
   }
@@ -67,7 +67,7 @@ extension Scan: Collection where Base: Collection {
   }
 }
 
-extension Scan: BidirectionalCollection where Base: BidirectionalCollection {
+extension Reductions: BidirectionalCollection where Base: BidirectionalCollection {
   public func index(before i: Base.Index) -> Base.Index {
     base.index(before: i)
   }
@@ -83,7 +83,7 @@ extension Sequence {
   ///
   /// ```
   /// let values = [1, 2, 3, 4]
-  /// let sequence = values.scan(0, +)
+  /// let sequence = values.reductions(0, +)
   /// print(Array(sequence))
   ///
   /// // prints [1, 3, 6, 10]
@@ -94,10 +94,10 @@ extension Sequence {
   ///   - transform: A closure that combines an accumulating value and
   ///     an element of the sequence.
   /// - Returns: A sequence of transformed elements.
-  public func scan<Result>(
+  public func reductions<Result>(
     _ initial: Result,
     _ transform: @escaping (Result, Element) -> Result
-  ) -> Scan<Result, Self> {
-    Scan(base: self, initial: initial, transform: transform)
+  ) -> Reductions<Result, Self> {
+    Reductions(base: self, initial: initial, transform: transform)
   }
 }

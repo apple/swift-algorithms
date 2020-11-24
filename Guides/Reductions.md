@@ -1,7 +1,7 @@
-# Scan
+# Reductions
 
-[[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Scan.swift) |
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/ScanTests.swift)]
+[[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Reductions.swift) |
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/ReductionsTests.swift)]
 
 Produces a sequence of values.
 
@@ -9,11 +9,11 @@ This has the behaviour of reduce, but instead of returning the final result
 value, it returns the a sequence of the results returned from each element.
 
 ```swift
-let accumulation = (1...5).scan(0, +)
+let accumulation = (1...5).reductions(0, +)
 print(Array(accumulation))
 // prints [1, 3, 6, 10, 15]
 
-let runningMinimum = [3, 4, 2, 3, 1].scan(.max, min)
+let runningMinimum = [3, 4, 2, 3, 1].reductions(.max, min)
 print(Array(runningMinimum))
 // prints [3, 3, 2, 2, 1]
 ```
@@ -24,10 +24,10 @@ One new method is added to sequences:
 
 ```swift
 extension Sequence {
-  func scan<Result>(
+  func reductions<Result>(
     _ initial: Result, 
     _ transform: @escaping (Result, Element) -> Result
-  ) -> Scan<Result, Self>
+  ) -> Reductions<Result, Self>
 }
 ```
 

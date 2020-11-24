@@ -12,31 +12,31 @@
 import XCTest
 import Algorithms
 
-final class ScanTests: XCTestCase {
+final class ReductionsTests: XCTestCase {
   func testSequence() {
-    let scan = (1...).prefix(5).scan(0, +)
-    XCTAssertEqualSequences(scan, [1, 3, 6, 10, 15])
+    let reductions = (1...).prefix(5).reductions(0, +)
+    XCTAssertEqualSequences(reductions, [1, 3, 6, 10, 15])
   }
 
   func testSequenceEmpty() {
-    let scan = (1...).prefix(0).scan(0, +)
-    XCTAssertEqualSequences(scan, [])
+    let reductions = (1...).prefix(0).reductions(0, +)
+    XCTAssertEqualSequences(reductions, [])
   }
 
   func testCollection() {
-    let scan = [3, 4, 2, 3, 1].scan(.max, min)
-    XCTAssertEqualSequences(scan, [3, 3, 2, 2, 1])
-    validateIndexTraversals(scan)
+    let reductions = [3, 4, 2, 3, 1].reductions(.max, min)
+    XCTAssertEqualSequences(reductions, [3, 3, 2, 2, 1])
+    validateIndexTraversals(reductions)
   }
 
   func testCollectionEmpty() {
-    let scan = EmptyCollection<Int>().scan(.max, min)
-    XCTAssertEqualSequences(scan, [])
-    validateIndexTraversals(scan)
+    let reductions = EmptyCollection<Int>().reductions(.max, min)
+    XCTAssertEqualSequences(reductions, [])
+    validateIndexTraversals(reductions)
   }
 
   func testBidirectionalCollection() {
-    let reversed = [1,2,3,4,5].scan(0, +).reversed()
+    let reversed = [1,2,3,4,5].reductions(0, +).reversed()
     XCTAssertEqualSequences(reversed, [15, 10, 6, 3, 1])
     validateIndexTraversals(reversed)
   }
