@@ -23,6 +23,18 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqualSequences(reductions, [])
   }
 
+  func testEager() {
+    let reductions: [Int] = [3, 4, 2, 3, 1].reductions(.max, min)
+    XCTAssertEqualSequences(reductions, [3, 3, 2, 2, 1])
+    validateIndexTraversals(reductions)
+  }
+
+  func testEagerThrows() {
+    struct E: Error {}
+    XCTAssertNoThrow(try [].reductions(0, { _, _ in throw E() }))
+    XCTAssertThrowsError(try [1].reductions(0, { _, _ in throw E() }))
+  }
+
   func testCollection() {
     let reductions = [3, 4, 2, 3, 1].reductions(.max, min)
     XCTAssertEqualSequences(reductions, [3, 3, 2, 2, 1])

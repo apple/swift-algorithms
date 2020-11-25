@@ -75,6 +75,21 @@ extension Reductions: BidirectionalCollection where Base: BidirectionalCollectio
 
 extension Sequence {
 
+  public func reductions<Result>(
+    _ initial: Result,
+    _ transform: (Result, Element) throws -> Result
+  ) rethrows -> [Result] {
+
+    var result = initial
+    return try map { element in
+      result = try transform(result, element)
+      return result
+    }
+  }
+}
+
+extension LazySequenceProtocol {
+
   /// Returns a sequence containing the results of combining the elements of
   /// the sequence using the given transform.
   ///
