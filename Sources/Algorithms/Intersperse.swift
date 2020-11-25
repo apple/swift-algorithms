@@ -152,6 +152,9 @@ extension Intersperse: BidirectionalCollection
 extension Intersperse: RandomAccessCollection
   where Base: RandomAccessCollection {}
 
+extension Intersperse: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
+
 extension Sequence {
 
   /// Returns a sequence containing elements of this sequence with the given
