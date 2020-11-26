@@ -109,7 +109,7 @@ extension Sequence {
   }
 
   public func reductions<Result>(
-    _ initial: Result,
+    excluding initial: Result,
     _ transform: (Result, Element) throws -> Result
   ) rethrows -> [Result] {
 
