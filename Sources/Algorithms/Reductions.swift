@@ -81,6 +81,24 @@ extension Reductions: Collection where Base: Collection {
 extension Sequence {
 
   public func reductions<Result>(
+    including initial: Result,
+    _ transform: (Result, Element) throws -> Result
+  ) rethrows -> [Result] {
+
+    var output = [Result]()
+    output.reserveCapacity(underestimatedCount + 1)
+    output.append(initial)
+
+    var result = initial
+    for element in self {
+      result = try transform(result, element)
+      output.append(result)
+    }
+
+    return output
+  }
+
+  public func reductions<Result>(
     _ initial: Result,
     _ transform: (Result, Element) throws -> Result
   ) rethrows -> [Result] {

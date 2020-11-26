@@ -27,12 +27,19 @@ final class ReductionsTests: XCTestCase {
     let reductions: [Int] = [3, 4, 2, 3, 1].reductions(.max, min)
     XCTAssertEqualSequences(reductions, [3, 3, 2, 2, 1])
     validateIndexTraversals(reductions)
+
+    let including: [Int] = [6, 3, 2, 4, 1].reductions(including: 10, +)
+    XCTAssertEqualSequences(including, [10, 16, 19, 21, 25, 26])
+    validateIndexTraversals(including)
   }
 
   func testEagerThrows() {
     struct E: Error {}
     XCTAssertNoThrow(try [].reductions(0, { _, _ in throw E() }))
     XCTAssertThrowsError(try [1].reductions(0, { _, _ in throw E() }))
+
+    XCTAssertNoThrow(try [].reductions(including: 0, { _, _ in throw E() }))
+    XCTAssertThrowsError(try [1].reductions(including: 0, { _, _ in throw E() }))
   }
 
   func testCollection() {
