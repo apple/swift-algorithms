@@ -38,32 +38,43 @@ extension Reductions: Sequence {
 }
 
 extension Reductions: Collection where Base: Collection {
-  public var startIndex: Base.Index {
-    base.startIndex
+  public struct Index: Comparable {
+    let index: Base.Index
+    let result: Result
+
+    public static func < (lhs: Index, rhs: Index) -> Bool {
+        lhs.index < rhs.index
+    }
+
+    public static func == (lhs: Index, rhs: Index) -> Bool {
+        lhs.index == rhs.index
+    }
   }
 
-  public var endIndex: Base.Index {
-    base.endIndex
+  public var startIndex: Index {
+    let start = base.startIndex
+    let result = transform(initial, base[start])
+    return Index(index: start, result: result)
   }
 
-  public subscript(position: Base.Index) -> Result {
-    base[...position].reduce(initial, transform)
+  public var endIndex: Index {
+    let end = base.endIndex
+    let result = base.reduce(initial, transform)
+    return Index(index: end, result: result)
   }
 
-  public func index(after i: Base.Index) -> Base.Index {
-    base.index(after: i)
+  public subscript(position: Index) -> Result {
+    position.result
   }
 
-  public func index(_ i: Base.Index, offsetBy distance: Int) -> Base.Index {
-    base.index(i, offsetBy: distance)
+  public func index(after i: Index) -> Index {
+    let index = base.index(after: i.index)
+    let result = transform(i.result, base[i.index])
+    return Index(index: index, result: result)
   }
 
-  public func index(_ i: Base.Index, offsetBy distance: Int, limitedBy limit: Base.Index) -> Base.Index? {
-    base.index(i, offsetBy: distance, limitedBy: limit)
-  }
-
-  public func distance(from start: Base.Index, to end: Base.Index) -> Int {
-    base.distance(from: start, to: end)
+  public func distance(from start: Index, to end: Index) -> Int {
+    base.distance(from: start.index, to: end.index)
   }
 }
 
