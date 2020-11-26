@@ -78,6 +78,12 @@ extension Reductions: Collection where Base: Collection {
   }
 }
 
+extension Reductions: LazyCollectionProtocol
+where Base: LazyCollectionProtocol {}
+
+extension Reductions: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
+
 extension Collection {
   public func reductions(
     _ transform: (Element, Element) throws -> Element
