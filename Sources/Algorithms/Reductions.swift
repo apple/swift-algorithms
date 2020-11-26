@@ -84,14 +84,14 @@ extension Collection {
   ) rethrows -> [Element] {
 
     guard let first = first else { return [] }
-    return try dropFirst().reductions(including: first, transform)
+    return try dropFirst().reductions(first, transform)
   }
 }
 
 extension Sequence {
 
   public func reductions<Result>(
-    including initial: Result,
+    _ initial: Result,
     _ transform: (Result, Element) throws -> Result
   ) rethrows -> [Result] {
 
@@ -106,18 +106,6 @@ extension Sequence {
     }
 
     return output
-  }
-
-  public func reductions<Result>(
-    excluding initial: Result,
-    _ transform: (Result, Element) throws -> Result
-  ) rethrows -> [Result] {
-
-    var result = initial
-    return try map { element in
-      result = try transform(result, element)
-      return result
-    }
   }
 }
 

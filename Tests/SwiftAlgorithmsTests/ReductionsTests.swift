@@ -36,13 +36,9 @@ final class ReductionsTests: XCTestCase {
   }
 
   func testEager() {
-    let excluding: [Int] = [3, 4, 2, 3, 1].reductions(excluding: .max, min)
-    XCTAssertEqualSequences(excluding, [3, 3, 2, 2, 1])
-    validateIndexTraversals(excluding)
-
-    let including: [Int] = [6, 3, 2, 4, 1].reductions(including: 10, +)
-    XCTAssertEqualSequences(including, [10, 16, 19, 21, 25, 26])
-    validateIndexTraversals(including)
+    let initial: [Int] = [6, 3, 2, 4, 1].reductions(10, +)
+    XCTAssertEqualSequences(initial, [10, 16, 19, 21, 25, 26])
+    validateIndexTraversals(initial)
 
     let noInitial: [Int] = [3, 4, 2, 3, 1].reductions(+)
     XCTAssertEqualSequences(noInitial, [3, 7, 9, 12, 13])
@@ -51,11 +47,8 @@ final class ReductionsTests: XCTestCase {
 
   func testEagerThrows() {
     struct E: Error {}
-    XCTAssertNoThrow(try [].reductions(excluding: 0, { _, _ in throw E() }))
-    XCTAssertThrowsError(try [1].reductions(excluding: 0, { _, _ in throw E() }))
-
-    XCTAssertNoThrow(try [].reductions(including: 0, { _, _ in throw E() }))
-    XCTAssertThrowsError(try [1].reductions(including: 0, { _, _ in throw E() }))
+    XCTAssertNoThrow(try [].reductions(0, { _, _ in throw E() }))
+    XCTAssertThrowsError(try [1].reductions(0, { _, _ in throw E() }))
 
     XCTAssertNoThrow(try [].reductions({ _, _ in throw E() }))
     XCTAssertNoThrow(try [1].reductions({ _, _ in throw E() }))
