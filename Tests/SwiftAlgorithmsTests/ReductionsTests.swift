@@ -31,6 +31,10 @@ final class ReductionsTests: XCTestCase {
     let including: [Int] = [6, 3, 2, 4, 1].reductions(including: 10, +)
     XCTAssertEqualSequences(including, [10, 16, 19, 21, 25, 26])
     validateIndexTraversals(including)
+
+    let noInitial: [Int] = [3, 4, 2, 3, 1].reductions(+)
+    XCTAssertEqualSequences(noInitial, [3, 7, 9, 12, 13])
+    validateIndexTraversals(noInitial)
   }
 
   func testEagerThrows() {
@@ -40,6 +44,10 @@ final class ReductionsTests: XCTestCase {
 
     XCTAssertNoThrow(try [].reductions(including: 0, { _, _ in throw E() }))
     XCTAssertThrowsError(try [1].reductions(including: 0, { _, _ in throw E() }))
+
+    XCTAssertNoThrow(try [].reductions({ _, _ in throw E() }))
+    XCTAssertNoThrow(try [1].reductions({ _, _ in throw E() }))
+    XCTAssertThrowsError(try [1, 1].reductions({ _, _ in throw E() }))
   }
 
   func testCollection() {

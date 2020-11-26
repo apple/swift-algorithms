@@ -78,6 +78,16 @@ extension Reductions: Collection where Base: Collection {
   }
 }
 
+extension Collection {
+  public func reductions(
+    _ transform: (Element, Element) throws -> Element
+  ) rethrows -> [Element] {
+
+    guard let first = first else { return [] }
+    return try dropFirst().reductions(including: first, transform)
+  }
+}
+
 extension Sequence {
 
   public func reductions<Result>(
