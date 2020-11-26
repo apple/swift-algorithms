@@ -12,7 +12,14 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
-*No changes yet.*
+### Additions
+
+- Two methods have been added to element-mutable collections.  The
+  `accumulate(via:)` method does a scan (a.k.a. progressive reduce) with a
+  given combining closure, but assigns the results on top of the existing
+  elements instead of returning a separate sequence.  The `disperse(via:)`
+  method does the counter-operation, assuming it's given the appropriate
+  counter-closure.
 
 ---
 
