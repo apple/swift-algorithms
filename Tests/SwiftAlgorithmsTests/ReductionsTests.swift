@@ -13,14 +13,26 @@ import XCTest
 import Algorithms
 
 final class ReductionsTests: XCTestCase {
-  func testSequence() {
-    let reductions = (1...).prefix(5).reductions(excluding: 0, +)
+  func testLazySequence() {
+    let reductions = (1...).prefix(5).lazy.reductions(0, +)
     XCTAssertEqualSequences(reductions, [1, 3, 6, 10, 15])
   }
 
-  func testSequenceEmpty() {
-    let reductions = (1...).prefix(0).reductions(excluding: 0, +)
+  func testLazySequenceEmpty() {
+    let reductions = (1...).prefix(0).lazy.reductions(0, +)
     XCTAssertEqualSequences(reductions, [])
+  }
+
+  func testLazyCollection() {
+    let reductions = [3, 4, 2, 3, 1].lazy.reductions(.max, min)
+    XCTAssertEqualSequences(reductions, [3, 3, 2, 2, 1])
+//    validateIndexTraversals(reductions)
+  }
+
+  func testLazyCollectionEmpty() {
+    let reductions = EmptyCollection<Int>().lazy.reductions(.max, min)
+    XCTAssertEqualSequences(reductions, [])
+//    validateIndexTraversals(reductions)
   }
 
   func testEager() {
@@ -48,17 +60,5 @@ final class ReductionsTests: XCTestCase {
     XCTAssertNoThrow(try [].reductions({ _, _ in throw E() }))
     XCTAssertNoThrow(try [1].reductions({ _, _ in throw E() }))
     XCTAssertThrowsError(try [1, 1].reductions({ _, _ in throw E() }))
-  }
-
-  func testCollection() {
-    let reductions = [3, 4, 2, 3, 1].reductions(excluding: .max, min)
-    XCTAssertEqualSequences(reductions, [3, 3, 2, 2, 1])
-    validateIndexTraversals(reductions)
-  }
-
-  func testCollectionEmpty() {
-    let reductions = EmptyCollection<Int>().reductions(excluding: .max, min)
-    XCTAssertEqualSequences(reductions, [])
-    validateIndexTraversals(reductions)
   }
 }
