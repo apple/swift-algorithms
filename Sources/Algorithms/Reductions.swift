@@ -67,12 +67,6 @@ extension Reductions: Collection where Base: Collection {
   }
 }
 
-extension Reductions: BidirectionalCollection where Base: BidirectionalCollection {
-  public func index(before i: Base.Index) -> Base.Index {
-    base.index(before: i)
-  }
-}
-
 extension Sequence {
 
   public func reductions<Result>(

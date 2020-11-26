@@ -46,10 +46,4 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqualSequences(reductions, [])
     validateIndexTraversals(reductions)
   }
-
-  func testBidirectionalCollection() {
-    let reversed = [1,2,3,4,5].reductions(0, +).reversed()
-    XCTAssertEqualSequences(reversed, [15, 10, 6, 3, 1])
-    validateIndexTraversals(reversed)
-  }
 }
