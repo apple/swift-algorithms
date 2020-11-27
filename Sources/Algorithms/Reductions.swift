@@ -141,5 +141,50 @@ extension InclusiveReductions: Sequence {
   }
 }
 
+extension InclusiveReductions: Collection where Base: Collection {
+  public struct Index: Comparable {
+    let index: Base.Index
+    let previous: Element?
+
+    public static func < (lhs: Index, rhs: Index) -> Bool {
+      lhs.index < rhs.index
+    }
+
+    public static func == (lhs: Index, rhs: Index) -> Bool {
+      lhs.index == rhs.index
+    }
+  }
+
+  public var startIndex: Index {
+    Index(index: base.startIndex, previous: nil)
+  }
+
+  public var endIndex: Index {
+    var iterator = makeIterator()
+    guard let initial = iterator.next() else { return startIndex }
+    let previous = IteratorSequence(iterator).dropLast().reduce(initial, transform)
+    return Index(index: base.endIndex, previous: previous)
+  }
+
+  public subscript(position: Index) -> Base.Element {
+    let element = base[position.index]
+    switch position.previous {
+    case .none: return element
+    case .some(let previous): return transform(previous, element)
+    }
+  }
+
+  public func index(after i: Index) -> Index {
+    Index(index: base.index(after: i.index), previous: self[i])
+  }
+
+  public func distance(from start: Index, to end: Index) -> Int {
+    base.distance(from: start.index, to: end.index)
+  }
+}
+
 extension InclusiveReductions: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
+
+extension InclusiveReductions: LazyCollectionProtocol
+  where Base: LazyCollectionProtocol {}
