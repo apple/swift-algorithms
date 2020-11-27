@@ -14,52 +14,60 @@ import Algorithms
 
 final class ReductionsTests: XCTestCase {
 
-  func testLazySequence() {
-    let reductions = (1...).prefix(5).lazy.reductions(0, +)
-    XCTAssertEqualSequences(reductions, [0, 1, 3, 6, 10, 15])
+  func testLazySequenceInitial() {
+    XCTAssertEqualSequences(
+      (1...).prefix(5).lazy.reductions(0, +),
+      [0, 1, 3, 6, 10, 15])
 
-    let one = (1...).prefix(1).lazy.reductions(0, +)
-    XCTAssertEqualSequences(one, [0, 1])
+    XCTAssertEqualSequences(
+      (1...).prefix(1).lazy.reductions(0, +),
+      [0, 1])
 
-    let empty = (1...).prefix(0).lazy.reductions(0, +)
-    XCTAssertEqualSequences(empty, [0])
+    XCTAssertEqualSequences(
+      (1...).prefix(0).lazy.reductions(0, +),
+      [0])
   }
 
-  func testLazyCollection() {
-    let reductions = [1, 2, 3, 4, 5].lazy.reductions(0, +)
-    XCTAssertEqualSequences(reductions, [0, 1, 3, 6, 10, 15])
-//    validateIndexTraversals(reductions)
+  func testLazyCollectionInitial() {
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 5].lazy.reductions(0, +),
+      [0, 1, 3, 6, 10, 15])
 
-    let one = [1].lazy.reductions(0, +)
-    XCTAssertEqualSequences(one, [0, 1])
-//    validateIndexTraversals(one)
+    XCTAssertEqualSequences(
+      [1].lazy.reductions(0, +),
+      [0, 1])
 
-    let empty = EmptyCollection<Int>().lazy.reductions(0, +)
-    XCTAssertEqualSequences(empty, [0])
-//    validateIndexTraversals(empty)
-//    validateIndexTraversals(reductions)
+    XCTAssertEqualSequences(
+      EmptyCollection<Int>().lazy.reductions(0, +),
+      [0])
   }
 
   func testEagerInitial() {
-    let reductions: [Int] = [1, 2, 3, 4, 5].reductions(0, +)
-    XCTAssertEqualSequences(reductions, [0, 1, 3, 6, 10, 15])
+    XCTAssertEqual(
+      [1, 2, 3, 4, 5].reductions(0, +),
+      [0, 1, 3, 6, 10, 15])
 
-    let one: [Int] = CollectionOfOne(1).reductions(0, +)
-    XCTAssertEqualSequences(one, [0, 1])
+    XCTAssertEqual(
+      CollectionOfOne(1).reductions(0, +),
+      [0, 1])
 
-    let empty: [Int] = EmptyCollection<Int>().reductions(0, +)
-    XCTAssertEqualSequences(empty, [0])
+    XCTAssertEqualSequences(
+      EmptyCollection<Int>().reductions(0, +),
+      [0])
   }
 
   func testEagerNoInitial() {
-    let reductions: [Int] = [1, 2, 3, 4, 5].reductions(+)
-    XCTAssertEqualSequences(reductions, [1, 3, 6, 10, 15])
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 5].reductions(+),
+      [1, 3, 6, 10, 15])
 
-    let one: [Int] = CollectionOfOne(1).reductions(+)
-    XCTAssertEqualSequences(one, [1])
+    XCTAssertEqualSequences(
+      CollectionOfOne(1).reductions(+),
+      [1])
 
-    let empty: [Int] = EmptyCollection<Int>().reductions(+)
-    XCTAssertEqualSequences(empty, [])
+    XCTAssertEqualSequences(
+      EmptyCollection<Int>().reductions(+),
+      [])
   }
 
   func testEagerThrows() {
