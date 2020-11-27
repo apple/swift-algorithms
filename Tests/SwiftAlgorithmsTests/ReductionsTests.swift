@@ -18,6 +18,9 @@ final class ReductionsTests: XCTestCase {
     let reductions = (1...).prefix(5).lazy.reductions(0, +)
     XCTAssertEqualSequences(reductions, [0, 1, 3, 6, 10, 15])
 
+    let one = (1...).prefix(1).lazy.reductions(0, +)
+    XCTAssertEqualSequences(one, [0, 1])
+
     let empty = (1...).prefix(0).lazy.reductions(0, +)
     XCTAssertEqualSequences(empty, [0])
   }
@@ -27,14 +30,22 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqualSequences(reductions, [0, 1, 3, 6, 10, 15])
 //    validateIndexTraversals(reductions)
 
+    let one = [1].lazy.reductions(0, +)
+    XCTAssertEqualSequences(one, [0, 1])
+//    validateIndexTraversals(one)
+
     let empty = EmptyCollection<Int>().lazy.reductions(0, +)
     XCTAssertEqualSequences(empty, [0])
+//    validateIndexTraversals(empty)
 //    validateIndexTraversals(reductions)
   }
 
   func testEagerInitial() {
     let reductions: [Int] = [1, 2, 3, 4, 5].reductions(0, +)
     XCTAssertEqualSequences(reductions, [0, 1, 3, 6, 10, 15])
+
+    let one: [Int] = CollectionOfOne(1).reductions(0, +)
+    XCTAssertEqualSequences(one, [0, 1])
 
     let empty: [Int] = EmptyCollection<Int>().reductions(0, +)
     XCTAssertEqualSequences(empty, [0])
@@ -43,6 +54,9 @@ final class ReductionsTests: XCTestCase {
   func testEagerNoInitial() {
     let reductions: [Int] = [1, 2, 3, 4, 5].reductions(+)
     XCTAssertEqualSequences(reductions, [1, 3, 6, 10, 15])
+
+    let one: [Int] = CollectionOfOne(1).reductions(+)
+    XCTAssertEqualSequences(one, [1])
 
     let empty: [Int] = EmptyCollection<Int>().reductions(+)
     XCTAssertEqualSequences(empty, [])
