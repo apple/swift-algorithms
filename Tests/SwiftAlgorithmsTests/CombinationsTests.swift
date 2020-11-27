@@ -40,6 +40,6 @@ final class CombinationsTests: XCTestCase {
   }
   
   func testCombinationsLazy() {
-    XCTAssertLazy("ABC".lazy.combinations(ofCount: 1))
+    XCTAssertLazySequence("ABC".lazy.combinations(ofCount: 1))
   }
 }

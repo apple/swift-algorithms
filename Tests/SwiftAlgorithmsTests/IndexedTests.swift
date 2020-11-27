@@ -29,6 +29,6 @@ final class IndexedTests: XCTestCase {
   }
   
   func testIndexedLazy() {
-    XCTAssertLazy("ABCD".lazy.indexed())
+    XCTAssertLazySequence("ABCD".lazy.indexed())
   }
 }

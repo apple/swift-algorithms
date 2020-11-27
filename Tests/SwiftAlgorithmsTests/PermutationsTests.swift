@@ -71,6 +71,6 @@ final class PermutationsTests: XCTestCase {
   }
   
   func testPermutationsLazy() {
-    XCTAssertLazy("ABCD".lazy.permutations(ofCount: 2))
+    XCTAssertLazySequence("ABCD".lazy.permutations(ofCount: 2))
   }
 }

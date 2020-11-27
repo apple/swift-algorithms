@@ -41,6 +41,6 @@ final class CycleTests: XCTestCase {
   }
   
   func testCycleLazy() {
-    XCTAssertLazy((1...4).lazy.cycled())
+    XCTAssertLazySequence((1...4).lazy.cycled())
   }
 }

@@ -73,7 +73,7 @@ final class ChunkedTests: XCTestCase {
   }
   
   func testChunkedLazy() {
-    XCTAssertLazy(fruits.lazy.chunked(by: { $0.first == $1.first }))
-    XCTAssertLazy(fruits.lazy.chunked(on: { $0.first }))
+    XCTAssertLazySequence(fruits.lazy.chunked(by: { $0.first == $1.first }))
+    XCTAssertLazySequence(fruits.lazy.chunked(on: { $0.first }))
   }
 }
