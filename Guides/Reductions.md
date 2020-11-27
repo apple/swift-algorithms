@@ -100,8 +100,9 @@ these terms carry through as the name for the lazy sequences;
 
 ### Comparison with other langauges
 
-**C++:** As of C++17, the `<algorithm>` library includes an `inclusive_scan`
-function.
+**C++:** As of C++17, the `<algorithm>` library includes both
+[`exclusive_scan`][C++ Exclusive] and [`inclusive_scan`][C++ Inclusive]
+functions.
 
 **[Clojure][Clojure]:** Clojure 1.2 added a `reductions` function.
 
@@ -114,6 +115,8 @@ parameter.
 
 **[Rust][Rust]:** Rust provides a `scan` function.
 
+[C++ Exclusive]: https://en.cppreference.com/w/cpp/algorithm/exclusive_scan
+[C++ Inclusive]: https://en.cppreference.com/w/cpp/algorithm/inclusive_scan
 [Clojure]: http://clojure.github.io/clojure/clojure.core-api.html#clojure.core/reductions
 [Haskell]: http://hackage.haskell.org/package/base-4.8.2.0/docs/Prelude.html#v:scanl
 [Rust]: https://doc.rust-lang.org/std/iter/trait.Iterator.html#method.scan
