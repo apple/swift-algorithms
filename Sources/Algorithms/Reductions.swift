@@ -9,6 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MARK: - Exclusive Reductions
+
 /// A sequence of applying a transform to the element of a sequence and the
 /// previously transformed result.
 public struct Reductions<Result, Base: Sequence> {
@@ -85,14 +87,6 @@ extension Reductions: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
 
 extension Sequence {
-  public func reductions(
-    _ transform: (Element, Element) throws -> Element
-  ) rethrows -> [Element] {
-
-    var iterator = makeIterator()
-    guard let initial = iterator.next() else { return [] }
-    return try IteratorSequence(iterator).reductions(initial, transform)
-  }
 
   public func reductions<Result>(
     _ initial: Result,
@@ -141,3 +135,55 @@ extension LazySequenceProtocol {
     Reductions(base: self, initial: initial, transform: transform)
   }
 }
+
+// MARK: - Inclusive Reductions
+
+extension LazySequenceProtocol {
+
+  public func reductions(
+    _ transform: @escaping (Element, Element) -> Element
+  ) -> InclusiveReductions<Self> {
+    InclusiveReductions(base: self, transform: transform)
+  }
+}
+
+extension Sequence {
+  public func reductions(
+    _ transform: (Element, Element) throws -> Element
+  ) rethrows -> [Element] {
+    var iterator = makeIterator()
+    guard let initial = iterator.next() else { return [] }
+    return try IteratorSequence(iterator).reductions(initial, transform)
+  }
+}
+
+public struct InclusiveReductions<Base: Sequence> {
+  let base: Base
+  let transform: (Base.Element, Base.Element) -> Base.Element
+}
+
+extension InclusiveReductions: Sequence {
+  public struct Iterator: IteratorProtocol {
+    var iterator: Base.Iterator
+    var element: Base.Element?
+    let transform: (Base.Element, Base.Element) -> Base.Element
+
+    public mutating func next() -> Base.Element? {
+      guard let previous = element else {
+        element = iterator.next()
+        return element
+      }
+      guard let next = iterator.next() else { return nil }
+      element = transform(previous, next)
+      return element
+    }
+  }
+
+  public func makeIterator() -> Iterator {
+    Iterator(iterator: base.makeIterator(),
+             transform: transform)
+  }
+}
+
+extension InclusiveReductions: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}

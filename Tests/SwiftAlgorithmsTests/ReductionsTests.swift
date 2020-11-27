@@ -14,6 +14,10 @@ import Algorithms
 
 final class ReductionsTests: XCTestCase {
 
+  struct TestError: Error {}
+
+  // MARK: - Exclusive Reductions
+
   func testLazySequenceInitial() {
     XCTAssertEqualSequences(
       (1...).prefix(5).lazy.reductions(0, +),
@@ -56,28 +60,26 @@ final class ReductionsTests: XCTestCase {
       [0])
   }
 
-  func testEagerNoInitial() {
-    XCTAssertEqualSequences(
-      [1, 2, 3, 4, 5].reductions(+),
-      [1, 3, 6, 10, 15])
-
-    XCTAssertEqualSequences(
-      CollectionOfOne(1).reductions(+),
-      [1])
-
-    XCTAssertEqualSequences(
-      EmptyCollection<Int>().reductions(+),
-      [])
+  func testEagerThrows() {
+    XCTAssertNoThrow(try [].reductions(0) { _, _ in throw TestError() })
+    XCTAssertThrowsError(try [1].reductions(0) { _, _ in throw TestError() })
   }
 
-  func testEagerThrows() {
-    struct E: Error {}
+  // MARK: - Inclusive Reductions
 
-    XCTAssertNoThrow(try [].reductions(0) { _, _ in throw E() })
-    XCTAssertThrowsError(try [1].reductions(0) { _, _ in throw E() })
+  func testInclusiveLazySequence() {
+    XCTAssertEqualSequences((1...).prefix(4).lazy.reductions(+), [1, 3, 6, 10])
+    XCTAssertEqualSequences((1...).prefix(1).lazy.reductions(+), [1])
+    XCTAssertEqualSequences((1...).prefix(0).lazy.reductions(+), [])
+  }
 
-    XCTAssertNoThrow(try [].reductions { _, _ in throw E() })
-    XCTAssertNoThrow(try [1].reductions { _, _ in throw E() })
-    XCTAssertThrowsError(try [1, 1].reductions { _, _ in throw E() })
+  func testInclusiveEager() {
+    XCTAssertEqual([1, 2, 3, 4].reductions(+), [1, 3, 6, 10])
+    XCTAssertEqual([1].reductions(+), [1])
+    XCTAssertEqual(EmptyCollection<Int>().reductions(+), [])
+
+    XCTAssertNoThrow(try [].reductions { _, _ in throw TestError() })
+    XCTAssertNoThrow(try [1].reductions { _, _ in throw TestError() })
+    XCTAssertThrowsError(try [1, 1].reductions { _, _ in throw TestError() })
   }
 }
