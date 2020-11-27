@@ -13,45 +13,49 @@ import XCTest
 import Algorithms
 
 final class ReductionsTests: XCTestCase {
+
   func testLazySequence() {
     let reductions = (1...).prefix(5).lazy.reductions(0, +)
-    XCTAssertEqualSequences(reductions, [1, 3, 6, 10, 15])
-  }
+    XCTAssertEqualSequences(reductions, [0, 1, 3, 6, 10, 15])
 
-  func testLazySequenceEmpty() {
-    let reductions = (1...).prefix(0).lazy.reductions(0, +)
-    XCTAssertEqualSequences(reductions, [])
+    let empty = (1...).prefix(0).lazy.reductions(0, +)
+    XCTAssertEqualSequences(empty, [0])
   }
 
   func testLazyCollection() {
-    let reductions = [3, 4, 2, 3, 1].lazy.reductions(.max, min)
-    XCTAssertEqualSequences(reductions, [3, 3, 2, 2, 1])
+    let reductions = [1, 2, 3, 4, 5].lazy.reductions(0, +)
+    XCTAssertEqualSequences(reductions, [0, 1, 3, 6, 10, 15])
+//    validateIndexTraversals(reductions)
+
+    let empty = EmptyCollection<Int>().lazy.reductions(0, +)
+    XCTAssertEqualSequences(empty, [0])
 //    validateIndexTraversals(reductions)
   }
 
-  func testLazyCollectionEmpty() {
-    let reductions = EmptyCollection<Int>().lazy.reductions(.max, min)
-    XCTAssertEqualSequences(reductions, [])
-//    validateIndexTraversals(reductions)
+  func testEagerInitial() {
+    let reductions: [Int] = [1, 2, 3, 4, 5].reductions(0, +)
+    XCTAssertEqualSequences(reductions, [0, 1, 3, 6, 10, 15])
+
+    let empty: [Int] = EmptyCollection<Int>().reductions(0, +)
+    XCTAssertEqualSequences(empty, [0])
   }
 
-  func testEager() {
-    let initial: [Int] = [6, 3, 2, 4, 1].reductions(10, +)
-    XCTAssertEqualSequences(initial, [10, 16, 19, 21, 25, 26])
-    validateIndexTraversals(initial)
+  func testEagerNoInitial() {
+    let reductions: [Int] = [1, 2, 3, 4, 5].reductions(+)
+    XCTAssertEqualSequences(reductions, [1, 3, 6, 10, 15])
 
-    let noInitial: [Int] = [3, 4, 2, 3, 1].reductions(+)
-    XCTAssertEqualSequences(noInitial, [3, 7, 9, 12, 13])
-    validateIndexTraversals(noInitial)
+    let empty: [Int] = EmptyCollection<Int>().reductions(+)
+    XCTAssertEqualSequences(empty, [])
   }
 
   func testEagerThrows() {
     struct E: Error {}
-    XCTAssertNoThrow(try [].reductions(0, { _, _ in throw E() }))
-    XCTAssertThrowsError(try [1].reductions(0, { _, _ in throw E() }))
 
-    XCTAssertNoThrow(try [].reductions({ _, _ in throw E() }))
-    XCTAssertNoThrow(try [1].reductions({ _, _ in throw E() }))
-    XCTAssertThrowsError(try [1, 1].reductions({ _, _ in throw E() }))
+    XCTAssertNoThrow(try [].reductions(0) { _, _ in throw E() })
+    XCTAssertThrowsError(try [1].reductions(0) { _, _ in throw E() })
+
+    XCTAssertNoThrow(try [].reductions { _, _ in throw E() })
+    XCTAssertNoThrow(try [1].reductions { _, _ in throw E() })
+    XCTAssertThrowsError(try [1, 1].reductions { _, _ in throw E() })
   }
 }

@@ -11,7 +11,7 @@ value, it returns the a sequence of the results returned from each element.
 ```swift
 let runningTotal = (1...5).reductions(0, +)
 print(Array(runningTotal))
-// prints [1, 3, 6, 10, 15]
+// prints [0, 1, 3, 6, 10, 15]
 
 let runningMinimum = [3, 4, 2, 3, 1].reductions(.max, min)
 print(Array(runningMinimum))
@@ -23,11 +23,26 @@ print(Array(runningMinimum))
 One new method is added to sequences:
 
 ```swift
-extension Sequence {
+extension LazySequenceProtocol {
   func reductions<Result>(
     _ initial: Result, 
     _ transform: @escaping (Result, Element) -> Result
   ) -> Reductions<Result, Self>
+}
+
+extension Sequence {
+  public func reductions<Result>(
+    _ initial: Result,
+    _ transform: (Result, Element) throws -> Result
+  ) rethrows -> [Result]
+}
+```
+
+```swift
+extension Collection {
+  public func reductions(
+    _ transform: (Element, Element) throws -> Element
+  ) rethrows -> [Element]
 }
 ```
 

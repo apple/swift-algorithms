@@ -20,13 +20,13 @@ public struct Reductions<Result, Base: Sequence> {
 extension Reductions: Sequence {
   public struct Iterator: IteratorProtocol {
     var iterator: Base.Iterator
-    var current: Result
+    var current: Result?
     let transform: (Result, Base.Element) -> Result
 
     public mutating func next() -> Result? {
-      guard let element = iterator.next() else { return nil }
-      current = transform(current, element)
-      return current
+      guard let result = current else { return nil }
+      current = iterator.next().map { transform(result, $0) }
+      return result
     }
   }
 
@@ -121,20 +121,20 @@ extension LazySequenceProtocol {
   /// the sequence using the given transform.
   ///
   /// This can be seen as applying the reduce function to each element and
-  /// providing these results as a sequence.
+  /// providing the initial value followed by these results as a sequence.
   ///
   /// ```
   /// let values = [1, 2, 3, 4]
   /// let sequence = values.reductions(0, +)
   /// print(Array(sequence))
   ///
-  /// // prints [1, 3, 6, 10]
+  /// // prints [0, 1, 3, 6, 10]
   /// ```
   ///
   /// - Parameters:
-  ///   - initial: The value to use as the initial accumulating value.
-  ///   - transform: A closure that combines an accumulating value and
-  ///     an element of the sequence.
+  ///   - initial: The value to use as the initial value.
+  ///   - transform: A closure that combines the previously reduced result and
+  ///   the next element in the receiving sequence.
   /// - Returns: A sequence of transformed elements.
   public func reductions<Result>(
     _ initial: Result,
