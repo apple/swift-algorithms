@@ -57,4 +57,9 @@ final class IntersperseTests: XCTestCase {
     XCTAssertEqualSequences(reversed, "E-D-C-B-A")
     validateIndexTraversals(reversed)
   }
+
+  func testIntersperseLazy() {
+    XCTAssertLazySequence((1...).prefix(0).lazy.interspersed(with: 0))
+    XCTAssertLazyCollection("ABCDE".lazy.interspersed(with: "-"))
+  }
 }
