@@ -84,17 +84,15 @@ where Base: LazyCollectionProtocol {}
 extension Reductions: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
 
-extension Collection {
+extension Sequence {
   public func reductions(
     _ transform: (Element, Element) throws -> Element
   ) rethrows -> [Element] {
 
-    guard let first = first else { return [] }
-    return try dropFirst().reductions(first, transform)
+    var iterator = makeIterator()
+    guard let initial = iterator.next() else { return [] }
+    return try IteratorSequence(iterator).reductions(initial, transform)
   }
-}
-
-extension Sequence {
 
   public func reductions<Result>(
     _ initial: Result,
