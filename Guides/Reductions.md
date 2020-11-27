@@ -13,33 +13,42 @@ let runningTotal = (1...5).reductions(0, +)
 print(Array(runningTotal))
 // prints [0, 1, 3, 6, 10, 15]
 
-let runningMinimum = [3, 4, 2, 3, 1].reductions(.max, min)
+let runningTotal = (1...5).reductions(+)
+print(Array(runningTotal))
+// prints [1, 3, 6, 10, 15]
+
+let runningMinimum = [3, 4, 2, 3, 1].reductions(min)
 print(Array(runningMinimum))
 // prints [3, 3, 2, 2, 1]
 ```
 
 ## Detailed Design
 
-One new method is added to sequences:
+One pair of methods are added to `LazySequenceProtocol` for a lazily evaluated
+sequence and another pair are added to `Sequence` which are eagerly evaluated.
 
 ```swift
 extension LazySequenceProtocol {
-  func reductions<Result>(
-    _ initial: Result, 
-    _ transform: @escaping (Result, Element) -> Result
-  ) -> Reductions<Result, Self>
-}
 
-extension Sequence {
   public func reductions<Result>(
     _ initial: Result,
-    _ transform: (Result, Element) throws -> Result
-  ) rethrows -> [Result]
+    _ transform: @escaping (Result, Element) -> Result
+  ) -> ExclusiveReductions<Result, Self>
+
+  public func reductions(
+    _ transform: @escaping (Element, Element) -> Element
+  ) -> InclusiveReductions<Self>
 }
 ```
 
 ```swift
-extension Collection {
+extension Sequence {
+
+  public func reductions<Result>(
+    _ initial: Result, 
+    _ transform: (Result, Element) throws -> Result
+  ) rethrows -> [Result]
+  
   public func reductions(
     _ transform: (Element, Element) throws -> Element
   ) rethrows -> [Element]
@@ -75,6 +84,13 @@ a good job at explaining the relation between the two.
 > As someone unfamiliar with the prior art, `reductions` strikes me as very
 approachable—I feel like I can extrapolate the expected behavior purely from my
 familiarity with `reduce`.
+
+As part of early discussions, it was decided to have two variants, one which
+takes an initial value to use for the first element in the returned sequence, 
+and another which uses the first value of the base sequence as the initial
+value. C++ calls these variants exclusive and inclusive respectively and so 
+these terms carry through as the name for the lazy sequences; 
+`ExclusiveReductions` and `InclusiveReductions`.
 
 [SE-0045]: https://forums.swift.org/t/review-se-0045-add-scan-prefix-while-drop-while-and-iterate-to-the-stdlib/2382
 [Issue 25]: https://github.com/apple/swift-algorithms/issues/25
