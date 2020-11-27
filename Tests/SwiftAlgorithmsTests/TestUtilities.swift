@@ -66,6 +66,7 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
 }
 
 func XCTAssertLazySequence<S: LazySequenceProtocol>(_: S) {}
+func XCTAssertLazyCollection<S: LazyCollectionProtocol>(_: S) {}
 
 /// Tests that all index traversal methods behave as expected.
 ///
