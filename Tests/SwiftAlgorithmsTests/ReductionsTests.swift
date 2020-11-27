@@ -18,49 +18,17 @@ final class ReductionsTests: XCTestCase {
 
   // MARK: - Exclusive Reductions
 
-  func testLazySequenceInitial() {
-    XCTAssertEqualSequences(
-      (1...).prefix(5).lazy.reductions(0, +),
-      [0, 1, 3, 6, 10, 15])
-
-    XCTAssertEqualSequences(
-      (1...).prefix(1).lazy.reductions(0, +),
-      [0, 1])
-
-    XCTAssertEqualSequences(
-      (1...).prefix(0).lazy.reductions(0, +),
-      [0])
+  func testExclusiveLazySequence() {
+    XCTAssertEqualSequences((1...).prefix(4).lazy.reductions(0, +), [0, 1, 3, 6, 10])
+    XCTAssertEqualSequences((1...).prefix(1).lazy.reductions(0, +), [0, 1])
+    XCTAssertEqualSequences((1...).prefix(0).lazy.reductions(0, +), [0])
   }
 
-  func testLazyCollectionInitial() {
-    XCTAssertEqualSequences(
-      [1, 2, 3, 4, 5].lazy.reductions(0, +),
-      [0, 1, 3, 6, 10, 15])
+  func testExclusiveEager() {
+    XCTAssertEqual([1, 2, 3, 4].reductions(0, +), [0, 1, 3, 6, 10])
+    XCTAssertEqual([1].reductions(0, +), [0, 1])
+    XCTAssertEqual(EmptyCollection<Int>().reductions(0, +), [0])
 
-    XCTAssertEqualSequences(
-      [1].lazy.reductions(0, +),
-      [0, 1])
-
-    XCTAssertEqualSequences(
-      EmptyCollection<Int>().lazy.reductions(0, +),
-      [0])
-  }
-
-  func testEagerInitial() {
-    XCTAssertEqual(
-      [1, 2, 3, 4, 5].reductions(0, +),
-      [0, 1, 3, 6, 10, 15])
-
-    XCTAssertEqual(
-      CollectionOfOne(1).reductions(0, +),
-      [0, 1])
-
-    XCTAssertEqualSequences(
-      EmptyCollection<Int>().reductions(0, +),
-      [0])
-  }
-
-  func testEagerThrows() {
     XCTAssertNoThrow(try [].reductions(0) { _, _ in throw TestError() })
     XCTAssertThrowsError(try [1].reductions(0) { _, _ in throw TestError() })
   }

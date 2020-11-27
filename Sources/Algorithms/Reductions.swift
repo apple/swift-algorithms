@@ -11,102 +11,6 @@
 
 // MARK: - Exclusive Reductions
 
-/// A sequence of applying a transform to the element of a sequence and the
-/// previously transformed result.
-public struct Reductions<Result, Base: Sequence> {
-  let base: Base
-  let initial: Result
-  let transform: (Result, Base.Element) -> Result
-}
-
-extension Reductions: Sequence {
-  public struct Iterator: IteratorProtocol {
-    var iterator: Base.Iterator
-    var current: Result?
-    let transform: (Result, Base.Element) -> Result
-
-    public mutating func next() -> Result? {
-      guard let result = current else { return nil }
-      current = iterator.next().map { transform(result, $0) }
-      return result
-    }
-  }
-
-  public func makeIterator() -> Iterator {
-    Iterator(iterator: base.makeIterator(),
-             current: initial,
-             transform: transform)
-  }
-}
-
-extension Reductions: Collection where Base: Collection {
-  public struct Index: Comparable {
-    let index: Base.Index
-    let result: Result
-
-    public static func < (lhs: Index, rhs: Index) -> Bool {
-        lhs.index < rhs.index
-    }
-
-    public static func == (lhs: Index, rhs: Index) -> Bool {
-        lhs.index == rhs.index
-    }
-  }
-
-  public var startIndex: Index {
-    let start = base.startIndex
-    let result = transform(initial, base[start])
-    return Index(index: start, result: result)
-  }
-
-  public var endIndex: Index {
-    let end = base.endIndex
-    let result = base.reduce(initial, transform)
-    return Index(index: end, result: result)
-  }
-
-  public subscript(position: Index) -> Result {
-    position.result
-  }
-
-  public func index(after i: Index) -> Index {
-    let index = base.index(after: i.index)
-    let result = transform(i.result, base[i.index])
-    return Index(index: index, result: result)
-  }
-
-  public func distance(from start: Index, to end: Index) -> Int {
-    base.distance(from: start.index, to: end.index)
-  }
-}
-
-extension Reductions: LazyCollectionProtocol
-where Base: LazyCollectionProtocol {}
-
-extension Reductions: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
-
-extension Sequence {
-
-  public func reductions<Result>(
-    _ initial: Result,
-    _ transform: (Result, Element) throws -> Result
-  ) rethrows -> [Result] {
-
-    var output = [Result]()
-    output.reserveCapacity(underestimatedCount + 1)
-    output.append(initial)
-
-    var result = initial
-    for element in self {
-      result = try transform(result, element)
-      output.append(result)
-    }
-
-    return output
-  }
-}
-
 extension LazySequenceProtocol {
 
   /// Returns a sequence containing the results of combining the elements of
@@ -131,10 +35,62 @@ extension LazySequenceProtocol {
   public func reductions<Result>(
     _ initial: Result,
     _ transform: @escaping (Result, Element) -> Result
-  ) -> Reductions<Result, Self> {
-    Reductions(base: self, initial: initial, transform: transform)
+  ) -> ExclusiveReductions<Result, Self> {
+    ExclusiveReductions(base: self, initial: initial, transform: transform)
   }
 }
+
+extension Sequence {
+
+  public func reductions<Result>(
+    _ initial: Result,
+    _ transform: (Result, Element) throws -> Result
+  ) rethrows -> [Result] {
+
+    var output = [Result]()
+    output.reserveCapacity(underestimatedCount + 1)
+    output.append(initial)
+
+    var result = initial
+    for element in self {
+      result = try transform(result, element)
+      output.append(result)
+    }
+
+    return output
+  }
+}
+
+/// A sequence of applying a transform to the element of a sequence and the
+/// previously transformed result.
+public struct ExclusiveReductions<Result, Base: Sequence> {
+  let base: Base
+  let initial: Result
+  let transform: (Result, Base.Element) -> Result
+}
+
+extension ExclusiveReductions: Sequence {
+  public struct Iterator: IteratorProtocol {
+    var iterator: Base.Iterator
+    var current: Result?
+    let transform: (Result, Base.Element) -> Result
+
+    public mutating func next() -> Result? {
+      guard let result = current else { return nil }
+      current = iterator.next().map { transform(result, $0) }
+      return result
+    }
+  }
+
+  public func makeIterator() -> Iterator {
+    Iterator(iterator: base.makeIterator(),
+             current: initial,
+             transform: transform)
+  }
+}
+
+extension ExclusiveReductions: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
 
 // MARK: - Inclusive Reductions
 
