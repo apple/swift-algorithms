@@ -37,8 +37,8 @@ The first upper bound is computed eagerly because it determines if the collectio
 ```
 
 The resulting `SlidingWindows` type is a collection, with conditional conformance to the 
-`BidirectionalCollection`, and `RandomAccessCollection`  when the base collection
-conforms.
+`BidirectionalCollection`, `RandomAccessCollection`, and
+`LazyCollectionProtocol` when the base collection conforms.
 
 ### Complexity
 
