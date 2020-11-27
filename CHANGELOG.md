@@ -12,7 +12,14 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
-*No changes yet.*
+### Additions
+
+- The `copy(from:)` method has been added, applying to types conforming to
+  `MutableCollection`.  It takes a sequence with the same element type as its
+  only parameter, whose elements will be copied on top of the existing
+  elements.  The return values are the past-the-end index in the receiver where
+  the copying ended and an iterator for the source sequence after the elements
+  that were copied.
 
 ---
 

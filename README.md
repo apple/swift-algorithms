@@ -15,6 +15,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 - [`rotate(toStartAt:)`, `rotate(subrange:toStartAt:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Rotate.md): In-place rotation of elements.
 - [`stablePartition(by:)`, `stablePartition(subrange:by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Partition.md): A partition that preserves the relative order of the resulting prefix and suffix.
+- [`copy(from:)`](./Guides/Copy.md): Copying from a sequence via overwriting elements.
 
 #### Combining collections
 
