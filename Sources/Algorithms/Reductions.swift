@@ -93,7 +93,8 @@ extension ExclusiveReductions: Collection where Base: Collection {
   public struct Index: Comparable {
     enum Representation {
       case start
-      case base(index: Base.Index, previous: Result)
+      case base(index: Base.Index, result: Result)
+      case end
     }
     let representation: Representation
 
@@ -101,6 +102,8 @@ extension ExclusiveReductions: Collection where Base: Collection {
       switch (lhs.representation, rhs.representation) {
       case (_, .start): return false
       case (.start, _): return true
+      case (.end, _): return false
+      case (_, .end): return true
       case let (.base(lhs, _), .base(rhs, _)): return lhs < rhs
       }
     }
@@ -108,39 +111,40 @@ extension ExclusiveReductions: Collection where Base: Collection {
     public static func == (lhs: Index, rhs: Index) -> Bool {
       switch (lhs.representation, rhs.representation) {
       case (.start, .start): return true
+      case (.end, .end): return true
       case let (.base(lhs, _), .base(rhs, _)): return lhs == rhs
       default: return false
       }
     }
 
-    static func base(index: Base.Index, previous: Result) -> Self {
-      Self(representation: .base(index: index, previous: previous))
+    static func base(index: Base.Index, result: Result) -> Self {
+      Self(representation: .base(index: index, result: result))
     }
   }
 
-  public var startIndex: Index {
-    Index(representation: .start)
-  }
-
-  public var endIndex: Index {
-    let previous = base.reduce(initial, transform)
-    return .base(index: base.endIndex, previous: previous)
-  }
+  public var startIndex: Index { Index(representation: .start) }
+  public var endIndex: Index { Index(representation: .end) }
 
   public subscript(position: Index) -> Result {
     switch position.representation {
     case .start: return initial
-    case let .base(index, previous): return transform(previous, base[index])
+    case .base(_, let result): return result
+    case .end: fatalError("Cannot get element of end index.")
     }
   }
 
   public func index(after i: Index) -> Index {
+    func index(base index: Base.Index, previous: Result) -> Index {
+      guard index != base.endIndex else { return endIndex }
+      return .base(index: index, result: transform(previous, base[index]))
+    }
     switch i.representation {
     case .start:
-      return .base(index: base.startIndex, previous: initial)
-    case let .base(index, previous):
-      return .base(index: base.index(after: index),
-                   previous: transform(previous, base[index]))
+      return index(base: base.startIndex, previous: initial)
+    case let .base(i, result):
+      return index(base: base.index(after: i), previous: result)
+    case .end:
+      fatalError("Cannot get index after end index.")
     }
   }
 
@@ -148,12 +152,22 @@ extension ExclusiveReductions: Collection where Base: Collection {
     switch (start.representation, end.representation) {
     case (.start, .start):
       return 0
-    case let (.start, .base(end, _)):
-      return base.distance(from: base.startIndex, to: end) + 1
+    case let (.start, .base(index, _)):
+      return base.distance(from: base.startIndex, to: index) + 1
+    case (.start, .end):
+      return base.distance(from: base.startIndex, to: base.endIndex) + 1
+    case let (.base(index, _), .start):
+      return base.distance(from: index, to: base.startIndex) - 1
     case let (.base(start, _), .base(end, _)):
       return base.distance(from: start, to: end)
-    case let (.base(start, _), .start):
-      return base.distance(from: start, to: base.startIndex) - 1
+    case let (.base(index, _), .end):
+      return base.distance(from: index, to: base.endIndex)
+    case (.end, .start):
+      return base.distance(from: base.endIndex, to: base.startIndex) - 1
+    case let (.end, .base(index, _)):
+      return base.distance(from: base.endIndex, to: index)
+    case (.end, .end):
+      return 0
     }
   }
 }
