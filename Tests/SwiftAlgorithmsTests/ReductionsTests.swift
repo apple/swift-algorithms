@@ -23,6 +23,10 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqualSequences((1...).prefix(1).lazy.reductions(0, +), [0, 1])
     XCTAssertEqualSequences((1...).prefix(0).lazy.reductions(0, +), [0])
 
+    XCTAssertEqualCollections([1, 2, 3, 4].lazy.reductions(0, +), [0, 1, 3, 6, 10])
+    XCTAssertEqualCollections([1].lazy.reductions(0, +), [0, 1])
+    XCTAssertEqualCollections(EmptyCollection<Int>().lazy.reductions(0, +), [0])
+
     XCTAssertLazy([1].lazy.reductions(0, +))
   }
 
