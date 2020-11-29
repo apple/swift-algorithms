@@ -218,16 +218,16 @@ extension InclusiveReductions: Collection where Base: Collection {
   }
 
   public func index(after i: Index) -> Index {
-    func index(base index: Base.Index, previous: Base.Element) -> Index {
+    func index(after i: Base.Index, previous: Base.Element) -> Index {
+      let index = base.index(after: i)
       guard index != base.endIndex else { return endIndex }
       return .base(index: index, result: transform(previous, base[index]))
     }
     switch i.representation {
     case .start:
-      let i = base.startIndex
-      return index(base: base.index(after: i), previous: base[i])
+      return index(after: base.startIndex, previous: base[base.startIndex])
     case let .base(i, element):
-      return index(base: base.index(after: i), previous: element)
+      return index(after: i, previous: element)
     case .end:
       fatalError("Cannot get index after end index.")
     }
