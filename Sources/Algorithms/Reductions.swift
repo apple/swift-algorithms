@@ -90,37 +90,7 @@ extension ExclusiveReductions: Sequence {
 }
 
 extension ExclusiveReductions: Collection where Base: Collection {
-  public struct Index: Comparable {
-    enum Representation {
-      case start
-      case base(index: Base.Index, result: Result)
-      case end
-    }
-    let representation: Representation
-
-    public static func < (lhs: Index, rhs: Index) -> Bool {
-      switch (lhs.representation, rhs.representation) {
-      case (_, .start): return false
-      case (.start, _): return true
-      case (.end, _): return false
-      case (_, .end): return true
-      case let (.base(lhs, _), .base(rhs, _)): return lhs < rhs
-      }
-    }
-
-    public static func == (lhs: Index, rhs: Index) -> Bool {
-      switch (lhs.representation, rhs.representation) {
-      case (.start, .start): return true
-      case (.end, .end): return true
-      case let (.base(lhs, _), .base(rhs, _)): return lhs == rhs
-      default: return false
-      }
-    }
-
-    static func base(index: Base.Index, result: Result) -> Self {
-      Self(representation: .base(index: index, result: result))
-    }
-  }
+  public typealias Index = ReductionsIndex<Base.Index, Result>
 
   public var startIndex: Index { Index(representation: .start) }
   public var endIndex: Index { Index(representation: .end) }
@@ -228,44 +198,62 @@ extension InclusiveReductions: Sequence {
 }
 
 extension InclusiveReductions: Collection where Base: Collection {
-  public struct Index: Comparable {
-    let index: Base.Index
-    let previous: Element?
-
-    public static func < (lhs: Index, rhs: Index) -> Bool {
-      lhs.index < rhs.index
-    }
-
-    public static func == (lhs: Index, rhs: Index) -> Bool {
-      lhs.index == rhs.index
-    }
-  }
+  public typealias Index = ReductionsIndex<Base.Index, Base.Element>
 
   public var startIndex: Index {
-    Index(index: base.startIndex, previous: nil)
+    guard base.startIndex != base.endIndex else { return endIndex }
+    return Index(representation: .start)
   }
 
   public var endIndex: Index {
-    var iterator = makeIterator()
-    guard let initial = iterator.next() else { return startIndex }
-    let previous = IteratorSequence(iterator).dropLast().reduce(initial, transform)
-    return Index(index: base.endIndex, previous: previous)
+    Index(representation: .end)
   }
 
   public subscript(position: Index) -> Base.Element {
-    let element = base[position.index]
-    switch position.previous {
-    case .none: return element
-    case .some(let previous): return transform(previous, element)
+    switch position.representation {
+    case .start: return base[base.startIndex]
+    case .base(_, let result): return result
+    case .end: fatalError("Cannot get element of end index.")
     }
   }
 
   public func index(after i: Index) -> Index {
-    Index(index: base.index(after: i.index), previous: self[i])
+    func index(base index: Base.Index, previous: Base.Element) -> Index {
+      guard index != base.endIndex else { return endIndex }
+      return .base(index: index, result: transform(previous, base[index]))
+    }
+    switch i.representation {
+    case .start:
+      let i = base.startIndex
+      return index(base: base.index(after: i), previous: base[i])
+    case let .base(i, element):
+      return index(base: base.index(after: i), previous: element)
+    case .end:
+      fatalError("Cannot get index after end index.")
+    }
   }
 
   public func distance(from start: Index, to end: Index) -> Int {
-    base.distance(from: start.index, to: end.index)
+    switch (start.representation, end.representation) {
+    case (.start, .start):
+      return 0
+    case let (.start, .base(index, _)):
+      return base.distance(from: base.startIndex, to: index)
+    case (.start, .end):
+      return base.distance(from: base.startIndex, to: base.endIndex)
+    case let (.base(index, _), .start):
+      return base.distance(from: index, to: base.startIndex)
+    case let (.base(start, _), .base(end, _)):
+      return base.distance(from: start, to: end)
+    case let (.base(index, _), .end):
+      return base.distance(from: index, to: base.endIndex)
+    case (.end, .start):
+      return base.distance(from: base.endIndex, to: base.startIndex)
+    case let (.end, .base(index, _)):
+      return base.distance(from: base.endIndex, to: index)
+    case (.end, .end):
+      return 0
+    }
   }
 }
 
@@ -274,3 +262,37 @@ extension InclusiveReductions: LazySequenceProtocol
 
 extension InclusiveReductions: LazyCollectionProtocol
   where Base: LazyCollectionProtocol {}
+
+// MARK: - Shared ReductionsIndex
+
+public struct ReductionsIndex<BaseIndex: Comparable, Result>: Comparable {
+  enum Representation {
+    case start
+    case base(index: BaseIndex, result: Result)
+    case end
+  }
+  let representation: Representation
+
+  public static func < (lhs: Self, rhs: Self) -> Bool {
+    switch (lhs.representation, rhs.representation) {
+    case (_, .start): return false
+    case (.start, _): return true
+    case (.end, _): return false
+    case (_, .end): return true
+    case let (.base(lhs, _), .base(rhs, _)): return lhs < rhs
+    }
+  }
+
+  public static func == (lhs: Self, rhs: Self) -> Bool {
+    switch (lhs.representation, rhs.representation) {
+    case (.start, .start): return true
+    case (.end, .end): return true
+    case let (.base(lhs, _), .base(rhs, _)): return lhs == rhs
+    default: return false
+    }
+  }
+
+  static func base(index: BaseIndex, result: Result) -> Self {
+    Self(representation: .base(index: index, result: result))
+  }
+}
