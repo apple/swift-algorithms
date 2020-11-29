@@ -47,14 +47,24 @@ extension Sequence {
     _ transform: (Result, Element) throws -> Result
   ) rethrows -> [Result] {
 
+    var result = initial
+    return try reductions(into: &result) { result, element in
+      result = try transform(result, element)
+    }
+  }
+
+  public func reductions<Result>(
+    into initial: inout Result,
+    _ transform: (inout Result, Element) throws -> Void
+  ) rethrows -> [Result] {
+
     var output = [Result]()
     output.reserveCapacity(underestimatedCount + 1)
     output.append(initial)
 
-    var result = initial
     for element in self {
-      result = try transform(result, element)
-      output.append(result)
+      try transform(&initial, element)
+      output.append(initial)
     }
 
     return output

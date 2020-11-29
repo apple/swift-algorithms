@@ -35,6 +35,14 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqual([1].reductions(0, +), [0, 1])
     XCTAssertEqual(EmptyCollection<Int>().reductions(0, +), [0])
 
+    var value0 = 0
+    var value1 = 0
+    var value2 = 0
+    func add(lhs: inout Int, rhs: Int) { lhs += rhs }
+    XCTAssertEqual([1, 2, 3, 4].reductions(into: &value0, add), [0, 1, 3, 6, 10])
+    XCTAssertEqual([1].reductions(into: &value1, add), [0, 1])
+    XCTAssertEqual(EmptyCollection<Int>().reductions(into: &value2, add), [0])
+
     XCTAssertNoThrow(try [].reductions(0) { _, _ in throw TestError() })
     XCTAssertThrowsError(try [1].reductions(0) { _, _ in throw TestError() })
   }
