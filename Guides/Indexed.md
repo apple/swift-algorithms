@@ -30,6 +30,6 @@ extension Collection {
 ```
 
 `Indexed` scales from a collection up to a random-access collection, depending on 
-its base type. `Indexed` also conforms to `LazySequenceProtocol` when the base type
-conforms.
+its base type. `Indexed` also conforms to `LazySequenceProtocol` and 
+`LazyCollectionProtocol` when the base type conforms.
 

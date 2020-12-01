@@ -299,6 +299,8 @@ extension SlidingWindows: BidirectionalCollection where Base: BidirectionalColle
   }
 }
 
+extension SlidingWindows: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension SlidingWindows: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
 extension SlidingWindows: RandomAccessCollection where Base: RandomAccessCollection {}
 extension SlidingWindows: Equatable where Base: Equatable {}
 extension SlidingWindows: Hashable where Base: Hashable, Base.Index: Hashable {}

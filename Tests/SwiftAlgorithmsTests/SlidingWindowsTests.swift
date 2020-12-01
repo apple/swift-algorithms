@@ -106,4 +106,8 @@ final class SlidingWindowsTests: XCTestCase {
           + [.init(lowerBound: endIndex, upperBound: endIndex)]
       })
   }
+
+  func testWindowsLazy() {
+    XCTAssertLazyCollection([0, 1, 2, 3].lazy.slidingWindows(ofCount: 2))
+  }
 }
