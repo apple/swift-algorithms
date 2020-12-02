@@ -138,7 +138,7 @@ extension Collection {
   /// four colors:
   ///
   ///     let colors = ["fuchsia", "cyan", "mauve", "magenta"]
-  ///     for combo in colors.combinations(ofCount k: 3) {
+  ///     for combo in colors.combinations(ofCount: 3) {
   ///         print(combo.joined(separator: ", "))
   ///     }
   ///     // fuchsia, cyan, mauve

@@ -213,7 +213,7 @@ extension MutableCollection {
   ///   rotating.
   /// - Returns: The new index of the element that was first pre-rotation.
   ///
-  /// - Complexity: O(*n*)
+  /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
   @discardableResult
   public mutating func rotate(toStartAt newStart: Index) -> Index {
@@ -273,7 +273,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///   rotating.
   /// - Returns: The new index of the element that was first pre-rotation.
   ///
-  /// - Complexity: O(*n*)
+  /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
   @discardableResult
   public mutating func rotate(toStartAt newStart: Index) -> Index {
