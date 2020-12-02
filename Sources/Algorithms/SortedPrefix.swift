@@ -61,8 +61,13 @@ extension Collection {
       }
       let insertionIndex =
         try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
+      let isLastElement = insertionIndex == result.endIndex
       result.removeLast()
-      result.insert(e, at: insertionIndex)
+      if isLastElement {
+        result.append(e)
+      } else {
+        result.insert(e, at: insertionIndex)
+      }
     }
 
     return result

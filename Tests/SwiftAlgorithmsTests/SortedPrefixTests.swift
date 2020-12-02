@@ -214,6 +214,46 @@ final class SortedPrefixTests: XCTestCase {
       input.sortedPrefix(1000, by: >),
       (1...1000).reversed()
     )
+
+    XCTAssertEqual(
+      ([0] + Array(repeating: 1, count: 100)).sortedPrefix(1, by: <),
+      [0]
+    )
+
+    XCTAssertEqual(
+      ([1] + Array(repeating: 0, count: 100)).sortedPrefix(1, by: <),
+      [0]
+    )
+
+    XCTAssertEqual(
+      ([0] + Array(repeating: 1, count: 100)).sortedPrefix(2, by: <),
+      [0, 1]
+    )
+
+    XCTAssertEqual(
+      ([1] + Array(repeating: 0, count: 100)).sortedPrefix(2, by: <),
+      [0, 0]
+    )
+
+    XCTAssertEqual(
+      ([1] + Array(repeating: 1, count: 100)).sortedPrefix(1, by: >),
+      [1]
+    )
+
+    XCTAssertEqual(
+      ([0] + Array(repeating: 1, count: 100)).sortedPrefix(1, by: >),
+      [1]
+    )
+
+    XCTAssertEqual(
+      ([1] + Array(repeating: 0, count: 100)).sortedPrefix(2, by: >),
+      [1, 0]
+    )
+
+    XCTAssertEqual(
+      ([0] + Array(repeating: 1, count: 100)).sortedPrefix(2, by: >),
+      [1, 1]
+    )
   }
 
   func testStability() {
@@ -221,10 +261,16 @@ final class SortedPrefixTests: XCTestCase {
     assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 6)
     assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 20)
     assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 1000)
-    assertStability([0,0,0,0,0], withPrefix: 0)
-    assertStability([0,0,0,0,0], withPrefix: 1)
-    assertStability([0,0,0,0,0], withPrefix: 2)
-    assertStability([0,0,0,0,0], withPrefix: 5)
+    assertStability(Array(repeating: 0, count: 100), withPrefix: 0)
+    assertStability(Array(repeating: 0, count: 100), withPrefix: 1)
+    assertStability(Array(repeating: 0, count: 100), withPrefix: 2)
+    assertStability(Array(repeating: 0, count: 100), withPrefix: 5)
+    assertStability(Array(repeating: 0, count: 100), withPrefix: 20)
+    assertStability(Array(repeating: 0, count: 100), withPrefix: 100)
+    assertStability(Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50), withPrefix: 2)
+    assertStability(Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50), withPrefix: 5)
+    assertStability(Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50), withPrefix: 20)
+    assertStability(Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50), withPrefix: 50)
     assertStability([0,0], withPrefix: 1)
     assertStability([0,0], withPrefix: 2)
     assertStability([0,1,0,1,0,1], withPrefix: 2)
@@ -237,6 +283,7 @@ final class SortedPrefixTests: XCTestCase {
     assertStability([1,1,1,0,0,0], withPrefix: 3)
     assertStability([1,1,1,0,0,0], withPrefix: 4)
     assertStability([1,1,1,0,0,0], withPrefix: 6)
+    assertStability([1,1,1,0,0,0], withPrefix: 5)
   }
 
   func assertStability(
