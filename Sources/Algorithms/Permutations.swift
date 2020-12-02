@@ -32,6 +32,7 @@ public struct Permutations<Base: Collection> {
 }
  
 extension Permutations: Sequence {
+  /// The iterator for a `Permutations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var base: Base

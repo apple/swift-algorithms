@@ -30,14 +30,15 @@ extension Collection {
   }
 }
 
+/// A collection wrapper that presents a sliding window over the elements of
+/// a collection.
 public struct SlidingWindows<Base: Collection> {
-  
   public let base: Base
   public let size: Int
   
-  private var firstUpperBound: Base.Index?
+  internal var firstUpperBound: Base.Index?
 
-  init(base: Base, size: Int) {
+  internal init(base: Base, size: Int) {
     precondition(size > 0, "SlidingWindows size must be greater than zero")
     self.base = base
     self.size = size
@@ -46,13 +47,15 @@ public struct SlidingWindows<Base: Collection> {
 }
 
 extension SlidingWindows: Collection {
-  
+  /// A position in a `SlidingWindows` collection.
   public struct Index: Comparable {
     internal var lowerBound: Base.Index
     internal var upperBound: Base.Index
+    
     public static func == (lhs: Index, rhs: Index) -> Bool {
       lhs.lowerBound == rhs.lowerBound
     }
+    
     public static func < (lhs: Index, rhs: Index) -> Bool {
       lhs.lowerBound < rhs.lowerBound
     }

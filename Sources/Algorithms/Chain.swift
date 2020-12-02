@@ -26,7 +26,7 @@ public struct Chain2<Base1: Sequence, Base2: Sequence>
 }
 
 extension Chain2: Sequence {
-  /// The iterator for a `Chain` sequence.
+  /// The iterator for a `Chain2` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var iterator1: Base1.Iterator
@@ -53,7 +53,7 @@ extension Chain2: Sequence {
 }
 
 extension Chain2: Collection where Base1: Collection, Base2: Collection {
-  /// A position in a `Chain` collection.
+  /// A position in a `Chain2` collection.
   public struct Index: Comparable {
     // The internal index representation, which can either be an index of the
     // first collection or the second. The `endIndex` of the first collection

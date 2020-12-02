@@ -9,6 +9,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// A collection wrapper that generates combinations of a base collection.
 public struct Combinations<Base: Collection> {
   /// The collection to iterate over for combinations.
   public let base: Base
@@ -40,6 +41,7 @@ public struct Combinations<Base: Collection> {
 }
 
 extension Combinations: Sequence {
+  /// The iterator for a `Combinations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal let base: Base

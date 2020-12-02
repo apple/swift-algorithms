@@ -9,6 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// A collection wrapper that breaks a collection into chunks based on a
+/// predicate or projection.
 public struct LazyChunked<Base: Collection, Subject> {
   /// The collection that this instance provides a view onto.
   public let base: Base

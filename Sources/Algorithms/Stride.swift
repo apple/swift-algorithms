@@ -32,12 +32,12 @@ extension Sequence {
   }
 }
 
+/// A wrapper that strides over a base sequence or collection.
 public struct Stride<Base: Sequence> {
+  internal let base: Base
+  internal let stride: Int
   
-  let base: Base
-  let stride: Int
-  
-  init(base: Base, stride: Int) {
+  internal init(base: Base, stride: Int) {
     precondition(stride > 0, "striding must be greater than zero")
     self.base = base
     self.stride = stride
@@ -51,12 +51,11 @@ extension Stride {
 }
 
 extension Stride: Sequence {
-  
+  /// An iterator over a `Stride` sequence.
   public struct Iterator: IteratorProtocol {
-    
-    var iterator: Base.Iterator
-    let stride: Int
-    var striding: Bool = false
+    internal var iterator: Base.Iterator
+    internal let stride: Int
+    internal var striding: Bool = false
     
     public mutating func next() -> Base.Element? {
       guard striding else {
@@ -76,12 +75,11 @@ extension Stride: Sequence {
 }
 
 extension Stride: Collection where Base: Collection {
-  
+  /// A position in a `Stride` collection.
   public struct Index: Comparable {
+    internal let base: Base.Index
     
-    let base: Base.Index
-    
-    init(_ base: Base.Index) {
+    internal init(_ base: Base.Index) {
       self.base = base
     }
     
@@ -192,29 +190,21 @@ extension Stride: BidirectionalCollection
   }
 }
 
-extension Stride: RandomAccessCollection
-  where Base: RandomAccessCollection {}
+extension Stride: RandomAccessCollection where Base: RandomAccessCollection {}
 
-extension Stride: Equatable
-  where Base.Element: Equatable {
-  
+extension Stride: Equatable where Base.Element: Equatable {
   public static func == (lhs: Stride, rhs: Stride) -> Bool {
     lhs.elementsEqual(rhs, by: ==)
   }
-  
 }
 
-extension Stride: Hashable
-  where Base.Element: Hashable {
-  
+extension Stride: Hashable where Base.Element: Hashable {
   public func hash(into hasher: inout Hasher) {
     hasher.combine(stride)
     for element in self {
       hasher.combine(element)
     }
   }
-  
 }
 
-extension Stride.Index: Hashable
-  where Base.Index: Hashable {}
+extension Stride.Index: Hashable where Base.Index: Hashable {}

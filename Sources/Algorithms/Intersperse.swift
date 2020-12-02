@@ -55,6 +55,7 @@ extension Intersperse: Sequence {
 }
 
 extension Intersperse: Collection where Base: Collection {
+  /// A position in an `Intersperse` collection.
   public struct Index: Comparable {
     enum Representation: Equatable {
       case element(Base.Index)
