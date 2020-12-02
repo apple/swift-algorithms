@@ -122,6 +122,100 @@ final class SortedPrefixTests: XCTestCase {
     )
   }
 
+  func testSortedPrefixWithHugeInput() {
+    let input = (1...1000).shuffled()
+
+    XCTAssertEqual(
+      input.sortedPrefix(0, by: <),
+      []
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(0, by: >),
+      []
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(1, by: <),
+      [1]
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(1, by: >),
+      [1000]
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(5, by: <),
+      [1, 2, 3, 4, 5]
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(5, by: >),
+      [1000, 999, 998, 997, 996]
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(10, by: <),
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(10, by: >),
+      [1000, 999, 998, 997, 996, 995, 994, 993, 992, 991]
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(50, by: <),
+      Array((1...50))
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(50, by: >),
+      Array((1...1000).reversed().prefix(50))
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(250, by: <),
+      Array((1...250))
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(250, by: >),
+      Array((1...1000).reversed().prefix(250))
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(500, by: <),
+      Array((1...500))
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(500, by: >),
+      Array((1...1000).reversed().prefix(500))
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(750, by: <),
+      Array((1...750))
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(750, by: >),
+      Array((1...1000).reversed().prefix(750))
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(1000, by: <),
+      Array((1...1000))
+    )
+
+    XCTAssertEqual(
+      input.sortedPrefix(1000, by: >),
+      (1...1000).reversed()
+    )
+  }
+
   func testStability() {
     assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 3)
     assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withPrefix: 6)

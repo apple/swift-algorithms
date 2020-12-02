@@ -40,6 +40,11 @@ extension Collection {
       """
     )
 
+    // Do nothing if we're prefixing nothing.
+    guard count > 0 else {
+      return []
+    }
+
     // Make sure we are within bounds.
     let prefixCount = Swift.min(count, self.count)
 
