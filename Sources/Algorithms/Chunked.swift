@@ -95,6 +95,7 @@ extension LazyChunked: LazyCollectionProtocol {
   
   @inlinable
   public func index(after i: Index) -> Index {
+    precondition(i != endIndex, "Can't advance past endIndex")
     let upperBound = i.upperBound ?? endOfChunk(startingAt: i.lowerBound)
     guard upperBound != base.endIndex else { return endIndex }
     let end = endOfChunk(startingAt: upperBound)
@@ -140,6 +141,7 @@ extension LazyChunked: BidirectionalCollection
 
   @inlinable
   public func index(before i: Index) -> Index {
+    precondition(i != startIndex, "Can't advance before startIndex")
     let start = startOfChunk(endingAt: i.lowerBound)
     return Index(lowerBound: start, upperBound: i.lowerBound)
   }
