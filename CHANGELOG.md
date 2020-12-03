@@ -12,7 +12,21 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
-*No changes yet.*
+### Additions
+
+- The `sortedEndIndex(by:)` and `sortedEndIndex()` methods check when a
+  collection stops being sorted.  The `rampedEndIndex(by:)` and
+  `rampedEndIndex()` methods are variants that check for strict increases in
+  rank, instead of non-decreases.  The `firstVariance(by:)` and
+  `firstVariance()` are variants in the other direction, checking for a run
+  with no changes in value.
+- The `sortedRange(for: by:)` and `sortedRange(for:)` methods perform a binary
+  search for a value within an already-sorted collection.  To optimize time in
+  some circumstances, an isolated phase of the binary-search procedure can be
+  done via the `someSortedPosition(of: by:)`, `lowerSortedBound(around: by:)`,
+  and `upperSortedBound(around: by:)` methods, each of which has a
+  defaulted-comparison overload (`someSortedPosition(of:)`,
+  `lowerSortedBound(around:)`, and `upperSortedBound(around:)`).
 
 ---
 

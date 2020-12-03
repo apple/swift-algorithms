@@ -28,6 +28,16 @@ Read more about the package, and the intent behind it, in the [announcement on s
 - [`randomStableSample(count:)`, `randomStableSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection, preserving their original relative order.
 - [`uniqued()`, `uniqued(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Unique.md): The unique elements of a collection, preserving their order.
 
+#### Sorted-Collection operations
+
+- [`sortedEndIndex(by:)`, `sortedEndIndex()`](./Guides/SortedPrefix.md): Reports when a collection stops being sorted.
+- [`rampedEndIndex(by:)`, `rampedEndIndex()`](./Guides/SortedPrefix.md): Reports when a collection stops being strictly increasing.
+- [`firstVariance(by:)`, `firstVariance()`](./Guides/SortedPrefix.md): Reports when a collection stops being at a constant value.
+- [`someSortedPosition(of: by:)`, `someSortedPosition(of:)`](./Guides/BinarySearch.md): Locates if and where a target value is within a sorted collection.
+- [`lowerSortedBound(around: by:)`, `lowerSortedBound(around:)`](./Guides/BinarySearch.md): Reports the lower bound for the equal-valued subsequence within a sorted collection that covers the targeted element.
+- [`upperSortedBound(around: by:)`, `upperSortedBound(around:)`](./Guides/BinarySearch.md): Reports the upper bound for the equal-valued subsequence within a sorted collection that covers the targeted element.
+- [`sortedRange(for: by:)`, `sortedRange(for:)`](./Guides/BinarySearch.md): Locates the subsequence within a sorted collection that contains all the elements matching a target value.
+
 #### Other useful operations
 
 - [`chunked(by:)`, `chunked(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chunked.md): Eager and lazy operations that break a collection into chunks based on either a binary predicate or when the result of a projection changes.
