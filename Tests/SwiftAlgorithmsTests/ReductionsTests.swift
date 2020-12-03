@@ -27,7 +27,9 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqualCollections([1].lazy.reductions(0, +), [0, 1])
     XCTAssertEqualCollections(EmptyCollection<Int>().lazy.reductions(0, +), [0])
 
-    XCTAssertLazy([1].lazy.reductions(0, +))
+    XCTAssertLazySequence((1...).prefix(1).lazy.reductions(0, +))
+    XCTAssertLazySequence([1].lazy.reductions(0, +))
+    XCTAssertLazyCollection([1].lazy.reductions(0, +))
   }
 
   func testExclusiveEager() {
@@ -58,7 +60,9 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqualCollections([1].lazy.reductions(+), [1])
     XCTAssertEqualCollections(EmptyCollection<Int>().lazy.reductions(+), [])
 
-    XCTAssertLazy([1].lazy.reductions(+))
+    XCTAssertLazySequence((1...).prefix(1).lazy.reductions(+))
+    XCTAssertLazySequence([1].lazy.reductions(+))
+    XCTAssertLazyCollection([1].lazy.reductions(+))
   }
 
   func testInclusiveEager() {
