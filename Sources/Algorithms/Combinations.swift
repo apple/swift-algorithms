@@ -15,7 +15,7 @@ public struct Combinations<Base: Collection> {
   public let base: Base
   
   @usableFromInline
-  internal var k: Int
+  internal let k: Int
   
   @usableFromInline
   internal init(_ base: Base, k: Int) {
