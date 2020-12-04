@@ -22,7 +22,8 @@ public struct Combinations<Base: Collection> {
     self.base = base
     self.k = base.count < k ? -1 : k
   }
-
+  
+  /// The total number of combinations.
   @inlinable
   public var count: Int {
     func binomial(n: Int, k: Int) -> Int {
