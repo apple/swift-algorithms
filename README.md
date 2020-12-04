@@ -37,6 +37,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 - [`chunked(by:)`, `chunked(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chunked.md): Eager and lazy operations that break a collection into chunks based on either a binary predicate or when the result of a projection changes.
 - [`indexed()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Indexed.md): Iterate over tuples of a collection's indices and elements. 
 - [`trimming(where:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Trim.md): Returns a slice by trimming elements from a collection's start and end. 
+- [`deltas(via:)`, `differences()`, `wrappedDifferences()`, `strides()`](./Guides/Deltas.md): Eager and lazy operations that evaluate the differences between each element of a sequence using a binary closure and publishes the result as another sequence.  There are specialized methods for sequences with element types that support: subtraction, vector and/or wrapping subtraction, and `Strideable`.
 
 
 ## Adding Swift Algorithms as a Dependency

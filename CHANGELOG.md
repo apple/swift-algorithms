@@ -12,7 +12,14 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
-*No changes yet.*
+### Additions
+
+- The `deltas(via:)` method on sequences uses a closure on each pair of
+  adjacent elements and vends those results as a new sequence, with eager and
+  lazy versions.  The variants `differences()`, `wrappedDifferences()`, and
+  `strides()` call `deltas(via:)` with a closure defaulted to a metric method
+  provided by the element's protocol (`-`, `&-`, and `distance(to:)`,
+  respectively).
 
 ---
 
