@@ -134,7 +134,7 @@ extension Combinations: Hashable where Base: Hashable {}
 
 extension Collection {
   /// Returns a collection of combinations of this collection's elements, with
-  /// each combination having the specificed number of elements.
+  /// each combination having the specified number of elements.
   ///
   /// This example prints the different combinations of three from an array of
   /// four colors:
