@@ -130,7 +130,7 @@ extension Combinations: Equatable where Base: Equatable {}
 extension Combinations: Hashable where Base: Hashable {}
 
 //===----------------------------------------------------------------------===//
-// combinations(count:)
+// combinations(ofCount:)
 //===----------------------------------------------------------------------===//
 
 extension Collection {
