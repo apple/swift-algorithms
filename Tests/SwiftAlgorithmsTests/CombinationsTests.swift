@@ -30,6 +30,36 @@ final class CombinationsTests: XCTestCase {
     
     let c4 = c.combinations(ofCount: 4).count
     XCTAssertEqual(c4, 1)
+    
+    let c5 = c.combinations(ofCounts: 0...0).count
+    XCTAssertEqual(c5, 1)
+    
+    let c6 = c.combinations(ofCounts: 1...1).count
+    XCTAssertEqual(c6, 4)
+    
+    let c7 = c.combinations(ofCounts: 1...2).count
+    XCTAssertEqual(c7, 10)
+    
+    let c8 = c.combinations(ofCounts: 1...3).count
+    XCTAssertEqual(c8, 14)
+    
+    let c9 = c.combinations(ofCounts: 2...4).count
+    XCTAssertEqual(c9, 11)
+    
+    // `k` greater than element count results in same number of combinations
+    let c10 = c.combinations(ofCounts: 3...10).count
+    XCTAssertEqual(c10, 5)
+    
+    // `k` greater than element count results in same number of combinations
+    let c11 = c.combinations(ofCounts: 4...10).count
+    XCTAssertEqual(c11, 1)
+    
+    // `k` entirely greater than element count results in no combinations
+    let c12 = c.combinations(ofCounts: 5...10).count
+    XCTAssertEqual(c12, 0)
+    
+    let c13 = c.combinations().count
+    XCTAssertEqual(c13, 16)
   }
   
   func testCombinations() {
@@ -46,19 +76,31 @@ final class CombinationsTests: XCTestCase {
     
     let c4 = c.combinations(ofCount: 4)
     XCTAssertEqual(["ABCD"], c4.map { String($0) })
+    
+    let c5 = c.combinations(ofCounts: 2...4)
+    XCTAssertEqual(["ABCD", "ABC", "ABD", "ACD", "BCD", "AB", "AC", "AD", "BC", "BD", "CD"], c5.map { String($0) })
+    
+    let c6 = c.combinations()
+    XCTAssertEqual(["ABCD", "ABC", "ABD", "ACD", "BCD", "AB", "AC", "AD", "BC", "BD", "CD", "A", "B", "C", "D", ""], c6.map { String($0) })
   }
   
   func testEmpty() {
     // `k == 0` results in one zero-length combination
     XCTAssertEqualSequences([[]], "".combinations(ofCount: 0))
+    XCTAssertEqualSequences([[]], "".combinations(ofCounts: 0...0))
     XCTAssertEqualSequences([[]], "ABCD".combinations(ofCount: 0))
+    XCTAssertEqualSequences([[]], "ABCD".combinations(ofCounts: 0...0))
     
     // `k` greater than element count results in zero combinations
     XCTAssertEqualSequences([], "".combinations(ofCount: 5))
+    XCTAssertEqualSequences([], "".combinations(ofCounts: 5...10))
     XCTAssertEqualSequences([], "ABCD".combinations(ofCount: 5))
+    XCTAssertEqualSequences([], "ABCD".combinations(ofCounts: 5...10))
   }
   
   func testCombinationsLazy() {
     XCTAssertLazySequence("ABC".lazy.combinations(ofCount: 1))
+    XCTAssertLazySequence("ABC".lazy.combinations(ofCounts: 1...3))
+    XCTAssertLazySequence("ABC".lazy.combinations())
   }
 }
