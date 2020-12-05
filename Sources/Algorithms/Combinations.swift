@@ -14,18 +14,49 @@ public struct Combinations<Base: Collection> {
   /// The collection to iterate over for combinations.
   public let base: Base
   
+  /// The range of accepted sizes of combinations.
+  /// - Note: This may be `nil` if the attempted range entirely exceeds the
+  /// upper bounds of the size of the `base` collection.
   @usableFromInline
-  internal let k: Int
+  internal let k: ClosedRange<Int>?
   
+  /// Initializes a `Combinations` for all combinations of `base` of all sizes.
+  /// - Parameter base: The collection to iterate over for combinations.
+  @usableFromInline
+  internal init(_ base: Base) {
+    self.init(base, k: 0...base.count)
+  }
+  
+  /// Initializes a `Combinations` for all combinations of `base` of size `k`.
+  /// - Parameters:
+  ///   - base: The collection to iterate over for combinations.
+  ///   - k: The expected size of each combination.
   @usableFromInline
   internal init(_ base: Base, k: Int) {
+    self.init(base, k: k...k)
+  }
+  
+  /// Initializes a `Combinations` for all combinations of `base` of sizes
+  /// within a given range.
+  /// - Parameters:
+  ///   - base: The collection to iterate over for combinations.
+  ///   - k: The range of accepted sizes of combinations.
+  @usableFromInline
+  internal init(_ base: Base, k: ClosedRange<Int>) {
+    assert(k.lowerBound >= 0, "Can't have combinations with a negative number of elements.")
     self.base = base
-    self.k = base.count < k ? -1 : k
+    self.k = (k.lowerBound <= base.count) ? k.clamped(to: 0...base.count) : nil
   }
   
   /// The total number of combinations.
   @inlinable
   public var count: Int {
+    guard let k = self.k else { return 0 }
+    let n = base.count
+    if k == 0...n {
+      return 1 << n
+    }
+    
     func binomial(n: Int, k: Int) -> Int {
       switch k {
       case n, 0: return 1
@@ -35,9 +66,9 @@ public struct Combinations<Base: Collection> {
       }
     }
     
-    return k >= 0
-      ? binomial(n: base.count, k: k)
-      : 0
+    return k.map {
+      binomial(n: n, k: $0)
+    }.reduce(0, +)
   }
 }
 
@@ -47,6 +78,10 @@ extension Combinations: Sequence {
     @usableFromInline
     internal let base: Base
     
+    /// The current range of accepted sizes of combinations.
+    @usableFromInline
+    internal var k: ClosedRange<Int>
+    
     @usableFromInline
     internal var indexes: [Base.Index]
     
@@ -55,10 +90,9 @@ extension Combinations: Sequence {
     
     internal init(_ combinations: Combinations) {
       self.base = combinations.base
-      self.finished = combinations.k < 0
-      self.indexes = combinations.k < 0
-        ? []
-        : Array(combinations.base.indices.prefix(combinations.k))
+      self.k = combinations.k ?? 0...0
+      self.indexes = Array(combinations.base.indices.prefix(k.upperBound))
+      self.finished = (combinations.k == nil)
     }
     
     /// Advances the current indices to the next set of combinations. If
@@ -88,17 +122,22 @@ extension Combinations: Sequence {
         finished = true
         return
       }
-    
+      
       let i = indexes.count - 1
       base.formIndex(after: &indexes[i])
       if indexes[i] != base.endIndex { return }
-
+      
       var j = i
       while indexes[i] == base.endIndex {
         j -= 1
         guard j >= 0 else {
-          // Finished iterating over combinations
-          finished = true
+          // Finished iterating over combinations of this size.
+          if k.lowerBound < k.upperBound {
+            k = k.lowerBound...k.upperBound.advanced(by: -1)
+            self.indexes = Array(base.indices.prefix(k.upperBound))
+          } else {
+            finished = true
+          }
           return
         }
         
@@ -128,6 +167,95 @@ extension Combinations: Sequence {
 extension Combinations: LazySequenceProtocol where Base: LazySequenceProtocol {}
 extension Combinations: Equatable where Base: Equatable {}
 extension Combinations: Hashable where Base: Hashable {}
+
+//===----------------------------------------------------------------------===//
+// combinations()
+//===----------------------------------------------------------------------===//
+
+extension Collection {
+  /// Returns a collection of all the combinations of this collection's
+  /// elements, including the full collection and an empty collection
+  ///
+  /// This example prints the all the combinations from an array of letters:
+  ///
+  ///     let letters = ["A", "B", "C", "D"]
+  ///     for combo in letters.combinations() {
+  ///         print(combo.joined(separator: ", "))
+  ///     }
+  ///     // A, B, C, D
+  ///     // A, B, C
+  ///     // A, B, D
+  ///     // A, C, D
+  ///     // B, C, D
+  ///     // A, B
+  ///     // A, C
+  ///     // A, D
+  ///     // B, C
+  ///     // B, D
+  ///     // C, D
+  ///     // A
+  ///     // B
+  ///     // C
+  ///     // D
+  ///
+  /// The returned collection presents combinations in a consistent order, where
+  /// the indices in each combination are in ascending lexicographical order.
+  /// That is, in the example above, the combinations in order are the elements
+  /// at `[0, 1, 2, 3]`, `[0, 1, 2]`, `[0, 1, 3]`, `[0, 2, 3]`, `[1, 2, 3]`, …
+  /// `[0]`, `[1]`, `[2]`, `[3]`, `[]`.
+  ///
+  /// - Complexity: O(1)
+  @inlinable
+  public func combinations() -> Combinations<Self> {
+    return Combinations(self)
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// combinations(ofCounts:)
+//===----------------------------------------------------------------------===//
+
+extension Collection {
+  /// Returns a collection of combinations of this collection's elements, with
+  /// each combination having the specified number of elements.
+  ///
+  /// This example prints the different combinations of 1 and 2 from an array of
+  /// four colors:
+  ///
+  ///     let colors = ["fuchsia", "cyan", "mauve", "magenta"]
+  ///     for combo in colors.combinations(ofCounts: 1...2) {
+  ///         print(combo.joined(separator: ", "))
+  ///     }
+  ///     // fuchsia, cyan
+  ///     // fuchsia, mauve
+  ///     // fuchsia, magenta
+  ///     // cyan, mauve
+  ///     // cyan, magenta
+  ///     // mauve, magenta
+  ///     // fuchsia
+  ///     // cyan
+  ///     // mauve
+  ///     // magenta
+  ///
+  /// The returned collection presents combinations in a consistent order, where
+  /// the indices in each combination are in ascending lexicographical order.
+  /// That is, in the example above, the combinations in order are the elements
+  /// at `[0, 1]`, `[0, 2]`, `[0, 3]`, `[1, 2]`, `[1, 3]`, `[2, 3]`, `[0]`,
+  /// `[1]`, `[2]`, and finally `[3]`.
+  ///
+  /// If `k` is `0...0`, the resulting sequence has exactly one element, an
+  /// empty array. If `k.upperBound` is greater than the number of elements in
+  /// this sequence, the resulting sequence has no elements.
+  ///
+  /// - Parameter k: The range of numbers of elements to include in each
+  /// combination.
+  ///
+  /// - Complexity: O(1)
+  @inlinable
+  public func combinations(ofCounts k: ClosedRange<Int>) -> Combinations<Self> {
+    return Combinations(self, k: k)
+  }
+}
 
 //===----------------------------------------------------------------------===//
 // combinations(ofCount:)
@@ -163,7 +291,6 @@ extension Collection {
   /// - Complexity: O(1)
   @inlinable
   public func combinations(ofCount k: Int) -> Combinations<Self> {
-    assert(k >= 0, "Can't have combinations with a negative number of elements.")
     return Combinations(self, k: k)
   }
 }
