@@ -78,10 +78,10 @@ final class CombinationsTests: XCTestCase {
     XCTAssertEqual(["ABCD"], c4.map { String($0) })
     
     let c5 = c.combinations(ofCounts: 2...4)
-    XCTAssertEqual(["ABCD", "ABC", "ABD", "ACD", "BCD", "AB", "AC", "AD", "BC", "BD", "CD"], c5.map { String($0) })
+    XCTAssertEqual(["AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD", "ABCD"], c5.map { String($0) })
     
-    let c6 = c.combinations()
-    XCTAssertEqual(["ABCD", "ABC", "ABD", "ACD", "BCD", "AB", "AC", "AD", "BC", "BD", "CD", "A", "B", "C", "D", ""], c6.map { String($0) })
+    let c6 = c.combinations(ofCounts: 0...4)
+    XCTAssertEqual(["", "A", "B", "C", "D", "AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD","ABCD"], c6.map { String($0) })
   }
   
   func testEmpty() {

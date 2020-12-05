@@ -91,7 +91,7 @@ extension Combinations: Sequence {
     internal init(_ combinations: Combinations) {
       self.base = combinations.base
       self.k = combinations.k ?? 0...0
-      self.indexes = Array(combinations.base.indices.prefix(k.upperBound))
+      self.indexes = Array(combinations.base.indices.prefix(k.lowerBound))
       self.finished = (combinations.k == nil)
     }
     
@@ -115,11 +115,21 @@ extension Combinations: Sequence {
     ///     // so the iteration is finished.
     @usableFromInline
     internal mutating func advance() {
+      /// Advances `k` by increasing its `lowerBound` or finishes the iteration.
+      func advanceK() {
+        if k.lowerBound < k.upperBound {
+          k = k.lowerBound.advanced(by: 1)...k.upperBound
+          self.indexes = Array(base.indices.prefix(k.lowerBound))
+        } else {
+          finished = true
+        }
+      }
+      
       guard !indexes.isEmpty else {
         // Initial state for combinations of 0 elements is an empty array with
         // `finished == false`. Even though no indexes are involved, advancing
         // from that state means we are finished with iterating.
-        finished = true
+        advanceK()
         return
       }
       
@@ -132,12 +142,7 @@ extension Combinations: Sequence {
         j -= 1
         guard j >= 0 else {
           // Finished iterating over combinations of this size.
-          if k.lowerBound < k.upperBound {
-            k = k.lowerBound...k.upperBound.advanced(by: -1)
-            self.indexes = Array(base.indices.prefix(k.upperBound))
-          } else {
-            finished = true
-          }
+          advanceK()
           return
         }
         
@@ -182,27 +187,29 @@ extension Collection {
   ///     for combo in letters.combinations() {
   ///         print(combo.joined(separator: ", "))
   ///     }
-  ///     // A, B, C, D
-  ///     // A, B, C
-  ///     // A, B, D
-  ///     // A, C, D
-  ///     // B, C, D
+  ///     //
+  ///     // A
+  ///     // B
+  ///     // C
+  ///     // D
   ///     // A, B
   ///     // A, C
   ///     // A, D
   ///     // B, C
   ///     // B, D
   ///     // C, D
-  ///     // A
-  ///     // B
-  ///     // C
-  ///     // D
+  ///     // A, B, C
+  ///     // A, B, D
+  ///     // A, C, D
+  ///     // B, C, D
+  ///     // A, B, C, D
   ///
   /// The returned collection presents combinations in a consistent order, where
-  /// the indices in each combination are in ascending lexicographical order.
+  /// the indices in each combination are in ascending lexicographical order,
+  /// and the size of the combinations are in increasing order.
   /// That is, in the example above, the combinations in order are the elements
-  /// at `[0, 1, 2, 3]`, `[0, 1, 2]`, `[0, 1, 3]`, `[0, 2, 3]`, `[1, 2, 3]`, …
-  /// `[0]`, `[1]`, `[2]`, `[3]`, `[]`.
+  /// at `[]`, `[0]`, `[1]`, `[2]`, `[3]`, `[0, 1]`, `[0, 2]`, `[0, 3]`,
+  /// `[1, 2]`, `[1, 3]`, … `[0, 1, 2, 3]`.
   ///
   /// - Complexity: O(1)
   @inlinable
@@ -226,22 +233,22 @@ extension Collection {
   ///     for combo in colors.combinations(ofCounts: 1...2) {
   ///         print(combo.joined(separator: ", "))
   ///     }
+  ///     // fuchsia
+  ///     // cyan
+  ///     // mauve
+  ///     // magenta
   ///     // fuchsia, cyan
   ///     // fuchsia, mauve
   ///     // fuchsia, magenta
   ///     // cyan, mauve
   ///     // cyan, magenta
   ///     // mauve, magenta
-  ///     // fuchsia
-  ///     // cyan
-  ///     // mauve
-  ///     // magenta
   ///
   /// The returned collection presents combinations in a consistent order, where
   /// the indices in each combination are in ascending lexicographical order.
   /// That is, in the example above, the combinations in order are the elements
-  /// at `[0, 1]`, `[0, 2]`, `[0, 3]`, `[1, 2]`, `[1, 3]`, `[2, 3]`, `[0]`,
-  /// `[1]`, `[2]`, and finally `[3]`.
+  /// at `[0]`, `[1]`, `[2]`, `[3]`, `[0, 1]`, `[0, 2]`, `[0, 3]`, `[1, 2]`,
+  /// `[1, 3]`, and finally `[2, 3]`.
   ///
   /// If `k` is `0...0`, the resulting sequence has exactly one element, an
   /// empty array. If `k.upperBound` is greater than the number of elements in
