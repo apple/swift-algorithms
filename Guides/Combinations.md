@@ -36,6 +36,52 @@ for combo in numbers2.combinations(ofCount: 2) {
 // [10, 10]
 ```
 
+The `combinations(ofCounts:)` method returns a sequence of all the different
+combinations of the given sizes of a collection’s elements in increasing order of size.
+
+```swift
+let numbers = [10, 20, 30, 40]
+for combo in numbers(ofCounts: 2...3) {
+    print(combo)
+}
+// [10, 20]
+// [10, 30]
+// [10, 40]
+// [20, 30]
+// [20, 40]
+// [30, 40]
+// [10, 20, 30]
+// [10, 20, 40]
+// [10, 30, 40]
+// [20, 30, 40]
+```
+
+The `combinations()` method returns a sequence of *all* the different
+combinations of a collection’s elements in increasing order of size.
+
+```swift
+let numbers = [10, 20, 30, 40]
+for combo in numbers.combinations() {
+    print(combo)
+}
+// []
+// [10]
+// [20]
+// [30]
+// [40]
+// [10, 20]
+// [10, 30]
+// [10, 40]
+// [20, 30]
+// [20, 40]
+// [30, 40]
+// [10, 20, 30]
+// [10, 20, 40]
+// [10, 30, 40]
+// [20, 30, 40]
+// [10, 20, 30, 40]
+```
+
 ## Detailed Design
 
 The `combinations(ofCount:)` method is declared as a  `Collection` extension,
