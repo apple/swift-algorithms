@@ -58,8 +58,14 @@ final class CombinationsTests: XCTestCase {
     let c12 = c.combinations(ofCounts: 5...10).count
     XCTAssertEqual(c12, 0)
     
-    let c13 = c.combinations().count
+    let c13 = c.combinations(ofCounts: 0...).count
     XCTAssertEqual(c13, 16)
+    
+    let c14 = c.combinations(ofCounts: ...3).count
+    XCTAssertEqual(c14, 15)
+    
+    let c15 = c.combinations().count
+    XCTAssertEqual(c15, 16)
   }
   
   func testCombinations() {
@@ -81,7 +87,19 @@ final class CombinationsTests: XCTestCase {
     XCTAssertEqual(["AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD", "ABCD"], c5.map { String($0) })
     
     let c6 = c.combinations(ofCounts: 0...4)
-    XCTAssertEqual(["", "A", "B", "C", "D", "AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD","ABCD"], c6.map { String($0) })
+    XCTAssertEqual(["", "A", "B", "C", "D", "AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD", "ABCD"], c6.map { String($0) })
+    
+    let c7 = c.combinations()
+    XCTAssertEqual(["", "A", "B", "C", "D", "AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD", "ABCD"], c7.map { String($0) })
+    
+    let c8 = c.combinations(ofCounts: ...4)
+    XCTAssertEqual(["", "A", "B", "C", "D", "AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD", "ABCD"], c8.map { String($0) })
+    
+    let c9 = c.combinations(ofCounts: ...3)
+    XCTAssertEqual(["", "A", "B", "C", "D", "AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD"], c9.map { String($0) })
+    
+    let c10 = c.combinations(ofCounts: 1...)
+    XCTAssertEqual(["A", "B", "C", "D", "AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD", "ABCD"], c10.map { String($0) })
   }
   
   func testEmpty() {
@@ -101,6 +119,8 @@ final class CombinationsTests: XCTestCase {
   func testCombinationsLazy() {
     XCTAssertLazySequence("ABC".lazy.combinations(ofCount: 1))
     XCTAssertLazySequence("ABC".lazy.combinations(ofCounts: 1...3))
+    XCTAssertLazySequence("ABC".lazy.combinations(ofCounts: 1...))
+    XCTAssertLazySequence("ABC".lazy.combinations(ofCounts: ...3))
     XCTAssertLazySequence("ABC".lazy.combinations())
   }
 }

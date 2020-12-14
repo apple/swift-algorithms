@@ -33,7 +33,6 @@ public struct Combinations<Base: Collection> {
   ///   - k: The expected size of each combination.
   @usableFromInline
   internal init(_ base: Base, k: Int) {
-    assert(k >= 0, "Can't have combinations with a negative number of elements.")
     self.init(base, k: k...k)
   }
   
@@ -307,6 +306,7 @@ extension Collection {
   /// - Complexity: O(1)
   @inlinable
   public func combinations(ofCount k: Int) -> Combinations<Self> {
+    assert(k >= 0, "Can't have combinations with a negative number of elements.")
     return Combinations(self, k: k)
   }
 }
