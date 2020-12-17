@@ -56,16 +56,16 @@ extension MutableCollection {
   ///   - collection: The collection to read the replacement values from.
   /// - Returns: A two-member tuple where the first member is the index of the
   ///   first element of this collection that was not assigned a copy and the
-  ///   second member is the index of the first element of `source` that was not
-  ///   used for the source of a copy.  They will be their collection's
+  ///   second member is the index of the first element of `collection` that was
+  ///   not used for the source of a copy.  They will be their collection's
   ///   `startIndex` if no copying was done and their collection's `endIndex` if
   ///   every element of that collection participated in a copy.
   /// - Postcondition: Let *k* be the element count of the shorter of `self` and
-  ///   `source`.  Then `prefix(k)` will be equivalent to `source.prefix(k)`,
-  ///   while `dropFirst(k)` is unchanged.
+  ///   `collection`.  Then `prefix(k)` will be equivalent to
+  ///   `collection.prefix(k)`, while `dropFirst(k)` is unchanged.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter sequence
-  ///   between `self` and `source`.
+  ///   between `self` and `collection`.
   public mutating func copy<C: Collection>(
     collection: C
   ) -> (copyEnd: Index, sourceTailStart: C.Index) where C.Element == Element {
