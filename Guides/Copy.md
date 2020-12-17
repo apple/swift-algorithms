@@ -17,16 +17,21 @@ print(Array(IteratorSequence(sourceSuffix)))  // "[]"
 
 `copy(from:)` takes a source sequence and overlays its first *k* elements'
 values over the first `k` elements of the receiver, where `k` is the smaller of
-the two sequences' lengths.
+the two sequences' lengths.  The `copy(collection:)` variant uses a collection
+for the source sequence.
 
 ## Detailed Design
 
-A new method is added to element-mutable collections:
+New methods are added to element-mutable collections:
 
 ```swift
 extension MutableCollection {
   mutating func copy<S: Sequence>(from source: S)
    -> (copyEnd: Index, sourceTail: S.Iterator) where S.Element == Element
+
+  mutating func copy<C>(collection: C)
+   -> (copyEnd: Index, sourceTailStart: C.Index)
+   where C : Collection, Self.Element == C.Element
 }
 ```
 

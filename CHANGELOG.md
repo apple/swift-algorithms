@@ -19,7 +19,9 @@ package updates, you can specify your package dependency using
   only parameter, whose elements will be copied on top of the existing
   elements.  The return values are the past-the-end index in the receiver where
   the copying ended and an iterator for the source sequence after the elements
-  that were copied.
+  that were copied.  The `copy(collection:)` method works like the previous
+  method, but uses a collection as the source, and expresses the unread suffix
+  for that source as an `Index` instead.
 
 ---
 
