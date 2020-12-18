@@ -6,13 +6,13 @@
 Returns a `SubSequence` formed by discarding all elements at the start and end of the collection
 which satisfy the given predicate.
 
-This example uses `trimming(where:)` to get a substring without the white space at the beginning and end of the string.
+This example uses `trimming(while:)` to get a substring without the white space at the beginning and end of the string.
 
 ```swift
 let myString = "   hello, world  "
-print(myString.trimming(where: \.isWhitespace)) // "hello, world"
+print(myString.trimming(while: \.isWhitespace)) // "hello, world"
 
-let results = [2, 10, 11, 15, 20, 21, 100].trimming(where: { $0.isMultiple(of: 2) })
+let results = [2, 10, 11, 15, 20, 21, 100].trimming(while: { $0.isMultiple(of: 2) })
 print(results) // [11, 15, 20, 21]
 ```
 
@@ -23,7 +23,7 @@ A new method is added to `BidirectionalCollection`:
 ```swift
 extension BidirectionalCollection {
 
-  public func trimming(where predicate: (Element) throws -> Bool) rethrows -> SubSequence
+  public func trimming(while predicate: (Element) throws -> Bool) rethrows -> SubSequence
 }
 ```
 
@@ -36,12 +36,12 @@ to add the `BidirectionalCollection` constraint will receive that inefficient im
 ```swift
 func myAlgorithm<Input>(input: Input) where Input: Collection {
 
-  let trimmedInput = input.trimming(where: { ... }) // Uses least-efficient implementation.
+  let trimmedInput = input.trimming(while: { ... }) // Uses least-efficient implementation.
 }
 
 func myAlgorithm2<Input>(input: Input) where Input: BidirectionalCollection {
 
-  let trimmedInput = input.trimming(where: { ... }) // Uses most-efficient implementation.
+  let trimmedInput = input.trimming(while: { ... }) // Uses most-efficient implementation.
 }
 ```
 
@@ -107,8 +107,8 @@ languages:
 ```swift
 // Does `result` contain the input, trimmed of certain elements?
 // Or does this code mutate `input` in-place and return the elements which were dropped?
-let result = input.dropFromBothEnds(where: { ... })
+let result = input.dropFromBothEnds(while: { ... })
 
 // No such ambiguity here.
-let result = input.trimming(where: { ... })
+let result = input.trimming(while: { ... })
 ```
