@@ -13,11 +13,11 @@ extension BidirectionalCollection {
   /// Returns a `SubSequence` formed by discarding all elements at the start and
   /// end of the collection which satisfy the given predicate.
   ///
-  /// This example uses `trimming(where:)` to get a substring without the white
+  /// This example uses `trimming(while:)` to get a substring without the white
   /// space at the beginning and end of the string:
   ///
   ///     let myString = "  hello, world  "
-  ///     print(myString.trimming(where: \.isWhitespace)) // "hello, world"
+  ///     print(myString.trimming(while: \.isWhitespace)) // "hello, world"
   ///
   /// - Parameters:
   ///    - predicate: A closure which determines if the element should be
@@ -27,7 +27,7 @@ extension BidirectionalCollection {
   ///
   @inlinable
   public func trimming(
-    where predicate: (Element) throws -> Bool
+    while predicate: (Element) throws -> Bool
   ) rethrows -> SubSequence {
     // Consume elements from the front.
     let sliceStart = try firstIndex { try predicate($0) == false } ?? endIndex
