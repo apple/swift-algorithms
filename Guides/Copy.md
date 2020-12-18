@@ -20,7 +20,9 @@ values over the first `k` elements of the receiver, where `k` is the smaller of
 the two sequences' lengths.  The `copy(collection:)` variant uses a collection
 for the source sequence.  The `copyOntoSuffix(with:)` and
 `copyOntoSuffix(withCollection:)` methods work similar to the first two methods
-except the last `k` elements of the receiver are overlaid instead.
+except the last `k` elements of the receiver are overlaid instead.  The
+`copy(backwards:)` method is like the previous method, except both the source
+and destination collections are traversed from the end.
 
 ## Detailed Design
 
@@ -44,12 +46,16 @@ extension MutableCollection where Self: BidirectionalCollection {
     mutating func copyOntoSuffix<C>(withCollection source: C)
      -> (copyStart: Index, sourceTailStart: C.Index)
      where C : Collection, Self.Element == C.Element
+
+    mutating func copy<C>(backwards source: C)
+     -> (writtenStart: Index, readStart: C.Index)
+      where C : BidirectionalCollection, Self.Element == C.Element
 }
 ```
 
 The methods return two values.  The first member is the index of the receiver
 defining the non-anchored endpoint of the elements that were actually written
-over.  The second member is for reading the suffix of the source that wasn't
+over.  The second member is for reading the adfix of the source that wasn't
 actually used.
 
 ### Complexity
@@ -68,8 +74,12 @@ libraries.
 a bounding pair of input iterators for the source and a single output iterator
 for the destination, returning one-past the last output iterator written over.
 The `copy_if` function does not have an analogue, since it can be simulated by
-submitting the result from `filter(_:)` as the source.
+submitting the result from `filter(_:)` as the source.  There is a
+[`copy_backward`][C++CopyBackward] function that copies elements backwards from
+the far end of the source and destination, returning the near end of the
+destination that got written.
 
 <!-- Link references for other languages -->
 
 [C++Copy]: https://en.cppreference.com/w/cpp/algorithm/copy
+[C++CopyBackward]: https://en.cppreference.com/w/cpp/algorithm/copy_backward

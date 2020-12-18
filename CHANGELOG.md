@@ -25,7 +25,10 @@ package updates, you can specify your package dependency using
   `copyOntoSuffix(withCollection:)` methods work like the first two methods
   except the end of the receiver is overwritten instead of the beginning, and
   so their return value instead includes the starting index in the receiver
-  where the copying began.
+  where the copying began.  The `copy(backwards:)` method works like the
+  previous method, except the source is also read from the end instead of the
+  beginning, and so the return values are the starting indices of both
+  collections' targeted elements.
 
 ---
 

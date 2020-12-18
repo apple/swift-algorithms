@@ -81,7 +81,7 @@ extension MutableCollection {
 }
 
 //===----------------------------------------------------------------------===//
-// copyOntoSuffix(with:), copyOntoSuffix(withCollection:)
+// copyOntoSuffix(with:), copyOntoSuffix(withCollection:), copy(backwards:)
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection where Self: BidirectionalCollection {
@@ -150,6 +150,39 @@ extension MutableCollection where Self: BidirectionalCollection {
       source.formIndex(after: &sourceIndex)
     }
     self[selfIndex...].reverse()
+    return (selfIndex, sourceIndex)
+  }
+
+  /// Copies the elements from the given collection on top of the elements of
+  /// this collection, going backwards from the ends of both collections, until
+  /// the shorter one is exhausted.
+  ///
+  /// If you want to limit how much of this collection can be overrun, call this
+  /// method on the limiting subsequence instead.
+  ///
+  /// - Parameters:
+  ///   - source: The collection to read the replacement values from.
+  /// - Returns: A two-member tuple.  The first member is the index of the
+  ///   earliest element of this collection that was assigned a copy.  The
+  ///   second member is the index of the earliest element of `source` that was
+  ///   read for copying.  If no copying was done, both returned indices are at
+  ///   their respective owner's `endIndex`.
+  /// - Postcondition: Let *k* be the element count of the shorter of `self` and
+  ///   `source`.  Then `suffix(k)` will be equivalent to `source.suffix(k)`,
+  ///   while `dropLast(k)` is unchanged.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the shorter collection
+  ///   between `self` and `source`.
+  public mutating func copy<C: BidirectionalCollection>(
+    backwards source: C
+  ) -> (writtenStart: Index, readStart: C.Index) where C.Element == Element {
+    var selfIndex = endIndex, sourceIndex = source.endIndex
+    let start = startIndex, sourceStart = source.startIndex
+    while selfIndex > start, sourceIndex > sourceStart {
+      formIndex(before: &selfIndex)
+      source.formIndex(before: &sourceIndex)
+      self[selfIndex] = source[sourceIndex]
+    }
     return (selfIndex, sourceIndex)
   }
 }

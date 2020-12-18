@@ -43,6 +43,13 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(empty1, [])
     XCTAssertEqualSequences(empty1[result4.copyStart...],
                             empty2[..<result4.sourceTailStart])
+
+    let result5 = empty1.copy(backwards: empty2)
+    XCTAssertEqual(result5.writtenStart, empty1.endIndex)
+    XCTAssertEqual(result5.readStart, empty2.endIndex)
+    XCTAssertEqualSequences(empty1, [])
+    XCTAssertEqualSequences(empty1[result5.writtenStart...],
+                            empty2[result5.readStart...])
   }
 
   /// Test nonempty source and empty destination.
@@ -74,6 +81,13 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(empty, [])
     XCTAssertEqualSequences(empty[result4.copyStart...],
                             single[..<result4.sourceTailStart])
+
+    let result5 = empty.copy(backwards: single)
+    XCTAssertEqual(result5.writtenStart, empty.endIndex)
+    XCTAssertEqual(result5.readStart, single.endIndex)
+    XCTAssertEqualSequences(empty, [])
+    XCTAssertEqualSequences(empty[result5.writtenStart...],
+                            single[result5.readStart...])
   }
 
   /// Test empty source and nonempty destination.
@@ -105,6 +119,13 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(single, [2.2])
     XCTAssertEqualSequences(single[result4.copyStart...],
                             empty[..<result4.sourceTailStart])
+
+    let result5 = single.copy(backwards: empty)
+    XCTAssertEqual(result5.writtenStart, single.endIndex)
+    XCTAssertEqual(result5.readStart, empty.endIndex)
+    XCTAssertEqualSequences(single, [2.2])
+    XCTAssertEqualSequences(single[result5.writtenStart...],
+                            empty[result5.readStart...])
   }
 
   /// Test two one-element collections.
@@ -139,6 +160,14 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination, [7.7])
     XCTAssertEqualSequences(destination[result4.copyStart...],
                             source4[..<result4.sourceTailStart])
+
+    let source5 = CollectionOfOne(8.8),
+        result5 = destination.copy(backwards: source5)
+    XCTAssertEqual(result5.writtenStart, destination.startIndex)
+    XCTAssertEqual(result5.readStart, source5.startIndex)
+    XCTAssertEqualSequences(destination, [8.8])
+    XCTAssertEqualSequences(destination[result5.writtenStart...],
+                            source5[result5.readStart...])
   }
 
   /// Test two equal-length multi-element collections.
@@ -171,6 +200,13 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination, "67890")
     XCTAssertEqualSequences(destination[result4.copyStart...],
                             source4[..<result4.sourceTailStart])
+
+    let source5 = "pqrst", result5 = destination.copy(backwards: source5)
+    XCTAssertEqual(result5.writtenStart, destination.startIndex)
+    XCTAssertEqual(result5.readStart, source5.startIndex)
+    XCTAssertEqualSequences(destination, "pqrst")
+    XCTAssertEqualSequences(destination[result5.writtenStart...],
+                            source5[result5.readStart...])
   }
 
   /// Test a source longer than a multi-element destination.
@@ -203,6 +239,13 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination, (-200)..<(-195))
     XCTAssertEqualSequences(destination[result4.copyStart...],
                             source4[..<result4.sourceTailStart])
+
+    let source5 = 400..<500, result5 = destination.copy(backwards: source5)
+    XCTAssertEqual(result5.writtenStart, destination.startIndex)
+    XCTAssertEqual(result5.readStart, 495)
+    XCTAssertEqualSequences(destination, 495..<500)
+    XCTAssertEqualSequences(destination[result5.writtenStart...],
+                            source5[result5.readStart...])
   }
 
   /// Test a multi-element source shorter than the destination.
@@ -236,6 +279,13 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination, "123QRfgh45678")
     XCTAssertEqualSequences(destination[result4.copyStart...],
                             source4[..<result4.sourceTailStart])
+
+    let source5 = "wxyz", result5 = destination.copy(backwards: source5)
+    XCTAssertEqual(result5.writtenStart, 9)
+    XCTAssertEqual(result5.readStart, source5.startIndex)
+    XCTAssertEqualSequences(destination, "123QRfgh4wxyz")
+    XCTAssertEqualSequences(destination[result5.writtenStart...],
+                            source5[result5.readStart...])
   }
 
   /// Test copying over part of the destination.
@@ -280,5 +330,12 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination, "abc1256hijklm")
     XCTAssertEqualSequences(destination[3..<7][result6.copyStart...],
                             source3[..<result6.sourceTailStart])
+
+    let source4 = "NOP", result7 = destination[3..<7].copy(backwards: source4)
+    XCTAssertEqual(result7.writtenStart, 4)
+    XCTAssertEqual(result7.readStart, source4.startIndex)
+    XCTAssertEqualSequences(destination, "abc1NOPhijklm")
+    XCTAssertEqualSequences(destination[3..<7][result7.writtenStart...],
+                            source4[result7.readStart...])
   }
 }
