@@ -174,7 +174,7 @@ final class CopyTests: XCTestCase {
   }
 
   /// Test a source longer than a multi-element destination.
-  func testLongerDestination() {
+  func testLongerSource() {
     var destination = Array(1...5)
     let source = 10...100
     XCTAssertEqualSequences(destination, 1...5)
@@ -206,7 +206,7 @@ final class CopyTests: XCTestCase {
   }
 
   /// Test a multi-element source shorter than the destination.
-  func testShorterDestination() {
+  func testShorterSource() {
     var destination = Array("abcdefghijklm")
     let source = "NOPQR"
     XCTAssertEqualSequences(destination, "abcdefghijklm")
