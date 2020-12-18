@@ -18,7 +18,9 @@ print(Array(IteratorSequence(sourceSuffix)))  // "[]"
 `copy(from:)` takes a source sequence and overlays its first *k* elements'
 values over the first `k` elements of the receiver, where `k` is the smaller of
 the two sequences' lengths.  The `copy(collection:)` variant uses a collection
-for the source sequence.
+for the source sequence.  The `copyOntoSuffix(with:)` and
+`copyOntoSuffix(withCollection:)` methods work similar to the first two methods
+except the last `k` elements of the receiver are overlaid instead.
 
 ## Detailed Design
 
@@ -32,6 +34,16 @@ extension MutableCollection {
   mutating func copy<C>(collection: C)
    -> (copyEnd: Index, sourceTailStart: C.Index)
    where C : Collection, Self.Element == C.Element
+}
+
+extension MutableCollection where Self: BidirectionalCollection {
+    mutating func copyOntoSuffix<S>(with source: S)
+     -> (copyStart: Index, sourceTail: S.Iterator)
+     where S : Sequence, Self.Element == S.Element
+
+    mutating func copyOntoSuffix<C>(withCollection source: C)
+     -> (copyStart: Index, sourceTailStart: C.Index)
+     where C : Collection, Self.Element == C.Element
 }
 ```
 
