@@ -28,7 +28,9 @@ package updates, you can specify your package dependency using
   where the copying began.  The `copy(backwards:)` method works like the
   previous method, except the source is also read from the end instead of the
   beginning, and so the return values are the starting indices of both
-  collections' targeted elements.
+  collections' targeted elements.  The Swift memory model restricts reading and
+  writing into the same collection, so the `copy(forwardsFrom:to:)` and
+  `copy(backwardsFrom:to:)` methods provide same-collection element copying.
 
 ---
 

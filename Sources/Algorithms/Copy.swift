@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
-// copy(from:), copy(collection:)
+// copy(from:), copy(collection:), copy(forwardsFrom:to:)
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection {
@@ -78,10 +78,54 @@ extension MutableCollection {
     }
     return (selfIndex, collectionIndex)
   }
+
+  /// Copies, in forward traversal, the prefix of a subsequence on top of the
+  /// prefix of another, using the given bounds to demarcate the subsequences.
+  ///
+  /// Copying stops when the end of the shorter subsequence is reached.
+  ///
+  /// - Precondition:
+  ///   - `source` and `destination` must bound valid subsequences of this collection.
+  ///   - Either `source` and `destination` are disjoint, or
+  ///     `self[source].startIndex >= self[destination].startIndex`.
+  ///
+  /// - Parameters:
+  ///   - source: The index range bounding the subsequence to read the
+  ///     replacement values from.
+  ///   - destination: The index range bounding the subsequence whose elements
+  ///     will be overwritten.
+  /// - Returns: A two-member tuple where the first member are the indices of
+  ///   `self[source]` that were read for copying and the second member are the
+  ///   indices of `self[destination]` that were written over during copying.
+  /// - Postcondition: Let *k* be the element count of the shorter of
+  ///   `self[source]` and `self[destination]`, and *c* be the pre-call value of
+  ///   `self[source]`.  Then `self[destination].prefix(k)` will be equivalent
+  ///   to `c.prefix(k)`, while `self[destination].dropFirst(k)` is unchanged.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the shorter subsequence
+  ///   between `self[source]` and `self[destination]`.
+  public mutating func copy<R: RangeExpression, S: RangeExpression>(
+    forwardsFrom source: R,
+    to destination: S
+  ) -> (sourceRead: Range<Index>, destinationWritten: Range<Index>)
+  where R.Bound == Index, S.Bound == Index {
+    let rangeS = source.relative(to: self),
+        rangeD = destination.relative(to: self)
+    var sourceIndex = rangeS.lowerBound, destinationIndex = rangeD.lowerBound
+    while sourceIndex < rangeS.upperBound,
+          destinationIndex < rangeD.upperBound {
+      self[destinationIndex] = self[sourceIndex]
+      formIndex(after: &sourceIndex)
+      formIndex(after: &destinationIndex)
+    }
+    return (rangeS.lowerBound ..< sourceIndex,
+            rangeD.lowerBound ..< destinationIndex)
+  }
 }
 
 //===----------------------------------------------------------------------===//
-// copyOntoSuffix(with:), copyOntoSuffix(withCollection:), copy(backwards:)
+// copyOntoSuffix(with:), copyOntoSuffix(withCollection:), copy(backwards:),
+// copy(backwardsFrom:to:)
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection where Self: BidirectionalCollection {
@@ -184,5 +228,48 @@ extension MutableCollection where Self: BidirectionalCollection {
       self[selfIndex] = source[sourceIndex]
     }
     return (selfIndex, sourceIndex)
+  }
+
+  /// Copies, in reverse traversal, the suffix of a subsequence on top of the
+  /// suffix of another, using the given bounds to demarcate the subsequences.
+  ///
+  /// Copying stops when the beginning of the shorter subsequence is reached.
+  ///
+  /// - Precondition:
+  ///   - `source` and `destination` must bound valid subsequences of this collection.
+  ///   - Either `source` and `destination` are disjoint, or
+  ///     `self[source].endIndex <= self[destination].endIndex`.
+  ///
+  /// - Parameters:
+  ///   - source: The index range bounding the subsequence to read the
+  ///     replacement values from.
+  ///   - destination: The index range bounding the subsequence whose elements
+  ///     will be overwritten.
+  /// - Returns: A two-member tuple where the first member are the indices of
+  ///   `self[source]` that were read for copying and the second member are the
+  ///   indices of `self[destination]` that were written over during copying.
+  /// - Postcondition: Let *k* be the element count of the shorter of
+  ///   `self[source]` and `self[destination]`, and *c* be the pre-call value of
+  ///   `self[source]`.  Then `self[destination].suffix(k)` will be equivalent
+  ///   to `c.suffix(k)`, while `self[destination].dropLast(k)` is unchanged.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the shorter subsequence
+  ///   between `self[source]` and `self[destination]`.
+  public mutating func copy<R: RangeExpression, S: RangeExpression>(
+    backwardsFrom source: R,
+    to destination: S
+  ) -> (sourceRead: Range<Index>, destinationWritten: Range<Index>)
+  where R.Bound == Index, S.Bound == Index {
+    let rangeS = source.relative(to: self),
+        rangeD = destination.relative(to: self)
+    var sourceIndex = rangeS.upperBound, destinationIndex = rangeD.upperBound
+    while sourceIndex > rangeS.lowerBound,
+          destinationIndex > rangeD.lowerBound {
+      formIndex(before: &destinationIndex)
+      formIndex(before: &sourceIndex)
+      self[destinationIndex] = self[sourceIndex]
+    }
+    return (sourceIndex ..< rangeS.upperBound,
+            destinationIndex ..< rangeD.upperBound)
   }
 }

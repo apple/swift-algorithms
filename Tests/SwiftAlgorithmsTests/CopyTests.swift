@@ -338,4 +338,134 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination[3..<7][result7.writtenStart...],
                             source4[result7.readStart...])
   }
+
+  /// Test forward copying within a collection.
+  func testInternalForward() {
+    // Empty source and destination
+    let untarnished = (0..<10).map(Double.init)
+    var sample = untarnished,
+        sRange, dRange: Range<Int>
+    XCTAssertEqualSequences(sample, untarnished)
+    (sRange, dRange) = sample.copy(forwardsFrom: 1..<1, to: 6..<6)
+    XCTAssertEqualSequences(sample, untarnished)
+    XCTAssertEqual(sRange, 1..<1)
+    XCTAssertEqual(dRange, 6..<6)
+
+    // Empty source
+    (sRange, dRange) = sample.copy(forwardsFrom: 2..<2, to: 7..<8)
+    XCTAssertEqualSequences(sample, untarnished)
+    XCTAssertEqual(sRange, 2..<2)
+    XCTAssertEqual(dRange, 7..<7)
+
+    // Empty destination
+    (sRange, dRange) = sample.copy(forwardsFrom: 3..<4, to: 9..<9)
+    XCTAssertEqualSequences(sample, untarnished)
+    XCTAssertEqual(sRange, 3..<3)
+    XCTAssertEqual(dRange, 9..<9)
+
+    // Equal nonempty source and destination
+    (sRange, dRange) = sample.copy(forwardsFrom: 5..<8, to: 5..<8)
+    XCTAssertEqualSequences(sample, untarnished)
+    XCTAssertEqual(sRange, 5..<8)
+    XCTAssertEqual(dRange, 5..<8)
+
+    // Overlapping nonempty source and destination
+    (sRange, dRange) = sample.copy(forwardsFrom: 5..<9, to: 3..<7)
+    XCTAssertEqualSequences(sample, [0, 1, 2, 5, 6, 7, 8, 7, 8, 9])
+    XCTAssertEqual(sRange, 5..<9)
+    XCTAssertEqual(dRange, 3..<7)
+
+    // Disjoint but nonempty equal-sized source and destination
+    sample = untarnished
+    (sRange, dRange) = sample.copy(forwardsFrom: 7..<9, to: 2..<4)
+    XCTAssertEqualSequences(sample, [0, 1, 7, 8, 4, 5, 6, 7, 8, 9])
+    XCTAssertEqual(sRange, 7..<9)
+    XCTAssertEqual(dRange, 2..<4)
+
+    // Source longer than nonempty destination
+    sample = untarnished
+    (sRange, dRange) = sample.copy(forwardsFrom: 2..<6, to: 7..<10)
+    XCTAssertEqualSequences(sample, [0, 1, 2, 3, 4, 5, 6, 2, 3, 4])
+    XCTAssertEqual(sRange, 2..<5)
+    XCTAssertEqual(dRange, 7..<10)
+
+    // Nonempty source shorter than destination
+    sample = untarnished
+    (sRange, dRange) = sample.copy(forwardsFrom: 5..<7, to: 1..<9)
+    XCTAssertEqualSequences(sample, [0, 5, 6, 3, 4, 5, 6, 7, 8, 9])
+    XCTAssertEqual(sRange, 5..<7)
+    XCTAssertEqual(dRange, 1..<3)
+
+    // Using expressions other than `Range`
+    sample = untarnished
+    (sRange, dRange) = sample.copy(forwardsFrom: ..<2, to: 8...)
+    XCTAssertEqualSequences(sample, [0, 1, 2, 3, 4, 5, 6, 7, 0, 1])
+    XCTAssertEqual(sRange, 0..<2)
+    XCTAssertEqual(dRange, 8..<10)
+  }
+
+  /// Test backward copying within a collection.
+  func testInternalBackward() {
+    // Empty source and destination
+    let untarnished = (0..<10).map(Double.init)
+    var sample = untarnished,
+        sRange, dRange: Range<Int>
+    XCTAssertEqualSequences(sample, untarnished)
+    (sRange, dRange) = sample.copy(backwardsFrom: 1..<1, to: 6..<6)
+    XCTAssertEqualSequences(sample, untarnished)
+    XCTAssertEqual(sRange, 1..<1)
+    XCTAssertEqual(dRange, 6..<6)
+
+    // Empty source
+    (sRange, dRange) = sample.copy(backwardsFrom: 2..<2, to: 7..<8)
+    XCTAssertEqualSequences(sample, untarnished)
+    XCTAssertEqual(sRange, 2..<2)
+    XCTAssertEqual(dRange, 8..<8)
+
+    // Empty destination
+    (sRange, dRange) = sample.copy(backwardsFrom: 3..<4, to: 9..<9)
+    XCTAssertEqualSequences(sample, untarnished)
+    XCTAssertEqual(sRange, 4..<4)
+    XCTAssertEqual(dRange, 9..<9)
+
+    // Equal nonempty source and destination
+    (sRange, dRange) = sample.copy(backwardsFrom: 5..<8, to: 5..<8)
+    XCTAssertEqualSequences(sample, untarnished)
+    XCTAssertEqual(sRange, 5..<8)
+    XCTAssertEqual(dRange, 5..<8)
+
+    // Overlapping nonempty source and destination
+    (sRange, dRange) = sample.copy(backwardsFrom: 3..<7, to: 5..<9)
+    XCTAssertEqualSequences(sample, [0, 1, 2, 3, 4, 3, 4, 5, 6, 9])
+    XCTAssertEqual(sRange, 3..<7)
+    XCTAssertEqual(dRange, 5..<9)
+
+    // Disjoint but nonempty equal-sized source and destination
+    sample = untarnished
+    (sRange, dRange) = sample.copy(backwardsFrom: 7..<9, to: 2..<4)
+    XCTAssertEqualSequences(sample, [0, 1, 7, 8, 4, 5, 6, 7, 8, 9])
+    XCTAssertEqual(sRange, 7..<9)
+    XCTAssertEqual(dRange, 2..<4)
+
+    // Source longer than nonempty destination
+    sample = untarnished
+    (sRange, dRange) = sample.copy(backwardsFrom: 2..<6, to: 7..<10)
+    XCTAssertEqualSequences(sample, [0, 1, 2, 3, 4, 5, 6, 3, 4, 5])
+    XCTAssertEqual(sRange, 3..<6)
+    XCTAssertEqual(dRange, 7..<10)
+
+    // Nonempty source shorter than destination
+    sample = untarnished
+    (sRange, dRange) = sample.copy(backwardsFrom: 5..<7, to: 1..<9)
+    XCTAssertEqualSequences(sample, [0, 1, 2, 3, 4, 5, 6, 5, 6, 9])
+    XCTAssertEqual(sRange, 5..<7)
+    XCTAssertEqual(dRange, 7..<9)
+
+    // Using expressions other than `Range`
+    sample = untarnished
+    (sRange, dRange) = sample.copy(backwardsFrom: 8..., to: ..<2)
+    XCTAssertEqualSequences(sample, [8, 9, 2, 3, 4, 5, 6, 7, 8, 9])
+    XCTAssertEqual(sRange, 8..<10)
+    XCTAssertEqual(dRange, 0..<2)
+  }
 }
