@@ -14,11 +14,12 @@
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection {
-  /// Copies the elements from the given sequence on top of the elements of this
-  /// collection, until the shorter one is exhausted.
+  /// Copies the prefix of the given sequence on top of the prefix of this
+  /// collection.
   ///
-  /// If you want to limit how much of this collection can be overrun, call this
-  /// method on the limiting subsequence instead.
+  /// Copying stops when the end of the shorter sequence is reached.  If you
+  /// want to limit how much of this collection can be overrun, call this method
+  /// on the limiting subsequence instead.
   ///
   /// - Parameters:
   ///   - source: The sequence to read the replacement values from.
@@ -46,11 +47,12 @@ extension MutableCollection {
     return (current, iterator)
   }
 
-  /// Copies the elements from the given collection on top of the elements of
-  /// this collection, until the shorter one is exhausted.
+  /// Copies the prefix of the given collection on top of the prefix of this
+  /// collection.
   ///
-  /// If you want to limit how much of this collection can be overrun, call this
-  /// method on the limiting subsequence instead.
+  /// Copying stops when the end of the shorter collection is reached.  If you
+  /// want to limit how much of this collection can be overrun, call this method
+  /// on the limiting subsequence instead.
   ///
   /// - Parameters:
   ///   - collection: The collection to read the replacement values from.
@@ -64,7 +66,7 @@ extension MutableCollection {
   ///   `collection`.  Then `prefix(k)` will be equivalent to
   ///   `collection.prefix(k)`, while `dropFirst(k)` is unchanged.
   ///
-  /// - Complexity: O(*n*), where *n* is the length of the shorter sequence
+  /// - Complexity: O(*n*), where *n* is the length of the shorter collection
   ///   between `self` and `collection`.
   public mutating func copy<C: Collection>(
     collection: C
@@ -124,17 +126,19 @@ extension MutableCollection {
 }
 
 //===----------------------------------------------------------------------===//
-// copyOntoSuffix(with:), copyOntoSuffix(withCollection:), copy(backwards:),
+// copy(asSuffix:), copy(collectionAsSuffix:), copy(backwards:),
 // copy(backwardsFrom:to:)
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection where Self: BidirectionalCollection {
-  /// Copies the elements from the given sequence on top of the elements at the
-  /// end of this collection, until the shorter one is exhausted.
+  /// Copies the prefix of the given sequence on top of the suffix of this
+  /// collection.
   ///
-  /// If you want to limit how much of this collection can be overrun, call this
-  /// method on the limiting subsequence instead.  The elements in the mutated
-  /// suffix stay in the same order as they were in `source`.
+  /// Copying stops when either the sequence is exhausted or every element of
+  /// this collection is touched.  If you want to limit how much of this
+  /// collection can be overrun, call this method on the limiting subsequence
+  /// instead.  The elements in the mutated suffix preserve the order they had
+  /// in `source`.
   ///
   /// - Parameters:
   ///   - source: The sequence to read the replacement values from.
@@ -150,8 +154,8 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter sequence
   ///   between `self` and `source`.
-  public mutating func copyOntoSuffix<S: Sequence>(
-    with source: S
+  public mutating func copy<S: Sequence>(
+    asSuffix source: S
   ) -> (copyStart: Index, sourceTail: S.Iterator) where S.Element == Element {
     var current = endIndex, iterator = source.makeIterator()
     let start = startIndex
@@ -163,12 +167,13 @@ extension MutableCollection where Self: BidirectionalCollection {
     return (current, iterator)
   }
 
-  /// Copies the elements from the given collection on top of the elements at
-  /// the end of this collection, until the shorter one is exhausted.
+  /// Copies the prefix of the given collection on top of the suffix of this
+  /// collection.
   ///
-  /// If you want to limit how much of this collection can be overrun, call this
-  /// method on the limiting subsequence instead.  The elements in the mutated
-  /// suffix stay in the same order as they were in `source`.
+  /// Copying stops when at least one of the collections has had all of its
+  /// elements touched.  If you want to limit how much of this collection can be
+  /// overrun, call this method on the limiting subsequence instead.  The
+  /// elements in the mutated suffix preserve the order they had in `source`.
   ///
   /// - Parameters:
   ///   - source: The collection to read the replacement values from.
@@ -181,10 +186,10 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///   `source`.  Then `suffix(k)` will be equivalent to `source.prefix(k)`,
   ///   while `dropLast(k)` is unchanged.
   ///
-  /// - Complexity: O(*n*), where *n* is the length of the shorter sequence
+  /// - Complexity: O(*n*), where *n* is the length of the shorter collection
   ///   between `self` and `source`.
-  public mutating func copyOntoSuffix<C: Collection>(
-    withCollection source: C
+  public mutating func copy<C: Collection>(
+    collectionAsSuffix source: C
   ) -> (copyStart: Index, sourceTailStart: C.Index) where C.Element == Element {
     var selfIndex = endIndex, sourceIndex = source.startIndex
     let start = startIndex, sourceEnd = source.endIndex
@@ -197,12 +202,12 @@ extension MutableCollection where Self: BidirectionalCollection {
     return (selfIndex, sourceIndex)
   }
 
-  /// Copies the elements from the given collection on top of the elements of
-  /// this collection, going backwards from the ends of both collections, until
-  /// the shorter one is exhausted.
+  /// Copies the suffix of the given collection on top of the suffix of this
+  /// collection.
   ///
-  /// If you want to limit how much of this collection can be overrun, call this
-  /// method on the limiting subsequence instead.
+  /// Copying occurs backwards, and stops when the beginning of the shorter
+  /// collection is reached.  If you want to limit how much of this collection
+  /// can be overrun, call this method on the limiting subsequence instead.
   ///
   /// - Parameters:
   ///   - source: The collection to read the replacement values from.

@@ -12,7 +12,7 @@
 import XCTest
 import Algorithms
 
-/// Unit tests for the `copy` and `copyOntoSuffix` methods.
+/// Unit tests for the `copy` methods.
 final class CopyTests: XCTestCase {
   /// Test empty source and destination.
   func testBothEmpty() {
@@ -32,12 +32,12 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(empty1[..<result2.copyEnd],
                             empty2[..<result2.sourceTailStart])
 
-    let result3 = empty1.copyOntoSuffix(with: empty2)
+    let result3 = empty1.copy(asSuffix: empty2)
     XCTAssertEqual(result3.copyStart, empty1.endIndex)
     XCTAssertEqualSequences(IteratorSequence(result3.sourceTail), [])
     XCTAssertEqualSequences(empty1, [])
 
-    let result4 = empty1.copyOntoSuffix(withCollection: empty2)
+    let result4 = empty1.copy(collectionAsSuffix: empty2)
     XCTAssertEqual(result4.copyStart, empty1.endIndex)
     XCTAssertEqual(result4.sourceTailStart, empty2.startIndex)
     XCTAssertEqualSequences(empty1, [])
@@ -70,12 +70,12 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(empty[..<result2.copyEnd],
                             single[..<result2.sourceTailStart])
 
-    let result3 = empty.copyOntoSuffix(with: single)
+    let result3 = empty.copy(asSuffix: single)
     XCTAssertEqual(result3.copyStart, empty.endIndex)
     XCTAssertEqualSequences(IteratorSequence(result3.sourceTail), [1.1])
     XCTAssertEqualSequences(empty, [])
 
-    let result4 = empty.copyOntoSuffix(withCollection: single)
+    let result4 = empty.copy(collectionAsSuffix: single)
     XCTAssertEqual(result4.copyStart, empty.endIndex)
     XCTAssertEqual(result4.sourceTailStart, single.startIndex)
     XCTAssertEqualSequences(empty, [])
@@ -108,12 +108,12 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(single[..<result2.copyEnd],
                             empty[..<result2.sourceTailStart])
 
-    let result3 = single.copyOntoSuffix(with: empty)
+    let result3 = single.copy(asSuffix: empty)
     XCTAssertEqual(result3.copyStart, single.endIndex)
     XCTAssertEqualSequences(IteratorSequence(result3.sourceTail), [])
     XCTAssertEqualSequences(single, [2.2])
 
-    let result4 = single.copyOntoSuffix(withCollection: empty)
+    let result4 = single.copy(collectionAsSuffix: empty)
     XCTAssertEqual(result4.copyStart, single.endIndex)
     XCTAssertEqual(result4.sourceTailStart, empty.startIndex)
     XCTAssertEqualSequences(single, [2.2])
@@ -148,13 +148,13 @@ final class CopyTests: XCTestCase {
                             source2[..<result2.sourceTailStart])
 
     let source3 = CollectionOfOne(6.6),
-        result3 = destination.copyOntoSuffix(with: source3)
+        result3 = destination.copy(asSuffix: source3)
     XCTAssertEqual(result3.copyStart, destination.startIndex)
     XCTAssertEqualSequences(IteratorSequence(result3.sourceTail), [])
     XCTAssertEqualSequences(destination, [6.6])
 
     let source4 = CollectionOfOne(7.7),
-        result4 = destination.copyOntoSuffix(withCollection: source4)
+        result4 = destination.copy(collectionAsSuffix: source4)
     XCTAssertEqual(result4.copyStart, destination.startIndex)
     XCTAssertEqual(result4.sourceTailStart, source4.endIndex)
     XCTAssertEqualSequences(destination, [7.7])
@@ -188,13 +188,13 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination[..<result2.copyEnd],
                             source2[..<result2.sourceTailStart])
 
-    let source3 = "KLMNO", result3 = destination.copyOntoSuffix(with: source3)
+    let source3 = "KLMNO", result3 = destination.copy(asSuffix: source3)
     XCTAssertEqual(result3.copyStart, destination.startIndex)
     XCTAssertEqualSequences(IteratorSequence(result3.sourceTail), [])
     XCTAssertEqualSequences(destination, "KLMNO")
 
     let source4 = "67890",
-        result4 = destination.copyOntoSuffix(withCollection: source4)
+        result4 = destination.copy(collectionAsSuffix: source4)
     XCTAssertEqual(result4.copyStart, destination.startIndex)
     XCTAssertEqual(result4.sourceTailStart, source4.endIndex)
     XCTAssertEqualSequences(destination, "67890")
@@ -227,13 +227,13 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination[..<result2.copyEnd],
                             source2[..<result2.sourceTailStart])
 
-    let source3 = 200..<300, result3 = destination.copyOntoSuffix(with: source3)
+    let source3 = 200..<300, result3 = destination.copy(asSuffix: source3)
     XCTAssertEqual(result3.copyStart, destination.startIndex)
     XCTAssertEqualSequences(IteratorSequence(result3.sourceTail), 205..<300)
     XCTAssertEqualSequences(destination, 200..<205)
 
     let source4 = -200..<0,
-        result4 = destination.copyOntoSuffix(withCollection: source4)
+        result4 = destination.copy(collectionAsSuffix: source4)
     XCTAssertEqual(result4.copyStart, destination.startIndex)
     XCTAssertEqual(result4.sourceTailStart, -195)
     XCTAssertEqualSequences(destination, (-200)..<(-195))
@@ -267,13 +267,13 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination[..<result2.copyEnd],
                             source2[..<result2.sourceTailStart])
 
-    let source3 = "STUV", result3 = destination.copyOntoSuffix(with: source3)
+    let source3 = "STUV", result3 = destination.copy(asSuffix: source3)
     XCTAssertEqual(result3.copyStart, 9)
     XCTAssertEqualSequences(IteratorSequence(result3.sourceTail), [])
     XCTAssertEqualSequences(destination, "123QRfghiSTUV")
 
     let source4 = "45678",
-        result4 = destination.copyOntoSuffix(withCollection: source4)
+        result4 = destination.copy(collectionAsSuffix: source4)
     XCTAssertEqual(result4.copyStart, 8)
     XCTAssertEqual(result4.sourceTailStart, source4.endIndex)
     XCTAssertEqualSequences(destination, "123QRfgh45678")
@@ -318,13 +318,13 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination[3..<7][..<result4.copyEnd],
                             source2[..<result4.sourceTailStart])
 
-    let result5 = destination[3..<7].copyOntoSuffix(with: "34")
+    let result5 = destination[3..<7].copy(asSuffix: "34")
     XCTAssertEqual(result5.copyStart, 5)
     XCTAssertEqualSequences(IteratorSequence(result5.sourceTail), [])
     XCTAssertEqualSequences(destination, "abc1234hijklm")
 
     let source3 = "56",
-        result6 = destination[3..<7].copyOntoSuffix(withCollection: source3)
+        result6 = destination[3..<7].copy(collectionAsSuffix: source3)
     XCTAssertEqual(result6.copyStart, 5)
     XCTAssertEqual(result6.sourceTailStart, source3.endIndex)
     XCTAssertEqualSequences(destination, "abc1256hijklm")

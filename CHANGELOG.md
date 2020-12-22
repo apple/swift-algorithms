@@ -21,8 +21,8 @@ package updates, you can specify your package dependency using
   the copying ended and an iterator for the source sequence after the elements
   that were copied.  The `copy(collection:)` method works like the previous
   method, but uses a collection as the source, and expresses the unread suffix
-  for that source as an `Index` instead.  The `copyOntoSuffix(with:)` and
-  `copyOntoSuffix(withCollection:)` methods work like the first two methods
+  for that source as an `Index` instead.  The `copy(asSuffix:)` and
+  `copy(collectionAsSuffix:)` methods work like the first two methods
   except the end of the receiver is overwritten instead of the beginning, and
   so their return value instead includes the starting index in the receiver
   where the copying began.  The `copy(backwards:)` method works like the
