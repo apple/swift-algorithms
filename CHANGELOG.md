@@ -14,23 +14,23 @@ package updates, you can specify your package dependency using
 
 ### Additions
 
-- The `copy(from:)` method has been added, applying to types conforming to
+- The `overwrite(prefixWith:)` method has been added, applying to types conforming to
   `MutableCollection`.  It takes a sequence with the same element type as its
   only parameter, whose elements will be copied on top of the existing
   elements.  The return values are the past-the-end index in the receiver where
   the copying ended and an iterator for the source sequence after the elements
-  that were copied.  The `copy(collection:)` method works like the previous
+  that were copied.  The `overwrite(prefixWithCollection:)` method works like the previous
   method, but uses a collection as the source, and expresses the unread suffix
-  for that source as an `Index` instead.  The `copy(asSuffix:)` and
-  `copy(collectionAsSuffix:)` methods work like the first two methods
+  for that source as an `Index` instead.  The `overwrite(suffixWith:)` and
+  `overwrite(suffixWithCollection:)` methods work like the first two methods
   except the end of the receiver is overwritten instead of the beginning, and
   so their return value instead includes the starting index in the receiver
-  where the copying began.  The `copy(backwards:)` method works like the
+  where the copying began.  The `overwrite(backwards:)` method works like the
   previous method, except the source is also read from the end instead of the
   beginning, and so the return values are the starting indices of both
   collections' targeted elements.  The Swift memory model restricts reading and
-  writing into the same collection, so the `copy(forwardsFrom:to:)` and
-  `copy(backwardsFrom:to:)` methods provide same-collection element copying.
+  writing into the same collection, so the `overwrite(forwardsFrom:to:)` and
+  `overwrite(backwardsFrom:to:)` methods provide same-collection element copying.
 
 ---
 

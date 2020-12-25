@@ -10,23 +10,23 @@ var destination = [1, 2, 3, 4, 5]
 let source = [6, 7, 8, 9, 10]
 print(destination)  // "[1, 2, 3, 4, 5]
 
-let (_, sourceSuffix) = destination.copy(from: source)
+let (_, sourceSuffix) = destination.overwrite(prefixWith: source)
 print(destination)  // "[6, 7, 8, 9, 10]"
 print(Array(IteratorSequence(sourceSuffix)))  // "[]"
 ```
 
-`copy(from:)` takes a source sequence and overlays its first *k* elements'
+`overwrite(prefixWith:)` takes a source sequence and overlays its first *k* elements'
 values over the first `k` elements of the receiver, where `k` is the smaller of
-the two sequences' lengths.  The `copy(collection:)` variant uses a collection
-for the source sequence.  The `copy(asSuffix:)` and `copy(collectionAsSuffix:)`
+the two sequences' lengths.  The `overwrite(prefixWithCollection:)` variant uses a collection
+for the source sequence.  The `overwrite(suffixWith:)` and `overwrite(suffixWithCollection:)`
 methods work similar to the first two methods except the last `k` elements of
-the receiver are overlaid instead.  The `copy(backwards:)` method is like the
+the receiver are overlaid instead.  The `overwrite(backwards:)` method is like the
 previous method, except both the source and destination collections are
 traversed from the end.
 
 Since the Swift memory model prevents a collection from being used multiple
-times in code where at least one use is mutable, the `copy(forwardsFrom:to:)`
-and `copy(backwardsFrom:to:)` methods permit copying elements across
+times in code where at least one use is mutable, the `overwrite(forwardsFrom:to:)`
+and `overwrite(backwardsFrom:to:)` methods permit copying elements across
 subsequences of the same collection.
 
 ## Detailed Design
@@ -35,33 +35,33 @@ New methods are added to element-mutable collections:
 
 ```swift
 extension MutableCollection {
-  mutating func copy<S: Sequence>(from source: S)
+  mutating func overwrite<S: Sequence>(prefixWith source: S)
    -> (copyEnd: Index, sourceTail: S.Iterator) where S.Element == Element
 
-  mutating func copy<C>(collection: C)
+  mutating func overwrite<C>(prefixWithCollection collection: C)
    -> (copyEnd: Index, sourceTailStart: C.Index)
    where C : Collection, Self.Element == C.Element
 
-  mutating func copy<R, S>(forwardsFrom source: R, to destination: S)
+  mutating func overwrite<R, S>(forwardsFrom source: R, to destination: S)
   -> (sourceRead: Range<Index>, destinationWritten: Range<Index>)
   where R : RangeExpression, S : RangeExpression, Self.Index == R.Bound,
         R.Bound == S.Bound
 }
 
 extension MutableCollection where Self: BidirectionalCollection {
-    mutating func copy<S>(asSuffix source: S)
+    mutating func overwrite<S>(suffixWith source: S)
      -> (copyStart: Index, sourceTail: S.Iterator)
      where S : Sequence, Self.Element == S.Element
 
-    mutating func copy<C>(collectionAsSuffix source: C)
+    mutating func overwrite<C>(suffixWithCollection source: C)
      -> (copyStart: Index, sourceTailStart: C.Index)
      where C : Collection, Self.Element == C.Element
 
-    mutating func copy<C>(backwards source: C)
+    mutating func overwrite<C>(backwards source: C)
      -> (writtenStart: Index, readStart: C.Index)
       where C : BidirectionalCollection, Self.Element == C.Element
 
-    mutating func copy<R, S>(backwardsFrom source: R, to destination: S)
+    mutating func overwrite<R, S>(backwardsFrom source: R, to destination: S)
      -> (sourceRead: Range<Index>, destinationWritten: Range<Index>)
      where R : RangeExpression, S : RangeExpression, Self.Index == R.Bound,
            R.Bound == S.Bound

@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
-// copy(from:), copy(collection:), copy(forwardsFrom:to:)
+// overwrite(prefixWith:), overwrite(prefixWithCollection:), overwrite(forwardsFrom:to:)
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection {
@@ -35,8 +35,8 @@ extension MutableCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter sequence
   ///   between `self` and `source`.
-  public mutating func copy<S: Sequence>(
-    from source: S
+  public mutating func overwrite<S: Sequence>(
+    prefixWith source: S
   ) -> (copyEnd: Index, sourceTail: S.Iterator) where S.Element == Element {
     var current = startIndex, iterator = source.makeIterator()
     let end = endIndex
@@ -68,8 +68,8 @@ extension MutableCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter collection
   ///   between `self` and `collection`.
-  public mutating func copy<C: Collection>(
-    collection: C
+  public mutating func overwrite<C: Collection>(
+    prefixWithCollection collection: C
   ) -> (copyEnd: Index, sourceTailStart: C.Index) where C.Element == Element {
     var selfIndex = startIndex, collectionIndex = collection.startIndex
     let end = endIndex, sourceEnd = collection.endIndex
@@ -106,7 +106,7 @@ extension MutableCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter subsequence
   ///   between `self[source]` and `self[destination]`.
-  public mutating func copy<R: RangeExpression, S: RangeExpression>(
+  public mutating func overwrite<R: RangeExpression, S: RangeExpression>(
     forwardsFrom source: R,
     to destination: S
   ) -> (sourceRead: Range<Index>, destinationWritten: Range<Index>)
@@ -126,8 +126,8 @@ extension MutableCollection {
 }
 
 //===----------------------------------------------------------------------===//
-// copy(asSuffix:), copy(collectionAsSuffix:), copy(backwards:),
-// copy(backwardsFrom:to:)
+// overwrite(suffixWith:), overwrite(suffixWithCollection:), overwrite(backwards:),
+// overwrite(backwardsFrom:to:)
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection where Self: BidirectionalCollection {
@@ -154,8 +154,8 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter sequence
   ///   between `self` and `source`.
-  public mutating func copy<S: Sequence>(
-    asSuffix source: S
+  public mutating func overwrite<S: Sequence>(
+    suffixWith source: S
   ) -> (copyStart: Index, sourceTail: S.Iterator) where S.Element == Element {
     var current = endIndex, iterator = source.makeIterator()
     let start = startIndex
@@ -188,8 +188,8 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter collection
   ///   between `self` and `source`.
-  public mutating func copy<C: Collection>(
-    collectionAsSuffix source: C
+  public mutating func overwrite<C: Collection>(
+    suffixWithCollection source: C
   ) -> (copyStart: Index, sourceTailStart: C.Index) where C.Element == Element {
     var selfIndex = endIndex, sourceIndex = source.startIndex
     let start = startIndex, sourceEnd = source.endIndex
@@ -222,7 +222,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter collection
   ///   between `self` and `source`.
-  public mutating func copy<C: BidirectionalCollection>(
+  public mutating func overwrite<C: BidirectionalCollection>(
     backwards source: C
   ) -> (writtenStart: Index, readStart: C.Index) where C.Element == Element {
     var selfIndex = endIndex, sourceIndex = source.endIndex
@@ -260,7 +260,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter subsequence
   ///   between `self[source]` and `self[destination]`.
-  public mutating func copy<R: RangeExpression, S: RangeExpression>(
+  public mutating func overwrite<R: RangeExpression, S: RangeExpression>(
     backwardsFrom source: R,
     to destination: S
   ) -> (sourceRead: Range<Index>, destinationWritten: Range<Index>)
