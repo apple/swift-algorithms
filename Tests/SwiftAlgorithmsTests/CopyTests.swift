@@ -14,6 +14,232 @@ import Algorithms
 
 /// Unit tests for the `overwrite` methods.
 final class CopyTests: XCTestCase {
+  /// Test using an iterator as the source for prefix copying.
+  func testIteratorSourcePrefix() {
+    // Empty source and destination
+    let source1 = EmptyCollection<Double>()
+    var destination1 = source1, iterator1 = source1.makeIterator()
+    XCTAssertEqualSequences(destination1, [])
+
+    let result1 = destination1.overwrite(prefixUsing: &iterator1)
+    XCTAssertEqual(result1, destination1.startIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator1), [])
+    XCTAssertEqualSequences(destination1, [])
+
+    // Nonempty source with empty destination
+    let source2 = CollectionOfOne(1.1)
+    var destination2 = EmptyCollection<Double>(),
+        iterator2 = source2.makeIterator()
+    XCTAssertEqualSequences(destination2, [])
+
+    let result2 = destination2.overwrite(prefixUsing: &iterator2)
+    XCTAssertEqual(result2, destination2.startIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator2), [1.1])
+    XCTAssertEqualSequences(destination2, [])
+
+    // Empty source with nonempty destination
+    let source3 = EmptyCollection<Double>()
+    var destination3 = CollectionOfOne(2.2), iterator3 = source3.makeIterator()
+    XCTAssertEqualSequences(destination3, [2.2])
+
+    let result3 = destination3.overwrite(prefixUsing: &iterator3)
+    XCTAssertEqual(result3, destination3.startIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator3), [])
+    XCTAssertEqualSequences(destination3, [2.2])
+
+    // Two one-element collections
+    let source4 = CollectionOfOne(3.3)
+    var destination4 = CollectionOfOne(4.4), iterator4 = source4.makeIterator()
+    XCTAssertEqualSequences(destination4, [4.4])
+
+    let result4 = destination4.overwrite(prefixUsing: &iterator4)
+    XCTAssertEqual(result4, destination4.endIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator4), [])
+    XCTAssertEqualSequences(destination4, [3.3])
+
+    // Two equal-length multi-element collections
+    let source5 = 1...5
+    var destination5 = Array(6...10), iterator5 = source5.makeIterator()
+    XCTAssertEqualSequences(destination5, 6...10)
+    XCTAssertEqual(source5.count, destination5.count)
+
+    let result5 = destination5.overwrite(prefixUsing: &iterator5)
+    XCTAssertEqual(result5, destination5.endIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator5), [])
+    XCTAssertEqualSequences(destination5, 1...5)
+
+    // Source longer than multi-element destination
+    let source6 = 10..<20
+    var destination6 = Array(1...5), iterator6 = source6.makeIterator()
+    XCTAssertEqualSequences(destination6, 1...5)
+    XCTAssertGreaterThan(source6.count, destination6.count)
+
+    let result6 = destination6.overwrite(prefixUsing: &iterator6)
+    XCTAssertEqual(result6, destination6.endIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator6), 15..<20)
+    XCTAssertEqualSequences(destination6, 10..<15)
+
+    // Multi-element source shorter than destination
+    let source7 = -5..<1
+    var destination7 = Array(0..<10), iterator7 = source7.makeIterator()
+    XCTAssertEqualSequences(destination7, 0..<10)
+    XCTAssertLessThan(source7.count, destination7.count)
+
+    let result7 = destination7.overwrite(prefixUsing: &iterator7)
+    XCTAssertEqual(result7, 6)
+    XCTAssertEqualSequences(IteratorSequence(iterator7), [])
+    XCTAssertEqualSequences(destination7, [-5, -4, -3, -2, -1, 0, 6, 7, 8, 9])
+
+    // Copying over part of the destination
+    var destination8 = Array("abcdefghijklm")
+    XCTAssertEqualSequences(destination8, "abcdefghijklm")
+
+    let source8a = EmptyCollection<Character>()
+    var iterator8a = source8a.makeIterator()
+    let result8a = destination8[3..<7].overwrite(prefixUsing: &iterator8a)
+    XCTAssertTrue(source8a.isEmpty)
+    XCTAssertEqual(result8a, 3)
+    XCTAssertEqualSequences(IteratorSequence(iterator8a), [])
+    XCTAssertEqualSequences(destination8, "abcdefghijklm")
+
+    let source8b = "12"
+    var iterator8b = source8b.makeIterator()
+    let result8b = destination8[3..<7].overwrite(prefixUsing: &iterator8b)
+    XCTAssertLessThan(source8b.count, destination8[3..<7].count)
+    XCTAssertEqual(result8b, 5)
+    XCTAssertEqualSequences(IteratorSequence(iterator8b), [])
+    XCTAssertEqualSequences(destination8, "abc12fghijklm")
+
+    let source8c = "!@#$"
+    var iterator8c = source8c.makeIterator()
+    let result8c = destination8[3..<7].overwrite(prefixUsing: &iterator8c)
+    XCTAssertEqual(source8c.count, destination8[3..<7].count)
+    XCTAssertEqual(result8c, 7)
+    XCTAssertEqualSequences(IteratorSequence(iterator8c), [])
+    XCTAssertEqualSequences(destination8, "abc!@#$hijklm")
+
+    let source8d = "NOPQRST"
+    var iterator8d = source8d.makeIterator()
+    let result8d = destination8[3..<7].overwrite(prefixUsing: &iterator8d)
+    XCTAssertGreaterThan(source8d.count, destination8[3..<7].count)
+    XCTAssertEqual(result8d, 7)
+    XCTAssertEqualSequences(IteratorSequence(iterator8d), "RST")
+    XCTAssertEqualSequences(destination8, "abcNOPQhijklm")
+  }
+
+  /// Test using an iterator as the source for suffix copying.
+  func testIteratorSourceSuffix() {
+    // Empty source and destination
+    let source1 = EmptyCollection<Double>()
+    var destination1 = source1, iterator1 = source1.makeIterator()
+    XCTAssertEqualSequences(destination1, [])
+
+    let result1 = destination1.overwrite(suffixUsing: &iterator1)
+    XCTAssertEqual(result1, destination1.endIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator1), [])
+    XCTAssertEqualSequences(destination1, [])
+
+    // Nonempty source with empty destination
+    let source2 = CollectionOfOne(1.1)
+    var destination2 = EmptyCollection<Double>(),
+        iterator2 = source2.makeIterator()
+    XCTAssertEqualSequences(destination2, [])
+
+    let result2 = destination2.overwrite(suffixUsing: &iterator2)
+    XCTAssertEqual(result2, destination2.endIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator2), [1.1])
+    XCTAssertEqualSequences(destination2, [])
+
+    // Empty source with nonempty destination
+    let source3 = EmptyCollection<Double>()
+    var destination3 = CollectionOfOne(2.2), iterator3 = source3.makeIterator()
+    XCTAssertEqualSequences(destination3, [2.2])
+
+    let result3 = destination3.overwrite(suffixUsing: &iterator3)
+    XCTAssertEqual(result3, destination3.endIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator3), [])
+    XCTAssertEqualSequences(destination3, [2.2])
+
+    // Two one-element collections
+    let source4 = CollectionOfOne(3.3)
+    var destination4 = CollectionOfOne(4.4), iterator4 = source4.makeIterator()
+    XCTAssertEqualSequences(destination4, [4.4])
+
+    let result4 = destination4.overwrite(suffixUsing: &iterator4)
+    XCTAssertEqual(result4, destination4.startIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator4), [])
+    XCTAssertEqualSequences(destination4, [3.3])
+
+    // Two equal-length multi-element collections
+    let source5 = 1...5
+    var destination5 = Array(6...10), iterator5 = source5.makeIterator()
+    XCTAssertEqualSequences(destination5, 6...10)
+    XCTAssertEqual(source5.count, destination5.count)
+
+    let result5 = destination5.overwrite(suffixUsing: &iterator5)
+    XCTAssertEqual(result5, destination5.startIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator5), [])
+    XCTAssertEqualSequences(destination5, 1...5)
+
+    // Source longer than multi-element destination
+    let source6 = 10..<20
+    var destination6 = Array(1...5), iterator6 = source6.makeIterator()
+    XCTAssertEqualSequences(destination6, 1...5)
+    XCTAssertGreaterThan(source6.count, destination6.count)
+
+    let result6 = destination6.overwrite(suffixUsing: &iterator6)
+    XCTAssertEqual(result6, destination6.startIndex)
+    XCTAssertEqualSequences(IteratorSequence(iterator6), 15..<20)
+    XCTAssertEqualSequences(destination6, 10..<15)
+
+    // Multi-element source shorter than destination
+    let source7 = -5..<1
+    var destination7 = Array(0..<10), iterator7 = source7.makeIterator()
+    XCTAssertEqualSequences(destination7, 0..<10)
+    XCTAssertLessThan(source7.count, destination7.count)
+
+    let result7 = destination7.overwrite(suffixUsing: &iterator7)
+    XCTAssertEqual(result7, 4)
+    XCTAssertEqualSequences(IteratorSequence(iterator7), [])
+    XCTAssertEqualSequences(destination7, [0, 1, 2, 3, -5, -4, -3, -2, -1, 0])
+
+    // Copying over part of the destination
+    var destination8 = Array("abcdefghijklm")
+    XCTAssertEqualSequences(destination8, "abcdefghijklm")
+
+    let source8a = EmptyCollection<Character>()
+    var iterator8a = source8a.makeIterator()
+    let result8a = destination8[3..<7].overwrite(suffixUsing: &iterator8a)
+    XCTAssertTrue(source8a.isEmpty)
+    XCTAssertEqual(result8a, 7)
+    XCTAssertEqualSequences(IteratorSequence(iterator8a), [])
+    XCTAssertEqualSequences(destination8, "abcdefghijklm")
+
+    let source8b = "12"
+    var iterator8b = source8b.makeIterator()
+    let result8b = destination8[3..<7].overwrite(suffixUsing: &iterator8b)
+    XCTAssertLessThan(source8b.count, destination8[3..<7].count)
+    XCTAssertEqual(result8b, 5)
+    XCTAssertEqualSequences(IteratorSequence(iterator8b), [])
+    XCTAssertEqualSequences(destination8, "abcde12hijklm")
+
+    let source8c = "!@#$"
+    var iterator8c = source8c.makeIterator()
+    let result8c = destination8[3..<7].overwrite(suffixUsing: &iterator8c)
+    XCTAssertEqual(source8c.count, destination8[3..<7].count)
+    XCTAssertEqual(result8c, 3)
+    XCTAssertEqualSequences(IteratorSequence(iterator8c), [])
+    XCTAssertEqualSequences(destination8, "abc!@#$hijklm")
+
+    let source8d = "NOPQRST"
+    var iterator8d = source8d.makeIterator()
+    let result8d = destination8[3..<7].overwrite(suffixUsing: &iterator8d)
+    XCTAssertGreaterThan(source8d.count, destination8[3..<7].count)
+    XCTAssertEqual(result8d, 3)
+    XCTAssertEqualSequences(IteratorSequence(iterator8d), "RST")
+    XCTAssertEqualSequences(destination8, "abcNOPQhijklm")
+  }
+
   /// Test empty source and destination.
   func testBothEmpty() {
     var empty1 = EmptyCollection<Double>()

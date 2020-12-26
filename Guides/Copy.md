@@ -15,14 +15,18 @@ print(destination)  // "[6, 7, 8, 9, 10]"
 print(Array(IteratorSequence(sourceSuffix)))  // "[]"
 ```
 
-`overwrite(prefixWith:)` takes a source sequence and overlays its first *k* elements'
-values over the first `k` elements of the receiver, where `k` is the smaller of
-the two sequences' lengths.  The `overwrite(prefixWithCollection:)` variant uses a collection
-for the source sequence.  The `overwrite(suffixWith:)` and `overwrite(suffixWithCollection:)`
-methods work similar to the first two methods except the last `k` elements of
-the receiver are overlaid instead.  The `overwrite(backwards:)` method is like the
-previous method, except both the source and destination collections are
-traversed from the end.
+`overwrite(prefixWith:)` takes a source sequence and overlays its first *k*
+elements' values over the first `k` elements of the receiver, where `k` is the
+smaller of the two sequences' lengths.  The `overwrite(prefixWithCollection:)`
+variant uses a collection for the source sequence.  The
+`overwrite(suffixWith:)` and `overwrite(suffixWithCollection:)` methods work
+similar to the first two methods except the last `k` elements of the receiver
+are overlaid instead.  The `overwrite(backwards:)` method is like the previous
+method, except both the source and destination collections are traversed from
+the end.  The `overwrite(prefixUsing:)` and `overwrite(suffixUsing:)` methods
+are the core copying routines, extracting elements from their iterator argument
+to copy on top of the elements of the targeted end of the receiver, returning
+the index of the non-anchored endpoint of the overwritten subsequence.
 
 Since the Swift memory model prevents a collection from being used multiple
 times in code where at least one use is mutable, the `overwrite(forwardsFrom:to:)`
@@ -35,6 +39,9 @@ New methods are added to element-mutable collections:
 
 ```swift
 extension MutableCollection {
+  mutating func overwrite<I>(prefixUsing source: inout I) -> Index
+   where I : IteratorProtocol, Self.Element == I.Element
+
   mutating func overwrite<S: Sequence>(prefixWith source: S)
    -> (copyEnd: Index, sourceTail: S.Iterator) where S.Element == Element
 
@@ -49,6 +56,9 @@ extension MutableCollection {
 }
 
 extension MutableCollection where Self: BidirectionalCollection {
+    mutating func overwrite<I>(suffixUsing source: inout I) -> Index
+     where I : IteratorProtocol, Self.Element == I.Element
+
     mutating func overwrite<S>(suffixWith source: S)
      -> (copyStart: Index, sourceTail: S.Iterator)
      where S : Sequence, Self.Element == S.Element

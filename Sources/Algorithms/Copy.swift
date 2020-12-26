@@ -10,10 +10,77 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
-// overwrite(prefixWith:), overwrite(prefixWithCollection:), overwrite(forwardsFrom:to:)
+// overwrite(prefixUsing:_:), overwrite(prefixUsing:), overwrite(prefixWith:),
+// overwrite(prefixWithCollection:), overwrite(forwardsFrom:to:)
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection {
+  /// Copies the transformed prefix of the given iterator's virtual sequence on
+  /// top of the prefix of this collection, using the given closure for mapping.
+  ///
+  /// Copying stops when either the iterator runs out of elements or every
+  /// element of this collection has been overwritten.  If you want to limit how
+  /// much of this collection can be overrun, call this method on the limiting
+  /// subsequence instead.
+  ///
+  /// - Parameters:
+  ///   - source: The iterator with the virtual sequence of the seeds for the
+  ///     replacement values.
+  ///   - transform: The closure mapping seed values to the actual replacement
+  ///     values.
+  /// - Returns: The index that is one past-the-end of the elements of this
+  ///   collection that were overwritten.  It will be `endIndex` if all elements
+  ///   of this collection were touched, but `startIndex` if none were.
+  /// - Postcondition: Let *k* be the lesser of `count` and the number of
+  ///   elements in `source`'s virtual sequence.  Then `prefix(k)` will be
+  ///   equivalent to the first *k* elements emitted from `source` and mapped
+  ///   with `transform`, while `dropFirst(k)` is unchanged.
+  ///
+  /// - Complexity: O(*n*), where *n* is is the length of the shorter between
+  ///   `self` and `source`'s virtual sequence.
+  fileprivate mutating func overwrite<I: IteratorProtocol>(
+    prefixUsing source: inout I,
+    _ transform: (I.Element) -> Element
+  ) -> Index {
+    var current = startIndex
+    let end = endIndex
+    while current < end, let seed = source.next() {
+      self[current] = transform(seed)
+      formIndex(after: &current)
+    }
+    return current
+  }
+
+  /// Copies the prefix of the given iterator's virtual sequence on top of the
+  /// prefix of this collection.
+  ///
+  /// Copying stops when either the iterator runs out of elements or every
+  /// element of this collection has been overwritten.  If you want to limit how
+  /// much of this collection can be overrun, call this method on the limiting
+  /// subsequence instead.
+  ///
+  /// - Parameters:
+  ///   - source: The iterator with the virtual sequence of replacement values.
+  /// - Returns: The index that is one past-the-end of the elements of this
+  ///   collection that were overwritten.  It will be `endIndex` if all elements
+  ///   of this collection were touched, but `startIndex` if none were.
+  /// - Postcondition: Let *k* be the lesser of `count` and the number of
+  ///   elements in `source`'s virtual sequence.  Then the next *k* elements
+  ///   from `source` will have been extracted, `prefix(k)` will be equivalent
+  ///   to that extracted sequence (in emission order), and `dropFirst(k)` will
+  ///   be unchanged.
+  ///
+  /// - Complexity: O(*n*), where *n* is is the length of the shorter between
+  ///   `self` and `source`'s virtual sequence.
+  @discardableResult
+  public mutating func overwrite<I: IteratorProtocol>(
+    prefixUsing source: inout I
+  ) -> Index where I.Element == Element {
+    // The second argument should be "\Element.self," but that's blocked by bug
+    // SR-12897.
+    return overwrite(prefixUsing: &source, { $0 })
+  }
+
   /// Copies the prefix of the given sequence on top of the prefix of this
   /// collection.
   ///
@@ -126,11 +193,79 @@ extension MutableCollection {
 }
 
 //===----------------------------------------------------------------------===//
-// overwrite(suffixWith:), overwrite(suffixWithCollection:), overwrite(backwards:),
+// overwrite(suffixUsing:_:), overwrite(suffixUsing:), overwrite(suffixWith:),
+// overwrite(suffixWithCollection:), overwrite(backwards:),
 // overwrite(backwardsFrom:to:)
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection where Self: BidirectionalCollection {
+  /// Copies the transformed prefix of the given iterator's virtual sequence on
+  /// top of the suffix of this collection, using the given closure for mapping.
+  ///
+  /// Copying stops when either the iterator runs out of elements or every
+  /// element of this collection has been overwritten.  If you want to limit how
+  /// much of this collection can be overrun, call this method on the limiting
+  /// subsequence instead.
+  ///
+  /// - Parameters:
+  ///   - source: The iterator with the virtual sequence of the seeds for the
+  ///     replacement values.
+  ///   - transform: The closure mapping seed values to the actual replacement
+  ///     values.
+  /// - Returns: The index for the first element of this collection that was
+  ///   overwritten.  It will be `startIndex` if all elements of this collection
+  ///   were touched, but `endIndex` if none were.
+  /// - Postcondition: Let *k* be the lesser of `count` and the number of
+  ///   elements in `source`'s virtual sequence.  Then `suffix(k)` will be
+  ///   equivalent to the first *k* elements emitted from `source` and mapped
+  ///   with `transform`, while `dropLast(k)` is unchanged.
+  ///
+  /// - Complexity: O(*n*), where *n* is is the length of the shorter between
+  ///   `self` and `source`'s virtual sequence.
+  fileprivate mutating func overwrite<I: IteratorProtocol>(
+    suffixUsing source: inout I,
+    _ transform: (I.Element) -> Element
+  ) -> Index {
+    var current = endIndex
+    let start = startIndex
+    while current > start, let seed = source.next() {
+      formIndex(before: &current)
+      self[current] = transform(seed)
+    }
+    self[current...].reverse()
+    return current
+  }
+
+  /// Copies the prefix of the given iterator's virtual sequence on top of the
+  /// suffix of this collection.
+  ///
+  /// Copying stops when either the iterator runs out of elements or every
+  /// element of this collection has been overwritten.  If you want to limit how
+  /// much of this collection can be overrun, call this method on the limiting
+  /// subsequence instead.
+  ///
+  /// - Parameters:
+  ///   - source: The iterator with the virtual sequence of replacement values.
+  /// - Returns: The index for the first element of this collection that was
+  ///   overwritten.  It will be `startIndex` if all elements of this collection
+  ///   were touched, but `endIndex` if none were.
+  /// - Postcondition: Let *k* be the lesser of `count` and the number of
+  ///   elements in `source`'s virtual sequence.  Then the next *k* elements
+  ///   from `source` will have been extracted, `suffix(k)` will be equivalent
+  ///   to that extracted sequence (in emission order), and `dropLast(k)` will
+  ///   be unchanged.
+  ///
+  /// - Complexity: O(*n*), where *n* is is the length of the shorter between
+  ///   `self` and `source`'s virtual sequence.
+  @discardableResult
+  public mutating func overwrite<I: IteratorProtocol>(
+    suffixUsing source: inout I
+  ) -> Index where I.Element == Element {
+    // The second argument should be "\Element.self," but that's blocked by bug
+    // SR-12897.
+    return overwrite(suffixUsing: &source, { $0 })
+  }
+
   /// Copies the prefix of the given sequence on top of the suffix of this
   /// collection.
   ///
