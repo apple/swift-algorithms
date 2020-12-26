@@ -14,23 +14,16 @@ package updates, you can specify your package dependency using
 
 ### Additions
 
-- The `overwrite(prefixWith:)` method has been added, applying to types conforming to
-  `MutableCollection`.  It takes a sequence with the same element type as its
-  only parameter, whose elements will be copied on top of the existing
-  elements.  The return values are the past-the-end index in the receiver where
-  the copying ended and an iterator for the source sequence after the elements
-  that were copied.  The `overwrite(prefixWithCollection:)` method works like the previous
-  method, but uses a collection as the source, and expresses the unread suffix
-  for that source as an `Index` instead.  The `overwrite(suffixWith:)` and
-  `overwrite(suffixWithCollection:)` methods work like the first two methods
-  except the end of the receiver is overwritten instead of the beginning, and
-  so their return value instead includes the starting index in the receiver
-  where the copying began.  The `overwrite(backwards:)` method works like the
-  previous method, except the source is also read from the end instead of the
-  beginning, and so the return values are the starting indices of both
-  collections' targeted elements.  The Swift memory model restricts reading and
-  writing into the same collection, so the `overwrite(forwardsFrom:to:)` and
-  `overwrite(backwardsFrom:to:)` methods provide same-collection element copying.
+- The `overwrite(prefixWith:)` method has been added to element-mutable
+  collections. It takes a sequence with the same element type as the receiver;
+  copies the leading elements from that source on top of the leading elements
+  of the receiver, in order, until at least one sequence runs out; and returns
+  the index after the last element of the receiver that was overwritten. The
+  similar `overwrite(suffixWith:)` method is restricted to bidirectional
+  element-mutable collections, uses the trailing elements of the receiver as
+  the destination, and returns the index to the first element of the receiver
+  that was overwritten instead. There are variants of these methods for when
+  the source is an iterator, collection, or subsequence.
 
 ---
 
