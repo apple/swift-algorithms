@@ -6,13 +6,13 @@
 Copy a sequence onto an element-mutable collection.
 
 ```swift
-var destination = [1, 2, 3, 4, 5]
-let source = [6, 7, 8, 9, 10]
-print(destination)  // "[1, 2, 3, 4, 5]
+var destination = Array("abcde")
+print(String(destination))  // "abcde"
 
-let (_, sourceSuffix) = destination.overwrite(prefixWith: source)
-print(destination)  // "[6, 7, 8, 9, 10]"
-print(Array(IteratorSequence(sourceSuffix)))  // "[]"
+let source = "123"
+let changedEnd = destination.overwrite(prefixWith: source)
+print(String(destination))  // "123de"
+print(String(destination[changedEnd...]))  // "de"
 ```
 
 `overwrite(prefixWith:)` takes a source sequence and overlays its first *k*
@@ -42,8 +42,8 @@ extension MutableCollection {
   mutating func overwrite<I>(prefixUsing source: inout I) -> Index
    where I : IteratorProtocol, Self.Element == I.Element
 
-  mutating func overwrite<S: Sequence>(prefixWith source: S)
-   -> (copyEnd: Index, sourceTail: S.Iterator) where S.Element == Element
+  mutating func overwrite<S>(prefixWith source: S) -> Index
+   where S : Sequence, Self.Element == S.Element
 
   mutating func overwrite<C>(prefixWithCollection collection: C)
    -> (copyEnd: Index, sourceTailStart: C.Index)
@@ -59,8 +59,7 @@ extension MutableCollection where Self: BidirectionalCollection {
     mutating func overwrite<I>(suffixUsing source: inout I) -> Index
      where I : IteratorProtocol, Self.Element == I.Element
 
-    mutating func overwrite<S>(suffixWith source: S)
-     -> (copyStart: Index, sourceTail: S.Iterator)
+    mutating func overwrite<S>(suffixWith source: S) -> Index
      where S : Sequence, Self.Element == S.Element
 
     mutating func overwrite<C>(suffixWithCollection source: C)
