@@ -186,7 +186,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   ) -> Index where I.Element == Element {
     // The second argument should be "\Element.self," but that's blocked by bug
     // SR-12897.
-    return overwrite(suffixUsing: &source, { $0 })
+    return overwrite(suffixUsing: &source, doCorrect: true, { $0 })
   }
 
   /// Copies the prefix of the given sequence on top of the suffix of this
@@ -332,7 +332,7 @@ extension MutableCollection where Self: BidirectionalCollection {
 }
 
 //===----------------------------------------------------------------------===//
-// overwrite(prefixUsing:_:), overwrite(suffixUsing:_:)
+// overwrite(prefixUsing:_:), overwrite(suffixUsing:doCorrect:_:)
 //===----------------------------------------------------------------------===//
 
 fileprivate extension MutableCollection {
@@ -385,6 +385,8 @@ fileprivate extension MutableCollection where Self: BidirectionalCollection {
   /// - Parameters:
   ///   - source: The iterator with the virtual sequence of the seeds for the
   ///     replacement values.
+  ///   - doCorrect: Whether to reverse the elements after replacement so their
+  ///     order maintains their orientation from `source`, or not.
   ///   - transform: The closure mapping seed values to the actual replacement
   ///     values.
   /// - Returns: The index for the first element of this collection that was
@@ -399,6 +401,7 @@ fileprivate extension MutableCollection where Self: BidirectionalCollection {
   ///   `self` and `source`'s virtual sequence.
   mutating func overwrite<I: IteratorProtocol>(
     suffixUsing source: inout I,
+    doCorrect: Bool,
     _ transform: (I.Element) -> Element
   ) -> Index {
     var current = endIndex
@@ -407,7 +410,9 @@ fileprivate extension MutableCollection where Self: BidirectionalCollection {
       formIndex(before: &current)
       self[current] = transform(seed)
     }
-    self[current...].reverse()
+    if doCorrect {
+      self[current...].reverse()
+    }
     return current
   }
 }
