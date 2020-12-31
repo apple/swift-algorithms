@@ -13,7 +13,7 @@ import XCTest
 import Algorithms
 
 /// Unit tests for the `overwrite` methods.
-final class CopyTests: XCTestCase {
+final class OverwriteTests: XCTestCase {
   /// Test using an iterator as the source for prefix copying.
   func testIteratorSourcePrefix() {
     // Empty source and destination

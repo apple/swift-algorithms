@@ -1,7 +1,7 @@
-# Copy
+# Overwrite
 
-[[Source](../Sources/Algorithms/Copy.swift) |
- [Tests](../Tests/SwiftAlgorithmsTests/CopyTests.swift)]
+[[Source](../Sources/Algorithms/Overwrite.swift) |
+ [Tests](../Tests/SwiftAlgorithmsTests/OverwriteTests.swift)]
 
 Copy a sequence onto an element-mutable collection.
 
@@ -54,20 +54,20 @@ extension MutableCollection {
 }
 
 extension MutableCollection where Self: BidirectionalCollection {
-    mutating func overwrite<I>(suffixUsing source: inout I) -> Index
-     where I : IteratorProtocol, Self.Element == I.Element
+  mutating func overwrite<I>(suffixUsing source: inout I) -> Index
+   where I : IteratorProtocol, Self.Element == I.Element
 
-    mutating func overwrite<S>(suffixWith source: S) -> Index
-     where S : Sequence, Self.Element == S.Element
+  mutating func overwrite<S>(suffixWith source: S) -> Index
+   where S : Sequence, Self.Element == S.Element
 
-    mutating func overwrite<C>(backwardsWith source: C)
-     -> (readStart: C.Index, writtenStart: Index)
-     where C : BidirectionalCollection, Self.Element == C.Element
+  mutating func overwrite<C>(backwardsWith source: C)
+   -> (readStart: C.Index, writtenStart: Index)
+   where C : BidirectionalCollection, Self.Element == C.Element
 
-    mutating func overwrite<R, S>(backwardsFrom source: R, to destination: S)
-     -> (sourceRead: Range<Index>, destinationWritten: Range<Index>)
-     where R : RangeExpression, S : RangeExpression, Self.Index == R.Bound,
-           R.Bound == S.Bound
+  mutating func overwrite<R, S>(backwardsFrom source: R, to destination: S)
+   -> (sourceRead: Range<Index>, destinationWritten: Range<Index>)
+   where R : RangeExpression, S : RangeExpression, Self.Index == R.Bound,
+         R.Bound == S.Bound
 }
 ```
 
