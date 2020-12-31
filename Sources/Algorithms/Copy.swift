@@ -10,8 +10,8 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
-// overwrite(prefixUsing:), overwrite(prefixWith:),
-// overwrite(prefixWithCollection:), overwrite(forwardsFrom:to:)
+// overwrite(prefixUsing:), overwrite(prefixWith:), overwrite(forwardsWith:),
+// overwrite(forwardsFrom:to:)
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection {
@@ -82,30 +82,26 @@ extension MutableCollection {
   /// on the limiting subsequence instead.
   ///
   /// - Parameters:
-  ///   - collection: The collection to read the replacement values from.
-  /// - Returns: A two-member tuple where the first member is the index of the
-  ///   first element of this collection that was not assigned a copy and the
-  ///   second member is the index of the first element of `collection` that was
-  ///   not used for the source of a copy.  They will be their collection's
-  ///   `startIndex` if no copying was done and their collection's `endIndex` if
-  ///   every element of that collection participated in a copy.
-  /// - Postcondition: Let *k* be the element count of the shorter of `self` and
-  ///   `collection`.  Then `prefix(k)` will be equivalent to
-  ///   `collection.prefix(k)`, while `dropFirst(k)` is unchanged.
+  ///   - source: The collection to read the replacement values from.
+  /// - Returns: A two-member tuple where the first member is the past-the-end
+  ///   index for the range of `source` elements that were actually read and the
+  ///   second member is the past-the-end index for the range of `self` elements
+  ///   that were actually overwritten.  The lower bound for each range is the
+  ///   corresponding collection's `startIndex`.
+  /// - Postcondition: Let *r* be the returned value from the call to this
+  ///   method.  Then `self[..<r.writtenEnd]` will be equivalent to
+  ///   `source[..<r.readEnd]`.  Both subsequences will have an element count of
+  ///   *k*, where *k* is minimum of `count` and `source.count`.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter collection
-  ///   between `self` and `collection`.
+  ///   between `self` and `source`.
   public mutating func overwrite<C: Collection>(
-    prefixWithCollection collection: C
-  ) -> (copyEnd: Index, sourceTailStart: C.Index) where C.Element == Element {
-    var selfIndex = startIndex, collectionIndex = collection.startIndex
-    let end = endIndex, sourceEnd = collection.endIndex
-    while selfIndex < end, collectionIndex < sourceEnd {
-      self[selfIndex] = collection[collectionIndex]
-      formIndex(after: &selfIndex)
-      collection.formIndex(after: &collectionIndex)
-    }
-    return (selfIndex, collectionIndex)
+    forwardsWith source: C
+  ) -> (readEnd: C.Index, writtenEnd: Index)
+  where C.Element == Element {
+    var indexIterator = source.indices.makeIterator()
+    let end = overwrite(prefixUsing: &indexIterator) { source[$0] }
+    return (indexIterator.next() ?? source.endIndex, end)
   }
 
   /// Copies, in forward traversal, the prefix of a subsequence on top of the
@@ -153,8 +149,7 @@ extension MutableCollection {
 }
 
 //===----------------------------------------------------------------------===//
-// overwrite(suffixUsing:), overwrite(suffixWith:),
-// overwrite(suffixWithCollection:), overwrite(backwards:),
+// overwrite(suffixUsing:), overwrite(suffixWith:), overwrite(backwardsWith:),
 // overwrite(backwardsFrom:to:)
 //===----------------------------------------------------------------------===//
 
@@ -219,41 +214,6 @@ extension MutableCollection where Self: BidirectionalCollection {
     return overwrite(suffixUsing: &iterator)
   }
 
-  /// Copies the prefix of the given collection on top of the suffix of this
-  /// collection.
-  ///
-  /// Copying stops when at least one of the collections has had all of its
-  /// elements touched.  If you want to limit how much of this collection can be
-  /// overrun, call this method on the limiting subsequence instead.  The
-  /// elements in the mutated suffix preserve the order they had in `source`.
-  ///
-  /// - Parameters:
-  ///   - source: The collection to read the replacement values from.
-  /// - Returns: A two-member tuple.  The first member is the index of the
-  ///   earliest element of this collection that was assigned a copy; or
-  ///   `endIndex` if no copying was done.  The second member is the index
-  ///   immediately after the latest element of `source` read for a copy; or
-  ///   `startIndex` if no copying was done.
-  /// - Postcondition: Let *k* be the element count of the shorter of `self` and
-  ///   `source`.  Then `suffix(k)` will be equivalent to `source.prefix(k)`,
-  ///   while `dropLast(k)` is unchanged.
-  ///
-  /// - Complexity: O(*n*), where *n* is the length of the shorter collection
-  ///   between `self` and `source`.
-  public mutating func overwrite<C: Collection>(
-    suffixWithCollection source: C
-  ) -> (copyStart: Index, sourceTailStart: C.Index) where C.Element == Element {
-    var selfIndex = endIndex, sourceIndex = source.startIndex
-    let start = startIndex, sourceEnd = source.endIndex
-    while selfIndex > start, sourceIndex < sourceEnd {
-      formIndex(before: &selfIndex)
-      self[selfIndex] = source[sourceIndex]
-      source.formIndex(after: &sourceIndex)
-    }
-    self[selfIndex...].reverse()
-    return (selfIndex, sourceIndex)
-  }
-
   /// Copies the suffix of the given collection on top of the suffix of this
   /// collection.
   ///
@@ -263,28 +223,27 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Parameters:
   ///   - source: The collection to read the replacement values from.
-  /// - Returns: A two-member tuple.  The first member is the index of the
-  ///   earliest element of this collection that was assigned a copy.  The
-  ///   second member is the index of the earliest element of `source` that was
-  ///   read for copying.  If no copying was done, both returned indices are at
-  ///   their respective owner's `endIndex`.
-  /// - Postcondition: Let *k* be the element count of the shorter of `self` and
-  ///   `source`.  Then `suffix(k)` will be equivalent to `source.suffix(k)`,
-  ///   while `dropLast(k)` is unchanged.
+  /// - Returns: A two-member tuple where the first member is the starting index
+  ///   for the range of `source` elements that were actually read and the
+  ///   second member is the starting index for the range of `self` elements
+  ///   that were actually overwritten.  The upper bound for each range is the
+  ///   corresponding collection's `endIndex`.
+  /// - Postcondition: Let *r* be the returned value from the call to this
+  ///   method.  Then `self[r.writtenStart...]` will be equivalent to
+  ///   `source[r.readStart...]`.  Both subsequences will have an element count
+  ///   of *k*, where *k* is minimum of `count` and `source.count`.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the shorter collection
   ///   between `self` and `source`.
   public mutating func overwrite<C: BidirectionalCollection>(
-    backwards source: C
-  ) -> (writtenStart: Index, readStart: C.Index) where C.Element == Element {
-    var selfIndex = endIndex, sourceIndex = source.endIndex
-    let start = startIndex, sourceStart = source.startIndex
-    while selfIndex > start, sourceIndex > sourceStart {
-      formIndex(before: &selfIndex)
-      source.formIndex(before: &sourceIndex)
-      self[selfIndex] = source[sourceIndex]
+    backwardsWith source: C
+  ) -> (readStart: C.Index, writtenStart: Index)
+  where C.Element == Element {
+    var indexIterator = source.reversed().indices.makeIterator()
+    let start = overwrite(suffixUsing: &indexIterator, doCorrect: false) {
+      source[source.index(before: $0.base)]
     }
-    return (selfIndex, sourceIndex)
+    return (indexIterator.next().map(\.base) ?? source.startIndex, start)
   }
 
   /// Copies, in reverse traversal, the suffix of a subsequence on top of the

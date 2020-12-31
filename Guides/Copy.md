@@ -15,23 +15,21 @@ print(String(destination))  // "123de"
 print(String(destination[changedEnd...]))  // "de"
 ```
 
-`overwrite(prefixWith:)` takes a source sequence and overlays its first *k*
-elements' values over the first `k` elements of the receiver, where `k` is the
-smaller of the two sequences' lengths.  The `overwrite(prefixWithCollection:)`
-variant uses a collection for the source sequence.  The
-`overwrite(suffixWith:)` and `overwrite(suffixWithCollection:)` methods work
-similar to the first two methods except the last `k` elements of the receiver
-are overlaid instead.  The `overwrite(backwards:)` method is like the previous
-method, except both the source and destination collections are traversed from
-the end.  The `overwrite(prefixUsing:)` and `overwrite(suffixUsing:)` methods
-are the core copying routines, extracting elements from their iterator argument
-to copy on top of the elements of the targeted end of the receiver, returning
-the index of the non-anchored endpoint of the overwritten subsequence.
+`overwrite(prefixWith:)` takes a source sequence and replaces the first `k`
+elements of the receiver with the first `k` elements of the source, where *k*
+is the length of the shorter sequence. `overwrite(forwardsWith:)` does the same
+thing with a source collection, and `overwrite(prefixUsing:)` with an `inout`
+source iterator. To preserve memory exclusivity, the
+`overwrite(forwardsFrom:to:)` overload is required to copy between subsequences
+of the same collection, where the source and destination are given as index
+ranges.
 
-Since the Swift memory model prevents a collection from being used multiple
-times in code where at least one use is mutable, the `overwrite(forwardsFrom:to:)`
-and `overwrite(backwardsFrom:to:)` methods permit copying elements across
-subsequences of the same collection.
+When the receiving element-mutable collection supports bidirectional traversal,
+variants of the previous methods are defined that copy the source elements on
+top of the receiver's suffix instead. The `overwrite(suffixWith:)` and
+`overwrite(suffixUsing:)` methods use their source's prefix, while the
+`overwrite(backwardsWith:)` and `overwrite(backwardsFrom:to:)` methods use
+their source's suffix.
 
 ## Detailed Design
 
@@ -45,8 +43,8 @@ extension MutableCollection {
   mutating func overwrite<S>(prefixWith source: S) -> Index
    where S : Sequence, Self.Element == S.Element
 
-  mutating func overwrite<C>(prefixWithCollection collection: C)
-   -> (copyEnd: Index, sourceTailStart: C.Index)
+  mutating func overwrite<C>(forwardsWith source: C)
+   -> (readEnd: C.Index, writtenEnd: Index)
    where C : Collection, Self.Element == C.Element
 
   mutating func overwrite<R, S>(forwardsFrom source: R, to destination: S)
@@ -62,13 +60,9 @@ extension MutableCollection where Self: BidirectionalCollection {
     mutating func overwrite<S>(suffixWith source: S) -> Index
      where S : Sequence, Self.Element == S.Element
 
-    mutating func overwrite<C>(suffixWithCollection source: C)
-     -> (copyStart: Index, sourceTailStart: C.Index)
-     where C : Collection, Self.Element == C.Element
-
-    mutating func overwrite<C>(backwards source: C)
-     -> (writtenStart: Index, readStart: C.Index)
-      where C : BidirectionalCollection, Self.Element == C.Element
+    mutating func overwrite<C>(backwardsWith source: C)
+     -> (readStart: C.Index, writtenStart: Index)
+     where C : BidirectionalCollection, Self.Element == C.Element
 
     mutating func overwrite<R, S>(backwardsFrom source: R, to destination: S)
      -> (sourceRead: Range<Index>, destinationWritten: Range<Index>)
@@ -77,20 +71,28 @@ extension MutableCollection where Self: BidirectionalCollection {
 }
 ```
 
-Each method returns two values.  For the two-sequence methods, the first member
-is the index for the non-endpoint bound for the destination adfix.  For the
-two-sequence methods where the non-receiver is a `Sequence`, the second member
-is an iterator for the elements of the source's suffix that were never read in
-for copying.  For the two-sequence methods where the non-receiver is a
-`Collection`, the second member is the index for the first element of the
-source's suffix that was never read in for copying.  For the two-subsequences
-methods, the members are the ranges for the parts of the subsequence operands
-that were actually touched during copying.
+When the source is an iterator or sequence, the return value from `overwrite`
+is a single index value within the receiver that is the non-anchored end of the
+range of overwritten elements. The prefix-overwriting methods return the upper
+bound, *i.e.* the index after the last touched element, and assume the lower
+bound is the receiver's `startIndex`. The suffix-overwriting methods return the
+lower bound, *i.e.* the index of the first touched element, and assume the
+upper bound is the receiver's `endIndex`. Use of the return value is optional
+to support casual use of copying without caring about the precise range of
+effect.
+
+When the source is a collection, the return value from `overwrite` has two
+components. The second component is the same as the sole value returned from
+the overloads with iterator or sequence sources. The first component is the
+non-anchored end of the range of the elements actually read from the source.
+When the source is a subsequence, the return value's components are index
+ranges fully bounding the touched elements instead of ranges implied from
+isolated indices.
 
 ### Complexity
 
 Calling these methods is O(_k_), where _k_ is the length of the shorter
-sequence between the receiver and `source`.
+(virtual) sequence between the receiver (subsequence) and the source.
 
 ### Naming
 

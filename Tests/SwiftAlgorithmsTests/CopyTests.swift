@@ -191,6 +191,119 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination8, "abcNOPQhijklm")
   }
 
+  /// Test using a collection as the source for prefix copying.
+  func testCollectionSourcePrefix() {
+    // Empty source and destination
+    var destination1 = EmptyCollection<Double>()
+    XCTAssertEqualSequences(destination1, [])
+
+    let source1 = EmptyCollection<Double>()
+    let (sEnd1, dEnd1) = destination1.overwrite(forwardsWith: source1)
+    XCTAssertEqual(sEnd1, source1.startIndex)
+    XCTAssertEqual(dEnd1, destination1.startIndex)
+    XCTAssertEqualSequences(destination1, [])
+    XCTAssertEqualSequences(source1[..<sEnd1], destination1[..<dEnd1])
+
+    // Nonempty source with empty destination
+    var destination2 = EmptyCollection<Double>()
+    XCTAssertEqualSequences(destination2, [])
+
+    let source2 = CollectionOfOne(1.1)
+    let (sEnd2, dEnd2) = destination2.overwrite(forwardsWith: source2)
+    XCTAssertEqual(sEnd2, source2.startIndex)
+    XCTAssertEqual(dEnd2, destination2.startIndex)
+    XCTAssertEqualSequences(destination2, [])
+    XCTAssertEqualSequences(source2[..<sEnd2], destination2[..<dEnd2])
+
+    // Empty source with nonempty destination
+    var destination3 = CollectionOfOne(2.2)
+    XCTAssertEqualSequences(destination3, [2.2])
+
+    let source3 = EmptyCollection<Double>()
+    let (sEnd3, dEnd3) = destination3.overwrite(forwardsWith: source3)
+    XCTAssertEqual(sEnd3, source3.startIndex)
+    XCTAssertEqual(dEnd3, destination3.startIndex)
+    XCTAssertEqualSequences(destination3, [2.2])
+    XCTAssertEqualSequences(source3[..<sEnd3], destination3[..<dEnd3])
+
+    // Two one-element collections
+    var destination4 = CollectionOfOne(3.3)
+    XCTAssertEqualSequences(destination4, [3.3])
+
+    let source4 = CollectionOfOne(4.4)
+    let (sEnd4, dEnd4) = destination4.overwrite(forwardsWith: source4)
+    XCTAssertEqual(sEnd4, source4.endIndex)
+    XCTAssertEqual(dEnd4, destination4.endIndex)
+    XCTAssertEqualSequences(destination4, [4.4])
+    XCTAssertEqualSequences(source4[..<sEnd4], destination4[..<dEnd4])
+
+    // Two equal-length multi-element collections
+    var destination5 = Array(6...10)
+    XCTAssertEqualSequences(destination5, 6...10)
+
+    let source5 = 1...5
+    let (sEnd5, dEnd5) = destination5.overwrite(forwardsWith: source5)
+    XCTAssertEqual(sEnd5, source5.endIndex)
+    XCTAssertEqual(dEnd5, destination5.endIndex)
+    XCTAssertEqualSequences(destination5, 1...5)
+    XCTAssertEqualSequences(source5[..<sEnd5], destination5[..<dEnd5])
+
+    // Source longer than multi-element destination
+    var destination6 = Array(1...5)
+    XCTAssertEqualSequences(destination6, 1...5)
+
+    let source6 = 10..<20
+    let (sEnd6, dEnd6) = destination6.overwrite(forwardsWith: source6)
+    XCTAssertEqual(sEnd6, 15)
+    XCTAssertEqual(dEnd6, destination6.endIndex)
+    XCTAssertEqualSequences(destination6, 10..<15)
+    XCTAssertEqualSequences(source6[..<sEnd6], destination6[..<dEnd6])
+
+    // Multi-element source shorter than destination
+    var destination7 = Array(0..<10)
+    XCTAssertEqualSequences(destination7, 0..<10)
+
+    let source7 = -5..<1
+    let (sEnd7, dEnd7) = destination7.overwrite(forwardsWith: source7)
+    XCTAssertEqual(sEnd7, source7.endIndex)
+    XCTAssertEqual(dEnd7, 6)
+    XCTAssertEqualSequences(destination7, [-5, -4, -3, -2, -1, 0, 6, 7, 8, 9])
+    XCTAssertEqualSequences(source7[..<sEnd7], destination7[..<dEnd7])
+
+    // Copying over part of the destination
+    var destination8 = Array("abcdefghijklm")
+    XCTAssertEqualSequences(destination8, "abcdefghijklm")
+
+    let source8a = ""
+    let (sEnd8a, dEnd8a) = destination8[3..<7].overwrite(forwardsWith: source8a)
+    XCTAssertEqual(sEnd8a, source8a.startIndex)
+    XCTAssertEqual(dEnd8a, 3)
+    XCTAssertEqualSequences(destination8, "abcdefghijklm")
+    XCTAssertEqualSequences(source8a[..<sEnd8a], destination8[3..<dEnd8a])
+
+    let source8b = "12"
+    let (sEnd8b, dEnd8b) = destination8[3..<7].overwrite(forwardsWith: source8b)
+    XCTAssertEqual(sEnd8b, source8b.endIndex)
+    XCTAssertEqual(dEnd8b, 5)
+    XCTAssertEqualSequences(destination8, "abc12fghijklm")
+    XCTAssertEqualSequences(source8b[..<sEnd8b], destination8[3..<dEnd8b])
+
+    let source8c = "!@#$"
+    let (sEnd8c, dEnd8c) = destination8[3..<7].overwrite(forwardsWith: source8c)
+    XCTAssertEqual(sEnd8c, source8c.endIndex)
+    XCTAssertEqual(dEnd8c, 7)
+    XCTAssertEqualSequences(destination8, "abc!@#$hijklm")
+    XCTAssertEqualSequences(source8c[..<sEnd8c], destination8[3..<dEnd8c])
+
+    let source8d = "NOPQRST"
+    let (sEnd8d, dEnd8d) = destination8[3..<7].overwrite(forwardsWith: source8d)
+    XCTAssertEqual(sEnd8d, source8d.index(source8d.startIndex, offsetBy: +4))
+    XCTAssertEqual(dEnd8d, 7)
+    XCTAssertEqualSequences(destination8, "abcNOPQhijklm")
+    XCTAssertEqualSequences(source8d[sEnd8d...], "RST")
+    XCTAssertEqualSequences(source8d[..<sEnd8d], destination8[3..<dEnd8d])
+  }
+
   /// Test using an iterator as the source for suffix copying.
   func testIteratorSourceSuffix() {
     // Empty source and destination
@@ -367,242 +480,121 @@ final class CopyTests: XCTestCase {
     XCTAssertEqualSequences(destination8, "abcNOPQhijklm")
   }
 
-  /// Test empty source and destination.
-  func testBothEmpty() {
-    var empty1 = EmptyCollection<Double>()
-    let empty2 = EmptyCollection<Double>()
-    XCTAssertEqualSequences(empty1, [])
+  /// Test using a collection as the source for suffix copying.
+  func testCollectionSourceSuffix() {
+    // Empty source and destination
+    var destination1 = EmptyCollection<Double>()
+    XCTAssertEqualSequences(destination1, [])
 
-    let result2 = empty1.overwrite(prefixWithCollection: empty2)
-    XCTAssertEqual(result2.copyEnd, empty1.startIndex)
-    XCTAssertEqual(result2.sourceTailStart, empty2.startIndex)
-    XCTAssertEqualSequences(empty1, [])
-    XCTAssertEqualSequences(empty1[..<result2.copyEnd],
-                            empty2[..<result2.sourceTailStart])
+    let source1 = EmptyCollection<Double>()
+    let (sStart1, dStart1) = destination1.overwrite(backwardsWith: source1)
+    XCTAssertEqual(sStart1, source1.endIndex)
+    XCTAssertEqual(dStart1, destination1.endIndex)
+    XCTAssertEqualSequences(destination1, [])
+    XCTAssertEqualSequences(source1[sStart1...], destination1[dStart1...])
 
-    let result4 = empty1.overwrite(suffixWithCollection: empty2)
-    XCTAssertEqual(result4.copyStart, empty1.endIndex)
-    XCTAssertEqual(result4.sourceTailStart, empty2.startIndex)
-    XCTAssertEqualSequences(empty1, [])
-    XCTAssertEqualSequences(empty1[result4.copyStart...],
-                            empty2[..<result4.sourceTailStart])
+    // Nonempty source with empty destination
+    var destination2 = EmptyCollection<Double>()
+    XCTAssertEqualSequences(destination2, [])
 
-    let result5 = empty1.overwrite(backwards: empty2)
-    XCTAssertEqual(result5.writtenStart, empty1.endIndex)
-    XCTAssertEqual(result5.readStart, empty2.endIndex)
-    XCTAssertEqualSequences(empty1, [])
-    XCTAssertEqualSequences(empty1[result5.writtenStart...],
-                            empty2[result5.readStart...])
-  }
+    let source2 = CollectionOfOne(1.1)
+    let (sStart2, dStart2) = destination2.overwrite(backwardsWith: source2)
+    XCTAssertEqual(sStart2, source2.endIndex)
+    XCTAssertEqual(dStart2, destination2.endIndex)
+    XCTAssertEqualSequences(destination2, [])
+    XCTAssertEqualSequences(source2[sStart2...], destination2[dStart2...])
 
-  /// Test nonempty source and empty destination.
-  func testOnlyDestinationEmpty() {
-    var empty = EmptyCollection<Double>()
-    let single = CollectionOfOne(1.1)
-    XCTAssertEqualSequences(empty, [])
+    // Empty source with nonempty destination
+    var destination3 = CollectionOfOne(2.2)
+    XCTAssertEqualSequences(destination3, [2.2])
 
-    let result2 = empty.overwrite(prefixWithCollection: single)
-    XCTAssertEqual(result2.copyEnd, empty.startIndex)
-    XCTAssertEqual(result2.sourceTailStart, single.startIndex)
-    XCTAssertEqualSequences(empty, [])
-    XCTAssertEqualSequences(empty[..<result2.copyEnd],
-                            single[..<result2.sourceTailStart])
+    let source3 = EmptyCollection<Double>()
+    let (sStart3, dStart3) = destination3.overwrite(backwardsWith: source3)
+    XCTAssertEqual(sStart3, source3.endIndex)
+    XCTAssertEqual(dStart3, destination3.endIndex)
+    XCTAssertEqualSequences(destination3, [2.2])
+    XCTAssertEqualSequences(source3[sStart3...], destination3[dStart3...])
 
-    let result4 = empty.overwrite(suffixWithCollection: single)
-    XCTAssertEqual(result4.copyStart, empty.endIndex)
-    XCTAssertEqual(result4.sourceTailStart, single.startIndex)
-    XCTAssertEqualSequences(empty, [])
-    XCTAssertEqualSequences(empty[result4.copyStart...],
-                            single[..<result4.sourceTailStart])
+    // Two one-element collections
+    var destination4 = CollectionOfOne(3.3)
+    XCTAssertEqualSequences(destination4, [3.3])
 
-    let result5 = empty.overwrite(backwards: single)
-    XCTAssertEqual(result5.writtenStart, empty.endIndex)
-    XCTAssertEqual(result5.readStart, single.endIndex)
-    XCTAssertEqualSequences(empty, [])
-    XCTAssertEqualSequences(empty[result5.writtenStart...],
-                            single[result5.readStart...])
-  }
+    let source4 = CollectionOfOne(4.4)
+    let (sStart4, dStart4) = destination4.overwrite(backwardsWith: source4)
+    XCTAssertEqual(sStart4, source4.startIndex)
+    XCTAssertEqual(dStart4, destination4.startIndex)
+    XCTAssertEqualSequences(destination4, [4.4])
+    XCTAssertEqualSequences(source4[sStart4...], destination4[dStart4...])
 
-  /// Test empty source and nonempty destination.
-  func testOnlySourceEmpty() {
-    var single = CollectionOfOne(2.2)
-    let empty = EmptyCollection<Double>()
-    XCTAssertEqualSequences(single, [2.2])
+    // Two equal-length multi-element collections
+    var destination5 = Array(6...10)
+    XCTAssertEqualSequences(destination5, 6...10)
 
-    let result2 = single.overwrite(prefixWithCollection: empty)
-    XCTAssertEqual(result2.copyEnd, single.startIndex)
-    XCTAssertEqual(result2.sourceTailStart, empty.startIndex)
-    XCTAssertEqualSequences(single, [2.2])
-    XCTAssertEqualSequences(single[..<result2.copyEnd],
-                            empty[..<result2.sourceTailStart])
+    let source5 = 1...5
+    let (sStart5, dStart5) = destination5.overwrite(backwardsWith: source5)
+    XCTAssertEqual(sStart5, source5.startIndex)
+    XCTAssertEqual(dStart5, destination5.startIndex)
+    XCTAssertEqualSequences(destination5, 1...5)
+    XCTAssertEqualSequences(source5[sStart5...], destination5[dStart5...])
 
-    let result4 = single.overwrite(suffixWithCollection: empty)
-    XCTAssertEqual(result4.copyStart, single.endIndex)
-    XCTAssertEqual(result4.sourceTailStart, empty.startIndex)
-    XCTAssertEqualSequences(single, [2.2])
-    XCTAssertEqualSequences(single[result4.copyStart...],
-                            empty[..<result4.sourceTailStart])
+    // Source longer than multi-element destination
+    var destination6 = Array(1...5)
+    XCTAssertEqualSequences(destination6, 1...5)
 
-    let result5 = single.overwrite(backwards: empty)
-    XCTAssertEqual(result5.writtenStart, single.endIndex)
-    XCTAssertEqual(result5.readStart, empty.endIndex)
-    XCTAssertEqualSequences(single, [2.2])
-    XCTAssertEqualSequences(single[result5.writtenStart...],
-                            empty[result5.readStart...])
-  }
+    let source6 = 10..<20
+    let (sStart6, dStart6) = destination6.overwrite(backwardsWith: source6)
+    XCTAssertEqual(sStart6, 15)
+    XCTAssertEqual(dStart6, destination6.startIndex)
+    XCTAssertEqualSequences(destination6, 15..<20)
+    XCTAssertEqualSequences(source6[sStart6...], destination6[dStart6...])
 
-  /// Test two one-element collections.
-  func testTwoSingles() {
-    var destination = CollectionOfOne(3.3)
-    //let source = CollectionOfOne(4.4)
-    XCTAssertEqualSequences(destination, [3.3])
+    // Multi-element source shorter than destination
+    var destination7 = Array(0..<10)
+    XCTAssertEqualSequences(destination7, 0..<10)
 
-    let source2 = CollectionOfOne(5.5),
-        result2 = destination.overwrite(prefixWithCollection: source2)
-    XCTAssertEqual(result2.copyEnd, destination.endIndex)
-    XCTAssertEqual(result2.sourceTailStart, source2.endIndex)
-    XCTAssertEqualSequences(destination, [5.5])
-    XCTAssertEqualSequences(destination[..<result2.copyEnd],
-                            source2[..<result2.sourceTailStart])
+    let source7 = -5..<1
+    let (sStart7, dStart7) = destination7.overwrite(backwardsWith: source7)
+    XCTAssertEqual(sStart7, source7.startIndex)
+    XCTAssertEqual(dStart7, 4)
+    XCTAssertEqualSequences(destination7, [0, 1, 2, 3, -5, -4, -3, -2, -1, 0])
+    XCTAssertEqualSequences(source7[sStart7...], destination7[dStart7...])
 
-    let source4 = CollectionOfOne(7.7),
-        result4 = destination.overwrite(suffixWithCollection: source4)
-    XCTAssertEqual(result4.copyStart, destination.startIndex)
-    XCTAssertEqual(result4.sourceTailStart, source4.endIndex)
-    XCTAssertEqualSequences(destination, [7.7])
-    XCTAssertEqualSequences(destination[result4.copyStart...],
-                            source4[..<result4.sourceTailStart])
+    // Copying over part of the destination
+    var destination8 = Array("abcdefghijklm")
+    XCTAssertEqualSequences(destination8, "abcdefghijklm")
 
-    let source5 = CollectionOfOne(8.8),
-        result5 = destination.overwrite(backwards: source5)
-    XCTAssertEqual(result5.writtenStart, destination.startIndex)
-    XCTAssertEqual(result5.readStart, source5.startIndex)
-    XCTAssertEqualSequences(destination, [8.8])
-    XCTAssertEqualSequences(destination[result5.writtenStart...],
-                            source5[result5.readStart...])
-  }
+    let source8a = ""
+    let (sStart8a, dStart8a) = destination8[3..<7]
+      .overwrite(backwardsWith: source8a)
+    XCTAssertEqual(sStart8a, source8a.endIndex)
+    XCTAssertEqual(dStart8a, 7)
+    XCTAssertEqualSequences(destination8, "abcdefghijklm")
+    XCTAssertEqualSequences(source8a[sStart8a...], destination8[dStart8a..<7])
 
-  /// Test two equal-length multi-element collections.
-  func testTwoWithEqualLength() {
-    var destination = Array("ABCDE")
-    //let source = "fghij"
-    XCTAssertEqualSequences(destination, "ABCDE")
+    let source8b = "12"
+    let (sStart8b, dStart8b) = destination8[3..<7]
+      .overwrite(backwardsWith: source8b)
+    XCTAssertEqual(sStart8b, source8b.startIndex)
+    XCTAssertEqual(dStart8b, 5)
+    XCTAssertEqualSequences(destination8, "abcde12hijklm")
+    XCTAssertEqualSequences(source8b[sStart8b...], destination8[dStart8b..<7])
 
-    let source2 = "12345", result2 = destination.overwrite(prefixWithCollection: source2)
-    XCTAssertEqual(result2.copyEnd, destination.endIndex)
-    XCTAssertEqual(result2.sourceTailStart, source2.endIndex)
-    XCTAssertEqualSequences(destination, "12345")
-    XCTAssertEqualSequences(destination[..<result2.copyEnd],
-                            source2[..<result2.sourceTailStart])
+    let source8c = "!@#$"
+    let (sStart8c, dStart8c) = destination8[3..<7]
+      .overwrite(backwardsWith: source8c)
+    XCTAssertEqual(sStart8c, source8c.startIndex)
+    XCTAssertEqual(dStart8c, 3)
+    XCTAssertEqualSequences(destination8, "abc!@#$hijklm")
+    XCTAssertEqualSequences(source8c[sStart8c...], destination8[dStart8c..<7])
 
-    let source4 = "67890",
-        result4 = destination.overwrite(suffixWithCollection: source4)
-    XCTAssertEqual(result4.copyStart, destination.startIndex)
-    XCTAssertEqual(result4.sourceTailStart, source4.endIndex)
-    XCTAssertEqualSequences(destination, "67890")
-    XCTAssertEqualSequences(destination[result4.copyStart...],
-                            source4[..<result4.sourceTailStart])
-
-    let source5 = "pqrst", result5 = destination.overwrite(backwards: source5)
-    XCTAssertEqual(result5.writtenStart, destination.startIndex)
-    XCTAssertEqual(result5.readStart, source5.startIndex)
-    XCTAssertEqualSequences(destination, "pqrst")
-    XCTAssertEqualSequences(destination[result5.writtenStart...],
-                            source5[result5.readStart...])
-  }
-
-  /// Test a source longer than a multi-element destination.
-  func testLongerSource() {
-    var destination = Array(1...5)
-    //let source = 10...100
-    XCTAssertEqualSequences(destination, 1...5)
-
-    let source2 = -50..<0, result2 = destination.overwrite(prefixWithCollection: source2)
-    XCTAssertEqual(result2.copyEnd, destination.endIndex)
-    XCTAssertEqual(result2.sourceTailStart, -45)
-    XCTAssertEqualSequences(destination, (-50)...(-46))
-    XCTAssertEqualSequences(destination[..<result2.copyEnd],
-                            source2[..<result2.sourceTailStart])
-
-    let source4 = -200..<0,
-        result4 = destination.overwrite(suffixWithCollection: source4)
-    XCTAssertEqual(result4.copyStart, destination.startIndex)
-    XCTAssertEqual(result4.sourceTailStart, -195)
-    XCTAssertEqualSequences(destination, (-200)..<(-195))
-    XCTAssertEqualSequences(destination[result4.copyStart...],
-                            source4[..<result4.sourceTailStart])
-
-    let source5 = 400..<500, result5 = destination.overwrite(backwards: source5)
-    XCTAssertEqual(result5.writtenStart, destination.startIndex)
-    XCTAssertEqual(result5.readStart, 495)
-    XCTAssertEqualSequences(destination, 495..<500)
-    XCTAssertEqualSequences(destination[result5.writtenStart...],
-                            source5[result5.readStart...])
-  }
-
-  /// Test a multi-element source shorter than the destination.
-  func testShorterSource() {
-    var destination = Array("abcdefghijklm")
-    //let source = "NOPQR"
-    XCTAssertEqualSequences(destination, "abcdefghijklm")
-
-    let source2 = "123", result2 = destination.overwrite(prefixWithCollection: source2)
-    XCTAssertEqual(result2.copyEnd, 3)
-    XCTAssertEqual(result2.sourceTailStart, source2.endIndex)
-    XCTAssertEqualSequences(destination, "123defghijklm")
-    XCTAssertEqualSequences(destination[..<result2.copyEnd],
-                            source2[..<result2.sourceTailStart])
-
-    let source4 = "45678",
-        result4 = destination.overwrite(suffixWithCollection: source4)
-    XCTAssertEqual(result4.copyStart, 8)
-    XCTAssertEqual(result4.sourceTailStart, source4.endIndex)
-    XCTAssertEqualSequences(destination, "123defgh45678")
-    XCTAssertEqualSequences(destination[result4.copyStart...],
-                            source4[..<result4.sourceTailStart])
-
-    let source5 = "wxyz", result5 = destination.overwrite(backwards: source5)
-    XCTAssertEqual(result5.writtenStart, 9)
-    XCTAssertEqual(result5.readStart, source5.startIndex)
-    XCTAssertEqualSequences(destination, "123defgh4wxyz")
-    XCTAssertEqualSequences(destination[result5.writtenStart...],
-                            source5[result5.readStart...])
-  }
-
-  /// Test copying over part of the destination.
-  func testPartial() {
-    var destination = Array("abcdefghijklm")
-    let source = "STUVWXYZ"
-    XCTAssertEqualSequences(destination, "abcdefghijklm")
-
-    let result3 = destination[3..<7].overwrite(prefixWithCollection: source)
-    XCTAssertEqual(result3.copyEnd, 7)
-    XCTAssertEqualSequences(source[result3.sourceTailStart...], "WXYZ")
-    XCTAssertEqualSequences(destination, "abcSTUVhijklm")
-    XCTAssertEqualSequences(destination[3..<7][..<result3.copyEnd],
-                            source[..<result3.sourceTailStart])
-
-    let source2 = "12", result4 = destination[3..<7].overwrite(prefixWithCollection: source2)
-    XCTAssertEqual(result4.copyEnd, 5)
-    XCTAssertEqual(result4.sourceTailStart, source2.endIndex)
-    XCTAssertEqualSequences(destination, "abc12UVhijklm")
-    XCTAssertEqualSequences(destination[3..<7][..<result4.copyEnd],
-                            source2[..<result4.sourceTailStart])
-
-    let source3 = "56",
-        result6 = destination[3..<7].overwrite(suffixWithCollection: source3)
-    XCTAssertEqual(result6.copyStart, 5)
-    XCTAssertEqual(result6.sourceTailStart, source3.endIndex)
-    XCTAssertEqualSequences(destination, "abc1256hijklm")
-    XCTAssertEqualSequences(destination[3..<7][result6.copyStart...],
-                            source3[..<result6.sourceTailStart])
-
-    let source4 = "NOP", result7 = destination[3..<7].overwrite(backwards: source4)
-    XCTAssertEqual(result7.writtenStart, 4)
-    XCTAssertEqual(result7.readStart, source4.startIndex)
-    XCTAssertEqualSequences(destination, "abc1NOPhijklm")
-    XCTAssertEqualSequences(destination[3..<7][result7.writtenStart...],
-                            source4[result7.readStart...])
+    let source8d = "NOPQRST"
+    let (sStart8d, dStart8d) = destination8[3..<7]
+      .overwrite(backwardsWith: source8d)
+    XCTAssertEqual(sStart8d, source8d.index(source8d.endIndex, offsetBy: -4))
+    XCTAssertEqual(dStart8d, 3)
+    XCTAssertEqualSequences(destination8, "abcQRSThijklm")
+    XCTAssertEqualSequences(source8d[..<sStart8d], "NOP")
+    XCTAssertEqualSequences(source8d[sStart8d...], destination8[dStart8d..<7])
   }
 
   /// Test forward copying within a collection.
