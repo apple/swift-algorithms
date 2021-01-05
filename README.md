@@ -39,6 +39,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 - [`trimming(where:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Trim.md): Returns a slice by trimming elements from a collection's start and end. 
 - [`slidingWindows(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SlidingWindows.md): Breaks a collection into overlapping contiguous window subsequences where elements are slices from the original collection.
 - [`striding(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Stride.md): Returns every nth element of a collection.
+- [`lastIndexAsRange(where:)`, `lastIndexAsRange(of:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/LastIndex.md): Returns an optional range, containing the last index of a matching element in the bidirectional collection.
 
 ## Adding Swift Algorithms as a Dependency
 
