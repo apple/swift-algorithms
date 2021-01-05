@@ -45,7 +45,7 @@ public struct Combinations<Base: Collection> {
   internal init<R: RangeExpression>(
     _ base: Base, k: R
   ) where R.Bound == Int {
-    let range = k.relative(to: R.Bound.zero..<R.Bound.max)
+    let range = k.relative(to: 0 ..< .max)
     self.base = base
     let upperBound = base.count + 1
     self.k = range.lowerBound < upperBound
