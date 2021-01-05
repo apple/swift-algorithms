@@ -122,7 +122,7 @@ extension Combinations: Sequence {
     internal mutating func advance() {
       /// Advances `k` by increasing its `lowerBound` or finishes the iteration.
       func advanceK() {
-        let advancedLowerBound = k.lowerBound.advanced(by: 1)
+        let advancedLowerBound = k.lowerBound + 1
         if advancedLowerBound < k.upperBound {
           k = advancedLowerBound..<k.upperBound
           self.indexes = Array(base.indices.prefix(k.lowerBound))
