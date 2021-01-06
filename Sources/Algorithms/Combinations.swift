@@ -18,13 +18,13 @@ public struct Combinations<Base: Collection> {
   /// - Note: This may be `nil` if the attempted range entirely exceeds the
   /// upper bounds of the size of the `base` collection.
   @usableFromInline
-  internal let k: Range<Int>?
+  internal let kRange: Range<Int>?
   
   /// Initializes a `Combinations` for all combinations of `base` of all sizes.
   /// - Parameter base: The collection to iterate over for combinations.
   @usableFromInline
   internal init(_ base: Base) {
-    self.init(base, k: 0...)
+    self.init(base, kRange: 0...)
   }
   
   /// Initializes a `Combinations` for all combinations of `base` of size `k`.
@@ -33,22 +33,22 @@ public struct Combinations<Base: Collection> {
   ///   - k: The expected size of each combination.
   @usableFromInline
   internal init(_ base: Base, k: Int) {
-    self.init(base, k: k...k)
+    self.init(base, kRange: k...k)
   }
   
   /// Initializes a `Combinations` for all combinations of `base` of sizes
   /// within a given range.
   /// - Parameters:
   ///   - base: The collection to iterate over for combinations.
-  ///   - k: The range of accepted sizes of combinations.
+  ///   - kRange: The range of accepted sizes of combinations.
   @usableFromInline
   internal init<R: RangeExpression>(
-    _ base: Base, k: R
+    _ base: Base, kRange: R
   ) where R.Bound == Int {
-    let range = k.relative(to: 0 ..< .max)
+    let range = kRange.relative(to: 0 ..< .max)
     self.base = base
     let upperBound = base.count + 1
-    self.k = range.lowerBound < upperBound
+    self.kRange = range.lowerBound < upperBound
       ? range.clamped(to: 0..<upperBound)
       : nil
   }
@@ -56,7 +56,7 @@ public struct Combinations<Base: Collection> {
   /// The total number of combinations.
   @inlinable
   public var count: Int {
-    guard let k = self.k else { return 0 }
+    guard let k = self.kRange else { return 0 }
     let n = base.count
     if k == 0..<(n + 1) {
       return 1 << n
@@ -84,20 +84,25 @@ extension Combinations: Sequence {
     internal let base: Base
     
     /// The current range of accepted sizes of combinations.
+    /// - Note: The range is contracted until empty while iterating over
+    /// combinations of different sizes. When the range is empty, iteration is
+    /// finished.
     @usableFromInline
-    internal var k: Range<Int>
+    internal var kRange: Range<Int>
+    
+    /// Whether or not iteration is finished (`kRange` is empty)
+    @usableFromInline
+    internal var isFinished: Bool {
+      return kRange.isEmpty
+    }
     
     @usableFromInline
     internal var indexes: [Base.Index]
     
-    @usableFromInline
-    internal var finished: Bool
-    
     internal init(_ combinations: Combinations) {
       self.base = combinations.base
-      self.k = combinations.k ?? 0..<1
-      self.indexes = Array(combinations.base.indices.prefix(k.lowerBound))
-      self.finished = (combinations.k == nil)
+      self.kRange = combinations.kRange ?? 0..<0
+      self.indexes = Array(combinations.base.indices.prefix(kRange.lowerBound))
     }
     
     /// Advances the current indices to the next set of combinations. If
@@ -120,14 +125,13 @@ extension Combinations: Sequence {
     ///     // so the iteration is finished.
     @usableFromInline
     internal mutating func advance() {
-      /// Advances `k` by increasing its `lowerBound` or finishes the iteration.
-      func advanceK() {
-        let advancedLowerBound = k.lowerBound + 1
-        if advancedLowerBound < k.upperBound {
-          k = advancedLowerBound..<k.upperBound
-          self.indexes = Array(base.indices.prefix(k.lowerBound))
-        } else {
-          finished = true
+      /// Advances `kRange` by incrementing its `lowerBound` until the range is
+      /// empty, when iteration is finished.
+      func advanceKRange() {
+        if kRange.lowerBound < kRange.upperBound {
+          let advancedLowerBound = kRange.lowerBound + 1
+          kRange = advancedLowerBound..<kRange.upperBound
+          self.indexes = Array(base.indices.prefix(kRange.lowerBound))
         }
       }
       
@@ -135,7 +139,7 @@ extension Combinations: Sequence {
         // Initial state for combinations of 0 elements is an empty array with
         // `finished == false`. Even though no indexes are involved, advancing
         // from that state means we are finished with iterating.
-        advanceK()
+        advanceKRange()
         return
       }
       
@@ -148,7 +152,7 @@ extension Combinations: Sequence {
         j -= 1
         guard j >= 0 else {
           // Finished iterating over combinations of this size.
-          advanceK()
+          advanceKRange()
           return
         }
         
@@ -164,7 +168,7 @@ extension Combinations: Sequence {
     
     @inlinable
     public mutating func next() -> [Base.Element]? {
-      if finished { return nil }
+      guard !isFinished else { return nil }
       defer { advance() }
       return indexes.map { i in base[i] }
     }
@@ -256,19 +260,19 @@ extension Collection {
   /// at `[0]`, `[1]`, `[2]`, `[3]`, `[0, 1]`, `[0, 2]`, `[0, 3]`, `[1, 2]`,
   /// `[1, 3]`, and finally `[2, 3]`.
   ///
-  /// If `k` is `0...0`, the resulting sequence has exactly one element, an
+  /// If `kRange` is `0...0`, the resulting sequence has exactly one element, an
   /// empty array. If `k.upperBound` is greater than the number of elements in
   /// this sequence, the resulting sequence has no elements.
   ///
-  /// - Parameter k: The range of numbers of elements to include in each
+  /// - Parameter kRange: The range of numbers of elements to include in each
   /// combination.
   ///
   /// - Complexity: O(1)
   @inlinable
   public func combinations<R: RangeExpression>(
-    ofCounts k: R
+    ofCounts kRange: R
   ) -> Combinations<Self> where R.Bound == Int {
-    return Combinations(self, k: k)
+    return Combinations(self, kRange: kRange)
   }
 }
 
