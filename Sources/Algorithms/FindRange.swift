@@ -86,22 +86,6 @@ extension SubSequenceFinder: Collection {
   }
 }
 
-extension SubSequenceFinder: BidirectionalCollection
-  where Base: BidirectionalCollection, Other: BidirectionalCollection
-{
-  public func index(before i: Index) -> Index {
-    let endingPoint: Base.Index
-    switch i.base {
-    case .match(let range):
-      precondition(range != firstRange, "Can't move before startIndex")
-      endingPoint = base.index(before: range.upperBound)
-    case .end:
-      endingPoint = base.endIndex
-    }
-    return Index(base[..<endingPoint].lastRange(of: other)!)
-  }
-}
-
 extension Collection where Element: Equatable {
   public func firstRange<Other: Collection>(of other: Other) -> Range<Index>?
     where Other.Element == Element
@@ -175,3 +159,136 @@ extension BidirectionalCollection where Element: Equatable {
     return nil
   }
 }
+
+
+public struct SubSequenceFinderFromEnd<Base: BidirectionalCollection, Other: BidirectionalCollection>
+  where Base.Element == Other.Element, Base.Element: Equatable
+{
+  internal var base: Base
+  internal var other: Other
+  internal var lastRange: Range<Base.Index>?
+  
+  internal init(base: Base, other: Other, allowingOverlaps: Bool) {
+    self.base = base
+    self.other = other
+    self.lastRange = base.lastRange(of: other)
+  }
+}
+
+extension SubSequenceFinderFromEnd: Collection {
+  public struct Index: Comparable {
+    internal enum Representation: Comparable {
+      case match(Range<Base.Index>)
+      case end
+      
+      public static func < (lhs: Representation, rhs: Representation) -> Bool {
+        switch (lhs, rhs) {
+        case (.match, .end):
+          return true
+        case (.end, _):
+          return false
+        case (.match(let lhs), .match(let rhs)):
+          return lhs.lowerBound > rhs.lowerBound
+        }
+      }
+    }
+    
+    internal var base: Representation
+    
+    internal static var end: Index {
+      Index(base: .end)
+    }
+    
+    private init(base: Representation) {
+      self.base = base
+    }
+    
+    internal init(_ range: Range<Base.Index>) {
+      self.base = .match(range)
+    }
+    
+    public static func < (lhs: Index, rhs: Index) -> Bool {
+      lhs.base < rhs.base
+    }
+  }
+  
+  public var startIndex: Index {
+    lastRange.map { Index($0) } ?? .end
+  }
+  
+  public var endIndex: Index {
+    .end
+  }
+  
+  public func index(after i: Index) -> Index {
+    guard case .match(let range) = i.base else {
+      preconditionFailure("Can't advance past endIndex")
+    }
+    return base[..<range.lowerBound]
+      .lastRange(of: other)
+      .map { Index($0) } ?? .end
+  }
+  
+  public subscript(position: Index) -> Range<Base.Index> {
+    guard case .match(let range) = position.base else {
+      preconditionFailure("Can't subscript with endIndex")
+    }
+    return range
+  }
+}
+
+public protocol CollectionOfRanges: Collection where
+  Element == Range<Bound>
+{
+  associatedtype Bound: Comparable
+  associatedtype AscendingRangeCollection: Collection
+    where AscendingRangeCollection.Element == Element
+  
+  func ascendingRanges() -> AscendingRangeCollection
+}
+
+extension CollectionOfRanges where Element == Range<Bound> {
+  public func ascendingRanges() -> [Range<Bound>] {
+    sorted(by: { $0.lowerBound < $1.lowerBound })
+  }
+}
+
+extension CollectionOfRanges where AscendingRangeCollection == Self {
+  public func ascendingRanges() -> Self {
+    self
+  }
+}
+
+extension SubSequenceFinder: CollectionOfRanges {
+  public typealias Bound = Base.Index
+  public typealias AscendingRangeCollection = Self
+}
+
+extension SubSequenceFinderFromEnd: CollectionOfRanges {
+  public typealias Bound = Base.Index
+  public typealias AscendingRangeCollection = [Range<Base.Index>]
+  
+  public func ascendingRanges() -> [Range<Base.Index>] {
+    self.reversed()
+  }
+}
+
+extension Slice: CollectionOfRanges where Base: CollectionOfRanges {
+  public typealias Bound = Base.Bound
+  public typealias AscendingRangeCollection = [Range<Base.Bound>]
+}
+
+extension ReversedCollection: CollectionOfRanges
+  where Base: CollectionOfRanges,
+        Base.AscendingRangeCollection: BidirectionalCollection
+{
+  public typealias Bound = Base.Bound
+  public typealias AscendingRangeCollection = ReversedCollection<Base.AscendingRangeCollection>
+  
+  public func ascendingRanges() -> ReversedCollection<Base.AscendingRangeCollection> {
+    // base.ascendingRanges().reversed()
+    fatalError()
+  }
+}
+
+extension LazyF

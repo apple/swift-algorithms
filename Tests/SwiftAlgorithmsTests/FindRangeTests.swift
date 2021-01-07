@@ -72,18 +72,13 @@ final class FindTests: XCTestCase {
     XCTAssertEqualSequences(
       input.allRanges(of: "ababa"),
       [input.range(at: 0..<5), input.range(at: 2..<7)])
-    XCTAssertEqual(input.allRanges(of: "ababa").last, input.range(at: 2..<7))
     XCTAssertEqualSequences(
       input.allRanges(of: "aaba"),
       [input.range(at: 6..<10), input.range(at: 9..<13)])
     XCTAssertEqualSequences(
       input.allRanges(of: "aaba").reversed(),
       [input.range(at: 9..<13), input.range(at: 6..<10)])
-    XCTAssertEqual(input.allRanges(of: "aaba").last, input.range(at: 9..<13))
-  }
-  
-  func testCollectionConformance() {
-    let matches = input.allRanges(of: "ab")
-    validateIndexTraversals(matches)
+    
+    print(input.allRanges(of: "aaba").prefix(2))
   }
 }
