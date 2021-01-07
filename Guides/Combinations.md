@@ -37,7 +37,8 @@ for combo in numbers2.combinations(ofCount: 2) {
 ```
 
 The `combinations(ofCounts:)` method returns a sequence of all the different
-combinations of the given sizes of a collection’s elements in increasing order of size.
+combinations of the given sizes of a collection’s elements in increasing order
+of size.
 
 ```swift
 let numbers = [10, 20, 30, 40]
@@ -76,9 +77,9 @@ array at every index advancement. `Combinations` does conform to
 
 ### Complexity
 
-Calling `combinations(ofCount:)` accesses the count of the collection, so it’s an
-O(1) operation for random-access collections, or an O(_n_) operation otherwise.
-Creating the iterator for a `Combinations` instance and each call to
+Calling `combinations(ofCount:)` accesses the count of the collection, so it’s
+an O(1) operation for random-access collections, or an O(_n_) operation
+otherwise. Creating the iterator for a `Combinations` instance and each call to
 `Combinations.Iterator.next()` is an O(_n_) operation.
 
 ### Naming
