@@ -8,7 +8,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 #### Combinations / permutations
 
-- [`combinations(ofCount:)`, `combinations(ofCounts:)`, `combinations()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Combinations.md): Combinations of particular sizes of the elements in a collection.
+- [`combinations(ofCount:)`, `combinations(ofCounts:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Combinations.md): Combinations of particular sizes of the elements in a collection.
 - [`permutations(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Permutations.md): Permutations of a particular size of the elements in a collection, or of the full collection.
 
 #### Mutating algorithms

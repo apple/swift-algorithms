@@ -64,7 +64,7 @@ final class CombinationsTests: XCTestCase {
     let c14 = c.combinations(ofCounts: ...3).count
     XCTAssertEqual(c14, 15)
     
-    let c15 = c.combinations().count
+    let c15 = c.combinations(ofCounts: 0...).count
     XCTAssertEqual(c15, 16)
   }
   
@@ -89,7 +89,7 @@ final class CombinationsTests: XCTestCase {
     let c6 = c.combinations(ofCounts: 0...4)
     XCTAssertEqual(["", "A", "B", "C", "D", "AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD", "ABCD"], c6.map { String($0) })
     
-    let c7 = c.combinations()
+    let c7 = c.combinations(ofCounts: 0...)
     XCTAssertEqual(["", "A", "B", "C", "D", "AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABD", "ACD", "BCD", "ABCD"], c7.map { String($0) })
     
     let c8 = c.combinations(ofCounts: ...4)
@@ -121,6 +121,6 @@ final class CombinationsTests: XCTestCase {
     XCTAssertLazySequence("ABC".lazy.combinations(ofCounts: 1...3))
     XCTAssertLazySequence("ABC".lazy.combinations(ofCounts: 1...))
     XCTAssertLazySequence("ABC".lazy.combinations(ofCounts: ...3))
-    XCTAssertLazySequence("ABC".lazy.combinations())
+    XCTAssertLazySequence("ABC".lazy.combinations(ofCounts: 0...))
   }
 }

@@ -20,13 +20,6 @@ public struct Combinations<Base: Collection> {
   @usableFromInline
   internal let kRange: Range<Int>?
   
-  /// Initializes a `Combinations` for all combinations of `base` of all sizes.
-  /// - Parameter base: The collection to iterate over for combinations.
-  @usableFromInline
-  internal init(_ base: Base) {
-    self.init(base, kRange: 0...)
-  }
-  
   /// Initializes a `Combinations` for all combinations of `base` of size `k`.
   /// - Parameters:
   ///   - base: The collection to iterate over for combinations.
@@ -184,51 +177,6 @@ extension Combinations: Equatable where Base: Equatable {}
 extension Combinations: Hashable where Base: Hashable {}
 
 //===----------------------------------------------------------------------===//
-// combinations()
-//===----------------------------------------------------------------------===//
-
-extension Collection {
-  /// Returns a collection of all the combinations of this collection's
-  /// elements, including the full collection and an empty collection
-  ///
-  /// This example prints the all the combinations from an array of letters:
-  ///
-  ///     let letters = ["A", "B", "C", "D"]
-  ///     for combo in letters.combinations() {
-  ///         print(combo.joined(separator: ", "))
-  ///     }
-  ///     //
-  ///     // A
-  ///     // B
-  ///     // C
-  ///     // D
-  ///     // A, B
-  ///     // A, C
-  ///     // A, D
-  ///     // B, C
-  ///     // B, D
-  ///     // C, D
-  ///     // A, B, C
-  ///     // A, B, D
-  ///     // A, C, D
-  ///     // B, C, D
-  ///     // A, B, C, D
-  ///
-  /// The returned collection presents combinations in a consistent order, where
-  /// the indices in each combination are in ascending lexicographical order,
-  /// and the size of the combinations are in increasing order.
-  /// That is, in the example above, the combinations in order are the elements
-  /// at `[]`, `[0]`, `[1]`, `[2]`, `[3]`, `[0, 1]`, `[0, 2]`, `[0, 3]`,
-  /// `[1, 2]`, `[1, 3]`, … `[0, 1, 2, 3]`.
-  ///
-  /// - Complexity: O(1)
-  @inlinable
-  public func combinations() -> Combinations<Self> {
-    return Combinations(self)
-  }
-}
-
-//===----------------------------------------------------------------------===//
 // combinations(ofCounts:)
 //===----------------------------------------------------------------------===//
 
@@ -259,6 +207,30 @@ extension Collection {
   /// That is, in the example above, the combinations in order are the elements
   /// at `[0]`, `[1]`, `[2]`, `[3]`, `[0, 1]`, `[0, 2]`, `[0, 3]`, `[1, 2]`,
   /// `[1, 3]`, and finally `[2, 3]`.
+  ///
+  /// This example prints _all_ the combinations (including an empty array and
+  /// the original collection) from an array of numbers:
+  ///
+  ///     let numbers = [10, 20, 30, 40]
+  ///     for combo in numbers.combinations(ofCount: 0...) {
+  ///         print(combo)
+  ///     }
+  ///     // []
+  ///     // [10]
+  ///     // [20]
+  ///     // [30]
+  ///     // [40]
+  ///     // [10, 20]
+  ///     // [10, 30]
+  ///     // [10, 40]
+  ///     // [20, 30]
+  ///     // [20, 40]
+  ///     // [30, 40]
+  ///     // [10, 20, 30]
+  ///     // [10, 20, 40]
+  ///     // [10, 30, 40]
+  ///     // [20, 30, 40]
+  ///     // [10, 20, 30, 40]
   ///
   /// If `kRange` is `0...0`, the resulting sequence has exactly one element, an
   /// empty array. If `k.upperBound` is greater than the number of elements in
