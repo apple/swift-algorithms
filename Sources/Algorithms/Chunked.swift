@@ -246,3 +246,177 @@ extension Collection {
     try chunked(on: projection, by: ==)
   }
 }
+
+//===----------------------------------------------------------------------===//
+// chunks(ofCount:)
+//===----------------------------------------------------------------------===//
+
+/// A collection that presents the elements of its base collection
+/// in `SubSequence` chunks of any given count.
+///
+/// A `ChunkedByCount` is a lazy view on the base Collection, but it does not implicitly confer
+/// laziness on algorithms applied to its result.  In other words, for ordinary collections `c`:
+///
+/// * `c.chunks(ofCount: 3)` does not create new storage
+/// * `c.chunks(ofCount: 3).map(f)` maps eagerly and returns a new array
+/// * `c.lazy.chunks(ofCount: 3).map(f)` maps lazily and returns a `LazyMapCollection`
+public struct ChunkedByCount<Base: Collection> {
+  
+  public typealias Element = Base.SubSequence
+  
+  @usableFromInline
+  internal let base: Base
+  
+  @usableFromInline
+  internal let chunkCount: Int
+  
+  @usableFromInline
+  internal var computedStartIndex: Index
+
+  ///  Creates a view instance that presents the elements of `base`
+  ///  in `SubSequence` chunks of the given count.
+  ///
+  /// - Complexity: O(n)
+  @inlinable
+  internal init(_base: Base, _chunkCount: Int) {
+    self.base = _base
+    self.chunkCount = _chunkCount
+    
+    // Compute the start index upfront in order to make
+    // start index a O(1) lookup.
+    let baseEnd = _base.index(
+      _base.startIndex, offsetBy: _chunkCount,
+      limitedBy: _base.endIndex
+    ) ?? _base.endIndex
+    
+    self.computedStartIndex =
+      Index(_baseRange: _base.startIndex..<baseEnd)
+  }
+}
+
+extension ChunkedByCount: Collection {
+  public struct Index {
+    @usableFromInline
+    internal let baseRange: Range<Base.Index>
+    
+    @usableFromInline
+    internal init(_baseRange: Range<Base.Index>) {
+      self.baseRange = _baseRange
+    }
+  }
+
+  /// - Complexity: O(n)
+  public var startIndex: Index { computedStartIndex }
+  public var endIndex: Index {
+    Index(_baseRange: base.endIndex..<base.endIndex)
+  }
+  
+  /// - Complexity: O(n)
+  public subscript(i: Index) -> Element {
+    base[i.baseRange]
+  }
+  
+  @inlinable
+  public func index(after i: Index) -> Index {
+    let baseIdx = base.index(
+      i.baseRange.upperBound, offsetBy: chunkCount,
+      limitedBy: base.endIndex
+    ) ?? base.endIndex
+    return Index(_baseRange: i.baseRange.upperBound..<baseIdx)
+  }
+}
+
+extension ChunkedByCount.Index: Comparable {
+  @inlinable
+  public static func < (lhs: ChunkedByCount.Index,
+                        rhs: ChunkedByCount.Index) -> Bool {
+    lhs.baseRange.lowerBound < rhs.baseRange.lowerBound
+  }
+}
+
+extension ChunkedByCount:
+  BidirectionalCollection, RandomAccessCollection
+where Base: RandomAccessCollection {
+  @inlinable
+  public func index(before i: Index) -> Index {
+    var offset = chunkCount
+    if i.baseRange.lowerBound == base.endIndex {
+      let remainder = base.count%chunkCount
+      if remainder != 0 {
+        offset = remainder
+      }
+    }
+    
+    let baseIdx = base.index(
+      i.baseRange.lowerBound, offsetBy: -offset,
+      limitedBy: base.startIndex
+    ) ?? base.startIndex
+    return Index(_baseRange: baseIdx..<i.baseRange.lowerBound)
+  }
+  
+  @inlinable
+  public func distance(from start: Index, to end: Index) -> Int {
+    let distance =
+      base.distance(from: start.baseRange.lowerBound,
+                    to: end.baseRange.lowerBound)
+    let (quotient, remainder) =
+      distance.quotientAndRemainder(dividingBy: chunkCount)
+    // Increment should account for negative distances.
+    if remainder < 0 {
+      return quotient - 1
+    }
+    return quotient + (remainder == 0 ? 0 : 1)
+  }
+
+  @inlinable
+  public var count: Int {
+    let (quotient, remainder) =
+      base.count.quotientAndRemainder(dividingBy: chunkCount)
+    return quotient + (remainder == 0 ? 0 : 1)
+  }
+}
+
+extension Collection {
+  /// Returns a `ChunkedCollection<Self>` view presenting the elements
+  /// in chunks with count of the given count parameter.
+  ///
+  /// - Parameter size: The size of the chunks. If the count parameter
+  ///   is evenly divided by the count of the base `Collection` all the
+  ///   chunks will have the count equals to size.
+  ///   Otherwise, the last chunk will contain the remaining elements.
+  ///
+  ///     let c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  ///     print(c.chunks(ofCount: 5).map(Array.init))
+  ///     // [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+  ///
+  ///     print(c.chunks(ofCount: 3).map(Array.init))
+  ///     // [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
+  ///
+  /// - Complexity: O(1)
+  @inlinable
+  public func chunks(ofCount count: Int) -> ChunkedByCount<Self> {
+    precondition(count > 0, " Cannot chunk with count <= 0!")
+    return ChunkedByCount(_base: self, _chunkCount: count)
+  }
+}
+
+// Conditional conformances.
+extension ChunkedByCount: Equatable where Base: Equatable {}
+
+// Since we have another stored property of type `Index` on the
+// collection, synthetization of hashble conformace would require
+// a `Base.Index: Hashable` constraint, so we implement the hasher
+// only in terms of base. Since the computed index is based on it,
+// it should make a difference here.
+extension ChunkedByCount: Hashable where Base: Hashable {
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(base)
+  }
+}
+extension ChunkedByCount.Index: Hashable where Base.Index: Hashable {}
+
+// Lazy conditional conformance.
+extension ChunkedByCount: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
+extension ChunkedByCount: LazyCollectionProtocol
+  where Base: LazyCollectionProtocol {}
