@@ -113,11 +113,14 @@ final class ChunkedTests: XCTestCase {
     XCTAssertEqual([Int]().chunks(ofCount: 1).count, 0)
     XCTAssertEqual([Int]().chunks(ofCount: 5).count, 0)
 
-    let collection = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    XCTAssertEqual(collection.chunks(ofCount: 1).count, 10)
-    XCTAssertEqual(collection.chunks(ofCount: 3).count, 4)
-    XCTAssertEqual(collection.chunks(ofCount: 5).count, 2)
-    XCTAssertEqual(collection.chunks(ofCount: 11).count, 1)
+    let collection1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    XCTAssertEqual(collection1.chunks(ofCount: 1).count, 10)
+    XCTAssertEqual(collection1.chunks(ofCount: 3).count, 4)
+    XCTAssertEqual(collection1.chunks(ofCount: 5).count, 2)
+    XCTAssertEqual(collection1.chunks(ofCount: 11).count, 1)
+    
+    let collection2 = (1...50).map { $0 }
+    XCTAssertEqual(collection2.chunks(ofCount: 9).count, 6)
   }
 
   func testEmptyChunksTraversal() {

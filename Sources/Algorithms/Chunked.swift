@@ -313,11 +313,13 @@ extension ChunkedByCount: Collection {
   
   /// - Complexity: O(n)
   public subscript(i: Index) -> Element {
-    base[i.baseRange]
+    precondition(i < endIndex, "Index out of range")
+    return base[i.baseRange]
   }
   
   @inlinable
   public func index(after i: Index) -> Index {
+    precondition(i < endIndex, "Advancing past end index")
     let baseIdx = base.index(
       i.baseRange.upperBound, offsetBy: chunkCount,
       limitedBy: base.endIndex
@@ -339,6 +341,8 @@ extension ChunkedByCount:
 where Base: RandomAccessCollection {
   @inlinable
   public func index(before i: Index) -> Index {
+    precondition(i > startIndex, "Advancing past start index")
+    
     var offset = chunkCount
     if i.baseRange.lowerBound == base.endIndex {
       let remainder = base.count%chunkCount
@@ -354,6 +358,10 @@ where Base: RandomAccessCollection {
     return Index(_baseRange: baseIdx..<i.baseRange.lowerBound)
   }
   
+  // TODO: index(_:offsetBy:) and index(_:offsetBy:limitedBy:)
+}
+
+extension ChunkedByCount {
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     let distance =
@@ -361,18 +369,14 @@ where Base: RandomAccessCollection {
                     to: end.baseRange.lowerBound)
     let (quotient, remainder) =
       distance.quotientAndRemainder(dividingBy: chunkCount)
-    // Increment should account for negative distances.
-    if remainder < 0 {
-      return quotient - 1
-    }
-    return quotient + (remainder == 0 ? 0 : 1)
+    return quotient + remainder.signum()
   }
 
   @inlinable
   public var count: Int {
     let (quotient, remainder) =
       base.count.quotientAndRemainder(dividingBy: chunkCount)
-    return quotient + (remainder == 0 ? 0 : 1)
+    return quotient + remainder.signum()
   }
 }
 
@@ -404,10 +408,10 @@ extension Collection {
 extension ChunkedByCount: Equatable where Base: Equatable {}
 
 // Since we have another stored property of type `Index` on the
-// collection, synthetization of hashble conformace would require
+// collection, synthesis of `Hashble` conformace would require
 // a `Base.Index: Hashable` constraint, so we implement the hasher
-// only in terms of base. Since the computed index is based on it,
-// it should make a difference here.
+// only in terms of `base`. Since the computed index is based on it,
+// it should not make a difference here.
 extension ChunkedByCount: Hashable where Base: Hashable {
   public func hash(into hasher: inout Hasher) {
     hasher.combine(base)
