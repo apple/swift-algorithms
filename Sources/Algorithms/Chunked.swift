@@ -305,13 +305,15 @@ extension ChunkedByCount: Collection {
     }
   }
 
-  /// - Complexity: O(n)
+  /// - Complexity: O(1)
+  @inlinable
   public var startIndex: Index { computedStartIndex }
+  @inlinable
   public var endIndex: Index {
     Index(_baseRange: base.endIndex..<base.endIndex)
   }
   
-  /// - Complexity: O(n)
+  /// - Complexity: O(1)
   public subscript(i: Index) -> Element {
     precondition(i < endIndex, "Index out of range")
     return base[i.baseRange]
@@ -358,7 +360,81 @@ where Base: RandomAccessCollection {
     return Index(_baseRange: baseIdx..<i.baseRange.lowerBound)
   }
   
-  // TODO: index(_:offsetBy:) and index(_:offsetBy:limitedBy:)
+  @inlinable
+  public func index(
+    _ i: Index, offsetBy offset: Int, limitedBy limit: Index
+  ) -> Index? {
+    guard offset != 0 else { return i }
+    guard limit != i else { return nil }
+    
+    if offset > 0 {
+      guard limit <= i || distance(from: i, to: limit) >= offset else {
+        return nil
+      }
+      return offsetForward(i, offsetBy: offset)
+    } else {
+      guard limit >= i || distance(from: i, to: limit) <= offset else {
+        return nil
+      }
+      return offsetBackward(i, offsetBy: offset)
+    }
+  }
+
+  @inlinable
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    guard distance != 0 else { return i }
+    
+    return distance > 0
+        ? offsetForward(i, offsetBy: distance)
+        : offsetBackward(i, offsetBy: distance)
+  }
+  
+  @usableFromInline
+  internal func offsetForward(_ i: Index, offsetBy distance: Int) -> Index {
+    return makeOffsetIndex(
+      from: i, baseBound: base.endIndex, distance: distance
+    )
+  }
+  
+  @usableFromInline
+  internal func offsetBackward(_ i: Index, offsetBy n: Int) -> Index {
+    var idx = i
+    var distance = n
+    // If we know that the last chunk is the only one that can possible
+    // have a variadic count. So in order to simplify and avoid another
+    // calculation of offsets(that is already done at `index(before:)`)
+    // we just move one position already so the index can be calculated
+    // assuming all chunks have the same size.
+    if i.baseRange.lowerBound == base.endIndex {
+      formIndex(before: &idx)
+      distance += 1
+      // If the offset was simply one, we are done.
+      guard distance != 0 else {
+        return idx
+      }
+    }
+
+    return makeOffsetIndex(
+      from: idx, baseBound: base.startIndex, distance: distance
+    )
+  }
+  
+  // Helper to compute index(offsetBy:) index.
+  internal func makeOffsetIndex(
+    from i: Index, baseBound: Base.Index, distance: Int
+  ) -> Index {
+    let baseStartIdx = base.index(
+      i.baseRange.lowerBound, offsetBy: distance * chunkCount,
+      limitedBy: baseBound
+    ) ?? baseBound
+    
+    let baseEndIdx = base.index(
+      i.baseRange.lowerBound, offsetBy: (distance + 1) * chunkCount,
+      limitedBy: base.endIndex
+    ) ?? base.endIndex
+    
+    return Index(_baseRange: baseStartIdx..<baseEndIdx)
+  }
 }
 
 extension ChunkedByCount {
@@ -399,7 +475,7 @@ extension Collection {
   /// - Complexity: O(1)
   @inlinable
   public func chunks(ofCount count: Int) -> ChunkedByCount<Self> {
-    precondition(count > 0, " Cannot chunk with count <= 0!")
+    precondition(count > 0, "Cannot chunk with count <= 0!")
     return ChunkedByCount(_base: self, _chunkCount: count)
   }
 }
