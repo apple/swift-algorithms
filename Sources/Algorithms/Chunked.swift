@@ -368,12 +368,12 @@ where Base: RandomAccessCollection {
     guard limit != i else { return nil }
     
     if offset > 0 {
-      guard limit <= i || distance(from: i, to: limit) >= offset else {
+      guard limit < i || distance(from: i, to: limit) >= offset else {
         return nil
       }
       return offsetForward(i, offsetBy: offset)
     } else {
-      guard limit >= i || distance(from: i, to: limit) <= offset else {
+      guard limit > i || distance(from: i, to: limit) <= offset else {
         return nil
       }
       return offsetBackward(i, offsetBy: offset)
@@ -397,14 +397,14 @@ where Base: RandomAccessCollection {
   }
   
   @usableFromInline
-  internal func offsetBackward(_ i: Index, offsetBy n: Int) -> Index {
+  internal func offsetBackward(_ i: Index, offsetBy distance: Int) -> Index {
     var idx = i
-    var distance = n
+    var distance = distance
     // If we know that the last chunk is the only one that can possible
     // have a variadic count. So in order to simplify and avoid another
     // calculation of offsets(that is already done at `index(before:)`)
     // we just move one position already so the index can be calculated
-    // assuming all chunks have the same size.
+    // since all remaining chunks have the same size.
     if i.baseRange.lowerBound == base.endIndex {
       formIndex(before: &idx)
       distance += 1
@@ -420,7 +420,8 @@ where Base: RandomAccessCollection {
   }
   
   // Helper to compute index(offsetBy:) index.
-  internal func makeOffsetIndex(
+  @inline(__always)
+  private func makeOffsetIndex(
     from i: Index, baseBound: Base.Index, distance: Int
   ) -> Index {
     let baseStartIdx = base.index(
