@@ -301,7 +301,9 @@ extension Collection {
   ///   If `k` is `nil`, the resulting sequence represents permutations of this
   ///   entire collection.
   ///
-  /// - Complexity: O(1)
+  /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
+  /// is the number of elements in the base collection, since `Permutations`
+  /// accesses the `count` of the base collection.
   @inlinable
   public func permutations(ofCount k: Int? = nil) -> Permutations<Self> {
     precondition(
