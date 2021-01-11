@@ -164,8 +164,8 @@ where Self: BidirectionalCollection, Element: Comparable
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @usableFromInline
   internal mutating func nextPermutation() -> Bool {
-    // ensure we have > 1 element in the collection
-    if isEmpty { return false }
+    // Ensure we have > 1 element in the collection.
+    guard !isEmpty else { return false }
     var i = index(before: endIndex)
     if i == startIndex { return false }
     
