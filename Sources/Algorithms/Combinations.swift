@@ -245,7 +245,9 @@ extension Collection {
   /// - Parameter kRange: The range of numbers of elements to include in each
   /// combination.
   ///
-  /// - Complexity: O(1)
+  /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
+  /// is the number of elements in the base collection, since `Combinations`
+  /// accesses the `count` of the base collection.
   @inlinable
   public func combinations<R: RangeExpression>(
     ofCount kRange: R
@@ -279,7 +281,9 @@ extension Collection {
   ///
   /// - Parameter k: The number of elements to include in each combination.
   ///
-  /// - Complexity: O(1)
+  /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
+  /// is the number of elements in the base collection, since `Combinations`
+  /// accesses the `count` of the base collection.
   @inlinable
   public func combinations(ofCount k: Int) -> Combinations<Self> {
     assert(k >= 0, "Can't have combinations with a negative number of elements.")
