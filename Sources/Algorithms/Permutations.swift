@@ -30,12 +30,13 @@ public struct Permutations<Base: Collection> {
       : 0
   }
 }
- 
+
 extension Permutations: Sequence {
   /// The iterator for a `Permutations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var base: Base
+    
     @usableFromInline
     internal var indexes: [Base.Index]
     @usableFromInline
@@ -83,28 +84,28 @@ extension Permutations: Sequence {
     @usableFromInline
     internal mutating func nextState() -> Bool {
       let edge = countToChoose - 1
-
+      
       // Find first index greater than the one at `edge`.
       if let i = indexes[countToChoose...].firstIndex(where: { indexes[edge] < $0 }) {
         indexes.swapAt(edge, i)
       } else {
-        indexes.reverse(subrange: countToChoose..<indexes.endIndex)
-
+        indexes.reverse(subrange: countToChoose ..< indexes.endIndex)
+        
         // Find last increasing pair below `edge`.
         // TODO: This could be indexes[..<edge].adjacentPairs().lastIndex(where: ...)
         var lastAscent = edge - 1
         while (lastAscent >= 0 && indexes[lastAscent] >= indexes[lastAscent + 1]) {
           lastAscent -= 1
         }
-        if (lastAscent < 0) {
+        if lastAscent < 0 {
           return false
         }
-
+        
         // Find rightmost index less than that at `lastAscent`.
         if let i = indexes[lastAscent...].lastIndex(where: { indexes[lastAscent] < $0 }) {
           indexes.swapAt(lastAscent, i)
         }
-        indexes.reverse(subrange: (lastAscent + 1)..<indexes.endIndex)
+        indexes.reverse(subrange: (lastAscent + 1) ..< indexes.endIndex)
       }
       
       return true
@@ -147,7 +148,7 @@ extension Permutations: LazySequenceProtocol where Base: LazySequenceProtocol {}
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection
-  where Self: BidirectionalCollection, Element: Comparable
+where Self: BidirectionalCollection, Element: Comparable
 {
   /// Permutes this collection's elements through all the lexical orderings.
   ///
@@ -178,7 +179,7 @@ extension MutableCollection
           formIndex(before: &j)
         }
         swapAt(i, j)
-        self.reverse(subrange: ip1..<endIndex)
+        self.reverse(subrange: ip1 ..< endIndex)
         return true
       }
       
