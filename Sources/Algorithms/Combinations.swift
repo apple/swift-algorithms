@@ -14,6 +14,9 @@ public struct Combinations<Base: Collection> {
   /// The collection to iterate over for combinations.
   public let base: Base
   
+  @usableFromInline
+  internal let baseCount: Int
+  
   /// The range of accepted sizes of combinations.
   /// - Note: This may be `nil` if the attempted range entirely exceeds the
   /// upper bounds of the size of the `base` collection.
@@ -40,9 +43,11 @@ public struct Combinations<Base: Collection> {
   ) where R.Bound == Int {
     let range = kRange.relative(to: 0 ..< .max)
     self.base = base
-    let upperBound = base.count + 1
+    let baseCount = base.count
+    self.baseCount = baseCount
+    let upperBound = baseCount + 1
     self.kRange = range.lowerBound < upperBound
-      ? range.clamped(to: 0..<upperBound)
+      ? range.clamped(to: 0 ..< upperBound)
       : nil
   }
   
@@ -50,8 +55,8 @@ public struct Combinations<Base: Collection> {
   @inlinable
   public var count: Int {
     guard let k = self.kRange else { return 0 }
-    let n = base.count
-    if k == 0..<(n + 1) {
+    let n = baseCount
+    if k == 0 ..< (n + 1) {
       return 1 << n
     }
     
@@ -123,7 +128,7 @@ extension Combinations: Sequence {
       func advanceKRange() {
         if kRange.lowerBound < kRange.upperBound {
           let advancedLowerBound = kRange.lowerBound + 1
-          kRange = advancedLowerBound..<kRange.upperBound
+          kRange = advancedLowerBound ..< kRange.upperBound
           indexes.removeAll(keepingCapacity: true)
           indexes.append(contentsOf: base.indices.prefix(kRange.lowerBound))
         }
