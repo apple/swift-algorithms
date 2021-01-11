@@ -60,6 +60,31 @@ for perm in numbers2.permutations() {
 // [10, 10, 20]
 ```
 
+Given a range, the `permutations(ofCount:)` method returns a sequence of all the different permutations of the given sizes of a collection’s elements in increasing order of size.
+
+```swift
+let numbers = [10, 20, 30]
+for perm in numbers.permutations(ofCount: 0...) {
+    print(perm)
+}
+// []
+// [10]
+// [20]
+// [30]
+// [10, 20]
+// [10, 30]
+// [20, 10]
+// [20, 30]
+// [30, 10]
+// [30, 20]
+// [10, 20, 30]
+// [10, 30, 20]
+// [20, 10, 30]
+// [20, 30, 10]
+// [30, 10, 20]
+// [30, 20, 10]
+```
+
 ## Detailed Design
 
 The `permutations(ofCount:)` method is declared as a `Collection` extension,
