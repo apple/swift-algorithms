@@ -11,7 +11,7 @@
 
 /// A sequence of all the permutations of a collection's elements.
 public struct Permutations<Base: Collection> {
-  /// The base collection.
+  /// The base collection to iterate over for permutations.
   public let base: Base
   
   internal let baseCount: Int
