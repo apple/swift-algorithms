@@ -124,7 +124,8 @@ extension Combinations: Sequence {
         if kRange.lowerBound < kRange.upperBound {
           let advancedLowerBound = kRange.lowerBound + 1
           kRange = advancedLowerBound..<kRange.upperBound
-          self.indexes = Array(base.indices.prefix(kRange.lowerBound))
+          indexes.removeAll(keepingCapacity: true)
+          indexes.append(contentsOf: base.indices.prefix(kRange.lowerBound))
         }
       }
       
