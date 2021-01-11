@@ -104,4 +104,101 @@ final class PermutationsTests: XCTestCase {
   func testPermutationsLazy() {
     XCTAssertLazySequence("ABCD".lazy.permutations(ofCount: 2))
   }
+  
+  func testDocumentationExample1() {
+    // From Guides/Permutations.md
+    let numbers = [10, 20, 30]
+    let permutations = numbers.permutations()
+    XCTAssertEqualSequences(permutations, [
+      [10, 20, 30],
+      [10, 30, 20],
+      [20, 10, 30],
+      [20, 30, 10],
+      [30, 10, 20],
+      [30, 20, 10],
+    ])
+  }
+  
+  func testDocumentationExample2() {
+    // From Guides/Permutations.md
+    let numbers = [10, 20, 30]
+    let permutations = numbers.permutations(ofCount: 2)
+    XCTAssertEqualSequences(permutations, [
+      [10, 20],
+      [10, 30],
+      [20, 10],
+      [20, 30],
+      [30, 10],
+      [30, 20],
+    ])
+  }
+  
+  func testDocumentationExample3() {
+    // From Guides/Permutations.md
+    let numbers2 = [20, 10, 10]
+    let permutations = numbers2.permutations()
+    XCTAssertEqualSequences(permutations, [
+      [20, 10, 10],
+      [20, 10, 10],
+      [10, 20, 10],
+      [10, 10, 20],
+      [10, 20, 10],
+      [10, 10, 20],
+    ])
+  }
+  
+  func testDocumentationExample4() {
+    // From Guides/Permutations.md
+    let numbers = [10, 20, 30]
+    let permutations = numbers.permutations(ofCount: 0...)
+    XCTAssertEqualSequences(permutations, [
+      [],
+      [10],
+      [20],
+      [30],
+      [10, 20],
+      [10, 30],
+      [20, 10],
+      [20, 30],
+      [30, 10],
+      [30, 20],
+      [10, 20, 30],
+      [10, 30, 20],
+      [20, 10, 30],
+      [20, 30, 10],
+      [30, 10, 20],
+      [30, 20, 10],
+    ])
+  }
+  
+  func testDocumentationExample5() {
+    // From Permutations.swift
+    let names = ["Alex", "Celeste", "Davide"]
+    let permutations = names.permutations(ofCount: 2)
+    XCTAssertEqualSequences(permutations, [
+      ["Alex", "Celeste"],
+      ["Alex", "Davide"],
+      ["Celeste", "Alex"],
+      ["Celeste", "Davide"],
+      ["Davide", "Alex"],
+      ["Davide", "Celeste"],
+    ])
+  }
+  
+  func testDocumentationExample6() {
+    // From Permutations.swift
+    let names = ["Alex", "Celeste", "Davide"]
+    let permutations = names.permutations(ofCount: 1...2)
+    XCTAssertEqualSequences(permutations, [
+      ["Alex"],
+      ["Celeste"],
+      ["Davide"],
+      ["Alex", "Celeste"],
+      ["Alex", "Davide"],
+      ["Celeste", "Alex"],
+      ["Celeste", "Davide"],
+      ["Davide", "Alex"],
+      ["Davide", "Celeste"],
+    ])
+  }
 }
