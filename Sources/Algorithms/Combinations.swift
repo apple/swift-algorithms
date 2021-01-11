@@ -239,8 +239,8 @@ extension Collection {
   ///     // [10, 20, 30, 40]
   ///
   /// If `kRange` is `0...0`, the resulting sequence has exactly one element, an
-  /// empty array. If `k.upperBound` is greater than the number of elements in
-  /// this sequence, the resulting sequence has no elements.
+  /// empty array. The given range is limited to `0...base.count`. If the
+  /// limited range is empty, the resulting sequence has no elements.
   ///
   /// - Parameter kRange: The range of numbers of elements to include in each
   /// combination.
