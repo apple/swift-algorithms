@@ -249,6 +249,55 @@ where Self: BidirectionalCollection, Element: Comparable
 //===----------------------------------------------------------------------===//
 
 extension Collection {
+  /// Returns a collection of the permutations of this collection with lengths
+  /// in the specified range.
+  ///
+  /// This example prints the different permutations of one to two elements from
+  /// an array of three names:
+  ///
+  ///     let names = ["Alex", "Celeste", "Davide"]
+  ///     for perm in names.permutations(ofCount: 1...2) {
+  ///         print(perm.joined(separator: ", "))
+  ///     }
+  ///     // Alex
+  ///     // Celeste
+  ///     // Davide
+  ///     // Alex, Celeste
+  ///     // Alex, Davide
+  ///     // Celeste, Alex
+  ///     // Celeste, Davide
+  ///     // Davide, Alex
+  ///     // Davide, Celeste
+  ///
+  /// This example prints _all_ the permutations (including an empty array) from
+  /// the an array of numbers:
+  ///
+  ///     let numbers = [10, 20, 30]
+  ///    for perm in numbers.permutations(ofCount: 0...) {
+  ///        print(perm)
+  ///    }
+  ///    // []
+  ///    // [10]
+  ///    // [20]
+  ///    // [30]
+  ///    // [10, 20]
+  ///    // [10, 30]
+  ///    // [20, 10]
+  ///    // [20, 30]
+  ///    // [30, 10]
+  ///    // [30, 20]
+  ///    // [10, 20, 30]
+  ///    // [10, 30, 20]
+  ///    // [20, 10, 30]
+  ///    // [20, 30, 10]
+  ///    // [30, 10, 20]
+  ///    // [30, 20, 10]
+  ///
+  /// - Parameter kRange: The number of elements to include in each permutation.
+  ///
+  /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
+  /// is the number of elements in the base collection, since `Permutations`
+  /// accesses the `count` of the base collection.
   @inlinable
   public func permutations<R: RangeExpression>(
     ofCount kRange: R
