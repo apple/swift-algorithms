@@ -177,7 +177,7 @@ extension Combinations: Equatable where Base: Equatable {}
 extension Combinations: Hashable where Base: Hashable {}
 
 //===----------------------------------------------------------------------===//
-// combinations(ofCounts:)
+// combinations(ofCount:)
 //===----------------------------------------------------------------------===//
 
 extension Collection {
@@ -188,7 +188,7 @@ extension Collection {
   /// four colors:
   ///
   ///     let colors = ["fuchsia", "cyan", "mauve", "magenta"]
-  ///     for combo in colors.combinations(ofCounts: 1...2) {
+  ///     for combo in colors.combinations(ofCount: 1...2) {
   ///         print(combo.joined(separator: ", "))
   ///     }
   ///     // fuchsia
@@ -242,17 +242,11 @@ extension Collection {
   /// - Complexity: O(1)
   @inlinable
   public func combinations<R: RangeExpression>(
-    ofCounts kRange: R
+    ofCount kRange: R
   ) -> Combinations<Self> where R.Bound == Int {
     return Combinations(self, kRange: kRange)
   }
-}
-
-//===----------------------------------------------------------------------===//
-// combinations(ofCount:)
-//===----------------------------------------------------------------------===//
-
-extension Collection {
+  
   /// Returns a collection of combinations of this collection's elements, with
   /// each combination having the specified number of elements.
   ///
