@@ -298,8 +298,8 @@ extension Collection {
   /// sequence, the resulting sequence has no elements.
   ///
   /// - Parameter k: The number of elements to include in each permutation.
-  ///   If `count` is `nil`, the resulting sequence represents permutations
-  ///   of this entire collection.
+  ///   If `k` is `nil`, the resulting sequence represents permutations of this
+  ///   entire collection.
   ///
   /// - Complexity: O(1)
   @inlinable
