@@ -144,7 +144,7 @@ extension Permutations: Sequence {
 extension Permutations: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
-// nextPermutation(by:)
+// nextPermutation()
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection
