@@ -99,7 +99,7 @@ Calling these methods is O(_k_), where _k_ is the length of the shorter
 The initial development version of this library used the term-of-art "`copy`"
 as the base name of this family of methods. But since the insertion-copying
 methods (in `RangeReplaceableCollection`) do not use the term, and the term is
-used for object copying in Foundation, a subsitute term was chosen here. The
+used for object copying in Foundation, a substitute term was chosen here. The
 term "`overwrite`" gives a precise description of the kind of copying employed.
 
 ### Comparison with other languages
