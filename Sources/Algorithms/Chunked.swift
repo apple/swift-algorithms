@@ -271,7 +271,7 @@ public struct ChunkedByCount<Base: Collection> {
   internal let chunkCount: Int
   
   @usableFromInline
-  internal var computedStartIndex: Index
+  internal var startUpperBound: Base.Index
 
   ///  Creates a view instance that presents the elements of `base`
   ///  in `SubSequence` chunks of the given count.
@@ -284,13 +284,10 @@ public struct ChunkedByCount<Base: Collection> {
     
     // Compute the start index upfront in order to make
     // start index a O(1) lookup.
-    let baseEnd = _base.index(
+    self.startUpperBound = _base.index(
       _base.startIndex, offsetBy: _chunkCount,
       limitedBy: _base.endIndex
     ) ?? _base.endIndex
-    
-    self.computedStartIndex =
-      Index(_baseRange: _base.startIndex..<baseEnd)
   }
 }
 
@@ -307,7 +304,9 @@ extension ChunkedByCount: Collection {
 
   /// - Complexity: O(1)
   @inlinable
-  public var startIndex: Index { computedStartIndex }
+  public var startIndex: Index {
+    Index(_baseRange: base.startIndex..<startUpperBound)
+  }
   @inlinable
   public var endIndex: Index {
     Index(_baseRange: base.endIndex..<base.endIndex)
@@ -331,6 +330,12 @@ extension ChunkedByCount: Collection {
 }
 
 extension ChunkedByCount.Index: Comparable {
+  @inlinable
+  public static func == (lhs: ChunkedByCount.Index,
+                         rhs: ChunkedByCount.Index) -> Bool {
+    lhs.baseRange.lowerBound == rhs.baseRange.lowerBound
+  }
+  
   @inlinable
   public static func < (lhs: ChunkedByCount.Index,
                         rhs: ChunkedByCount.Index) -> Bool {
@@ -358,6 +363,25 @@ where Base: RandomAccessCollection {
       limitedBy: base.startIndex
     ) ?? base.startIndex
     return Index(_baseRange: baseIdx..<i.baseRange.lowerBound)
+  }
+}
+
+extension ChunkedByCount {
+  @inlinable
+  public func distance(from start: Index, to end: Index) -> Int {
+    let distance =
+      base.distance(from: start.baseRange.lowerBound,
+                    to: end.baseRange.lowerBound)
+    let (quotient, remainder) =
+      distance.quotientAndRemainder(dividingBy: chunkCount)
+    return quotient + remainder.signum()
+  }
+
+  @inlinable
+  public var count: Int {
+    let (quotient, remainder) =
+      base.count.quotientAndRemainder(dividingBy: chunkCount)
+    return quotient + remainder.signum()
   }
   
   @inlinable
@@ -391,69 +415,48 @@ where Base: RandomAccessCollection {
   
   @usableFromInline
   internal func offsetForward(_ i: Index, offsetBy distance: Int) -> Index {
+    assert(distance > 0)
     return makeOffsetIndex(
-      from: i, baseBound: base.endIndex, distance: distance
+      from: i, baseBound: base.endIndex, baseDistance: distance * chunkCount
     )
   }
   
   @usableFromInline
   internal func offsetBackward(_ i: Index, offsetBy distance: Int) -> Index {
-    var idx = i
-    var distance = distance
-    // If we know that the last chunk is the only one that can possible
-    // have a variadic count. So in order to simplify and avoid another
-    // calculation of offsets(that is already done at `index(before:)`)
-    // we just move one position already so the index can be calculated
-    // since all remaining chunks have the same size.
+    assert(distance < 0)
     if i.baseRange.lowerBound == base.endIndex {
-      formIndex(before: &idx)
-      distance += 1
-      // If the offset was simply one, we are done.
-      guard distance != 0 else {
-        return idx
+      let remainder = base.count%chunkCount
+      // We have to take it into account when calculating offsets.
+      if remainder != 0 {
+        // Distance "minus" one(at this point distance is negative) because we
+        // need to adjust for the last position that have a variadic(remainder)
+        // number of elements.
+        let baseDistance = ((distance + 1) * chunkCount) - remainder
+        return makeOffsetIndex(
+          from: i, baseBound: base.startIndex, baseDistance: baseDistance
+        )
       }
     }
-
     return makeOffsetIndex(
-      from: idx, baseBound: base.startIndex, distance: distance
+      from: i, baseBound: base.startIndex, baseDistance: distance * chunkCount
     )
   }
   
   // Helper to compute index(offsetBy:) index.
   @inline(__always)
   private func makeOffsetIndex(
-    from i: Index, baseBound: Base.Index, distance: Int
+    from i: Index, baseBound: Base.Index, baseDistance: Int
   ) -> Index {
     let baseStartIdx = base.index(
-      i.baseRange.lowerBound, offsetBy: distance * chunkCount,
+      i.baseRange.lowerBound, offsetBy: baseDistance,
       limitedBy: baseBound
     ) ?? baseBound
     
     let baseEndIdx = base.index(
-      i.baseRange.lowerBound, offsetBy: (distance + 1) * chunkCount,
-      limitedBy: base.endIndex
+      baseStartIdx, offsetBy: chunkCount, limitedBy: base.endIndex
     ) ?? base.endIndex
     
     return Index(_baseRange: baseStartIdx..<baseEndIdx)
-  }
-}
-
-extension ChunkedByCount {
-  @inlinable
-  public func distance(from start: Index, to end: Index) -> Int {
-    let distance =
-      base.distance(from: start.baseRange.lowerBound,
-                    to: end.baseRange.lowerBound)
-    let (quotient, remainder) =
-      distance.quotientAndRemainder(dividingBy: chunkCount)
-    return quotient + remainder.signum()
-  }
-
-  @inlinable
-  public var count: Int {
-    let (quotient, remainder) =
-      base.count.quotientAndRemainder(dividingBy: chunkCount)
-    return quotient + remainder.signum()
   }
 }
 
