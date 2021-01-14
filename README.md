@@ -38,7 +38,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 - [`indexed()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Indexed.md): Iterate over tuples of a collection's indices and elements. 
 - [`trimming(where:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Trim.md): Returns a slice by trimming elements from a collection's start and end. 
 - [`slidingWindows(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SlidingWindows.md): Breaks a collection into overlapping contiguous window subsequences where elements are slices from the original collection.
-- [`striding(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Stride.md): Safely and efficiently operate over every `nth` element of a collection.
+- [`striding(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Stride.md): Returns every nth element of a collection.
 
 ## Adding Swift Algorithms as a Dependency
 
