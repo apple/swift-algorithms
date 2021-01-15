@@ -392,15 +392,13 @@ extension ChunkedByCount {
     guard limit != i else { return nil }
     
     if offset > 0 {
-      guard limit < i || distance(from: i, to: limit) >= offset else {
-        return nil
-      }
-      return offsetForward(i, offsetBy: offset)
+      return limit > i
+        ? offsetForward(i, offsetBy: offset, limit: limit)
+        : offsetForward(i, offsetBy: offset)
     } else {
-      guard limit > i || distance(from: i, to: limit) <= offset else {
-        return nil
-      }
-      return offsetBackward(i, offsetBy: offset)
+      return limit < i
+        ? offsetBackward(i, offsetBy: offset, limit: limit)
+        : offsetBackward(i, offsetBy: offset)
     }
   }
 
@@ -408,50 +406,98 @@ extension ChunkedByCount {
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     guard distance != 0 else { return i }
     
-    return distance > 0
+    let idx = distance > 0
         ? offsetForward(i, offsetBy: distance)
         : offsetBackward(i, offsetBy: distance)
+    guard let index = idx else {
+      fatalError("Out of bounds")
+    }
+    return index
   }
   
   @usableFromInline
-  internal func offsetForward(_ i: Index, offsetBy distance: Int) -> Index {
+  internal func offsetForward(
+    _ i: Index, offsetBy distance: Int, limit: Index? = nil
+  ) -> Index? {
     assert(distance > 0)
+
     return makeOffsetIndex(
-      from: i, baseBound: base.endIndex, baseDistance: distance * chunkCount
+      from: i, baseBound: base.endIndex,
+      distance: distance, baseDistance: distance * chunkCount,
+      limit: limit, by: >
     )
   }
   
-  @usableFromInline
-  internal func offsetBackward(_ i: Index, offsetBy distance: Int) -> Index {
-    assert(distance < 0)
-    if i.baseRange.lowerBound == base.endIndex {
+  // Convenience to compute offset backward base distance.
+  @inline(__always)
+  private func computeOffsetBackwardBaseDistance(
+    _ i: Index, _ distance: Int
+  ) -> Int {
+    if i == endIndex {
       let remainder = base.count%chunkCount
       // We have to take it into account when calculating offsets.
       if remainder != 0 {
-        // Distance "minus" one(at this point distance is negative) because we
-        // need to adjust for the last position that have a variadic(remainder)
-        // number of elements.
-        let baseDistance = ((distance + 1) * chunkCount) - remainder
-        return makeOffsetIndex(
-          from: i, baseBound: base.startIndex, baseDistance: baseDistance
-        )
+        // Distance "minus" one(at this point distance is negative)
+        // because we need to adjust for the last position that have
+        // a variadic(remainder) number of elements.
+        return ((distance + 1) * chunkCount) - remainder
       }
     }
+    return distance * chunkCount
+  }
+  
+  @usableFromInline
+  internal func offsetBackward(
+    _ i: Index, offsetBy distance: Int, limit: Index? = nil
+  ) -> Index? {
+    assert(distance < 0)
+    let baseDistance =
+        computeOffsetBackwardBaseDistance(i, distance)
     return makeOffsetIndex(
-      from: i, baseBound: base.startIndex, baseDistance: distance * chunkCount
+      from: i, baseBound: base.startIndex,
+      distance: distance, baseDistance: baseDistance,
+      limit: limit, by: <
     )
   }
   
   // Helper to compute index(offsetBy:) index.
   @inline(__always)
   private func makeOffsetIndex(
-    from i: Index, baseBound: Base.Index, baseDistance: Int
-  ) -> Index {
-    let baseStartIdx = base.index(
+    from i: Index, baseBound: Base.Index, distance: Int, baseDistance: Int,
+    limit: Index?, by limitFn: (Base.Index, Base.Index) -> Bool
+  ) -> Index? {
+    let baseIdx = base.index(
       i.baseRange.lowerBound, offsetBy: baseDistance,
       limitedBy: baseBound
-    ) ?? baseBound
+    )
     
+    if let limit = limit {
+      if baseIdx == nil {
+        // If we past the bounds while advancing forward and the
+        // limit is the `endIndex`, since the computation on base
+        // don't take into account the remainder, we have to make
+        // sure that passing the bound was because of the distance
+        // not just because of a remainder. Special casing is less
+        // expensive than always use count(which could be O(n) for
+        // non-random access collection base) to compute the base
+        // distance taking remainder into account.
+        if baseDistance > 0 && limit == endIndex {
+          if self.distance(from: i, to: limit) < distance {
+            return nil
+          }
+        } else {
+          return nil
+        }
+      }
+
+      // Checks for the limit.
+      let baseStartIdx = baseIdx ?? baseBound
+      if limitFn(baseStartIdx, limit.baseRange.lowerBound) {
+        return nil
+      }
+    }
+    
+    let baseStartIdx = baseIdx ?? baseBound
     let baseEndIdx = base.index(
       baseStartIdx, offsetBy: chunkCount, limitedBy: base.endIndex
     ) ?? base.endIndex
