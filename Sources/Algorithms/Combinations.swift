@@ -286,7 +286,7 @@ extension Collection {
   /// accesses the `count` of the base collection.
   @inlinable
   public func combinations(ofCount k: Int) -> Combinations<Self> {
-    assert(k >= 0, "Can't have combinations with a negative number of elements.")
+    precondition(k >= 0, "Can't have combinations with a negative number of elements.")
     return Combinations(self, k: k)
   }
 }

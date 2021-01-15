@@ -242,7 +242,7 @@ extension Collection {
   ///
   /// - Complexity: O(1)
   public func permutations(ofCount k: Int? = nil) -> Permutations<Self> {
-    assert(
+    precondition(
       k ?? 0 >= 0,
       "Can't have permutations with a negative number of elements.")
     return Permutations(self, k: k)
