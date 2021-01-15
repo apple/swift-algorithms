@@ -138,23 +138,11 @@ final class ChunkedTests: XCTestCase {
   }
   
   func testChunksOfCountTraversal() {
-    let collection = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    let chunks = collection.chunks(ofCount: 2)
-  
-    validateIndexTraversals(chunks)
-  }
-  
-  func testChunksOfCountWithSingleRemainderTraversal() {
-    let collection = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    let chunks = collection.chunks(ofCount: 3)
-  
-    validateIndexTraversals(chunks)
-  }
-  
-  func testChunksOfCountWithRemainder() {
-    let collection2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    let chunks = collection2.chunks(ofCount: 3)
-    
-    validateIndexTraversals(chunks)
+    for i in 1..<10 {
+      let collection = (1...50).map { $0 }
+      let chunks = collection.chunks(ofCount: i)
+      
+      validateIndexTraversals(chunks)
+    }
   }
 }
