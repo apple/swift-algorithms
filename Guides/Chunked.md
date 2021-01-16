@@ -4,7 +4,10 @@
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/ChunkedTests.swift)]
 
 Break a collection into subsequences where consecutive elements pass a binary
-predicate, or where all elements in each chunk project to the same value.
+predicate, or where all elements in each chunk project to the same value. 
+
+Also, includes a `chunks(ofCount:)` that breaks a collection into subsequences 
+of a given `count`.
 
 There are two variations of the `chunked` method: `chunked(by:)` and
 `chunked(on:)`. `chunked(by:)` uses a binary predicate to test consecutive
@@ -26,16 +29,31 @@ let chunks = names.chunked(on: \.first!)
 // [["David"], ["Kyle", "Karoy"], ["Nate"]] 
 ```
 
-These methods are related to the [existing SE proposal][proposal] for chunking a
-collection into subsequences of a particular size, potentially named something
-like `chunked(length:)`. Unlike the `split` family of methods, the entire
-collection is included in the chunked result — joining the resulting chunks
-recreates the original collection.
+The `chunks(ofCount:)` takes a `count` parameter (required to be > 0) and separates 
+the collection into `n` chunks of this given count. If the `count` parameter is 
+evenly divided by the count of the base `Collection` all the chunks will have 
+the count equals to the parameter. Otherwise, the last chunk will contain the 
+remaining elements.
+ 
+```swift
+let names = ["David", "Kyle", "Karoy", "Nate"]
+let evenly = names.chunks(ofCount: 2)
+// equivalent to [["David", "Kyle"], ["Karoy", "Nate"]] 
+
+let remaining = names.chunks(ofCount: 3)
+// equivalent to [["David", "Kyle", "Karoy"], ["Nate"]]
+```
+
+The `chunks(ofCount:)` is the method of the [existing SE proposal][proposal]. 
+Unlike the `split` family of methods, the entire collection is included in the
+chunked result — joining the resulting chunks recreates the original collection. 
 
 ```swift
 c.elementsEqual(c.chunked(...).joined())
 // true
 ```
+
+Check the [proposal][proposal] detailed design section for more info. 
 
 [proposal]: https://github.com/apple/swift-evolution/pull/935
 
