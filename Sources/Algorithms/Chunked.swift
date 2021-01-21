@@ -23,6 +23,10 @@ public struct LazyChunked<Base: Collection, Subject> {
   @usableFromInline
   internal let belongInSameGroup: (Subject, Subject) -> Bool
   
+  /// The upper bound of the first chunk.
+  @usableFromInline
+  internal var firstUpperBound: Base.Index
+  
   @usableFromInline
   internal init(
     base: Base,
@@ -32,46 +36,37 @@ public struct LazyChunked<Base: Collection, Subject> {
     self.base = base
     self.projection = projection
     self.belongInSameGroup = belongInSameGroup
+    self.firstUpperBound = base.startIndex
+    
+    if !base.isEmpty {
+      firstUpperBound = endOfChunk(startingAt: base.startIndex)
+    }
   }
 }
 
 extension LazyChunked: LazyCollectionProtocol {
   /// A position in a chunked collection.
   public struct Index: Comparable {
-    /// The lower bound of the chunk at this position.
+    /// The range corresponding to the chunk at this position.
     @usableFromInline
-    internal var lowerBound: Base.Index
-    
-    /// The upper bound of the chunk at this position.
-    ///
-    /// `upperBound` is optional so that computing `startIndex` can be an O(1)
-    /// operation. When `upperBound` is `nil`, the actual upper bound is found
-    /// when subscripting or calling `index(after:)`.
-    @usableFromInline
-    internal var upperBound: Base.Index?
+    internal var baseRange: Range<Base.Index>
     
     @usableFromInline
-    internal init(lowerBound: Base.Index, upperBound: Base.Index? = nil) {
-      self.lowerBound = lowerBound
-      self.upperBound = upperBound
+    internal init(_ baseRange: Range<Base.Index>) {
+      self.baseRange = baseRange
     }
     
     @inlinable
     public static func == (lhs: Index, rhs: Index) -> Bool {
-      // Only use the lower bound to test for equality, since sometimes the
-      // `startIndex` will have an upper bound of `nil` and sometimes it won't,
-      // such as when retrieved by:
-      // `c.index(before: c.index(after: c.startIndex))`.
-      //
       // Since each index represents the range of a disparate chunk, no two
       // unique indices will have the same lower bound.
-      lhs.lowerBound == rhs.lowerBound
+      lhs.baseRange.lowerBound == rhs.baseRange.lowerBound
     }
     
     @inlinable
     public static func < (lhs: Index, rhs: Index) -> Bool {
       // Only use the lower bound to test for ordering, as above.
-      lhs.lowerBound < rhs.lowerBound
+      lhs.baseRange.lowerBound < rhs.baseRange.lowerBound
     }
   }
 
@@ -87,28 +82,27 @@ extension LazyChunked: LazyCollectionProtocol {
   
   @inlinable
   public var startIndex: Index {
-    Index(lowerBound: base.startIndex)
+    Index(base.startIndex..<firstUpperBound)
   }
   
   @inlinable
   public var endIndex: Index {
-    Index(lowerBound: base.endIndex)
+    Index(base.endIndex..<base.endIndex)
   }
   
   @inlinable
   public func index(after i: Index) -> Index {
     precondition(i != endIndex, "Can't advance past endIndex")
-    let upperBound = i.upperBound ?? endOfChunk(startingAt: i.lowerBound)
+    let upperBound = i.baseRange.upperBound
     guard upperBound != base.endIndex else { return endIndex }
     let end = endOfChunk(startingAt: upperBound)
-    return Index(lowerBound: upperBound, upperBound: end)
+    return Index(upperBound..<end)
   }
   
   @inlinable
   public subscript(position: Index) -> Base.SubSequence {
-    let upperBound = position.upperBound
-      ?? endOfChunk(startingAt: position.lowerBound)
-    return base[position.lowerBound..<upperBound]
+    precondition(position != endIndex, "Can't subscript using endIndex")
+    return base[position.baseRange]
   }
 }
 
@@ -144,8 +138,8 @@ extension LazyChunked: BidirectionalCollection
   @inlinable
   public func index(before i: Index) -> Index {
     precondition(i != startIndex, "Can't advance before startIndex")
-    let start = startOfChunk(endingAt: i.lowerBound)
-    return Index(lowerBound: start, upperBound: i.lowerBound)
+    let start = startOfChunk(endingAt: i.baseRange.lowerBound)
+    return Index(start..<i.baseRange.lowerBound)
   }
 }
 
@@ -157,9 +151,7 @@ extension LazyCollectionProtocol {
   /// Returns a lazy collection of subsequences of this collection, chunked by
   /// the given predicate.
   ///
-  /// - Complexity: O(1). When iterating over the resulting collection,
-  ///   accessing each successive chunk has a complexity of O(*m*), where *m*
-  ///   is the length of the chunk.
+  /// - Complexity: O(*n*), because the start index is pre-computed.
   @inlinable
   public func chunked(
     by belongInSameGroup: @escaping (Element, Element) -> Bool
@@ -173,9 +165,7 @@ extension LazyCollectionProtocol {
   /// Returns a lazy collection of subsequences of this collection, chunked by
   /// grouping elements that project to the same value.
   ///
-  /// - Complexity: O(1). When iterating over the resulting collection,
-  ///   accessing each successive chunk has a complexity of O(*m*), where *m*
-  ///   is the length of the chunk.
+  /// - Complexity: O(*n*), because the start index is pre-computed.
   @inlinable
   public func chunked<Subject: Equatable>(
     on projection: @escaping (Element) -> Subject
@@ -276,7 +266,7 @@ public struct ChunkedByCount<Base: Collection> {
   ///  Creates a view instance that presents the elements of `base`
   ///  in `SubSequence` chunks of the given count.
   ///
-  /// - Complexity: O(n)
+  /// - Complexity: O(*n*), because the start index is pre-computed.
   @inlinable
   internal init(_base: Base, _chunkCount: Int) {
     self.base = _base
@@ -522,7 +512,7 @@ extension Collection {
   ///     print(c.chunks(ofCount: 3).map(Array.init))
   ///     // [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
   ///
-  /// - Complexity: O(1)
+  /// - Complexity: O(*n*), because the start index is pre-computed.
   @inlinable
   public func chunks(ofCount count: Int) -> ChunkedByCount<Self> {
     precondition(count > 0, "Cannot chunk with count <= 0!")
