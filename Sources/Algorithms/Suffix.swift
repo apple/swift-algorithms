@@ -31,7 +31,6 @@ extension BidirectionalCollection {
     while result != start {
       let previous = index(before: result)
       guard try predicate(self[previous]) else { break }
-
       result = previous
     }
     return self[result...]
