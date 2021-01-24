@@ -14,8 +14,8 @@
 //===----------------------------------------------------------------------===//
 
 extension BidirectionalCollection {
-  /// Returns a subsequence containing the elements from the end until `predicate`
-  /// returns `false` and skipping the remaining elements.
+  /// Returns a subsequence containing the elements from the end until
+  /// `predicate` returns `false` and skipping the remaining elements.
   ///
   /// - Parameter predicate: A closure that takes an element of the
   ///   sequence as its argument and returns `true` if the element should
