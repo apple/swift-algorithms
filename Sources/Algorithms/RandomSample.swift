@@ -87,14 +87,14 @@ extension Collection {
 internal func nextW<G: RandomNumberGenerator>(
   k: Int, using rng: inout G
 ) -> Double {
-  Double.root(.random(in: 0..<1, using: &rng), k)
+  Double.root(1 - .random(in: 0..<1, using: &rng), k)
 }
 
 @usableFromInline
 internal func nextOffset<G: RandomNumberGenerator>(
   w: Double, using rng: inout G
 ) -> Int {
-  Int(Double.log(.random(in: 0..<1, using: &rng)) / .log(1 - w))
+  Int(Double.log(1 - .random(in: 0..<1, using: &rng)) / .log(1 - w))
 }
 
 extension Collection {

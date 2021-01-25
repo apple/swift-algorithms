@@ -95,4 +95,9 @@ final class RandomSampleTests: XCTestCase {
     let sample2c = c.randomStableSample(count: k, using: &generator)
     XCTAssertEqual(sample1c, sample2c)
   }
+
+  func testRandomSampleZeroRandom() {
+    var generator = SplitMix64(seed: 0x61c8864680b583eb) // this seed starts with 0
+    _ = c.randomSample(count: k, using: &generator) // must not crash
+  }
 }
