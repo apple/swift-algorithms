@@ -17,10 +17,10 @@ final class UniqueTests: XCTestCase {
     let a = repeatElement(1...10, count: 15).joined().shuffled()
     let b = a.uniqued()
     XCTAssertEqual(b.sorted(), Set(a).sorted())
-    XCTAssertEqual(10, b.count)
+    XCTAssertEqual(10, Array(b).count)
     
     let c: [Int] = []
-    XCTAssertEqual(c.uniqued(), [])
+    XCTAssertEqualSequences(c.uniqued(), [])
   }
   
   func testUniqueOn() {
@@ -30,5 +30,15 @@ final class UniqueTests: XCTestCase {
     
     let c: [Int] = []
     XCTAssertEqual(c.uniqued(on: { $0.bitWidth }), [])
+  }
+  
+  func testLazyUniqueOn() {
+    let a = ["Albemarle", "Abeforth", "Astrology", "Brandywine", "Beatrice", "Axiom"]
+    let b = a.lazy.uniqued(on: { $0.first })
+    XCTAssertEqualSequences(b, ["Albemarle", "Brandywine"])
+    XCTAssertLazySequence(b)
+
+    let c: [Int] = []
+    XCTAssertEqualSequences(c.lazy.uniqued(on: { $0.bitWidth }), [])
   }
 }
