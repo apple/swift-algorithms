@@ -124,11 +124,11 @@ extension Product2: Collection where Base1: Collection {
     (base1[position.i1], base2[position.i2])
   }
   
-  /// Forms an index from a pair of base indices, converting
+  /// Forms an index from a pair of base indices, normalizing
   /// `(i, base2.endIndex)` to `(base1.index(after: i), base2.startIndex)` if
   /// necessary.
   @usableFromInline
-  internal func convertIndex(_ i1: Base1.Index, _ i2: Base2.Index) -> Index {
+  internal func normalizeIndex(_ i1: Base1.Index, _ i2: Base2.Index) -> Index {
     i2 == base2.endIndex
       ? Index(i1: base1.index(after: i1), i2: base2.startIndex)
       : Index(i1: i1, i2: i2)
@@ -137,7 +137,7 @@ extension Product2: Collection where Base1: Collection {
   @inlinable
   public func index(after i: Index) -> Index {
     precondition(i.i1 != base1.endIndex, "Can't advance past endIndex")
-    return convertIndex(i.i1, base2.index(after: i.i2))
+    return normalizeIndex(i.i1, base2.index(after: i.i2))
   }
   
   @inlinable
@@ -259,7 +259,7 @@ extension Product2: Collection where Base1: Collection {
       // i.i1 > [x x x|x x x x x x|x x x]
       //        [     |> > > > > >|     ]   (`distance`)
       
-      return convertIndex(i.i1, i2)
+      return normalizeIndex(i.i1, i2)
     }
     
     let suffixCount = base2[i.i2...].count
