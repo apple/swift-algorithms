@@ -79,7 +79,7 @@ extension Sequence where Element: Hashable {
   ///     print(Array(uniqued))
   ///     // Prints '["dog", "pig", "cat", "ox"]'
   ///
-  /// - Returns: An array with only the unique elements of this sequence.
+  /// - Returns: A sequence with only the unique elements of this sequence.
   ///  .
   /// - Complexity: O(1).
   @inlinable
@@ -131,7 +131,7 @@ extension Sequence {
 
 extension LazySequenceProtocol {
   /// Returns a lazy sequence with the unique elements of this sequence (as
-  /// determined by the given projection), in the order of the first occurence
+  /// determined by the given projection), in the order of the first occurrence
   /// of each unique element.
   ///
   /// - Complexity: O(1).
