@@ -7,8 +7,8 @@ Methods to strip repeated elements from a sequence or collection.
 
 The `uniqued()` method returns an array, dropping duplicate elements
 from a sequence. The `uniqued(on:)` method does the same, using 
-the result of the given closure to determine the "uniqueness" of each 
-element.
+the result of the given closure, or a key path, to determine the
+"uniqueness" of each element.
 
 ```swift
 let numbers = [1, 2, 3, 3, 2, 3, 3, 2, 2, 2, 1]
@@ -19,8 +19,8 @@ let unique = numbers.uniqued()
 
 ## Detailed Design
 
-Both methods are available for sequences, with the simplest limited to
-when the element type conforms to `Hashable`. Both methods preserve
+The three methods are available for sequences, with the simplest limited to
+when the element type conforms to `Hashable`. These methods preserve
 the relative order of the elements.
 
 ```swift
@@ -30,6 +30,11 @@ extension Sequence where Element: Hashable {
 
 extension Sequence {
     func uniqued<T>(on: (Element) throws -> T) rethrows -> [Element]
+        where T: Hashable
+}
+
+extension Sequence {
+    func uniqued<T>(on: KeyPath<Element, T>) rethrows -> [Element]
         where T: Hashable
 }
 ```

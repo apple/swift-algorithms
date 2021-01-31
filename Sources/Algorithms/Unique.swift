@@ -66,4 +66,38 @@ extension Sequence {
     }
     return result
   }
+
+  /// Returns an array with the unique elements of this sequence (as determined
+  /// by the given key path), in the order of the first occurrence of each
+  /// unique element.
+  ///
+  /// This example finds the elements of the `animals` array with unique
+  /// first characters:
+  ///
+  ///     let animals = ["dog", "pig", "cat", "ox", "cow", "owl"]
+  ///     let uniqued = animals.uniqued(on: \.first)
+  ///     print(uniqued)
+  ///     // Prints '["dog", "pig", "cat", "ox"]'
+  ///
+  /// - Parameter keyPath: A key path from a specific root type to a specific
+  ///   resulting value type.
+  ///
+  /// - Returns: An array with only the unique elements of this sequence, as
+  ///   determined by the key path of each element.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  @inlinable
+  public func uniqued<Subject: Hashable>(
+    on keyPath: KeyPath<Element, Subject>
+  ) -> [Element] {
+    var seen: Set<Subject> = []
+    var result: [Element] = []
+    for element in self {
+      let value = element[keyPath: keyPath]
+      if seen.insert(value).inserted {
+        result.append(element)
+      }
+    }
+    return result
+  }
 }

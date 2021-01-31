@@ -30,5 +30,8 @@ final class UniqueTests: XCTestCase {
     
     let c: [Int] = []
     XCTAssertEqual(c.uniqued(on: { $0.bitWidth }), [])
+
+    let d = a.uniqued(on: \.first)
+    XCTAssertEqual(["Albemarle", "Brandywine"], d)
   }
 }
