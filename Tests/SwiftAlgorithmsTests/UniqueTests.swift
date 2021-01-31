@@ -33,5 +33,8 @@ final class UniqueTests: XCTestCase {
 
     let d = a.uniqued(on: \.first)
     XCTAssertEqual(["Albemarle", "Brandywine"], d)
+
+    let e = a.uniqued(on: \.count)
+    XCTAssertEqual(["Albemarle", "Abeforth", "Brandywine", "Axiom"], e)
   }
 }
