@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
-import Algorithms
+@testable import Algorithms
 
 func validateRandomSamples<S: Sequence>(
   _ samples: [Int: Int],
@@ -96,8 +96,13 @@ final class RandomSampleTests: XCTestCase {
     XCTAssertEqual(sample1c, sample2c)
   }
 
-  func testRandomSampleZeroRandom() {
-    var generator = SplitMix64(seed: 0x61c8864680b583eb) // this seed starts with 0
-    _ = c.randomSample(count: k, using: &generator) // must not crash
+  func testRandomSampleRandomEdgeCasesInternal() {
+    struct ZeroGenerator: RandomNumberGenerator {
+      mutating func next() -> UInt64 { 0 }
+    }
+    var zero = ZeroGenerator()
+    XCTAssertGreaterThan(nextW(k: 1, using: &zero), 0)
+    XCTAssertGreaterThan(nextW(k: k, using: &zero), 0)
+    _ = nextOffset(w: 1, using: &zero) // must not crash
   }
 }
