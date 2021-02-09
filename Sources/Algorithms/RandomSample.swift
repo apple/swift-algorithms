@@ -202,10 +202,10 @@ extension Sequence {
       w *= nextW(k: k, using: &rng)
       
       // Find the offset of the next element to swap into the reservoir.
-      var offset = nextOffset(w: w, using: &rng) &+ 1
+      var offset = nextOffset(w: w, using: &rng)
       
-      // Skip over `offset - 1` elements to find the selected element.
-      while offset > 1, let _ = iterator.next() {
+      // Skip over `offset` elements to find the selected element.
+      while offset > 0, let _ = iterator.next() {
         offset -= 1
       }
       guard let nextElement = iterator.next() else { break }
