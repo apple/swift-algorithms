@@ -87,14 +87,15 @@ extension Collection {
 internal func nextW<G: RandomNumberGenerator>(
   k: Int, using rng: inout G
 ) -> Double {
-  Double.root(1 - .random(in: 0..<1, using: &rng), k)
+  Double.root(.random(in: 0..<1, using: &rng), k)
 }
 
 @usableFromInline
 internal func nextOffset<G: RandomNumberGenerator>(
   w: Double, using rng: inout G
 ) -> Int {
-  Int(Double.log(1 - .random(in: 0..<1, using: &rng)) / .log(1 - w))
+  let offset = Double.log(.random(in: 0..<1, using: &rng)) / .log(onePlus: -w)
+  return offset < Double(Int.max) ? Int(offset) : Int.max
 }
 
 extension Collection {
@@ -201,7 +202,7 @@ extension Sequence {
       w *= nextW(k: k, using: &rng)
       
       // Find the offset of the next element to swap into the reservoir.
-      var offset = nextOffset(w: w, using: &rng) + 1
+      var offset = nextOffset(w: w, using: &rng) &+ 1
       
       // Skip over `offset - 1` elements to find the selected element.
       while offset > 1, let _ = iterator.next() {

@@ -101,8 +101,26 @@ final class RandomSampleTests: XCTestCase {
       mutating func next() -> UInt64 { 0 }
     }
     var zero = ZeroGenerator()
-    XCTAssertGreaterThan(nextW(k: 1, using: &zero), 0)
-    XCTAssertGreaterThan(nextW(k: k, using: &zero), 0)
     _ = nextOffset(w: 1, using: &zero) // must not crash
+
+    struct AlmostAllZeroGenerator: RandomNumberGenerator {
+      private var forward: SplitMix64
+      private var count: Int = 0
+
+      init(seed: UInt64) {
+        forward = SplitMix64(seed: seed)
+      }
+
+      mutating func next() -> UInt64 {
+        defer { count &+= 1 }
+        if count % 1000 == 0 { return forward.next() }
+        return 0
+      }
+    }
+
+    var almostAllZero = AlmostAllZeroGenerator(seed: 0)
+    _ = s.randomSample(count: k, using: &almostAllZero) // must not crash
+    almostAllZero = AlmostAllZeroGenerator(seed: 0)
+    _ = c.randomSample(count: k, using: &almostAllZero) // must not crash
   }
 }
