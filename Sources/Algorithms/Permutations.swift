@@ -149,11 +149,8 @@ extension Permutations: Sequence {
       /// Advances `kRange` by incrementing its `lowerBound` until the range is
       /// empty, when iteration is finished.
       func advanceKRange() {
-        if kRange.lowerBound < kRange.upperBound {
-          let advancedLowerBound = kRange.lowerBound + 1
-          kRange = advancedLowerBound ..< kRange.upperBound
-          indexes = Array(base.indices)
-        }
+        kRange.removeFirst()
+        indexes = Array(base.indices)
       }
       
       let countToChoose = self.kRange.lowerBound
