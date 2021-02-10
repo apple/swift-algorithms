@@ -59,13 +59,12 @@ extension MutableCollection where Self: BidirectionalCollection {
   @inlinable
   public mutating func reverse(subrange: Range<Index>) {
     if subrange.isEmpty { return }
-    var lo = subrange.lowerBound
-    var hi = subrange.upperBound
-    
-    while lo < hi {
-      formIndex(before: &hi)
-      swapAt(lo, hi)
-      formIndex(after: &lo)
+    var lower = subrange.lowerBound
+    var upper = subrange.upperBound
+    while lower < upper {
+      formIndex(before: &upper)
+      swapAt(lower, upper)
+      formIndex(after: &lower)
     }
   }
 }
