@@ -25,23 +25,23 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///     Output:
   ///     [p o n m e f g h i j k l d c b a]
   ///             ^               ^
-  ///             f               l
+  ///           lower           upper
   ///
-  /// - Postcondition: For returned indices `(f, l)`:
-  ///   `f == limit || l == limit`
+  /// - Postcondition: For returned indices `(lower, upper)`:
+  ///   `lower == limit || upper == limit`
   @usableFromInline
   @discardableResult
   internal mutating func _reverse(
     subrange: Range<Index>, until limit: Index
   ) -> (Index, Index) {
-    var f = subrange.lowerBound
-    var l = subrange.upperBound
-    while f != limit && l != limit {
-      formIndex(before: &l)
-      swapAt(f, l)
-      formIndex(after: &f)
+    var lower = subrange.lowerBound
+    var upper = subrange.upperBound
+    while lower != limit && upper != limit {
+      formIndex(before: &upper)
+      swapAt(lower, upper)
+      formIndex(after: &lower)
     }
-    return (f, l)
+    return (lower, upper)
   }
   
   /// Reverses the elements within the given subrange.
