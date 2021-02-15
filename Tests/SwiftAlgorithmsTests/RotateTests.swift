@@ -10,9 +10,27 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
-import Algorithms
+@testable import Algorithms
 
 final class RotateTests: XCTestCase {
+  /// Tests the example given in `_reverse(subrange:until:)`’s documentation
+  func testUnderscoreReverse() {
+    var input = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p"]
+    let limit: Int = 4
+    let (lower, upper) = input._reverse(subrange: input.startIndex..<input.endIndex, until: input.startIndex.advanced(by: limit))
+    let expected = ["p", "o", "n", "m", "e", "f", "g", "h", "i", "j", "k", "l", "d", "c", "b", "a"]
+    XCTAssertEqual(input, expected)
+    XCTAssertEqual(lower, input.startIndex.advanced(by: limit))
+    XCTAssertEqual(upper, input.endIndex.advanced(by: -limit))
+  }
+  
+  /// Tests the example given in `reverse(subrange:)`’s documentation
+  func testReverse() {
+    var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+    numbers.reverse(subrange: 0..<4)
+    XCTAssertEqual(numbers, [40, 30, 20, 10, 50, 60, 70, 80])
+  }
+  
   /// Tests `rotate(subrange:toStartAt:)` with an empty subrange
   /// The order of elements are unchanged
   func testRotateEmptySubrange() {
