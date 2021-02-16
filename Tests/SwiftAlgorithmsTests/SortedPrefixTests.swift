@@ -13,83 +13,99 @@ import XCTest
 import Algorithms
 
 final class SortedPrefixTests: XCTestCase {
+  func testMaxCount() {
+    // Replacement at startIndex
+    let input = [0, 11, 12, 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    let max = input.max(count: 5, sortedBy: <)
+    XCTAssertEqual(max, [9, 11, 12, 13, 14])
+
+    // Replacement at endIndex
+    let max2 = (input + [15]).max(count: 5, sortedBy: <)
+    XCTAssertEqual(max2, [11, 12, 13, 14, 15])
+
+    // Stability with all equal values
+    let zeroes = Array(repeating: 0, count: 100)
+    let maxZeroes = Array(zeroes.enumerated()).max(count: 5, sortedBy: { $0.1 < $1.1 })
+    XCTAssertEqualSequences(maxZeroes.map { $0.0 }, 95..<100)
+  }
+  
   func testEmpty() {
     let array = [Int]()
-    XCTAssertEqual(array.sortedPrefix(0), [])
+    XCTAssertEqual(array.min(count: 0), [])
   }
 
   func testSortedPrefixWithOrdering() {
     let array: [Int] = [20, 1, 4, 70, 100, 2, 3, 7, 90]
 
-    XCTAssertEqual(array.sortedPrefix(0, by: >), [])
+    XCTAssertEqual(array.min(count: 0, sortedBy: >), [])
     XCTAssertEqual(
-      array.sortedPrefix(1, by: >),
+      array.min(count: 1, sortedBy: >),
       [100]
     )
 
     XCTAssertEqual(
-      array.sortedPrefix(5, by: >),
+      array.min(count: 5, sortedBy: >),
       [100, 90, 70, 20, 7]
     )
 
     XCTAssertEqual(
-      array.sortedPrefix(9, by: >),
+      array.min(count: 9, sortedBy: >),
       [100, 90, 70, 20, 7, 4, 3, 2, 1]
     )
 
-    XCTAssertEqual([1].sortedPrefix(0, by: <), [])
-    XCTAssertEqual([1].sortedPrefix(0, by: >), [])
-    XCTAssertEqual([1].sortedPrefix(1, by: <), [1])
-    XCTAssertEqual([1].sortedPrefix(1, by: >), [1])
-    XCTAssertEqual([0, 1].sortedPrefix(1, by: <), [0])
-    XCTAssertEqual([1, 0].sortedPrefix(1, by: <), [0])
-    XCTAssertEqual([1, 0].sortedPrefix(2, by: <), [0, 1])
-    XCTAssertEqual([0, 1].sortedPrefix(1, by: >), [1])
-    XCTAssertEqual([1, 0].sortedPrefix(1, by: >), [1])
-    XCTAssertEqual([1, 0].sortedPrefix(2, by: >), [1, 0])
+    XCTAssertEqual([1].min(count: 0, sortedBy: <), [])
+    XCTAssertEqual([1].min(count: 0, sortedBy: >), [])
+    XCTAssertEqual([1].min(count: 1, sortedBy: <), [1])
+    XCTAssertEqual([1].min(count: 1, sortedBy: >), [1])
+    XCTAssertEqual([0, 1].min(count: 1, sortedBy: <), [0])
+    XCTAssertEqual([1, 0].min(count: 1, sortedBy: <), [0])
+    XCTAssertEqual([1, 0].min(count: 2, sortedBy: <), [0, 1])
+    XCTAssertEqual([0, 1].min(count: 1, sortedBy: >), [1])
+    XCTAssertEqual([1, 0].min(count: 1, sortedBy: >), [1])
+    XCTAssertEqual([1, 0].min(count: 2, sortedBy: >), [1, 0])
 
     XCTAssertEqual(
-      [1, 2, 3, 4, 7, 20, 70, 90, 100].sortedPrefix(5, by: <),
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].min(count: 5, sortedBy: <),
       [1, 2, 3, 4, 7]
     )
 
     XCTAssertEqual(
-      [1, 2, 3, 4, 7, 20, 70, 90, 100].sortedPrefix(5, by: >),
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].min(count: 5, sortedBy: >),
       [100, 90, 70, 20, 7]
     )
 
     XCTAssertEqual(
-      [1, 2, 3, 4, 7, 20, 70, 90, 100].sortedPrefix(5, by: >),
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].min(count: 5, sortedBy: >),
       [100, 90, 70, 20, 7]
     )
 
     XCTAssertEqual(
-      [1, 2, 3, 4, 7, 20, 70, 90, 100].sortedPrefix(5, by: <),
+      [1, 2, 3, 4, 7, 20, 70, 90, 100].min(count: 5, sortedBy: <),
       [1, 2, 3, 4, 7]
     )
 
     XCTAssertEqual(
-      [4, 5, 6, 1, 2, 3].sortedPrefix(3, by: <),
+      [4, 5, 6, 1, 2, 3].min(count: 3, sortedBy: <),
       [1, 2, 3]
     )
 
     XCTAssertEqual(
-      [4, 5, 9, 8, 7, 6].sortedPrefix(3, by: <),
+      [4, 5, 9, 8, 7, 6].min(count: 3, sortedBy: <),
       [4, 5, 6]
     )
 
     XCTAssertEqual(
-      [4, 3, 2, 1].sortedPrefix(1, by: <),
+      [4, 3, 2, 1].min(count: 1, sortedBy: <),
       [1]
     )
 
     XCTAssertEqual(
-      [4, 2, 1, 3].sortedPrefix(3, by: >),
+      [4, 2, 1, 3].min(count: 3, sortedBy: >),
       [4, 3, 2]
     )
 
     XCTAssertEqual(
-      [4, 2, 1, 3].sortedPrefix(3, by: <),
+      [4, 2, 1, 3].min(count: 3, sortedBy: <),
       [1, 2, 3]
     )
   }
@@ -97,27 +113,27 @@ final class SortedPrefixTests: XCTestCase {
   func testSortedPrefixComparable() {
     let array: [Int] = [20, 1, 4, 70, 100, 2, 3, 7, 90]
 
-    XCTAssertEqual(array.sortedPrefix(0), [])
+    XCTAssertEqual(array.min(count: 0), [])
 
     XCTAssertEqual(
-      array.sortedPrefix(1),
+      array.min(count: 1),
       [1]
     )
 
     XCTAssertEqual(
-      array.sortedPrefix(5),
+      array.min(count: 5),
       [1, 2, 3, 4, 7]
     )
 
     XCTAssertEqual(
-      array.sortedPrefix(9),
+      array.min(count: 9),
       [1, 2, 3, 4, 7, 20, 70, 90, 100]
     )
   }
   
   func testSortedPrefixWithHugePrefix() {
     XCTAssertEqual(
-      [4, 2, 1, 3].sortedPrefix(.max),
+      [4, 2, 1, 3].min(count: .max),
       [1, 2, 3, 4]
     )
   }
@@ -126,132 +142,132 @@ final class SortedPrefixTests: XCTestCase {
     let input = (1...1000).shuffled()
 
     XCTAssertEqual(
-      input.sortedPrefix(0, by: <),
+      input.min(count: 0, sortedBy: <),
       []
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(0, by: >),
+      input.min(count: 0, sortedBy: >),
       []
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(1, by: <),
+      input.min(count: 1, sortedBy: <),
       [1]
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(1, by: >),
+      input.min(count: 1, sortedBy: >),
       [1000]
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(5, by: <),
+      input.min(count: 5, sortedBy: <),
       [1, 2, 3, 4, 5]
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(5, by: >),
+      input.min(count: 5, sortedBy: >),
       [1000, 999, 998, 997, 996]
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(10, by: <),
+      input.min(count: 10, sortedBy: <),
       [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(10, by: >),
+      input.min(count: 10, sortedBy: >),
       [1000, 999, 998, 997, 996, 995, 994, 993, 992, 991]
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(50, by: <),
+      input.min(count: 50, sortedBy: <),
       Array((1...50))
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(50, by: >),
+      input.min(count: 50, sortedBy: >),
       Array((1...1000).reversed().prefix(50))
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(250, by: <),
+      input.min(count: 250, sortedBy: <),
       Array((1...250))
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(250, by: >),
+      input.min(count: 250, sortedBy: >),
       Array((1...1000).reversed().prefix(250))
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(500, by: <),
+      input.min(count: 500, sortedBy: <),
       Array((1...500))
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(500, by: >),
+      input.min(count: 500, sortedBy: >),
       Array((1...1000).reversed().prefix(500))
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(750, by: <),
+      input.min(count: 750, sortedBy: <),
       Array((1...750))
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(750, by: >),
+      input.min(count: 750, sortedBy: >),
       Array((1...1000).reversed().prefix(750))
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(1000, by: <),
+      input.min(count: 1000, sortedBy: <),
       Array((1...1000))
     )
 
     XCTAssertEqual(
-      input.sortedPrefix(1000, by: >),
+      input.min(count: 1000, sortedBy: >),
       (1...1000).reversed()
     )
 
     XCTAssertEqual(
-      ([0] + Array(repeating: 1, count: 100)).sortedPrefix(1, by: <),
+      ([0] + Array(repeating: 1, count: 100)).min(count: 1, sortedBy: <),
       [0]
     )
 
     XCTAssertEqual(
-      ([1] + Array(repeating: 0, count: 100)).sortedPrefix(1, by: <),
+      ([1] + Array(repeating: 0, count: 100)).min(count: 1, sortedBy: <),
       [0]
     )
 
     XCTAssertEqual(
-      ([0] + Array(repeating: 1, count: 100)).sortedPrefix(2, by: <),
+      ([0] + Array(repeating: 1, count: 100)).min(count: 2, sortedBy: <),
       [0, 1]
     )
 
     XCTAssertEqual(
-      ([1] + Array(repeating: 0, count: 100)).sortedPrefix(2, by: <),
+      ([1] + Array(repeating: 0, count: 100)).min(count: 2, sortedBy: <),
       [0, 0]
     )
 
     XCTAssertEqual(
-      ([1] + Array(repeating: 1, count: 100)).sortedPrefix(1, by: >),
+      ([1] + Array(repeating: 1, count: 100)).min(count: 1, sortedBy: >),
       [1]
     )
 
     XCTAssertEqual(
-      ([0] + Array(repeating: 1, count: 100)).sortedPrefix(1, by: >),
+      ([0] + Array(repeating: 1, count: 100)).min(count: 1, sortedBy: >),
       [1]
     )
 
     XCTAssertEqual(
-      ([1] + Array(repeating: 0, count: 100)).sortedPrefix(2, by: >),
+      ([1] + Array(repeating: 0, count: 100)).min(count: 2, sortedBy: >),
       [1, 0]
     )
 
     XCTAssertEqual(
-      ([0] + Array(repeating: 1, count: 100)).sortedPrefix(2, by: >),
+      ([0] + Array(repeating: 1, count: 100)).min(count: 2, sortedBy: >),
       [1, 1]
     )
   }
@@ -291,7 +307,7 @@ final class SortedPrefixTests: XCTestCase {
     withPrefix prefixCount: Int
   ) {
     let indexed = actual.enumerated()
-    let sorted = indexed.map { $0 }.sortedPrefix(prefixCount) { $0.element < $1.element }
+    let sorted = indexed.map { $0 }.min(count: prefixCount) { $0.element < $1.element }
 
     for element in Set(actual) {
       let filtered = sorted.filter { $0.element == element }.map(\.offset)
