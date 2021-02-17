@@ -84,4 +84,9 @@ final class LazySplitCollectionTests: XCTestCase {
     let testResult = line.lazy.split(whereSeparator: isSpace)
     XCTAssertEqualSequences(testResult, expectedResult)
   }
+
+  func testSplitLazy() {
+    let testSubject = "foo.bar".lazy.split(separator: ".")
+    XCTAssertLazySequence(testSubject)
+  }
 }

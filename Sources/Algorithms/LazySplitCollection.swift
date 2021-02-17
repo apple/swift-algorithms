@@ -9,11 +9,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-/// A collection that lazily splits a collection into subsequences separated by elements that satisfy the given `whereSeparator` predicate.
+/// A collection that lazily splits a base collection into subsequences separated by elements that satisfy the given `whereSeparator` predicate.
 ///
 /// - Note: This type is the result of `x.split(maxSplits:omittingEmptySubsequences:whereSeparator)` and
 /// `x.split(separator:maxSplits:omittingEmptySubsequences)`, where `x` conforms to `LazyCollection`.
-public struct LazySplitCollection<Base: LazyCollectionProtocol>: LazySequenceProtocol where Base.Element: Equatable, Base.Elements.Index == Base.Index {
+public struct LazySplitCollection<Base: LazyCollectionProtocol> where Base.Element: Equatable, Base.Elements.Index == Base.Index {
   internal let base: Base
   internal let whereSeparator: (Base.Element) -> Bool
   internal let maxSplits: Int
@@ -44,7 +44,7 @@ extension LazySplitCollection {
   }
 }
 
-extension LazySplitCollection.Iterator: IteratorProtocol {
+extension LazySplitCollection.Iterator: IteratorProtocol, Sequence {
   public typealias Element = Base.Elements.SubSequence
 
   public mutating func next() -> Element? {
@@ -83,7 +83,7 @@ extension LazySplitCollection.Iterator: IteratorProtocol {
   }
 }
 
-extension LazySplitCollection: Sequence {
+extension LazySplitCollection: LazySequenceProtocol {
   public func makeIterator() -> Iterator {
     return Iterator(
       base: self.base,
