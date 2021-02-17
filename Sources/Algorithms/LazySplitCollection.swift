@@ -58,12 +58,19 @@ extension LazySplitCollection.Iterator: IteratorProtocol, Sequence {
       subSequenceEnd = base[subSequenceStart...].firstIndex(where: whereSeparator) ?? base.endIndex
       lastAdjacentSeparator = subSequenceEnd
 
-      while omittingEmptySubsequences && lastAdjacentSeparator < base.endIndex {
-        let next = base.index(after: lastAdjacentSeparator)
-        if next < base.endIndex && whereSeparator(base[next]) {
-          lastAdjacentSeparator = next
-        } else {
-          break
+      if omittingEmptySubsequences {
+        /// TODO: should be able to replace this raw loop with something like
+        /// ```
+        /// lastAdjacentSeparator = indexBeforeFirst { !whereSeparator($0) } ?? base.endIndex
+        /// ```
+        /// when available.
+        while lastAdjacentSeparator < base.endIndex {
+          let next = base.index(after: lastAdjacentSeparator)
+          if next < base.endIndex && whereSeparator(base[next]) {
+            lastAdjacentSeparator = next
+          } else {
+            break
+          }
         }
       }
     } else {
