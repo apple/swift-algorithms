@@ -174,7 +174,9 @@ extension LazyCollection where Element: Equatable {
     omittingEmptySubsequences: Bool = true,
     whereSeparator: @escaping (Base.Element) -> Bool
   ) -> LazySplitCollection<Self> {
-    LazySplitCollection(
+    precondition(maxSplits >= 0, "Must take zero or more splits")
+
+    return LazySplitCollection(
       base: self,
       whereSeparator: whereSeparator,
       maxSplits: maxSplits,
@@ -259,7 +261,9 @@ extension LazyCollection where Element: Equatable {
     maxSplits: Int = Int.max,
     omittingEmptySubsequences: Bool = true
   ) -> LazySplitCollection<Self> {
-    LazySplitCollection(
+    precondition(maxSplits >= 0, "Must take zero or more splits")
+
+    return LazySplitCollection(
       base: self,
       whereSeparator: { $0 == separator },
       maxSplits: maxSplits,
