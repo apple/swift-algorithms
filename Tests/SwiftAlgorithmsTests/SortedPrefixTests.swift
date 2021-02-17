@@ -15,12 +15,12 @@ import Algorithms
 final class SortedPrefixTests: XCTestCase {
   func testMaxCount() {
     // Replacement at startIndex
-    let input = [0, 11, 12, 13, 14, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    let max = input.max(count: 5, sortedBy: <)
+    let input = [0, 11, 12, 1, 13, 2, 14, 3, 4, 5, 6, 7, 8, 9]
+    let max = input.max(count: 5)
     XCTAssertEqual(max, [9, 11, 12, 13, 14])
 
     // Replacement at endIndex
-    let max2 = (input + [15]).max(count: 5, sortedBy: <)
+    let max2 = (input + [15]).max(count: 5)
     XCTAssertEqual(max2, [11, 12, 13, 14, 15])
 
     // Stability with all equal values
@@ -307,7 +307,7 @@ final class SortedPrefixTests: XCTestCase {
     withPrefix prefixCount: Int
   ) {
     let indexed = actual.enumerated()
-    let sorted = indexed.map { $0 }.min(count: prefixCount) { $0.element < $1.element }
+    let sorted = Array(indexed).min(count: prefixCount) { $0.element < $1.element }
 
     for element in Set(actual) {
       let filtered = sorted.filter { $0.element == element }.map(\.offset)
