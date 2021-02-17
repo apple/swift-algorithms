@@ -10,44 +10,58 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
-// slidingWindows(ofCount:)
+// windows(ofCount:)
 //===----------------------------------------------------------------------===//
 
 extension Collection {
-  /// A collection for all contiguous windows of length size, the
-  /// windows overlap.
+  /// Returns a collection of all the overlapping slices of a given size.
   ///
-  /// - Complexity: O(*1*) if the collection conforms to
-  /// `RandomAccessCollection`, otherwise O(*k*) where `k` is `count`.
-  /// Access to the next window is O(*1*).
+  /// Use this method to iterate over overlapping subsequences of this
+  /// collection. This example prints every five character substring of `str`:
+  ///
+  ///     let str = "Hello, world!"
+  ///     for substring in str.windows(ofCount: 5) {
+  ///         print(substring)
+  ///     }
+  ///     // "Hello"
+  ///     // "ello,"
+  ///     // "llo, "
+  ///     // "lo, W"
+  ///     // ...
+  ///     // "orld!"
   ///
   /// - Parameter count: The number of elements in each window subsequence.
+  /// - Returns: A collection of subsequences of this collection, each with
+  ///   length `count`. If this collection is shorter than `count`, the
+  ///   resulting collection is empty.
   ///
-  /// - Returns: If the collection is shorter than `size` the resulting
-  /// SlidingWindows collection will be empty.
-  public func slidingWindows(ofCount count: Int) -> SlidingWindows<Self> {
-    SlidingWindows(base: self, size: count)
+  /// - Complexity: O(1) if the collection conforms to
+  ///   `RandomAccessCollection`, otherwise O(*k*) where `k` is `count`.
+  ///   Access to successive windows is O(1).
+  public func windows(ofCount count: Int) -> Windows<Self> {
+    Windows(base: self, size: count)
   }
 }
 
 /// A collection wrapper that presents a sliding window over the elements of
 /// a collection.
-public struct SlidingWindows<Base: Collection> {
+public struct Windows<Base: Collection> {
   public let base: Base
   public let size: Int
   
   internal var firstUpperBound: Base.Index?
 
   internal init(base: Base, size: Int) {
-    precondition(size > 0, "SlidingWindows size must be greater than zero")
+    precondition(size > 0, "Windows size must be greater than zero")
     self.base = base
     self.size = size
-    self.firstUpperBound = base.index(base.startIndex, offsetBy: size, limitedBy: base.endIndex)
+    self.firstUpperBound =
+      base.index(base.startIndex, offsetBy: size, limitedBy: base.endIndex)
   }
 }
 
-extension SlidingWindows: Collection {
-  /// A position in a `SlidingWindows` collection.
+extension Windows: Collection {
+  /// A position in a `Windows` collection.
   public struct Index: Comparable {
     internal var lowerBound: Base.Index
     internal var upperBound: Base.Index
@@ -74,7 +88,9 @@ extension SlidingWindows: Collection {
   }
   
   public subscript(index: Index) -> Base.SubSequence {
-    precondition(index.lowerBound != index.upperBound, "SlidingWindows index is out of range")
+    precondition(
+      index.lowerBound != index.upperBound,
+      "Windows index is out of range")
     return base[index.lowerBound..<index.upperBound]
   }
   
@@ -285,7 +301,7 @@ extension SlidingWindows: Collection {
   }
 }
 
-extension SlidingWindows: BidirectionalCollection where Base: BidirectionalCollection {
+extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
   public func index(before index: Index) -> Index {
     precondition(index > startIndex, "Incrementing past start index")
     if index == endIndex {
@@ -302,9 +318,9 @@ extension SlidingWindows: BidirectionalCollection where Base: BidirectionalColle
   }
 }
 
-extension SlidingWindows: LazySequenceProtocol where Base: LazySequenceProtocol {}
-extension SlidingWindows: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
-extension SlidingWindows: RandomAccessCollection where Base: RandomAccessCollection {}
-extension SlidingWindows: Equatable where Base: Equatable {}
-extension SlidingWindows: Hashable where Base: Hashable, Base.Index: Hashable {}
-extension SlidingWindows.Index: Hashable where Base.Index: Hashable {}
+extension Windows: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension Windows: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
+extension Windows: RandomAccessCollection where Base: RandomAccessCollection {}
+extension Windows: Equatable where Base: Equatable {}
+extension Windows: Hashable where Base: Hashable, Base.Index: Hashable {}
+extension Windows.Index: Hashable where Base.Index: Hashable {}
