@@ -14,14 +14,14 @@ import XCTest
 
 final class LazySplitCollectionTests: XCTestCase {
   func testInts() {
-    let nums = [1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
+    let nums = [1, 2, 42, 3, 4, 42, 5, 6, 42, 7,]
     let expectedResult = nums.split(separator: 42)
     let testResult = nums.lazy.split(separator: 42)
     XCTAssertEqualSequences(testResult, expectedResult)
   }
 
   func testIntsWithMultipleAdjacentSeparators() {
-    let nums = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7]
+    let nums = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7,]
     let expectedResult = nums.split(separator: 42)
     let testResult = nums.lazy.split(separator: 42)
     XCTAssertEqualSequences(testResult, expectedResult)
@@ -42,7 +42,7 @@ final class LazySplitCollectionTests: XCTestCase {
   }
 
   func testIntsWithMaxSplits() {
-    let nums = [1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
+    let nums = [1, 2, 42, 3, 4, 42, 5, 6, 42, 7,]
     let expectedResult = nums.split(separator: 42, maxSplits: 2)
     let testResult = nums.lazy.split(separator: 42, maxSplits: 2)
     XCTAssertEqualSequences(testResult, expectedResult)
@@ -56,7 +56,7 @@ final class LazySplitCollectionTests: XCTestCase {
   }
 
   func testIntsWithoutOmittingEmptySubsequences() {
-    let nums = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7]
+    let nums = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7,]
     let expectedResult = nums.split(separator: 42, omittingEmptySubsequences: false)
     let testResult = nums.lazy.split(separator: 42, omittingEmptySubsequences: false)
     XCTAssertEqualSequences(testResult, expectedResult)
@@ -70,7 +70,7 @@ final class LazySplitCollectionTests: XCTestCase {
   }
 
   func testIntsWithWhereClosure() {
-    let nums = [1, 2, 3, 4, 5, 6, 7]
+    let nums = [1, 2, 3, 4, 5, 6, 7,]
     let isEven = { $0 % 2 == 0 }
     let expectedResult = nums.split(whereSeparator: isEven)
     let testResult = nums.lazy.split(whereSeparator: isEven)
