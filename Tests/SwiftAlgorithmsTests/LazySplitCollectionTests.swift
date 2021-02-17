@@ -27,6 +27,14 @@ final class LazySplitCollectionTests: XCTestCase {
     XCTAssertEqualSequences(testResult, expectedResult)
   }
 
+  func testIntsWithTrailingMultipleAdjacentSeparators() {
+    let nums = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7, 42, 42, 42]
+    let expectedResult = nums.split(separator: 42)
+    let testResult = nums.lazy.split(separator: 42)
+    for nums in testResult { print(nums.debugDescription) }
+    XCTAssertEqualSequences(testResult, expectedResult)
+  }
+
   func testString() {
     let path = "archive.tar.gz"
     let expectedResult = path.split(separator: ".")
