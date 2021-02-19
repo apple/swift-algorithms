@@ -9,25 +9,34 @@
 //
 //===----------------------------------------------------------------------===//
 
-/// A collection that lazily splits a base collection into subsequences separated by elements that satisfy the given `whereSeparator` predicate.
+/// A collection that lazily splits a base collection into subsequences separated by elements that satisfy the
+/// given `whereSeparator` predicate.
 ///
-/// - Note: This type is the result of `x.split(maxSplits:omittingEmptySubsequences:whereSeparator)` and
-/// `x.split(separator:maxSplits:omittingEmptySubsequences)`, where `x` conforms to `LazyCollection`.
-public struct LazySplitCollection<Base: LazyCollectionProtocol> where Base.Element: Equatable, Base.Elements.Index == Base.Index {
+/// - Note: This type is the result of
+///
+///     x.split(maxSplits:omittingEmptySubsequences:whereSeparator)
+///     x.split(separator:maxSplits:omittingEmptySubsequences)
+///
+///   where `x` conforms to `LazyCollection`.
+public struct LazySplitCollection<Base: LazyCollectionProtocol>
+    where Base.Element: Equatable, Base.Elements.Index == Base.Index {
   internal let base: Base
-  internal let whereSeparator: (Base.Element) -> Bool
+  internal let isSeparator: (Base.Element) -> Bool
   internal let maxSplits: Int
   internal let omittingEmptySubsequences: Bool
 }
 
 extension LazySplitCollection {
   public struct Iterator {
+    public typealias Index = Base.Index
+
     internal let base: Base
-    internal let whereSeparator: (Base.Element) -> Bool
+    internal let isSeparator: (Base.Element) -> Bool
     internal let maxSplits: Int
     internal let omittingEmptySubsequences: Bool
-    internal var subSequenceStart: Base.Index
-    internal var splitCount = 0
+    internal var subsequenceStart: Base.Index
+    internal var separatorCount = 0
+    internal var sequenceLength = 0
 
     internal init(
       base: Base,
@@ -36,10 +45,10 @@ extension LazySplitCollection {
       omittingEmptySubsequences: Bool
     ) {
       self.base = base
-      self.whereSeparator = whereSeparator
+      self.isSeparator = whereSeparator
       self.maxSplits = maxSplits
       self.omittingEmptySubsequences = omittingEmptySubsequences
-      self.subSequenceStart = self.base.startIndex
+      self.subsequenceStart = self.base.startIndex
     }
   }
 }
@@ -48,45 +57,83 @@ extension LazySplitCollection.Iterator: IteratorProtocol, Sequence {
   public typealias Element = Base.Elements.SubSequence
 
   public mutating func next() -> Element? {
-    guard subSequenceStart < base.endIndex else { return nil }
+    /// Separators mark the points where we want to split (cut in two) the base collection, removing
+    /// the separator in the process.
+    ///
+    /// Each split yields two subsequences, though splitting at the start or end of a sequence yields
+    /// an empty subsequence where there were no elements adjacent to the cut.
+    ///
+    /// Thus the maximum number of subsequences returned after iterating the entire base collection
+    /// (including empty ones, if they are not omitted) will be at most one more than the number of
+    /// splits made (equivalently, one more than the number of separators encountered).
+    ///
+    /// The number of splits is limited by `maxSplits`, and thus may be less than total number of
+    /// separators in the base collection.
+    ///
+    ///     [1, 2, 42, 3, 4, 42, 5].split(separator: 42,
+    ///                                   omittingEmptySubsequences: false)
+    ///     // first split -> [1, 2], [3, 4, 42, 5]
+    ///     // last split  -> [1, 2], [3, 4], [5]
+    ///
+    ///     [1, 2, 42, 3, 4, 42, 5, 42].split(separator: 42,
+    ///                                       maxSplits: 2,
+    ///                                       omittingEmptySubsequences: false)
+    ///     // first split -> [1, 2], [3, 4, 42, 5, 42]
+    ///     // last split  -> [1, 2], [3, 4], [5, 42]
+    ///
+    ///     [42, 1, 42].split(separator: 42, omittingEmptySubsequences: false)
+    ///     // first split -> [], [1, 42]
+    ///     // last split  -> [], [1], []
+    ///
+    ///     [42, 42].split(separator: 42, omittingEmptySubsequences: false)
+    ///     // first split -> [], [42]
+    ///     // last split  -> [], [], []
+    ///
+    /// Preconditions:
+    /// `subsequenceStart` points to the beginning of the next subsequence to return (which may
+    /// turn out to be empty), or the end of the base collection.
 
-    var subSequenceEnd: Base.Index
-    var lastAdjacentSeparator: Base.Index
+    guard subsequenceStart < base.endIndex else {
+      if !omittingEmptySubsequences && sequenceLength < separatorCount + 1 {
+        /// We've reached the end of the base collection, and we're returning empty subsequences, but we
+        /// haven't yet returned one more subsequence than the number of splits we've performed (i.e., the
+        /// number of separators we've encountered). This happens when the last element of the base
+        /// collection is a separator. Return one last empty subsequence.
+        sequenceLength += 1
+        return base.elements[subsequenceStart..<subsequenceStart]
+      } else {
+        return nil
+      }
+    }
 
-    if splitCount < maxSplits {
-      splitCount += 1
-      subSequenceEnd = base[subSequenceStart...].firstIndex(where: whereSeparator) ?? base.endIndex
-      lastAdjacentSeparator = subSequenceEnd
+    /// The non-inclusive end of the next subsequence is marked by the next separator, or the end of the base collection.
+    var subsequenceEnd: Base.Index
 
-      if omittingEmptySubsequences {
-        /// TODO: should be able to replace this raw loop with something like
-        /// ```
-        /// lastAdjacentSeparator = indexBeforeFirst { !whereSeparator($0) } ?? base.endIndex
-        /// ```
-        /// when available.
-        while lastAdjacentSeparator < base.endIndex {
-          let next = base.index(after: lastAdjacentSeparator)
-          if next < base.endIndex && whereSeparator(base[next]) {
-            lastAdjacentSeparator = next
-          } else {
-            break
-          }
+    /// The number of separators encountered thus far is identical to the number of splits performed thus far.
+    if separatorCount < maxSplits {
+      subsequenceEnd = base[subsequenceStart...].firstIndex(where: isSeparator) ?? base.endIndex
+
+      if omittingEmptySubsequences && base[subsequenceStart..<subsequenceEnd].isEmpty {
+        /// Find the next sequence of non-separators.
+        subsequenceStart = base[subsequenceEnd...].firstIndex(where: { !isSeparator($0) }) ?? base.endIndex
+        if subsequenceStart == base.endIndex {
+          /// No non-separators left in the base collection, so we're done.
+          return nil
         }
+        subsequenceEnd = base[subsequenceStart...].firstIndex(where: isSeparator) ?? base.endIndex
       }
     } else {
-      subSequenceEnd = base.endIndex
-      lastAdjacentSeparator = subSequenceEnd
+      /// We've performed the requested number of splits. Return all remaining elements in the base collection as one final subsequence.
+      subsequenceEnd = base.endIndex
     }
 
     defer {
-      if lastAdjacentSeparator < base.endIndex {
-        subSequenceStart = base.index(after: lastAdjacentSeparator)
-      } else {
-        subSequenceStart = base.endIndex
-      }
+      separatorCount += subsequenceEnd < base.endIndex ? 1 : 0
+      sequenceLength += 1
+      subsequenceStart = subsequenceEnd < base.endIndex ? base.index(after: subsequenceEnd) : base.endIndex
     }
 
-    return base.elements[subSequenceStart..<subSequenceEnd]
+    return base.elements[subsequenceStart..<subsequenceEnd]
   }
 }
 
@@ -94,7 +141,7 @@ extension LazySplitCollection: LazySequenceProtocol {
   public func makeIterator() -> Iterator {
     return Iterator(
       base: self.base,
-      whereSeparator: self.whereSeparator,
+      whereSeparator: self.isSeparator,
       maxSplits: self.maxSplits,
       omittingEmptySubsequences: self.omittingEmptySubsequences
     )
@@ -106,8 +153,9 @@ extension LazyCollection where Element: Equatable {
   /// that don't contain elements satisfying the given predicate.
   ///
   /// The resulting lazy sequence consists of at most `maxSplits + 1` subsequences.
-  /// Elements that are used to split the sequence are not returned as part of
-  /// any subsequence.
+  /// Elements that are used to split the collection are not returned as part of any
+  /// subsequence (except possibly the last one, in the case where `maxSplits` is
+  /// less than the number of separators in the collection).
   ///
   /// The following examples show the effects of the `maxSplits` and
   /// `omittingEmptySubsequences` parameters when lazily splitting a string using a
@@ -179,13 +227,13 @@ extension LazyCollection where Element: Equatable {
   func split(
     maxSplits: Int = Int.max,
     omittingEmptySubsequences: Bool = true,
-    whereSeparator: @escaping (Base.Element) -> Bool
+    whereSeparator isSeparator: @escaping (Base.Element) -> Bool
   ) -> LazySplitCollection<Self> {
     precondition(maxSplits >= 0, "Must take zero or more splits")
 
     return LazySplitCollection(
       base: self,
-      whereSeparator: whereSeparator,
+      isSeparator: isSeparator,
       maxSplits: maxSplits,
       omittingEmptySubsequences: omittingEmptySubsequences
     )
@@ -195,8 +243,9 @@ extension LazyCollection where Element: Equatable {
   /// around elements equal to the given element.
   ///
   /// The resulting lazy sequence consists of at most `maxSplits + 1` subsequences.
-  /// Elements that are used to split the collection are not returned as part
-  /// of any subsequence.
+  /// Elements that are used to split the collection are not returned as part of any
+  /// subsequence (except possibly the last one, in the case where `maxSplits` is
+  /// less than the number of separators in the collection).
   ///
   /// The following examples show the effects of the `maxSplits` and
   /// `omittingEmptySubsequences` parameters when splitting a string at each
@@ -272,7 +321,7 @@ extension LazyCollection where Element: Equatable {
 
     return LazySplitCollection(
       base: self,
-      whereSeparator: { $0 == separator },
+      isSeparator: { $0 == separator },
       maxSplits: maxSplits,
       omittingEmptySubsequences: omittingEmptySubsequences
     )
