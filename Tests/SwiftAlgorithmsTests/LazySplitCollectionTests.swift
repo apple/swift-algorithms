@@ -125,6 +125,13 @@ final class LazySplitCollectionTests: XCTestCase {
     XCTAssertEqualSequences(testResult, expectedResult)
   }
 
+  func testZeroMaxSplits() {
+    let nums = [1, 2, 42, 3, 4, 42, 5, 6, 42, 7,]
+    let expectedResult = nums.split(separator: 42, maxSplits: 0)
+    let testResult = nums.lazy.split(separator: 42, maxSplits: 0)
+    XCTAssertEqualSequences(testResult, expectedResult)
+  }
+
   func testStringWithMaxSplits() {
     let path = "archive.tar.gz"
     let expectedResult = path.split(separator: ".", maxSplits: 1)
