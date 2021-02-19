@@ -67,8 +67,8 @@ extension LazySplitCollection.Iterator: IteratorProtocol {
     /// (including empty ones, if they are not omitted) will be at most one more than the number of
     /// splits made (equivalently, one more than the number of separators encountered).
     ///
-    /// The number of splits is limited by `maxSplits`, and thus may be less than total number of
-    /// separators in the base collection.
+    /// The number of splits is limited by `maxSplits`, and thus may be less than the total number
+    /// of separators in the base collection.
     ///
     ///     [1, 2, 42, 3, 4, 42, 5].split(separator: 42,
     ///                                   omittingEmptySubsequences: false)
