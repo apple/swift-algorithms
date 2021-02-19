@@ -17,9 +17,9 @@
 ///     x.split(maxSplits:omittingEmptySubsequences:whereSeparator)
 ///     x.split(separator:maxSplits:omittingEmptySubsequences)
 ///
-///   where `x` conforms to `LazyCollection`.
+///   where `x` conforms to `LazyCollectionProtocol`.
 public struct LazySplitCollection<Base: LazyCollectionProtocol>
-    where Base.Element: Equatable, Base.Elements.Index == Base.Index {
+where Base.Elements.Index == Base.Index {
   internal let base: Base
   internal let isSeparator: (Base.Element) -> Bool
   internal let maxSplits: Int
@@ -53,7 +53,7 @@ extension LazySplitCollection {
   }
 }
 
-extension LazySplitCollection.Iterator: IteratorProtocol, Sequence {
+extension LazySplitCollection.Iterator: IteratorProtocol {
   public typealias Element = Base.Elements.SubSequence
 
   public mutating func next() -> Element? {
@@ -148,7 +148,7 @@ extension LazySplitCollection: LazySequenceProtocol {
   }
 }
 
-extension LazyCollection where Element: Equatable {
+extension LazyCollectionProtocol where Elements.Index == Index {
   /// Lazily returns the longest possible subsequences of the collection, in order,
   /// that don't contain elements satisfying the given predicate.
   ///
@@ -227,7 +227,7 @@ extension LazyCollection where Element: Equatable {
   func split(
     maxSplits: Int = Int.max,
     omittingEmptySubsequences: Bool = true,
-    whereSeparator isSeparator: @escaping (Base.Element) -> Bool
+    whereSeparator isSeparator: @escaping (Element) -> Bool
   ) -> LazySplitCollection<Self> {
     precondition(maxSplits >= 0, "Must take zero or more splits")
 
@@ -238,7 +238,9 @@ extension LazyCollection where Element: Equatable {
       omittingEmptySubsequences: omittingEmptySubsequences
     )
   }
+}
 
+extension LazyCollectionProtocol where Element: Equatable, Elements.Index == Index {
   /// Lazily returns the longest possible subsequences of the collection, in order,
   /// around elements equal to the given element.
   ///
