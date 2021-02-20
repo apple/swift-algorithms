@@ -18,8 +18,7 @@
 ///     x.split(separator:maxSplits:omittingEmptySubsequences)
 ///
 ///   where `x` conforms to `LazyCollectionProtocol`.
-public struct LazySplitCollection<Base: LazyCollectionProtocol>
-where Base.Elements.Index == Base.Index {
+public struct LazySplitCollection<Base: Collection> {
   internal let base: Base
   internal let isSeparator: (Base.Element) -> Bool
   internal let maxSplits: Int
@@ -54,7 +53,7 @@ extension LazySplitCollection {
 }
 
 extension LazySplitCollection.Iterator: IteratorProtocol {
-  public typealias Element = Base.Elements.SubSequence
+  public typealias Element = Base.SubSequence
 
   public mutating func next() -> Element? {
     /// Separators mark the points where we want to split (cut in two) the base collection, removing
@@ -100,7 +99,7 @@ extension LazySplitCollection.Iterator: IteratorProtocol {
         /// number of separators we've encountered). This happens when the last element of the base
         /// collection is a separator. Return one last empty subsequence.
         sequenceLength += 1
-        return base.elements[subsequenceStart..<subsequenceStart]
+        return base[subsequenceStart..<subsequenceStart]
       } else {
         return nil
       }
@@ -133,7 +132,7 @@ extension LazySplitCollection.Iterator: IteratorProtocol {
       subsequenceStart = subsequenceEnd < base.endIndex ? base.index(after: subsequenceEnd) : base.endIndex
     }
 
-    return base.elements[subsequenceStart..<subsequenceEnd]
+    return base[subsequenceStart..<subsequenceEnd]
   }
 }
 
@@ -228,11 +227,11 @@ extension LazyCollectionProtocol where Elements.Index == Index {
     maxSplits: Int = Int.max,
     omittingEmptySubsequences: Bool = true,
     whereSeparator isSeparator: @escaping (Element) -> Bool
-  ) -> LazySplitCollection<Self> {
+  ) -> LazySplitCollection<Elements> {
     precondition(maxSplits >= 0, "Must take zero or more splits")
 
     return LazySplitCollection(
-      base: self,
+      base: elements,
       isSeparator: isSeparator,
       maxSplits: maxSplits,
       omittingEmptySubsequences: omittingEmptySubsequences
@@ -318,11 +317,11 @@ extension LazyCollectionProtocol where Element: Equatable, Elements.Index == Ind
     separator: Element,
     maxSplits: Int = Int.max,
     omittingEmptySubsequences: Bool = true
-  ) -> LazySplitCollection<Self> {
+  ) -> LazySplitCollection<Elements> {
     precondition(maxSplits >= 0, "Must take zero or more splits")
 
     return LazySplitCollection(
-      base: self,
+      base: elements,
       isSeparator: { $0 == separator },
       maxSplits: maxSplits,
       omittingEmptySubsequences: omittingEmptySubsequences
