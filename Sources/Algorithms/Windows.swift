@@ -47,8 +47,11 @@ extension Collection {
 /// A collection wrapper that presents a sliding window over the elements of
 /// a collection.
 public struct Windows<Base: Collection> {
-  public let base: Base
-  public let size: Int
+  @usableFromInline
+  internal let base: Base
+  
+  @usableFromInline
+  internal let size: Int
   
   @usableFromInline
   internal var firstUpperBound: Base.Index?

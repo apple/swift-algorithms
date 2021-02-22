@@ -14,10 +14,12 @@ public struct Chain2<Base1: Sequence, Base2: Sequence>
   where Base1.Element == Base2.Element
 {
   /// The first sequence in this chain.
-  public let base1: Base1
+  @usableFromInline
+  internal let base1: Base1
   
   /// The second sequence in this chain.
-  public let base2: Base2
+  @usableFromInline
+  internal let base2: Base2
 
   @usableFromInline
   internal init(base1: Base1, base2: Base2) {

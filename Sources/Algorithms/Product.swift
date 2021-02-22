@@ -12,9 +12,12 @@
 /// A sequence that represents the product of two sequences' elements.
 public struct Product2<Base1: Sequence, Base2: Collection> {
   /// The outer sequence in the product.
-  public let base1: Base1
+  @usableFromInline
+  internal let base1: Base1
+  
   /// The inner sequence in the product.
-  public let base2: Base2
+  @usableFromInline
+  internal let base2: Base2
   
   @usableFromInline
   internal init(_ base1: Base1, _ base2: Base2) {
