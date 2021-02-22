@@ -13,6 +13,11 @@
 public struct Cycle<Base: Collection> {
   /// The collection to repeat.
   public let base: Base
+  
+  @usableFromInline
+  internal init(base: Base) {
+    self.base = base
+  }
 }
 
 extension Cycle: Sequence {
@@ -43,6 +48,7 @@ extension Cycle: Sequence {
     }
   }
   
+  @inlinable
   public func makeIterator() -> Iterator {
     Iterator(base: base)
   }
@@ -80,6 +86,7 @@ extension Collection {
   ///   forever.
   ///
   /// - Complexity: O(1)
+  @inlinable
   public func cycled() -> Cycle<Self> {
     Cycle(base: self)
   }
@@ -101,6 +108,7 @@ extension Collection {
   ///   times.
   ///
   /// - Complexity: O(1)
+  @inlinable
   public func cycled(times: Int) -> FlattenSequence<Repeated<Self>> {
     repeatElement(self, count: times).joined()
   }

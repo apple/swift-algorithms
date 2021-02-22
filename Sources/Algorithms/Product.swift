@@ -16,6 +16,7 @@ public struct Product2<Base1: Sequence, Base2: Collection> {
   /// The inner sequence in the product.
   public let base2: Base2
   
+  @usableFromInline
   internal init(_ base1: Base1, _ base2: Base2) {
     self.base1 = base1
     self.base2 = base2
@@ -470,6 +471,7 @@ extension Product2: Hashable where Base1: Hashable, Base2: Hashable {}
 ///   - s2: The second sequence to iterate over.
 ///
 /// - Complexity: O(1)
+@inlinable
 public func product<Base1: Sequence, Base2: Collection>(
   _ s1: Base1, _ s2: Base2
 ) -> Product2<Base1, Base2> {

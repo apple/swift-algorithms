@@ -19,6 +19,7 @@ public struct Chain2<Base1: Sequence, Base2: Sequence>
   /// The second sequence in this chain.
   public let base2: Base2
 
+  @usableFromInline
   internal init(base1: Base1, base2: Base2) {
     self.base1 = base1
     self.base2 = base2
@@ -306,6 +307,7 @@ extension Chain2: Hashable where Base1: Hashable, Base2: Hashable {}
 ///   then over the elements of `s2`.
 ///
 /// - Complexity: O(1)
+@inlinable
 public func chain<S1, S2>(_ s1: S1, _ s2: S2) -> Chain2<S1, S2> {
   Chain2(base1: s1, base2: s2)
 }

@@ -529,6 +529,7 @@ extension ChunkedByCount: Equatable where Base: Equatable {}
 // only in terms of `base`. Since the computed index is based on it,
 // it should not make a difference here.
 extension ChunkedByCount: Hashable where Base: Hashable {
+  @inlinable
   public func hash(into hasher: inout Hasher) {
     hasher.combine(base)
   }
