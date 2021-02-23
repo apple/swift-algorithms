@@ -11,7 +11,7 @@
 
 import XCTest
 
-@testable import Algorithms
+import Algorithms
 
 final class LazySplitCollectionTests: XCTestCase {
   func testInts() {

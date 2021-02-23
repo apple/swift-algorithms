@@ -214,7 +214,7 @@ extension LazySequenceProtocol {
   ///   elements.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
-  func split(
+  public func split(
     maxSplits: Int = Int.max,
     omittingEmptySubsequences: Bool = true,
     whereSeparator isSeparator: @escaping (Element) -> Bool
@@ -304,7 +304,7 @@ extension LazySequenceProtocol where Element: Equatable {
   ///   elements.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
-  func split(
+  public func split(
     separator: Element,
     maxSplits: Int = Int.max,
     omittingEmptySubsequences: Bool = true

@@ -11,7 +11,7 @@
 
 import XCTest
 
-@testable import Algorithms
+import Algorithms
 
 final class LazySplitSequenceTests: XCTestCase {
   fileprivate static let isEven = { $0 % 2 == 0 }
