@@ -26,6 +26,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 - [`randomSample(count:)`, `randomSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection.
 - [`randomStableSample(count:)`, `randomStableSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection, preserving their original relative order.
+- [`suffix(while:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Suffix.md): Returns the suffix of a collection where all element pass a given predicate.
 - [`uniqued()`, `uniqued(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Unique.md): The unique elements of a collection, preserving their order.
 
 #### Partial sorting
@@ -36,6 +37,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 - [`chunked(by:)`, `chunked(on:)`, `chunks(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chunked.md): Eager and lazy operations that break a collection into chunks based on either a binary predicate or when the result of a projection changes or chunks of a given count.
 - [`indexed()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Indexed.md): Iterate over tuples of a collection's indices and elements. 
+- [`interspersed(with:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Interspersed.md): Place a value between every two elements of a sequence.
 - [`trimming(where:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Trim.md): Returns a slice by trimming elements from a collection's start and end. 
 - [`windows(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SlidingWindows.md): Breaks a collection into overlapping subsequences where elements are slices from the original collection.
 - [`striding(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Stride.md): Returns every nth element of a collection.
