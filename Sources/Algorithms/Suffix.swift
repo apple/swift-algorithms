@@ -23,6 +23,7 @@ extension BidirectionalCollection {
   ///   returns `false` it will not be called again.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
+  @inlinable
   public func suffix(
     while predicate: (Element) throws -> Bool
   ) rethrows -> SubSequence {

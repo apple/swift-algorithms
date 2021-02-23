@@ -186,6 +186,7 @@ extension Permutations: Sequence {
     }
   }
   
+  @inlinable
   public func makeIterator() -> Iterator {
     Iterator(self)
   }
