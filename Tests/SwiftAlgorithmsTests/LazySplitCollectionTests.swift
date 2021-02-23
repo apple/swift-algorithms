@@ -195,4 +195,24 @@ final class LazySplitCollectionTests: XCTestCase {
     let testResult = empty.lazy.split(separator: 42)
     XCTAssertEqualSequences(expectedResult, testResult)
   }
+
+  func testSepCountEqualOrMoreThanElemCount() {
+    let nums = [0, 1, 0, 0, 2]
+    let expectedResult = nums.split(separator: 0)
+    let testResult = nums.lazy.split(separator: 0)
+    XCTAssertEqualSequences(testResult, expectedResult)
+  }
+
+  func testSepCountEqualOrMoreThanElemCountNotOmittingEmpty() {
+    let nums = [0, 1, 0, 0, 2]
+    let expectedResult = nums.split(
+      separator: 0,
+      omittingEmptySubsequences: false
+    )
+    let testResult = nums.lazy.split(
+      separator: 0,
+      omittingEmptySubsequences: false
+    )
+    XCTAssertEqualSequences(testResult, expectedResult)
+  }
 }

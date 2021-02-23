@@ -82,4 +82,67 @@ final class LazySplitSequenceTests: XCTestCase {
     )
     XCTAssertEqualSequences(testResult, expectedResult)
   }
+
+  // Exercise the end-of-list logic to make sure we don't, for example, repeat
+  // the last element when there are an equal or greater number of separators
+  // than elements.
+  func testSepCountEqualElemCount() {
+    let nums = AnySequence([1, 0, 0, 2])
+    let expectedResult = nums.split(separator: 0).map { Array($0) }
+    let testResult = nums.lazy.split(separator: 0)
+    XCTAssertEqualSequences(testResult, expectedResult)
+  }
+
+  func testSepCountEqualElemCountNotOmittingEmpty() {
+    let nums = AnySequence([1, 0, 0, 2])
+    let expectedResult = nums.split(
+      separator: 0,
+      omittingEmptySubsequences: false
+    ).map { Array($0) }
+    let testResult = nums.lazy.split(
+      separator: 0,
+      omittingEmptySubsequences: false
+    )
+    XCTAssertEqualSequences(testResult, expectedResult)
+  }
+
+  func testSepCountMoreThanElemCountStartsWithSep() {
+    let nums = AnySequence([0, 1, 0, 0, 2])
+    let expectedResult = nums.split(separator: 0).map { Array($0) }
+    let testResult = nums.lazy.split(separator: 0)
+    XCTAssertEqualSequences(testResult, expectedResult)
+  }
+
+  func testSepCountMoreThanElemCountStartsWithSepNotOmittingEmpty() {
+    let nums = AnySequence([0, 1, 0, 0, 2])
+    let expectedResult = nums.split(
+      separator: 0,
+      omittingEmptySubsequences: false
+    ).map { Array($0) }
+    let testResult = nums.lazy.split(
+      separator: 0,
+      omittingEmptySubsequences: false
+    )
+    XCTAssertEqualSequences(testResult, expectedResult)
+  }
+
+  func testSepCountMoreThanElemCountStartsWithElem() {
+    let nums = AnySequence([1, 0, 0, 0, 0, 2, 0, 3])
+    let expectedResult = nums.split(separator: 0).map { Array($0) }
+    let testResult = nums.lazy.split(separator: 0)
+    XCTAssertEqualSequences(testResult, expectedResult)
+  }
+
+  func testSepCountMoreThanElemCountStartsWithElemNotOmittingEmpty() {
+    let nums = AnySequence([1, 0, 0, 0, 0, 2, 0, 3])
+    let expectedResult = nums.split(
+      separator: 0,
+      omittingEmptySubsequences: false
+    ).map { Array($0) }
+    let testResult = nums.lazy.split(
+      separator: 0,
+      omittingEmptySubsequences: false
+    )
+    XCTAssertEqualSequences(testResult, expectedResult)
+  }
 }

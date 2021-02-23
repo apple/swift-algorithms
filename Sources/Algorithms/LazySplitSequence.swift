@@ -33,7 +33,6 @@ extension LazySplitSequence {
     internal let isSeparator: (Base.Element) -> Bool
     internal let maxSplits: Int
     internal let omittingEmptySubsequences: Bool
-    internal var subsequence: Element = []
     internal var separatorCount = 0
     internal var sequenceLength = 0
 
@@ -88,6 +87,7 @@ extension LazySplitSequence.Iterator: IteratorProtocol {
     ///     // last split  -> [], [], []
 
     var currentElement = base.next()
+    var subsequence: Element = []
 
     while currentElement != nil {
       if separatorCount < maxSplits && isSeparator(currentElement!) {
