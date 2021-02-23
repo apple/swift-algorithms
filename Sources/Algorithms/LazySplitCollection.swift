@@ -165,7 +165,7 @@ extension LazySplitCollection: LazySequenceProtocol {
   }
 }
 
-extension LazyCollectionProtocol where Elements.Index == Index {
+extension LazyCollectionProtocol {
   /// Lazily returns the longest possible subsequences of the collection, in order,
   /// that don't contain elements satisfying the given predicate.
   ///
@@ -258,7 +258,7 @@ extension LazyCollectionProtocol where Elements.Index == Index {
 }
 
 extension LazyCollectionProtocol
-where Element: Equatable, Elements.Index == Index {
+where Element: Equatable {
   /// Lazily returns the longest possible subsequences of the collection, in order,
   /// around elements equal to the given element.
   ///
