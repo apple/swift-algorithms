@@ -100,7 +100,15 @@ extension ExclusiveReductions: Sequence {
 }
 
 extension ExclusiveReductions: Collection where Base: Collection {
-  public typealias Index = ReductionsIndex<Base.Index, Result>
+  public struct Index: Comparable {
+    let representation: ReductionsIndexRepresentation<Base.Index, Result>
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+      lhs.representation < rhs.representation
+    }
+    static func base(index: Base.Index, result: Result) -> Self {
+      Self(representation: .base(index: index, result: result))
+    }
+  }
 
   public var startIndex: Index { Index(representation: .start) }
   public var endIndex: Index { Index(representation: .end) }
@@ -208,7 +216,15 @@ extension InclusiveReductions: Sequence {
 }
 
 extension InclusiveReductions: Collection where Base: Collection {
-  public typealias Index = ReductionsIndex<Base.Index, Base.Element>
+  public struct Index: Comparable {
+    let representation: ReductionsIndexRepresentation<Base.Index, Base.Element>
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+      lhs.representation < rhs.representation
+    }
+    static func base(index: Base.Index, result: Base.Element) -> Self {
+      Self(representation: .base(index: index, result: result))
+    }
+  }
 
   public var startIndex: Index {
     guard base.startIndex != base.endIndex else { return endIndex }
@@ -273,36 +289,33 @@ extension InclusiveReductions: LazySequenceProtocol
 extension InclusiveReductions: LazyCollectionProtocol
   where Base: LazyCollectionProtocol {}
 
-// MARK: - Shared ReductionsIndex
+// MARK: - ReductionsIndexRepresentation
 
-public struct ReductionsIndex<BaseIndex: Comparable, Result>: Comparable {
-  enum Representation {
-    case start
-    case base(index: BaseIndex, result: Result)
-    case end
-  }
-  let representation: Representation
+enum ReductionsIndexRepresentation<BaseIndex: Comparable, Result> {
+  case start
+  case base(index: BaseIndex, result: Result)
+  case end
+}
 
-  public static func < (lhs: Self, rhs: Self) -> Bool {
-    switch (lhs.representation, rhs.representation) {
-    case (_, .start): return false
-    case (.start, _): return true
-    case (.end, _): return false
-    case (_, .end): return true
-    case let (.base(lhs, _), .base(rhs, _)): return lhs < rhs
-    }
-  }
-
+extension ReductionsIndexRepresentation: Equatable {
   public static func == (lhs: Self, rhs: Self) -> Bool {
-    switch (lhs.representation, rhs.representation) {
+    switch (lhs, rhs) {
     case (.start, .start): return true
     case (.end, .end): return true
     case let (.base(lhs, _), .base(rhs, _)): return lhs == rhs
     default: return false
     }
   }
+}
 
-  static func base(index: BaseIndex, result: Result) -> Self {
-    Self(representation: .base(index: index, result: result))
+extension ReductionsIndexRepresentation: Comparable {
+  public static func < (lhs: Self, rhs: Self) -> Bool {
+    switch (lhs, rhs) {
+    case (_, .start): return false
+    case (.start, _): return true
+    case (.end, _): return false
+    case (_, .end): return true
+    case let (.base(lhs, _), .base(rhs, _)): return lhs < rhs
+    }
   }
 }
