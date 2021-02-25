@@ -24,7 +24,7 @@ print(Array(runningMinimum))
 
 ## Detailed Design
 
-One pair of methods are added to `LazySequenceProtocol` for a lazily evaluated
+One pair of methods are added to `LazySequenceProtocol` for a lazily evaluated.
 sequence and another pair are added to `Sequence` which are eagerly evaluated.
 
 ```swift
@@ -57,7 +57,8 @@ extension Sequence {
 
 ### Complexity
 
-Calling these methods is O(_1_).
+Calling the lazy methods, those defined on `LazySequenceProtocol`, is O(_1_).
+Calling the eager methods, those returning an array, is O(_n_).
 
 ### Naming
 
