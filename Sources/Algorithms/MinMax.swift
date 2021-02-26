@@ -102,6 +102,7 @@ extension Sequence {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   sequence and *k* is `count`.
+  @inlinable
   public func min(
     count: Int,
     sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
@@ -146,6 +147,7 @@ extension Sequence {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   sequence and *k* is `count`.
+  @inlinable
   public func max(
     count: Int,
     sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
@@ -186,6 +188,7 @@ extension Sequence where Element: Comparable {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   sequence and *k* is `count`.
+  @inlinable
   public func min(count: Int) -> [Element] {
     return min(count: count, sortedBy: <)
   }
@@ -211,6 +214,7 @@ extension Sequence where Element: Comparable {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   sequence and *k* is `count`.
+  @inlinable
   public func max(count: Int) -> [Element] {
     return max(count: count, sortedBy: <)
   }
@@ -244,6 +248,7 @@ extension Collection {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   collection and *k* is `count`.
+  @inlinable
   public func min(
     count: Int,
     sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
@@ -297,6 +302,7 @@ extension Collection {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   collection and *k* is `count`.
+  @inlinable
   public func max(
     count: Int,
     sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
@@ -346,6 +352,7 @@ extension Collection where Element: Comparable {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   collection and *k* is `count`.
+  @inlinable
   public func min(count: Int) -> [Element] {
     return min(count: count, sortedBy: <)
   }
@@ -371,6 +378,7 @@ extension Collection where Element: Comparable {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   collection and *k* is `count`.
+  @inlinable
   public func max(count: Int) -> [Element] {
     return max(count: count, sortedBy: <)
   }
