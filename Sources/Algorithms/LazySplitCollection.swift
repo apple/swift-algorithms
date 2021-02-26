@@ -24,6 +24,7 @@ public struct LazySplitCollection<Base: Collection> {
   internal let maxSplits: Int
   internal let omittingEmptySubsequences: Bool
   internal var _startIndex: Index
+  internal var _endIndex: Index
 
   internal init(
     base: Base,
@@ -35,10 +36,28 @@ public struct LazySplitCollection<Base: Collection> {
     self.isSeparator = isSeparator
     self.maxSplits = maxSplits
     self.omittingEmptySubsequences = omittingEmptySubsequences
-    self._startIndex = Index(baseRange: base.startIndex..<base.startIndex)
+    self._endIndex = Index(
+      baseRange: base.endIndex..<base.endIndex,
+      sequenceLength: Int.max,
+      separatorCount: Int.max
+    )
 
-    if !base.isEmpty {
-      // Precompute the start index.
+    /// We precalculate `startIndex`. There are three possibilities:
+    /// 1. `base` is empty and we're _not_ omitting empty subsequences, in which
+    /// case the following index describes the sole element of this collection;
+    self._startIndex = Index(
+      baseRange: base.startIndex..<base.startIndex,
+      sequenceLength: 1,
+      separatorCount: 0
+    )
+    if base.isEmpty {
+      if omittingEmptySubsequences {
+        /// 2. `base` is empty and we _are_ omitting empty subsequences, so this
+        /// collection has no elements;
+        _startIndex = _endIndex
+      }
+    } else {
+      /// 3. `base` isn't empty, so we must iterate it to determine the start index.
       _startIndex = indexForSubsequence(atOrAfter: base.startIndex)
     }
   }
@@ -56,8 +75,8 @@ extension LazySplitCollection: LazyCollectionProtocol {
 
     internal init(
       baseRange: Range<Base.Index>,
-      sequenceLength: Int = 0,
-      separatorCount: Int = 0
+      sequenceLength: Int,
+      separatorCount: Int
     ) {
       self.baseRange = baseRange
       self.sequenceLength = sequenceLength
@@ -65,14 +84,13 @@ extension LazySplitCollection: LazyCollectionProtocol {
     }
 
     public static func == (lhs: Index, rhs: Index) -> Bool {
-      // Since each index represents the range of a disparate subsequence, no
-      // two unique indices will have the same lower bound.
-      lhs.baseRange.lowerBound == rhs.baseRange.lowerBound
+      // `sequenceLength` is equivalent to the index's 1-based position in the
+      // collection of indices.
+      lhs.sequenceLength == rhs.sequenceLength
     }
 
     public static func < (lhs: Index, rhs: Index) -> Bool {
-      // Only use the lower bound to test for ordering, as above.
-      lhs.baseRange.lowerBound < rhs.baseRange.lowerBound
+      lhs.sequenceLength < rhs.sequenceLength
     }
   }
 
@@ -128,7 +146,7 @@ extension LazySplitCollection: LazyCollectionProtocol {
   }
 
   public var endIndex: Index {
-    Index(baseRange: base.endIndex..<base.endIndex)
+    _endIndex
   }
 
   public func index(after i: Index) -> Index {
@@ -147,10 +165,11 @@ extension LazySplitCollection: LazyCollectionProtocol {
         && i.sequenceLength < i.separatorCount + 1
       {
         /// The base collection ended with a separator, so we need to emit one
-        /// more empty subsequence. Its range can't be equal to that of
-        /// `endIndex`, else we'll terminate iteration prematurely.
+        /// more empty subsequence. This one differs from `endIndex` in its
+        /// `sequenceLength` (except in an extreme edge case!), which is the
+        /// sole property tested for equality and comparison.
         return Index(
-          baseRange: i.baseRange.upperBound..<i.baseRange.upperBound,
+          baseRange: base.endIndex..<base.endIndex,
           sequenceLength: i.sequenceLength + 1,
           separatorCount: i.separatorCount
         )
