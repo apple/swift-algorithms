@@ -118,10 +118,7 @@ extension LazySplitSequence.Iterator: IteratorProtocol {
       }
     }
 
-    defer {
-      sequenceLength += 1
-      subsequence = []
-    }
+    sequenceLength += 1
 
     return subsequence
   }
