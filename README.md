@@ -31,7 +31,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 #### Partial sorting
 
-- [`sortedPrefix(_:by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SortedPrefix.md): Returns the first k elements of a sorted collection.
+- [`min(count:)`, `max(count:)`, `min(count:sortedBy:)`, `max(count:sortedBy:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/MinMax.md): Returns the smallest or largest elements of a collection, sorted by a predicate.
 
 #### Other useful operations
 
