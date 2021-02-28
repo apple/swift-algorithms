@@ -58,7 +58,11 @@ public struct LazySplitCollection<Base: Collection> {
       }
     } else {
       /// 3. `base` isn't empty, so we must iterate it to determine the start index.
-      _startIndex = indexForSubsequence(atOrAfter: base.startIndex)
+      _startIndex = indexForSubsequence(
+        atOrAfter: base.startIndex,
+        sequenceLength: 0,
+        separatorCount: 0
+      )
     }
   }
 }
@@ -97,8 +101,8 @@ extension LazySplitCollection: LazyCollectionProtocol {
   /// Returns the index of the subsequence starting at or after the given base collection index.
   internal func indexForSubsequence(
     atOrAfter lowerBound: Base.Index,
-    sequenceLength: Int = 0,
-    separatorCount: Int = 0
+    sequenceLength: Int,
+    separatorCount: Int
   ) -> Index {
     var newSeparatorCount = separatorCount
     var start = lowerBound
