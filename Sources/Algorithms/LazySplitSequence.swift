@@ -33,7 +33,11 @@ extension LazySplitSequence {
     internal let isSeparator: (Base.Element) -> Bool
     internal let maxSplits: Int
     internal let omittingEmptySubsequences: Bool
+
+    /// The number of separators found and used to make a split.
     internal var separatorCount = 0
+
+    /// The number of subsequences returned.
     internal var sequenceLength = 0
 
     internal init(
