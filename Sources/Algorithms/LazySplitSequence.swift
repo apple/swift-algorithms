@@ -52,40 +52,6 @@ extension LazySplitSequence {
 
 extension LazySplitSequence.Iterator: IteratorProtocol {
   public mutating func next() -> Element? {
-    /// Separators mark the points where we want to split (cut in two) the base
-    /// collection, removing the separator in the process.
-    ///
-    /// Each split yields two subsequences, though splitting at the start or end
-    /// of a sequence yields an empty subsequence where there were no elements
-    /// adjacent to the cut.
-    ///
-    /// Thus the maximum number of subsequences returned after iterating the
-    /// entire base collection (including empty ones, if they are not omitted)
-    /// will be at most one more than the number of splits made (equivalently,
-    /// one more than the number of separators encountered).
-    ///
-    /// The number of splits is limited by `maxSplits`, and thus may be less
-    /// than the total number of separators in the base collection.
-    ///
-    ///     [1, 2, 42, 3, 4, 42, 5].split(separator: 42,
-    ///                                   omittingEmptySubsequences: false)
-    ///     // first split -> [1, 2], [3, 4, 42, 5]
-    ///     // last split  -> [1, 2], [3, 4], [5]
-    ///
-    ///     [1, 2, 42, 3, 4, 42, 5, 42].split(separator: 42,
-    ///                                       maxSplits: 2,
-    ///                                       omittingEmptySubsequences: false)
-    ///     // first split -> [1, 2], [3, 4, 42, 5, 42]
-    ///     // last split  -> [1, 2], [3, 4], [5, 42]
-    ///
-    ///     [42, 1, 42].split(separator: 42, omittingEmptySubsequences: false)
-    ///     // first split -> [], [1, 42]
-    ///     // last split  -> [], [1], []
-    ///
-    ///     [42, 42].split(separator: 42, omittingEmptySubsequences: false)
-    ///     // first split -> [], [42]
-    ///     // last split  -> [], [], []
-
     var currentElement = base.next()
     var subsequence: Element = []
 
@@ -136,18 +102,19 @@ extension LazySplitSequence: LazySequenceProtocol {
 }
 
 extension LazySequenceProtocol {
-  /// Lazily returns the longest possible subsequences of the sequence, in order,
-  /// that don't contain elements satisfying the given predicate.
+  /// Lazily returns the longest possible subsequences of the sequence, in
+  /// order, that don't contain elements satisfying the given predicate.
   ///
-  /// The resulting lazy sequence consists of at most `maxSplits + 1` subsequences.
-  /// Elements that are used to split the sequence are not returned as part of any
-  /// subsequence (except possibly the last one, in the case where `maxSplits` is
-  /// less than the number of separators in the sequence).
+  /// The resulting lazy sequence consists of at most `maxSplits + 1`
+  /// subsequences. Elements that are used to split the sequence are not
+  /// returned as part of any subsequence (except possibly the last one, in the
+  /// case where `maxSplits` is less than the number of separators in the
+  /// sequence).
   ///
   /// The following examples show the effects of the `maxSplits` and
-  /// `omittingEmptySubsequences` parameters when lazily splitting a string using a
-  /// closure that matches spaces. The first use of `split` returns each word
-  /// that was originally separated by one or more spaces.
+  /// `omittingEmptySubsequences` parameters when lazily splitting a string
+  /// using a closure that matches spaces. The first use of `split` returns each
+  /// word that was originally separated by one or more spaces.
   ///
   ///     let line = "BLANCHE:   I don't want realism. I want magic!"
   ///     for spaceless in line.lazy.split(whereSeparator: { $0 == " " }) {
@@ -166,7 +133,10 @@ extension LazySequenceProtocol {
   /// The second example passes `1` for the `maxSplits` parameter, so the
   /// original string is split just once, into two new strings.
   ///
-  ///     for spaceless in line.lazy.split(maxSplits: 1, whereSeparator: { $0 == " " }) {
+  ///     for spaceless in line.lazy.split(
+  ///       maxSplits: 1,
+  ///       whereSeparator: { $0 == " " }
+  ///     ) {
   ///       print(spaceless)
   ///     }
   ///     // Prints
@@ -177,7 +147,10 @@ extension LazySequenceProtocol {
   /// parameter, so the returned array contains empty strings where spaces
   /// were repeated.
   ///
-  ///     for spaceless in line.lazy.split(omittingEmptySubsequences: false, whereSeparator: { $0 == " " }) {
+  ///     for spaceless in line.lazy.split(
+  ///       omittingEmptySubsequences: false,
+  ///       whereSeparator: { $0 == " " }
+  ///     ) {
   ///       print(spaceless)
   ///     }
   ///     // Prints
@@ -228,13 +201,14 @@ extension LazySequenceProtocol {
 }
 
 extension LazySequenceProtocol where Element: Equatable {
-  /// Lazily returns the longest possible subsequences of the sequence, in order,
-  /// around elements equal to the given element.
+  /// Lazily returns the longest possible subsequences of the sequence, in
+  /// order, around elements equal to the given element.
   ///
-  /// The resulting lazy sequence consists of at most `maxSplits + 1` subsequences.
-  /// Elements that are used to split the sequence are not returned as part of any
-  /// subsequence (except possibly the last one, in the case where `maxSplits` is
-  /// less than the number of separators in the sequence).
+  /// The resulting lazy sequence consists of at most `maxSplits + 1`
+  /// subsequences. Elements that are used to split the sequence are not
+  /// returned as part of any subsequence (except possibly the last one, in the
+  /// case where `maxSplits` is less than the number of separators in the
+  /// sequence).
   ///
   /// The following examples show the effects of the `maxSplits` and
   /// `omittingEmptySubsequences` parameters when splitting a string at each
@@ -269,7 +243,10 @@ extension LazySequenceProtocol where Element: Equatable {
   /// parameter, so the returned array contains empty strings where spaces
   /// were repeated.
   ///
-  ///     for spaceless in line.lazy.split(separator: " ", omittingEmptySubsequences: false) {
+  ///     for spaceless in line.lazy.split(
+  ///       separator: " ",
+  ///       omittingEmptySubsequences: false
+  ///     ) {
   ///       print(spaceless)
   ///     }
   ///     // Prints
