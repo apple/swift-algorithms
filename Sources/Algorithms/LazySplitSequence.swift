@@ -55,11 +55,15 @@ extension LazySplitSequence.Iterator: IteratorProtocol {
     var currentElement = base.next()
     var subsequence: Element = []
 
+    // Add the next elements of the base sequence to this subsequence, until we
+    // reach a separator, unless we've already split the maximum number of
+    // times. In all cases, stop at the end of the base sequence.
     while currentElement != nil {
       if separatorCount < maxSplits && isSeparator(currentElement!) {
         separatorCount += 1
 
         if omittingEmptySubsequences && subsequence.isEmpty {
+          // Keep going if we don't want to return an empty subsequence.
           currentElement = base.next()
           continue
         } else {
@@ -71,22 +75,18 @@ extension LazySplitSequence.Iterator: IteratorProtocol {
       }
     }
 
-    if currentElement == nil {
-      if sequenceLength < separatorCount + 1 {
-        if !subsequence.isEmpty || !omittingEmptySubsequences {
-          sequenceLength += 1
-          return subsequence
-        } else {
-          return nil
-        }
-      } else {
-        return nil
-      }
+    // We're done iterating when we've reached the end of the base sequence,
+    // and we've either returned the maximum number of subsequences (one more
+    // than the number of separators), or the only subsequence left to return is
+    // empty and we're omitting those.
+    if currentElement == nil
+        && (sequenceLength == separatorCount + 1
+              || omittingEmptySubsequences && subsequence.isEmpty) {
+      return nil
+    } else {
+      sequenceLength += 1
+      return subsequence
     }
-
-    sequenceLength += 1
-
-    return subsequence
   }
 }
 
