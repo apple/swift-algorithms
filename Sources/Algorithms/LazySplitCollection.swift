@@ -39,7 +39,7 @@ public struct LazySplitCollection<Base: Collection> {
     self._endIndex = Index(
       baseRange: base.endIndex..<base.endIndex,
       sequenceLength: Int.max,
-      separatorCount: Int.max
+      splitCount: Int.max
     )
 
     /// We precalculate `startIndex`. There are three possibilities:
@@ -48,7 +48,7 @@ public struct LazySplitCollection<Base: Collection> {
     self._startIndex = Index(
       baseRange: base.startIndex..<base.startIndex,
       sequenceLength: 1,
-      separatorCount: 0
+      splitCount: 0
     )
     if base.isEmpty {
       if omittingEmptySubsequences {
@@ -61,7 +61,7 @@ public struct LazySplitCollection<Base: Collection> {
       _startIndex = indexForSubsequence(
         atOrAfter: base.startIndex,
         sequenceLength: 0,
-        separatorCount: 0
+        splitCount: 0
       )
     }
   }
@@ -75,16 +75,16 @@ extension LazySplitCollection: LazyCollectionProtocol {
     /// The number of subsequences up to and including this position in the
     /// collection.
     internal let sequenceLength: Int
-    internal let separatorCount: Int
+    internal let splitCount: Int
 
     internal init(
       baseRange: Range<Base.Index>,
       sequenceLength: Int,
-      separatorCount: Int
+      splitCount: Int
     ) {
       self.baseRange = baseRange
       self.sequenceLength = sequenceLength
-      self.separatorCount = separatorCount
+      self.splitCount = splitCount
     }
 
     public static func == (lhs: Index, rhs: Index) -> Bool {
@@ -102,18 +102,15 @@ extension LazySplitCollection: LazyCollectionProtocol {
   internal func indexForSubsequence(
     atOrAfter lowerBound: Base.Index,
     sequenceLength: Int,
-    separatorCount: Int
+    splitCount: Int
   ) -> Index {
-    var newSeparatorCount = separatorCount
     var start = lowerBound
     // If we don't have any more splits to do (which we'll determine shortly),
-    // the end of the next subsequence will be the end of the base collection.
+    // the end of this subsequence will be the end of the base collection.
     var end = base.endIndex
 
-    // The number of separators encountered thus far is identical to the number
-    // of splits performed thus far.
-    if newSeparatorCount < maxSplits {
-      // The non-inclusive end of the next subsequence is marked by the next
+    if splitCount < maxSplits {
+      // The non-inclusive end of this subsequence is marked by the next
       // separator, or the end of the base collection.
       end =
         base[start...].firstIndex(where: isSeparator)
@@ -134,14 +131,18 @@ extension LazySplitCollection: LazyCollectionProtocol {
       }
     }
 
+    var updatedSplitCount = splitCount
     if end < base.endIndex {
-      newSeparatorCount += 1
+      // This subsequence ends on a separator (and perhaps includes other
+      // separators, if we're omitting empty subsequences), so we've performed
+      // another split.
+      updatedSplitCount += 1
     }
 
     return Index(
       baseRange: start..<end,
       sequenceLength: sequenceLength + 1,
-      separatorCount: newSeparatorCount
+      splitCount: updatedSplitCount
     )
   }
 
@@ -166,7 +167,7 @@ extension LazySplitCollection: LazyCollectionProtocol {
 
     guard subsequenceStart != base.endIndex else {
       if !omittingEmptySubsequences
-        && i.sequenceLength < i.separatorCount + 1
+        && i.sequenceLength < i.splitCount + 1
       {
         /// The base collection ended with a separator, so we need to emit one
         /// more empty subsequence. This one differs from `endIndex` in its
@@ -175,7 +176,7 @@ extension LazySplitCollection: LazyCollectionProtocol {
         return Index(
           baseRange: base.endIndex..<base.endIndex,
           sequenceLength: i.sequenceLength + 1,
-          separatorCount: i.separatorCount
+          splitCount: i.splitCount
         )
       } else {
         return endIndex
@@ -185,7 +186,7 @@ extension LazySplitCollection: LazyCollectionProtocol {
     return indexForSubsequence(
       atOrAfter: subsequenceStart,
       sequenceLength: i.sequenceLength,
-      separatorCount: i.separatorCount
+      splitCount: i.splitCount
     )
   }
 
