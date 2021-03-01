@@ -9,9 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
-
 import Algorithms
+import XCTest
 
 final class LazySplitSequenceTests: XCTestCase {
   fileprivate static let isEven = { $0 % 2 == 0 }

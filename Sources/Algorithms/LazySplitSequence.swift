@@ -84,8 +84,9 @@ extension LazySplitSequence.Iterator: IteratorProtocol {
     // than the number of separators), or the only subsequence left to return is
     // empty and we're omitting those.
     if currentElement == nil
-        && (sequenceLength == separatorCount + 1
-              || omittingEmptySubsequences && subsequence.isEmpty) {
+      && (sequenceLength == separatorCount + 1
+        || omittingEmptySubsequences && subsequence.isEmpty)
+    {
       return nil
     } else {
       sequenceLength += 1
