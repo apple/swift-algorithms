@@ -13,15 +13,19 @@ collection without allocating additional storage on the heap.
 
 ```swift
 // Splitting a lazy sequence.
-let numbers = stride(from: 1, through: 28, by: 1)
-for subsequence in numbers.lazy.split(whereSeparator: { $0 % 9 == 0 }) {
+let numbers = stride(from: 1, through: 16, by: 1)
+for subsequence in numbers.lazy.split(
+  whereSeparator: { $0 % 3 == 0 || $0 % 5 == 0 }
+) {
   print(subsequence)
 }
 /* Prints:
-[1, 2, 3, 4, 5, 6, 7, 8]
-[10, 11, 12, 13, 14, 15, 16, 17]
-[19, 20, 21, 22, 23, 24, 25, 26]
-[28]
+[1, 2]
+[4]
+[7, 8]
+[11]
+[13, 14]
+[16]
 */
 
 // Splitting a lazy collection.
