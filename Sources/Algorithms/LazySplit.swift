@@ -120,58 +120,60 @@ extension LazySequenceProtocol {
   /// sequence).
   ///
   /// The following examples show the effects of the `maxSplits` and
-  /// `omittingEmptySubsequences` parameters when lazily splitting a string
-  /// using a closure that matches spaces. The first use of `split` returns each
-  /// word that was originally separated by one or more spaces.
+  /// `omittingEmptySubsequences` parameters when lazily splitting a sequence of
+  /// integers using a closure that matches numbers evenly divisible by 3 or 5.
+  /// The first use of `split` returns each subsequence that was originally
+  /// separated by one or more such numbers.
   ///
-  ///     let line = "BLANCHE:   I don't want realism. I want magic!"
-  ///     for spaceless in line.lazy.split(whereSeparator: { $0 == " " }) {
-  ///       print(spaceless)
+  ///     let numbers = stride(from: 1, through: 16, by: 1)
+  ///     for subsequence in numbers.lazy.split(
+  ///       whereSeparator: { $0 % 3 == 0 || $0 % 5 == 0 }
+  ///     ) {
+  ///       print(subsequence)
   ///     }
-  ///     // Prints
-  ///     // BLANCHE:
-  ///     // I
-  ///     // don't
-  ///     // want
-  ///     // realism.
-  ///     // I
-  ///     // want
-  ///     // magic!
+  ///     /* Prints:
+  ///     [1, 2]
+  ///     [4]
+  ///     [7, 8]
+  ///     [11]
+  ///     [13, 14]
+  ///     [16]
+  ///     */
   ///
   /// The second example passes `1` for the `maxSplits` parameter, so the
-  /// original string is split just once, into two new strings.
+  /// original sequence is split just once, into two subsequences.
   ///
-  ///     for spaceless in line.lazy.split(
+  ///     for subsequence in numbers.lazy.split(
   ///       maxSplits: 1,
-  ///       whereSeparator: { $0 == " " }
+  ///       whereSeparator: { $0 % 3 == 0 || $0 % 5 == 0 }
   ///     ) {
-  ///       print(spaceless)
+  ///       print(subsequence)
   ///     }
-  ///     // Prints
-  ///     // BLANCHE:
-  ///     // I don't want realism. I want magic!
+  ///     /* Prints:
+  ///     [1, 2]
+  ///     [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+  ///     */
   ///
   /// The final example passes `false` for the `omittingEmptySubsequences`
-  /// parameter, so the returned array contains empty strings where spaces
-  /// were repeated.
+  /// parameter, so the sequence of returned subsequences contains empty
+  /// subsequences where numbers evenly divisible by 3 or 5 were repeated.
   ///
-  ///     for spaceless in line.lazy.split(
-  ///       omittingEmptySubsequences: false,
-  ///       whereSeparator: { $0 == " " }
+  ///     for subsequence in numbers.lazy.split(
+  ///         omittingEmptySubsequences: false,
+  ///         whereSeparator: { $0 % 3 == 0 || $0 % 5 == 0 }
   ///     ) {
-  ///       print(spaceless)
+  ///       print(subsequence)
   ///     }
-  ///     // Prints
-  ///     // BLANCHE:
-  ///     //
-  ///     //
-  ///     // I
-  ///     // don't
-  ///     // want
-  ///     // realism.
-  ///     // I
-  ///     // want
-  ///     // magic!
+  ///     /* Prints:
+  ///     [1, 2]
+  ///     [4]
+  ///     []
+  ///     [7, 8]
+  ///     []
+  ///     [11]
+  ///     [13, 14]
+  ///     [16]
+  ///     */
   ///
   /// - Parameters:
   ///   - maxSplits: The maximum number of times to split the sequence, or
@@ -219,55 +221,50 @@ extension LazySequenceProtocol where Element: Equatable {
   /// sequence).
   ///
   /// The following examples show the effects of the `maxSplits` and
-  /// `omittingEmptySubsequences` parameters when splitting a string at each
-  /// space character (" "). The first use of `split` returns each word that
-  /// was originally separated by one or more spaces.
+  /// `omittingEmptySubsequences` parameters when splitting a sequence of
+  /// integers at each zero (`0`). The first use of `split` returns each
+  /// subsequence that was originally separated by one or more zeros.
   ///
-  ///     let line = "BLANCHE:   I don't want realism. I want magic!"
-  ///     for spaceless in line.lazy.split(separator: " ") {
-  ///       print(spaceless)
+  ///     let numbers = AnySequence([1, 2, 0, 3, 4, 0, 0, 5])
+  ///     for subsequence in numbers.lazy.split(separator: 0) {
+  ///       print(subsequence)
   ///     }
-  ///     // Prints
-  ///     // BLANCHE:
-  ///     // I
-  ///     // don't
-  ///     // want
-  ///     // realism.
-  ///     // I
-  ///     // want
-  ///     // magic!
+  ///     /* Prints:
+  ///     [1, 2]
+  ///     [3, 4]
+  ///     [5]
+  ///     */
   ///
   /// The second example passes `1` for the `maxSplits` parameter, so the
-  /// original string is split just once, into two new strings.
+  /// original sequence is split just once, into two subsequences.
   ///
-  ///     for spaceless in line.lazy.split(separator: " ", maxSplits: 1) {
-  ///       print(spaceless)
+  ///     for subsequence in numbers.lazy.split(
+  ///         separator: 0,
+  ///         maxSplits: 1
+  ///     ) {
+  ///       print(subsequence)
   ///     }
-  ///     // Prints
-  ///     // BLANCHE:
-  ///     // I don't want realism. I want magic!
+  ///     /* Prints:
+  ///     [1, 2]
+  ///     [3, 4, 0, 0, 5]
+  ///     */
   ///
   /// The final example passes `false` for the `omittingEmptySubsequences`
-  /// parameter, so the returned array contains empty strings where spaces
-  /// were repeated.
+  /// parameter, so the sequence of returned subsequences contains empty
+  /// subsequences where zeros were repeated.
   ///
-  ///     for spaceless in line.lazy.split(
-  ///       separator: " ",
-  ///       omittingEmptySubsequences: false
+  ///     for subsequence in numbers.lazy.split(
+  ///         separator: 0,
+  ///         omittingEmptySubsequences: false
   ///     ) {
-  ///       print(spaceless)
+  ///       print(subsequence)
   ///     }
-  ///     // Prints
-  ///     // BLANCHE:
-  ///     //
-  ///     //
-  ///     // I
-  ///     // don't
-  ///     // want
-  ///     // realism.
-  ///     // I
-  ///     // want
-  ///     // magic!
+  ///     /* Prints:
+  ///     [1, 2]
+  ///     [3, 4]
+  ///     []
+  ///     [5]
+  ///     */
   ///
   /// - Parameters:
   ///   - separator: The element that should be split upon.
