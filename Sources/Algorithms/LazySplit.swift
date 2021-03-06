@@ -362,9 +362,6 @@ public struct LazySplitCollection<Base: Collection> {
   internal var _startIndex: Index
 
   @usableFromInline
-  internal var _endIndex: Index
-
-  @usableFromInline
   internal init(
     base: Base,
     isSeparator: @escaping (Base.Element) -> Bool,
@@ -375,11 +372,6 @@ public struct LazySplitCollection<Base: Collection> {
     self.isSeparator = isSeparator
     self.maxSplits = maxSplits
     self.omittingEmptySubsequences = omittingEmptySubsequences
-    self._endIndex = Index(
-      baseRange: base.endIndex..<base.endIndex,
-      sequenceLength: Int.max,
-      splitCount: Int.max
-    )
 
     // We precalculate `startIndex`. There are three possibilities:
     // 1. `base` is empty and we're _not_ omitting empty subsequences, in which
@@ -393,7 +385,7 @@ public struct LazySplitCollection<Base: Collection> {
       if omittingEmptySubsequences {
         // 2. `base` is empty and we _are_ omitting empty subsequences, so this
         // collection has no elements;
-        _startIndex = _endIndex
+        _startIndex = endIndex
       }
     } else {
       // 3. `base` isn't empty, so we must iterate it to determine the start
@@ -505,7 +497,11 @@ extension LazySplitCollection: LazyCollectionProtocol {
 
   @inlinable
   public var endIndex: Index {
-    _endIndex
+    Index(
+      baseRange: base.endIndex..<base.endIndex,
+      sequenceLength: Int.max,
+      splitCount: Int.max
+    )
   }
 
   @inlinable
