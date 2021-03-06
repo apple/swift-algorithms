@@ -13,380 +13,771 @@ import Algorithms
 import XCTest
 
 //===----------------------------------------------------------------------===//
-// Tests for `LazySplitSequence`
+// Tests for `LazySplitSequence` and `LazySplitCollection`
 //===----------------------------------------------------------------------===//
-final class LazySplitSequenceTests: XCTestCase {
-  fileprivate static let isEven = { $0 % 2 == 0 }
 
-  func testOneSeparator() {
-    let nums = stride(from: 1, through: 10, by: 1)
-    let expectedResult = nums.split(separator: 7).map { Array($0) }
-    let testResult = nums.lazy.split(separator: 7)
-    XCTAssertEqualSequences(testResult, expectedResult)
+final class LazySplitTests: XCTestCase {
+  func testEmpty() {
+    Validator(
+      subject: [],
+      separator: .element(0),
+      maxSplits: 1
+    ).validate()
   }
 
-  func testEndsWithSeparatorWithClosure() {
-    let nums = stride(from: 1, through: 10, by: 1)
-    let expectedResult = nums.split(
-      whereSeparator: LazySplitSequenceTests.isEven
-    ).map { Array($0) }
-    let testResult = nums.lazy.split(
-      whereSeparator: LazySplitSequenceTests.isEven)
-    XCTAssertEqualSequences(testResult, expectedResult)
+  // The following test names indicate the sequence being split, using the
+  // notation
+  // S: Separator
+  // E: Element
+  //
+  // Values of `maxSplit` are interesting when they're less than the number of
+  // splits that would occur with the default. That varies depending on whether
+  // empty subsequences are omitted or included. `Validator` tests both the
+  // default and the value provided, but there are cases below where the
+  // provided `maxSplit` isn't less than the number of splits when empty
+  // subsequences are omitted.
+
+  //===--------------------------------------------------------------------===//
+  // Length 1
+  //===--------------------------------------------------------------------===//
+
+  func testE() {
+    Validator(subject: [1], separator: .element(0), maxSplits: 0).validate()
   }
 
-  func testEndsWithSeparatorWithClosureNotOmittingEmptySubsequences() {
-    let nums = stride(from: 1, through: 10, by: 1)
-    let expectedResult = nums.split(
-      omittingEmptySubsequences: false,
-      whereSeparator: LazySplitSequenceTests.isEven
-    ).map { Array($0) }
-    let testResult = nums.lazy.split(
-      omittingEmptySubsequences: false,
-      whereSeparator: LazySplitSequenceTests.isEven)
-    XCTAssertEqualSequences(testResult, expectedResult)
+  func testS() {
+    Validator(subject: [0], separator: .element(0), maxSplits: 0).validate()
   }
 
-  func testAllSeparators() {
-    let evens = stride(from: 2, through: 6, by: 2)
-    let expectedResult = evens.split(
-      whereSeparator: LazySplitSequenceTests.isEven
-    ).map {
-      Array($0)
+  //===--------------------------------------------------------------------===//
+  // Length 2
+  //===--------------------------------------------------------------------===//
+
+  func testEE() {
+    Validator(subject: [1, 1], separator: .element(0), maxSplits: 0).validate()
+  }
+
+  func testSS() {
+    Validator(subject: [0, 0], separator: .element(0), maxSplits: 1).validate()
+  }
+
+  func testES() {
+    Validator(subject: [1, 0], separator: .element(0), maxSplits: 0).validate()
+  }
+
+  func testSE() {
+    Validator(subject: [0, 1], separator: .element(0), maxSplits: 0).validate()
+  }
+
+  //===--------------------------------------------------------------------===//
+  // Length 3
+  //===--------------------------------------------------------------------===//
+
+  func testEEE() {
+    Validator(subject: [1, 1, 1], separator: .element(0), maxSplits: 0)
+      .validate()
+  }
+
+  func testSSS() {
+    Validator(subject: [0, 0, 0], separator: .element(0), maxSplits: 1)
+      .validate()
+  }
+
+  func testAllEES() {
+    let permutations = [[1, 1, 0], [1, 0, 1], [0, 1, 1]]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 0)
+        .validate()
     }
-    let testResult = evens.lazy.split(
-      whereSeparator: LazySplitSequenceTests.isEven)
-    XCTAssertEqualSequences(testResult, expectedResult)
   }
 
-  func testAllSeparatorsNotOmittingEmptySubsequences() {
-    let evens = stride(from: 2, through: 6, by: 2)
-    let expectedResult = evens.split(
-      omittingEmptySubsequences: false,
-      whereSeparator: LazySplitSequenceTests.isEven
-    ).map { Array($0) }
-    let testResult = evens.lazy.split(
-      omittingEmptySubsequences: false,
-      whereSeparator: LazySplitSequenceTests.isEven
-    )
-    XCTAssertEqualSequences(testResult, expectedResult)
+  func testAllESS() {
+    let permutations = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
+        .validate()
+    }
   }
 
-  func testMaxSplits() {
-    let nums = stride(from: 1, through: 10, by: 1)
-    let expectedResult = nums.split(
-      maxSplits: 2,
-      whereSeparator: LazySplitSequenceTests.isEven
-    ).map { Array($0) }
-    let testResult = nums.lazy.split(
-      maxSplits: 2,
-      whereSeparator: LazySplitSequenceTests.isEven
-    )
-    XCTAssertEqualSequences(testResult, expectedResult)
+  //===--------------------------------------------------------------------===//
+  // Unique permutations of sequences with at least two separators, so there can
+  // be multiple adjacent separators at the beginning, middle, or end.
+  //===--------------------------------------------------------------------===//
+
+  // All separators.
+  func testSSSS() {
+    Validator(subject: [0, 0, 0, 0], separator: .element(0), maxSplits: 1)
+      .validate()
   }
 
-  // Exercise the end-of-list logic to make sure we don't, for example, repeat
-  // the last element when there are an equal or greater number of separators
-  // than elements.
-  func testSepCountEqualElemCount() {
-    let nums = AnySequence([1, 0, 0, 2])
-    let expectedResult = nums.split(separator: 0).map { Array($0) }
-    let testResult = nums.lazy.split(separator: 0)
-    XCTAssertEqualSequences(testResult, expectedResult)
+  // Equal numbers of elements and separators.
+  func testAllEESS() {
+    let permutations = [
+      [1, 1, 0, 0], [1, 0, 1, 0], [1, 0, 0, 1],
+      [0, 1, 1, 0], [0, 1, 0, 1], [0, 0, 1, 1],
+    ]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
+        .validate()
+    }
   }
 
-  func testSepCountEqualElemCountNotOmittingEmpty() {
-    let nums = AnySequence([1, 0, 0, 2])
-    let expectedResult = nums.split(
-      separator: 0,
-      omittingEmptySubsequences: false
-    ).map { Array($0) }
-    let testResult = nums.lazy.split(
-      separator: 0,
-      omittingEmptySubsequences: false
-    )
-    XCTAssertEqualSequences(testResult, expectedResult)
+  // More separators than elements.
+  func testAllEESSS() {
+    let permutations = [
+      [1, 1, 0, 0, 0], [1, 0, 1, 0, 0], [1, 0, 0, 1, 0], [1, 0, 0, 0, 1],
+      [0, 1, 1, 0, 0], [0, 1, 0, 1, 0], [0, 1, 0, 0, 1], [0, 0, 1, 1, 0],
+      [0, 0, 1, 0, 1], [0, 0, 0, 1, 1],
+    ]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
+        .validate()
+    }
   }
 
-  func testSepCountMoreThanElemCountStartsWithSep() {
-    let nums = AnySequence([0, 1, 0, 0, 2])
-    let expectedResult = nums.split(separator: 0).map { Array($0) }
-    let testResult = nums.lazy.split(separator: 0)
-    XCTAssertEqualSequences(testResult, expectedResult)
+  // More elements than separators.
+  func testAllEEESS() {
+    let permutations = [
+      [1, 1, 1, 0, 0], [1, 1, 0, 1, 0], [1, 1, 0, 0, 1], [1, 0, 1, 1, 0],
+      [1, 0, 1, 0, 1], [1, 0, 0, 1, 1], [0, 1, 1, 1, 0], [0, 1, 1, 0, 1],
+      [0, 1, 0, 1, 1], [0, 0, 1, 1, 1],
+    ]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
+        .validate()
+    }
   }
 
-  func testSepCountMoreThanElemCountStartsWithSepNotOmittingEmpty() {
-    let nums = AnySequence([0, 1, 0, 0, 2])
-    let expectedResult = nums.split(
-      separator: 0,
-      omittingEmptySubsequences: false
-    ).map { Array($0) }
-    let testResult = nums.lazy.split(
-      separator: 0,
-      omittingEmptySubsequences: false
-    )
-    XCTAssertEqualSequences(testResult, expectedResult)
+  //===--------------------------------------------------------------------===//
+  // Unique permutations of sequences with at least four separators, so there
+  // can be two runs of multiple adjacent separators: beginning and end,
+  // beginning and middle, or end and middle.
+  //===--------------------------------------------------------------------===//
+
+  // Equal numbers of separators and elements.
+  func testAllEEEESSSS() {
+    let permutations = [
+      [1, 1, 1, 1, 0, 0, 0, 0], [1, 1, 1, 0, 1, 0, 0, 0],
+      [1, 1, 1, 0, 0, 1, 0, 0], [1, 1, 1, 0, 0, 0, 1, 0],
+      [1, 1, 1, 0, 0, 0, 0, 1], [1, 1, 0, 1, 1, 0, 0, 0],
+      [1, 1, 0, 1, 0, 1, 0, 0], [1, 1, 0, 1, 0, 0, 1, 0],
+      [1, 1, 0, 1, 0, 0, 0, 1], [1, 1, 0, 0, 1, 1, 0, 0],
+      [1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 0, 0, 1, 0, 0, 1],
+      [1, 1, 0, 0, 0, 1, 1, 0], [1, 1, 0, 0, 0, 1, 0, 1],
+      [1, 1, 0, 0, 0, 0, 1, 1], [1, 0, 1, 1, 1, 0, 0, 0],
+      [1, 0, 1, 1, 0, 1, 0, 0], [1, 0, 1, 1, 0, 0, 1, 0],
+      [1, 0, 1, 1, 0, 0, 0, 1], [1, 0, 1, 0, 1, 1, 0, 0],
+      [1, 0, 1, 0, 1, 0, 1, 0], [1, 0, 1, 0, 1, 0, 0, 1],
+      [1, 0, 1, 0, 0, 1, 1, 0], [1, 0, 1, 0, 0, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 1, 1], [1, 0, 0, 1, 1, 1, 0, 0],
+      [1, 0, 0, 1, 1, 0, 1, 0], [1, 0, 0, 1, 1, 0, 0, 1],
+      [1, 0, 0, 1, 0, 1, 1, 0], [1, 0, 0, 1, 0, 1, 0, 1],
+      [1, 0, 0, 1, 0, 0, 1, 1], [1, 0, 0, 0, 1, 1, 1, 0],
+      [1, 0, 0, 0, 1, 1, 0, 1], [1, 0, 0, 0, 1, 0, 1, 1],
+      [1, 0, 0, 0, 0, 1, 1, 1], [0, 1, 1, 1, 1, 0, 0, 0],
+      [0, 1, 1, 1, 0, 1, 0, 0], [0, 1, 1, 1, 0, 0, 1, 0],
+      [0, 1, 1, 1, 0, 0, 0, 1], [0, 1, 1, 0, 1, 1, 0, 0],
+      [0, 1, 1, 0, 1, 0, 1, 0], [0, 1, 1, 0, 1, 0, 0, 1],
+      [0, 1, 1, 0, 0, 1, 1, 0], [0, 1, 1, 0, 0, 1, 0, 1],
+      [0, 1, 1, 0, 0, 0, 1, 1], [0, 1, 0, 1, 1, 1, 0, 0],
+      [0, 1, 0, 1, 1, 0, 1, 0], [0, 1, 0, 1, 1, 0, 0, 1],
+      [0, 1, 0, 1, 0, 1, 1, 0], [0, 1, 0, 1, 0, 1, 0, 1],
+      [0, 1, 0, 1, 0, 0, 1, 1], [0, 1, 0, 0, 1, 1, 1, 0],
+      [0, 1, 0, 0, 1, 1, 0, 1], [0, 1, 0, 0, 1, 0, 1, 1],
+      [0, 1, 0, 0, 0, 1, 1, 1], [0, 0, 1, 1, 1, 1, 0, 0],
+      [0, 0, 1, 1, 1, 0, 1, 0], [0, 0, 1, 1, 1, 0, 0, 1],
+      [0, 0, 1, 1, 0, 1, 1, 0], [0, 0, 1, 1, 0, 1, 0, 1],
+      [0, 0, 1, 1, 0, 0, 1, 1], [0, 0, 1, 0, 1, 1, 1, 0],
+      [0, 0, 1, 0, 1, 1, 0, 1], [0, 0, 1, 0, 1, 0, 1, 1],
+      [0, 0, 1, 0, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1, 1, 0],
+      [0, 0, 0, 1, 1, 1, 0, 1], [0, 0, 0, 1, 1, 0, 1, 1],
+      [0, 0, 0, 1, 0, 1, 1, 1], [0, 0, 0, 0, 1, 1, 1, 1],
+    ]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
+        .validate()
+    }
   }
 
-  func testSepCountMoreThanElemCountStartsWithElem() {
-    let nums = AnySequence([1, 0, 0, 0, 0, 2, 0, 3])
-    let expectedResult = nums.split(separator: 0).map { Array($0) }
-    let testResult = nums.lazy.split(separator: 0)
-    XCTAssertEqualSequences(testResult, expectedResult)
+  // More separators than elements.
+  func testAllEEESSSS() {
+    let permutations = [
+      [1, 1, 1, 0, 0, 0, 0], [1, 1, 0, 1, 0, 0, 0], [1, 1, 0, 0, 1, 0, 0],
+      [1, 1, 0, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 1], [1, 0, 1, 1, 0, 0, 0],
+      [1, 0, 1, 0, 1, 0, 0], [1, 0, 1, 0, 0, 1, 0], [1, 0, 1, 0, 0, 0, 1],
+      [1, 0, 0, 1, 1, 0, 0], [1, 0, 0, 1, 0, 1, 0], [1, 0, 0, 1, 0, 0, 1],
+      [1, 0, 0, 0, 1, 1, 0], [1, 0, 0, 0, 1, 0, 1], [1, 0, 0, 0, 0, 1, 1],
+      [0, 1, 1, 1, 0, 0, 0], [0, 1, 1, 0, 1, 0, 0], [0, 1, 1, 0, 0, 1, 0],
+      [0, 1, 1, 0, 0, 0, 1], [0, 1, 0, 1, 1, 0, 0], [0, 1, 0, 1, 0, 1, 0],
+      [0, 1, 0, 1, 0, 0, 1], [0, 1, 0, 0, 1, 1, 0], [0, 1, 0, 0, 1, 0, 1],
+      [0, 1, 0, 0, 0, 1, 1], [0, 0, 1, 1, 1, 0, 0], [0, 0, 1, 1, 0, 1, 0],
+      [0, 0, 1, 1, 0, 0, 1], [0, 0, 1, 0, 1, 1, 0], [0, 0, 1, 0, 1, 0, 1],
+      [0, 0, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 0], [0, 0, 0, 1, 1, 0, 1],
+      [0, 0, 0, 1, 0, 1, 1], [0, 0, 0, 0, 1, 1, 1],
+    ]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
+        .validate()
+    }
   }
 
-  func testSepCountMoreThanElemCountStartsWithElemNotOmittingEmpty() {
-    let nums = AnySequence([1, 0, 0, 0, 0, 2, 0, 3])
-    let expectedResult = nums.split(
-      separator: 0,
-      omittingEmptySubsequences: false
-    ).map { Array($0) }
-    let testResult = nums.lazy.split(
-      separator: 0,
-      omittingEmptySubsequences: false
-    )
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-}
+  // More elements than separators.
+  func testAllEEEEESSSS() {
+    let permutations = [
+      [1, 1, 1, 1, 1, 0, 0, 0, 0], [1, 1, 1, 1, 0, 1, 0, 0, 0],
+      [1, 1, 1, 1, 0, 0, 1, 0, 0], [1, 1, 1, 1, 0, 0, 0, 1, 0],
+      [1, 1, 1, 1, 0, 0, 0, 0, 1], [1, 1, 1, 0, 1, 1, 0, 0, 0],
+      [1, 1, 1, 0, 1, 0, 1, 0, 0], [1, 1, 1, 0, 1, 0, 0, 1, 0],
+      [1, 1, 1, 0, 1, 0, 0, 0, 1], [1, 1, 1, 0, 0, 1, 1, 0, 0],
+      [1, 1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 1, 0, 0, 1, 0, 0, 1],
+      [1, 1, 1, 0, 0, 0, 1, 1, 0], [1, 1, 1, 0, 0, 0, 1, 0, 1],
+      [1, 1, 1, 0, 0, 0, 0, 1, 1], [1, 1, 0, 1, 1, 1, 0, 0, 0],
+      [1, 1, 0, 1, 1, 0, 1, 0, 0], [1, 1, 0, 1, 1, 0, 0, 1, 0],
+      [1, 1, 0, 1, 1, 0, 0, 0, 1], [1, 1, 0, 1, 0, 1, 1, 0, 0],
+      [1, 1, 0, 1, 0, 1, 0, 1, 0], [1, 1, 0, 1, 0, 1, 0, 0, 1],
+      [1, 1, 0, 1, 0, 0, 1, 1, 0], [1, 1, 0, 1, 0, 0, 1, 0, 1],
+      [1, 1, 0, 1, 0, 0, 0, 1, 1], [1, 1, 0, 0, 1, 1, 1, 0, 0],
+      [1, 1, 0, 0, 1, 1, 0, 1, 0], [1, 1, 0, 0, 1, 1, 0, 0, 1],
+      [1, 1, 0, 0, 1, 0, 1, 1, 0], [1, 1, 0, 0, 1, 0, 1, 0, 1],
+      [1, 1, 0, 0, 1, 0, 0, 1, 1], [1, 1, 0, 0, 0, 1, 1, 1, 0],
+      [1, 1, 0, 0, 0, 1, 1, 0, 1], [1, 1, 0, 0, 0, 1, 0, 1, 1],
+      [1, 1, 0, 0, 0, 0, 1, 1, 1], [1, 0, 1, 1, 1, 1, 0, 0, 0],
+      [1, 0, 1, 1, 1, 0, 1, 0, 0], [1, 0, 1, 1, 1, 0, 0, 1, 0],
+      [1, 0, 1, 1, 1, 0, 0, 0, 1], [1, 0, 1, 1, 0, 1, 1, 0, 0],
+      [1, 0, 1, 1, 0, 1, 0, 1, 0], [1, 0, 1, 1, 0, 1, 0, 0, 1],
+      [1, 0, 1, 1, 0, 0, 1, 1, 0], [1, 0, 1, 1, 0, 0, 1, 0, 1],
+      [1, 0, 1, 1, 0, 0, 0, 1, 1], [1, 0, 1, 0, 1, 1, 1, 0, 0],
+      [1, 0, 1, 0, 1, 1, 0, 1, 0], [1, 0, 1, 0, 1, 1, 0, 0, 1],
+      [1, 0, 1, 0, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 0, 0, 1, 1], [1, 0, 1, 0, 0, 1, 1, 1, 0],
+      [1, 0, 1, 0, 0, 1, 1, 0, 1], [1, 0, 1, 0, 0, 1, 0, 1, 1],
+      [1, 0, 1, 0, 0, 0, 1, 1, 1], [1, 0, 0, 1, 1, 1, 1, 0, 0],
+      [1, 0, 0, 1, 1, 1, 0, 1, 0], [1, 0, 0, 1, 1, 1, 0, 0, 1],
+      [1, 0, 0, 1, 1, 0, 1, 1, 0], [1, 0, 0, 1, 1, 0, 1, 0, 1],
+      [1, 0, 0, 1, 1, 0, 0, 1, 1], [1, 0, 0, 1, 0, 1, 1, 1, 0],
+      [1, 0, 0, 1, 0, 1, 1, 0, 1], [1, 0, 0, 1, 0, 1, 0, 1, 1],
+      [1, 0, 0, 1, 0, 0, 1, 1, 1], [1, 0, 0, 0, 1, 1, 1, 1, 0],
+      [1, 0, 0, 0, 1, 1, 1, 0, 1], [1, 0, 0, 0, 1, 1, 0, 1, 1],
+      [1, 0, 0, 0, 1, 0, 1, 1, 1], [1, 0, 0, 0, 0, 1, 1, 1, 1],
+      [0, 1, 1, 1, 1, 1, 0, 0, 0], [0, 1, 1, 1, 1, 0, 1, 0, 0],
+      [0, 1, 1, 1, 1, 0, 0, 1, 0], [0, 1, 1, 1, 1, 0, 0, 0, 1],
+      [0, 1, 1, 1, 0, 1, 1, 0, 0], [0, 1, 1, 1, 0, 1, 0, 1, 0],
+      [0, 1, 1, 1, 0, 1, 0, 0, 1], [0, 1, 1, 1, 0, 0, 1, 1, 0],
+      [0, 1, 1, 1, 0, 0, 1, 0, 1], [0, 1, 1, 1, 0, 0, 0, 1, 1],
+      [0, 1, 1, 0, 1, 1, 1, 0, 0], [0, 1, 1, 0, 1, 1, 0, 1, 0],
+      [0, 1, 1, 0, 1, 1, 0, 0, 1], [0, 1, 1, 0, 1, 0, 1, 1, 0],
+      [0, 1, 1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 1, 0, 0, 1, 1],
+      [0, 1, 1, 0, 0, 1, 1, 1, 0], [0, 1, 1, 0, 0, 1, 1, 0, 1],
+      [0, 1, 1, 0, 0, 1, 0, 1, 1], [0, 1, 1, 0, 0, 0, 1, 1, 1],
+      [0, 1, 0, 1, 1, 1, 1, 0, 0], [0, 1, 0, 1, 1, 1, 0, 1, 0],
+      [0, 1, 0, 1, 1, 1, 0, 0, 1], [0, 1, 0, 1, 1, 0, 1, 1, 0],
+      [0, 1, 0, 1, 1, 0, 1, 0, 1], [0, 1, 0, 1, 1, 0, 0, 1, 1],
+      [0, 1, 0, 1, 0, 1, 1, 1, 0], [0, 1, 0, 1, 0, 1, 1, 0, 1],
+      [0, 1, 0, 1, 0, 1, 0, 1, 1], [0, 1, 0, 1, 0, 0, 1, 1, 1],
+      [0, 1, 0, 0, 1, 1, 1, 1, 0], [0, 1, 0, 0, 1, 1, 1, 0, 1],
+      [0, 1, 0, 0, 1, 1, 0, 1, 1], [0, 1, 0, 0, 1, 0, 1, 1, 1],
+      [0, 1, 0, 0, 0, 1, 1, 1, 1], [0, 0, 1, 1, 1, 1, 1, 0, 0],
+      [0, 0, 1, 1, 1, 1, 0, 1, 0], [0, 0, 1, 1, 1, 1, 0, 0, 1],
+      [0, 0, 1, 1, 1, 0, 1, 1, 0], [0, 0, 1, 1, 1, 0, 1, 0, 1],
+      [0, 0, 1, 1, 1, 0, 0, 1, 1], [0, 0, 1, 1, 0, 1, 1, 1, 0],
+      [0, 0, 1, 1, 0, 1, 1, 0, 1], [0, 0, 1, 1, 0, 1, 0, 1, 1],
+      [0, 0, 1, 1, 0, 0, 1, 1, 1], [0, 0, 1, 0, 1, 1, 1, 1, 0],
+      [0, 0, 1, 0, 1, 1, 1, 0, 1], [0, 0, 1, 0, 1, 1, 0, 1, 1],
+      [0, 0, 1, 0, 1, 0, 1, 1, 1], [0, 0, 1, 0, 0, 1, 1, 1, 1],
+      [0, 0, 0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 1, 1, 1, 1, 0, 1],
+      [0, 0, 0, 1, 1, 1, 0, 1, 1], [0, 0, 0, 1, 1, 0, 1, 1, 1],
+      [0, 0, 0, 1, 0, 1, 1, 1, 1], [0, 0, 0, 0, 1, 1, 1, 1, 1],
+    ]
 
-//===----------------------------------------------------------------------===//
-// Tests for `LazySplitCollection`
-//===----------------------------------------------------------------------===//
-final class LazySplitCollectionTests: XCTestCase {
-  func testInts() {
-    let nums = [1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
-    let expectedResult = nums.split(separator: 42)
-    let testResult = nums.lazy.split(separator: 42)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsWithWhereClosure() {
-    let nums = [1, 2, 3, 4, 5, 6, 7]
-    let isEven = { $0 % 2 == 0 }
-    let expectedResult = nums.split(whereSeparator: isEven)
-    let testResult = nums.lazy.split(whereSeparator: isEven)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsWithMaxSplits() {
-    let nums = [1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
-    let expectedResult = nums.split(separator: 42, maxSplits: 2)
-    let testResult = nums.lazy.split(separator: 42, maxSplits: 2)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testZeroMaxSplits() {
-    let nums = [1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
-    let expectedResult = nums.split(separator: 42, maxSplits: 0)
-    let testResult = nums.lazy.split(separator: 42, maxSplits: 0)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsNotOmittingEmpty() {
-    let nums = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7]
-    let expectedResult = nums.split(
-      separator: 42, omittingEmptySubsequences: false)
-    let testResult = nums.lazy.split(
-      separator: 42, omittingEmptySubsequences: false)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsEndsWithSeparatorNotOmittingEmpty() {
-    let nums = [7, 42]
-    let expectedResult = nums.split(
-      separator: 42,
-      omittingEmptySubsequences: false
-    )
-    let testResult = nums.lazy.split(
-      separator: 42,
-      omittingEmptySubsequences: false
-    )
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsWithMultipleAdjacentSeparators() {
-    let nums = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7]
-    let expectedResult = nums.split(separator: 42)
-    let testResult = nums.lazy.split(separator: 42)
-    XCTAssertEqualSequences(testResult, expectedResult)
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
+        .validate()
+    }
   }
 
-  func testIntsWithTrailingMultipleAdjacentSeparators() {
-    let nums = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7, 42, 42, 42]
-    let expectedResult = nums.split(separator: 42)
-    let testResult = nums.lazy.split(separator: 42)
-    XCTAssertEqualSequences(testResult, expectedResult)
+  //===--------------------------------------------------------------------===//
+  // Permutations of a sequence with six separators, so there can be multiple
+  // adjacent separators at the beginning, middle, _and_ end.
+  //===--------------------------------------------------------------------===//
+
+  // More separators than elements.
+  func testAllEEESSSSSS() {
+    let permutations = [
+      [1, 1, 1, 0, 0, 0, 0, 0, 0], [1, 1, 0, 1, 0, 0, 0, 0, 0],
+      [1, 1, 0, 0, 1, 0, 0, 0, 0], [1, 1, 0, 0, 0, 1, 0, 0, 0],
+      [1, 1, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 0, 0, 0, 0, 1, 0],
+      [1, 1, 0, 0, 0, 0, 0, 0, 1], [1, 0, 1, 1, 0, 0, 0, 0, 0],
+      [1, 0, 1, 0, 1, 0, 0, 0, 0], [1, 0, 1, 0, 0, 1, 0, 0, 0],
+      [1, 0, 1, 0, 0, 0, 1, 0, 0], [1, 0, 1, 0, 0, 0, 0, 1, 0],
+      [1, 0, 1, 0, 0, 0, 0, 0, 1], [1, 0, 0, 1, 1, 0, 0, 0, 0],
+      [1, 0, 0, 1, 0, 1, 0, 0, 0], [1, 0, 0, 1, 0, 0, 1, 0, 0],
+      [1, 0, 0, 1, 0, 0, 0, 1, 0], [1, 0, 0, 1, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 1, 1, 0, 0, 0], [1, 0, 0, 0, 1, 0, 1, 0, 0],
+      [1, 0, 0, 0, 1, 0, 0, 1, 0], [1, 0, 0, 0, 1, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 1, 1, 0, 0], [1, 0, 0, 0, 0, 1, 0, 1, 0],
+      [1, 0, 0, 0, 0, 1, 0, 0, 1], [1, 0, 0, 0, 0, 0, 1, 1, 0],
+      [1, 0, 0, 0, 0, 0, 1, 0, 1], [1, 0, 0, 0, 0, 0, 0, 1, 1],
+      [0, 1, 1, 1, 0, 0, 0, 0, 0], [0, 1, 1, 0, 1, 0, 0, 0, 0],
+      [0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 1, 1, 0, 0, 0, 1, 0, 0],
+      [0, 1, 1, 0, 0, 0, 0, 1, 0], [0, 1, 1, 0, 0, 0, 0, 0, 1],
+      [0, 1, 0, 1, 1, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 0, 0],
+      [0, 1, 0, 1, 0, 0, 1, 0, 0], [0, 1, 0, 1, 0, 0, 0, 1, 0],
+      [0, 1, 0, 1, 0, 0, 0, 0, 1], [0, 1, 0, 0, 1, 1, 0, 0, 0],
+      [0, 1, 0, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 1, 0, 0, 1, 0],
+      [0, 1, 0, 0, 1, 0, 0, 0, 1], [0, 1, 0, 0, 0, 1, 1, 0, 0],
+      [0, 1, 0, 0, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0, 0, 1],
+      [0, 1, 0, 0, 0, 0, 1, 1, 0], [0, 1, 0, 0, 0, 0, 1, 0, 1],
+      [0, 1, 0, 0, 0, 0, 0, 1, 1], [0, 0, 1, 1, 1, 0, 0, 0, 0],
+      [0, 0, 1, 1, 0, 1, 0, 0, 0], [0, 0, 1, 1, 0, 0, 1, 0, 0],
+      [0, 0, 1, 1, 0, 0, 0, 1, 0], [0, 0, 1, 1, 0, 0, 0, 0, 1],
+      [0, 0, 1, 0, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 0, 1, 0, 0],
+      [0, 0, 1, 0, 1, 0, 0, 1, 0], [0, 0, 1, 0, 1, 0, 0, 0, 1],
+      [0, 0, 1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 0, 0, 1, 0, 1, 0],
+      [0, 0, 1, 0, 0, 1, 0, 0, 1], [0, 0, 1, 0, 0, 0, 1, 1, 0],
+      [0, 0, 1, 0, 0, 0, 1, 0, 1], [0, 0, 1, 0, 0, 0, 0, 1, 1],
+      [0, 0, 0, 1, 1, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0, 1, 0, 0],
+      [0, 0, 0, 1, 1, 0, 0, 1, 0], [0, 0, 0, 1, 1, 0, 0, 0, 1],
+      [0, 0, 0, 1, 0, 1, 1, 0, 0], [0, 0, 0, 1, 0, 1, 0, 1, 0],
+      [0, 0, 0, 1, 0, 1, 0, 0, 1], [0, 0, 0, 1, 0, 0, 1, 1, 0],
+      [0, 0, 0, 1, 0, 0, 1, 0, 1], [0, 0, 0, 1, 0, 0, 0, 1, 1],
+      [0, 0, 0, 0, 1, 1, 1, 0, 0], [0, 0, 0, 0, 1, 1, 0, 1, 0],
+      [0, 0, 0, 0, 1, 1, 0, 0, 1], [0, 0, 0, 0, 1, 0, 1, 1, 0],
+      [0, 0, 0, 0, 1, 0, 1, 0, 1], [0, 0, 0, 0, 1, 0, 0, 1, 1],
+      [0, 0, 0, 0, 0, 1, 1, 1, 0], [0, 0, 0, 0, 0, 1, 1, 0, 1],
+      [0, 0, 0, 0, 0, 1, 0, 1, 1], [0, 0, 0, 0, 0, 0, 1, 1, 1],
+    ]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
+        .validate()
+    }
   }
 
-  func testIntsWithTrailingMultipleAdjacentSeparatorsNotOmittingEmpty() {
-    let nums = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7, 42, 42, 42]
-    let expectedResult = nums.split(
-      separator: 42, omittingEmptySubsequences: false)
-    let testResult = nums.lazy.split(
-      separator: 42, omittingEmptySubsequences: false)
-    XCTAssertEqualSequences(testResult, expectedResult)
+  //===--------------------------------------------------------------------===//
+  // Specific examples of interest.
+  //===--------------------------------------------------------------------===//
+
+  // The motivating example from
+  // https://github.com/apple/swift-algorithms/issues/59.
+  func testSplitFilenameComponents() {
+    Validator(
+      subject: "archive.tar.gz",
+      separator: .element("."),
+      maxSplits: 1
+    ).validate()
   }
 
-  func testIntsAllSeparators() {
-    let nums = [42, 42, 42, 42, 42]
-    let expectedResult = nums.split(separator: 42)
-    let testResult = nums.lazy.split(separator: 42)
-    XCTAssertEqualSequences(testResult, expectedResult)
+  // Examples from documentation.
+  func testSequenceDocExamples() {
+    // Closure version.
+    let numbers = stride(from: 1, through: 16, by: 1)
+    Validator(
+      subject: Array(numbers),
+      separator: .closure({ $0 % 3 == 0 || $0 % 5 == 0 }),
+      maxSplits: 1
+    ).validate()
+
+    // Equatable element version.
+    let numbers2 = [1, 2, 0, 3, 4, 0, 0, 5]
+    Validator(subject: numbers2, separator: .element(0), maxSplits: 1)
+      .validate()
   }
 
-  func testIntsAllSeparatorsNotOmittingEmpty() {
-    let nums = [42, 42, 42, 42, 42]
-    let expectedResult = nums.split(
-      separator: 42, omittingEmptySubsequences: false)
-    let testResult = nums.lazy.split(
-      separator: 42, omittingEmptySubsequences: false)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsStartWithSeparator() {
-    let nums = [42, 1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
-    let expectedResult = nums.split(separator: 42)
-    let testResult = nums.lazy.split(separator: 42)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsStartWithSeparatorNotOmittingEmpty() {
-    let nums = [42, 1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
-    let expectedResult = nums.split(
-      separator: 42, omittingEmptySubsequences: false)
-    let testResult = nums.lazy.split(
-      separator: 42, omittingEmptySubsequences: false)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsStartWithSeparatorMaxSplitsNotOmittingEmpty() {
-    let nums = [42, 1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
-    let expectedResult = nums.split(
-      separator: 42, maxSplits: 2, omittingEmptySubsequences: false)
-    let testResult = nums.lazy.split(
-      separator: 42, maxSplits: 2, omittingEmptySubsequences: false)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsSingleElement() {
-    let num = [1]
-    let expectedResult = num.split(separator: 42)
-    let testResult = num.lazy.split(separator: 42)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsSingleSeparator() {
-    let num = [42]
-    let expectedResult = num.split(separator: 42)
-    let testResult = num.lazy.split(separator: 42)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsSingleSeparatorNotOmittingEmpty() {
-    let num = [42]
-    let expectedResult = num.split(
-      separator: 42, omittingEmptySubsequences: false)
-    let testResult = num.lazy.split(
-      separator: 42, omittingEmptySubsequences: false)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsNonSeparatorSandwich() {
-    let nums = [42, 1, 42]
-    let expectedResult = nums.split(separator: 42)
-    let testResult = nums.lazy.split(separator: 42)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsNonSeparatorSandwichNotOmittingEmpty() {
-    let nums = [42, 1, 42]
-    let expectedResult = nums.split(
-      separator: 42, omittingEmptySubsequences: false)
-    let testResult = nums.lazy.split(
-      separator: 42, omittingEmptySubsequences: false)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsEmptyEquatableCollection() {
-    let empty: [Int] = []
-    let expectedResult = empty.split(separator: 42)
-    let testResult = empty.lazy.split(separator: 42)
-    XCTAssertEqualSequences(expectedResult, testResult)
-  }
-
-  func testIntsEmptyEquatableCollectionNotOmittingEmpty() {
-    let empty: [Int] = []
-    let expectedResult = empty.split(
-      separator: 42,
-      omittingEmptySubsequences: false
-    )
-    let testResult = empty.lazy.split(
-      separator: 42,
-      omittingEmptySubsequences: false
-    )
-    XCTAssertEqualSequences(expectedResult, testResult)
-  }
-
-  func testIntsSepCountEqualOrMoreThanElemCount() {
-    let nums = [0, 1, 0, 0, 2]
-    let expectedResult = nums.split(separator: 0)
-    let testResult = nums.lazy.split(separator: 0)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testIntsSepCountEqualOrMoreThanElemCountNotOmittingEmpty() {
-    let nums = [0, 1, 0, 0, 2]
-    let expectedResult = nums.split(
-      separator: 0,
-      omittingEmptySubsequences: false
-    )
-    let testResult = nums.lazy.split(
-      separator: 0,
-      omittingEmptySubsequences: false
-    )
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testString() {
-    let path = "archive.tar.gz"
-    let expectedResult = path.split(separator: ".")
-    let testResult = path.lazy.split(separator: ".")
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
-
-  func testStringWithMultipleAdjacentSeparators() {
+  func testCollectionDocExample() {
     let line = "BLANCHE:   I don't want realism. I want magic!"
-    let expectedResult = line.split(separator: " ")
-    let testResult = line.lazy.split(separator: " ")
-    XCTAssertEqualSequences(testResult, expectedResult)
+    Validator(subject: line, separator: .element("."), maxSplits: 1).validate()
   }
 
-  func testStringWithMaxSplits() {
-    let path = "archive.tar.gz"
-    let expectedResult = path.split(separator: ".", maxSplits: 1)
-    let testResult = path.lazy.split(separator: ".", maxSplits: 1)
-    XCTAssertEqualSequences(testResult, expectedResult)
+  // Patterns tested in a previous version of this file which aren't tested
+  // above. Preserved to ensure we're not losing any test coverage.
+  func testVintagePatterns() {
+    let pattern1 = [1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
+    Validator(subject: pattern1, separator: .element(42), maxSplits: 2)
+      .validate()
+    Validator(subject: pattern1, separator: .element(42), maxSplits: 0)
+      .validate()
+
+    let pattern2 = [42, 1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
+    Validator(subject: pattern2, separator: .element(42), maxSplits: 2)
+      .validate()
+
+    let pattern3 = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7]
+    Validator(subject: pattern3, separator: .element(42), maxSplits: 2)
+      .validate()
+
+    let pattern4 = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7, 42, 42, 42]
+    Validator(subject: pattern4, separator: .element(42), maxSplits: 1)
+      .validate()
   }
 
-  func testStringNotOmittingEmpty() {
-    let line = "BLANCHE:   I don't want realism. I want magic!"
-    let expectedResult = line.split(
-      separator: " ", omittingEmptySubsequences: false)
-    let testResult = line.lazy.split(
-      separator: " ", omittingEmptySubsequences: false)
-    XCTAssertEqualSequences(testResult, expectedResult)
+  //===--------------------------------------------------------------------===//
+  // Protocol conformance.
+  //===--------------------------------------------------------------------===//
+
+  func testLaziness() {
+    let splitSequence = AnySequence([1, 2, 42, 3]).lazy.split(separator: 42)
+    XCTAssertLazySequence(splitSequence)
+
+    let splitCollection = "foo.bar".lazy.split(separator: ".")
+    XCTAssertLazySequence(splitCollection)
+    XCTAssertLazyCollection(splitCollection)
   }
 
-  func testStringWithWhereClosure() {
-    let line = "BLANCHE:   I don't want realism. I want magic!"
-    let isSpace = { $0 == Character(" ") }
-    let expectedResult = line.split(whereSeparator: isSpace)
-    let testResult = line.lazy.split(whereSeparator: isSpace)
-    XCTAssertEqualSequences(testResult, expectedResult)
-  }
+  // TODO: Need a version of `validateIndexTraversals` that doesn't require
+  // `BidirectionalCollection` conformance.
 
-  func testSplitLazy() {
-    let testSubject = "foo.bar".lazy.split(separator: ".")
-    XCTAssertLazySequence(testSubject)
+  //===--------------------------------------------------------------------===//
+  // Validator
+  //===--------------------------------------------------------------------===//
+
+  /// Splits a collection as both a lazy sequence and a lazy collection, using
+  /// the provided separator, and compares the results to those of the Standard
+  /// Library's eager splits, which are assumed to be correct.
+  ///
+  /// Tests all combinations of default and provided `maxSplit` arguments and
+  /// default (true) and explicit false for `omittingEmptySubsequences`.
+  ///
+  /// - Parameters:
+  ///  - subject: The collection whose splits will be validated.
+  ///  - separator: The element of the collection--or a predicate function to
+  ///    determine the element--on which to split.
+  ///  - maxSplits: The value to pass for `maxSplits` during validation. The
+  ///    default value is also validated.
+  fileprivate struct Validator<C: Collection>
+  where C.Element: Equatable, C.SubSequence: Equatable {
+    enum Separator {
+      case element(C.Element)
+      case closure((C.Element) -> Bool)
+    }
+
+    let subject: C
+    let separator: Separator
+    let maxSplits: Int
+
+    func validate() {
+      _validateAsSequence(AnySequence(subject))
+      _validateAsCollection(subject)
+    }
+
+    private enum MaxSplits: CustomStringConvertible {
+      case provided(Int)
+      case defaultValue
+
+      var description: String {
+        switch self {
+        case .provided(let value):
+          return "maxSplits: \(value)"
+        case .defaultValue:
+          return "maxSplits: default"
+        }
+      }
+    }
+
+    private enum OmittingEmptySubsequences: CustomStringConvertible {
+      case provided(Bool)
+      case defaultValue
+
+      var description: String {
+        switch self {
+        case .provided(let value):
+          return "omittingEmptySubsequences: \(value)"
+        case .defaultValue:
+          return "omittingEmptySubsequences: default"
+        }
+      }
+    }
+
+    private func failureMessage<L: LazySequenceProtocol, S: Sequence>(
+      actual: L,
+      expected: S,
+      maxSplits: MaxSplits,
+      omittingEmptySubsequences: OmittingEmptySubsequences
+    ) -> String {
+      "for \(Array(subject).debugDescription), \(maxSplits), \(omittingEmptySubsequences): \(Array(actual).debugDescription) != \(Array(expected).debugDescription)"
+    }
+
+    private func _validateAsSequence<T: Sequence>(_ s: T)
+    where T.Element == C.Element {
+      // Default max splits, omitting empty sequences
+      switch separator {
+      case let .element(element):
+        let expected = s.split(separator: element).map { Array($0) }
+        let actual = s.lazy.split(separator: element)
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .defaultValue,
+            omittingEmptySubsequences: .defaultValue)
+        )
+      case let .closure(closure):
+        let expected = s.split(whereSeparator: closure).map { Array($0) }
+        let actual = s.lazy.split(whereSeparator: closure)
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .defaultValue,
+            omittingEmptySubsequences: .defaultValue)
+        )
+      }
+
+      // Provided max splits, omitting empty sequences
+      switch separator {
+      case let .element(element):
+        let expected = s.split(
+          separator: element,
+          maxSplits: maxSplits
+        ).map { Array($0) }
+        let actual = s.lazy.split(
+          separator: element,
+          maxSplits: maxSplits
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .provided(maxSplits),
+            omittingEmptySubsequences: .defaultValue)
+        )
+      case let .closure(closure):
+        let expected = s.split(
+          maxSplits: maxSplits,
+          whereSeparator: closure
+        ).map { Array($0) }
+        let actual = s.lazy.split(
+          maxSplits: maxSplits,
+          whereSeparator: closure
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .provided(maxSplits),
+            omittingEmptySubsequences: .defaultValue)
+        )
+      }
+
+      // Default max splits, including empty sequences
+      switch separator {
+      case let .element(element):
+        let expected = s.split(
+          separator: element,
+          omittingEmptySubsequences: false
+        ).map { Array($0) }
+        let actual = s.lazy.split(
+          separator: element,
+          omittingEmptySubsequences: false
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .defaultValue,
+            omittingEmptySubsequences: .provided(false))
+        )
+      case let .closure(closure):
+        let expected = s.split(
+          omittingEmptySubsequences: false,
+          whereSeparator: closure
+        ).map { Array($0) }
+        let actual = s.lazy.split(
+          omittingEmptySubsequences: false,
+          whereSeparator: closure
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .defaultValue,
+            omittingEmptySubsequences: .provided(false))
+        )
+      }
+
+      // Provided max splits, including empty sequences
+      switch separator {
+      case let .element(element):
+        let expected = s.split(
+          separator: element,
+          maxSplits: maxSplits,
+          omittingEmptySubsequences: false
+        ).map { Array($0) }
+        let actual = s.lazy.split(
+          separator: element,
+          maxSplits: maxSplits,
+          omittingEmptySubsequences: false
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .provided(maxSplits),
+            omittingEmptySubsequences: .provided(false))
+        )
+      case let .closure(closure):
+        let expected = s.split(
+          maxSplits: maxSplits,
+          omittingEmptySubsequences: false,
+          whereSeparator: closure
+        ).map { Array($0) }
+        let actual = s.lazy.split(
+          maxSplits: maxSplits,
+          omittingEmptySubsequences: false,
+          whereSeparator: closure
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .provided(maxSplits),
+            omittingEmptySubsequences: .provided(false))
+        )
+      }
+    }
+
+    private func _validateAsCollection(_ c: C) {
+      // Default max splits, omitting empty sequences
+      switch separator {
+      case let .element(element):
+        let expected = c.split(separator: element)
+        let actual = c.lazy.split(separator: element)
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .defaultValue,
+            omittingEmptySubsequences: .defaultValue)
+        )
+      case let .closure(closure):
+        let expected = c.split(whereSeparator: closure)
+        let actual = c.lazy.split(whereSeparator: closure)
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .defaultValue,
+            omittingEmptySubsequences: .defaultValue)
+        )
+      }
+
+      // Provided max splits, omitting empty sequences
+      switch separator {
+      case let .element(element):
+        let expected = c.split(
+          separator: element,
+          maxSplits: maxSplits
+        )
+        let actual = c.lazy.split(
+          separator: element,
+          maxSplits: maxSplits
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .provided(maxSplits),
+            omittingEmptySubsequences: .defaultValue)
+        )
+      case let .closure(closure):
+        let expected = c.split(
+          maxSplits: maxSplits,
+          whereSeparator: closure
+        )
+        let actual = c.lazy.split(
+          maxSplits: maxSplits,
+          whereSeparator: closure
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .provided(maxSplits),
+            omittingEmptySubsequences: .defaultValue)
+        )
+      }
+
+      // Default max splits, including empty sequences
+      switch separator {
+      case let .element(element):
+        let expected = c.split(
+          separator: element,
+          omittingEmptySubsequences: false
+        )
+        let actual = c.lazy.split(
+          separator: element,
+          omittingEmptySubsequences: false
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .defaultValue,
+            omittingEmptySubsequences: .provided(false))
+        )
+      case let .closure(closure):
+        let expected = c.split(
+          omittingEmptySubsequences: false,
+          whereSeparator: closure
+        )
+        let actual = c.lazy.split(
+          omittingEmptySubsequences: false,
+          whereSeparator: closure
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .defaultValue,
+            omittingEmptySubsequences: .provided(false))
+        )
+      }
+
+      // Provided max splits, including empty sequences
+      switch separator {
+      case let .element(element):
+        let expected = c.split(
+          separator: element,
+          maxSplits: maxSplits,
+          omittingEmptySubsequences: false
+        )
+        let actual = c.lazy.split(
+          separator: element,
+          maxSplits: maxSplits,
+          omittingEmptySubsequences: false
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .provided(maxSplits),
+            omittingEmptySubsequences: .provided(false))
+        )
+      case let .closure(closure):
+        let expected = c.split(
+          maxSplits: maxSplits,
+          omittingEmptySubsequences: false,
+          whereSeparator: closure
+        )
+        let actual = c.lazy.split(
+          maxSplits: maxSplits,
+          omittingEmptySubsequences: false,
+          whereSeparator: closure
+        )
+        XCTAssertEqualSequences(
+          expected,
+          actual,
+          failureMessage(
+            actual: actual, expected: expected, maxSplits: .provided(maxSplits),
+            omittingEmptySubsequences: .provided(false))
+        )
+      }
+    }
   }
 }

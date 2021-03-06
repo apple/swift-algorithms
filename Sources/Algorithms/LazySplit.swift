@@ -64,9 +64,9 @@ extension LazySplitSequence {
     @usableFromInline
     internal let omittingEmptySubsequences: Bool
 
-    /// The number of separators found and used to make a split.
+    /// The number of splits performed.
     @usableFromInline
-    internal var separatorCount = 0
+    internal var splitCount = 0
 
     /// The number of subsequences returned.
     @usableFromInline
@@ -97,14 +97,13 @@ extension LazySplitSequence.Iterator: IteratorProtocol {
     // reach a separator, unless we've already split the maximum number of
     // times. In all cases, stop at the end of the base sequence.
     while currentElement != nil {
-      if separatorCount < maxSplits && isSeparator(currentElement!) {
-        separatorCount += 1
-
+      if splitCount < maxSplits && isSeparator(currentElement!) {
         if omittingEmptySubsequences && subsequence.isEmpty {
           // Keep going if we don't want to return an empty subsequence.
           currentElement = base.next()
           continue
         } else {
+          splitCount += 1
           break
         }
       } else {
@@ -118,7 +117,7 @@ extension LazySplitSequence.Iterator: IteratorProtocol {
     // than the number of separators), or the only subsequence left to return is
     // empty and we're omitting those.
     if currentElement == nil
-      && (sequenceLength == separatorCount + 1
+      && (sequenceLength == splitCount + 1
         || omittingEmptySubsequences && subsequence.isEmpty)
     {
       return nil
