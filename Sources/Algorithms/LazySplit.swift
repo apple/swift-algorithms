@@ -547,7 +547,11 @@ extension LazySplitCollection: LazyCollectionProtocol {
   }
 }
 
-extension LazySplitCollection.Index: Hashable where Base.Index: Hashable {}
+extension LazySplitCollection.Index: Hashable {
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(sequenceLength)
+  }
+}
 
 extension LazyCollectionProtocol {
   /// Lazily returns the longest possible subsequences of the collection, in
