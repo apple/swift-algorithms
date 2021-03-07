@@ -154,6 +154,43 @@ final class LazySplitTests: XCTestCase {
   }
 
   //===--------------------------------------------------------------------===//
+  // Unique permutations of sequences with at least three separators.
+  //===--------------------------------------------------------------------===//
+
+  func testAllESSS() {
+    let permutations = [
+      [1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1],
+    ]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
+        .validate()
+    }
+  }
+
+  func testAllEEEESSS() {
+    let permutations = [
+      [1, 1, 1, 1, 0, 0, 0], [1, 1, 1, 0, 1, 0, 0], [1, 1, 1, 0, 0, 1, 0],
+      [1, 1, 1, 0, 0, 0, 1], [1, 1, 0, 1, 1, 0, 0], [1, 1, 0, 1, 0, 1, 0],
+      [1, 1, 0, 1, 0, 0, 1], [1, 1, 0, 0, 1, 1, 0], [1, 1, 0, 0, 1, 0, 1],
+      [1, 1, 0, 0, 0, 1, 1], [1, 0, 1, 1, 1, 0, 0], [1, 0, 1, 1, 0, 1, 0],
+      [1, 0, 1, 1, 0, 0, 1], [1, 0, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 0, 1, 1], [1, 0, 0, 1, 1, 1, 0], [1, 0, 0, 1, 1, 0, 1],
+      [1, 0, 0, 1, 0, 1, 1], [1, 0, 0, 0, 1, 1, 1], [0, 1, 1, 1, 1, 0, 0],
+      [0, 1, 1, 1, 0, 1, 0], [0, 1, 1, 1, 0, 0, 1], [0, 1, 1, 0, 1, 1, 0],
+      [0, 1, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 1, 0, 1, 1, 1, 0],
+      [0, 1, 0, 1, 1, 0, 1], [0, 1, 0, 1, 0, 1, 1], [0, 1, 0, 0, 1, 1, 1],
+      [0, 0, 1, 1, 1, 1, 0], [0, 0, 1, 1, 1, 0, 1], [0, 0, 1, 1, 0, 1, 1],
+      [0, 0, 1, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1, 1],
+    ]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
+        .validate()
+    }
+  }
+
+  //===--------------------------------------------------------------------===//
   // Unique permutations of sequences with at least four separators, so there
   // can be two runs of multiple adjacent separators: beginning and end,
   // beginning and middle, or end and middle.
