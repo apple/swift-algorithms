@@ -185,3 +185,47 @@ final class SortedPrefixTests: XCTestCase {
     }
   }
 }
+
+final class ExtremaTests: XCTestCase {
+  /// Confirms that empty sequences yield no results.
+  func testEmpty() {
+    XCTAssertNil(EmptyCollection<Int>().extrema())
+  }
+
+  /// Confirms the same element is used when there is only one.
+  func testSingleElement() {
+    let result = CollectionOfOne(2).extrema()
+    XCTAssertEqual(result?.min, 2)
+    XCTAssertEqual(result?.max, 2)
+  }
+
+  /// Confirms the same value is used when all the elements have it.
+  func testSingleValueMultipleElements() {
+    let result = repeatElement(3.3, count: 5).extrema()
+    XCTAssertEqual(result?.min, 3.3)
+    XCTAssertEqual(result?.max, 3.3)
+  }
+
+  /// Confirms when the minimum value is constantly updated, but the maximum
+  /// never is.
+  func testRampDown() {
+    let result = (1...5).reversed().extrema()
+    XCTAssertEqual(result?.min, 1)
+    XCTAssertEqual(result?.max, 5)
+  }
+
+  /// Confirms when the maximum value is constantly updated, but the minimum
+  /// never is.
+  func testRampUp() {
+    let result = (1...5).extrema()
+    XCTAssertEqual(result?.min, 1)
+    XCTAssertEqual(result?.max, 5)
+  }
+
+  /// Confirms when the maximum and minimum change during a run.
+  func testUpsAndDowns() {
+    let result = [4, 3, 3, 5, 2, 0, 7, 6].extrema()
+    XCTAssertEqual(result?.min, 0)
+    XCTAssertEqual(result?.max, 7)
+  }
+}

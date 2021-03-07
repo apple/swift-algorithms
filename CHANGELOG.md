@@ -12,7 +12,8 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
-*No changes yet.*
+- `extrema()` finds both the smallest and largest elements of a sequence in a
+  single pass.
 
 ---
 

@@ -383,3 +383,92 @@ extension Collection where Element: Comparable {
     return max(count: count, sortedBy: <)
   }
 }
+
+//===----------------------------------------------------------------------===//
+// Simultaneous minimum and maximum evaluation
+//===----------------------------------------------------------------------===//
+
+extension Sequence {
+  /// Returns both the minimum and maximum elements in the sequence, using the
+  /// given predicate as the comparison between elements.
+  ///
+  /// The predicate must be a *strict weak ordering* over the elements. That
+  /// is, for any elements `a`, `b`, and `c`, the following conditions must
+  /// hold:
+  ///
+  /// - `areInIncreasingOrder(a, a)` is always `false`. (Irreflexivity)
+  /// - If `areInIncreasingOrder(a, b)` and `areInIncreasingOrder(b, c)` are
+  ///   both `true`, then `areInIncreasingOrder(a, c)` is also
+  ///   `true`. (Transitive comparability)
+  /// - Two elements are *incomparable* if neither is ordered before the other
+  ///   according to the predicate. If `a` and `b` are incomparable, and `b`
+  ///   and `c` are incomparable, then `a` and `c` are also incomparable.
+  ///   (Transitive incomparability)
+  ///
+  /// This example shows how to use the `extrema(by:)` method on a
+  /// dictionary to find the key-value pair with the lowest value and the pair
+  /// with the highest value.
+  ///
+  ///     let hues = ["Heliotrope": 296, "Coral": 16, "Aquamarine": 156]
+  ///     let minmax = hues.extrema { a, b in a.value < b.value }
+  ///     let leastHue = minmax?.min, greatestHue = minmax?.max
+  ///     print(leastHue, greatestHue)
+  ///     /*
+  ///       Prints:
+  ///         """
+  ///         Optional((key: "Coral", value: 16)) Optional((key: "Heliotrope", value: 296))
+  ///         """
+  ///      */
+  ///
+  /// - Parameter areInIncreasingOrder: A predicate that returns `true`
+  ///   if its first argument should be ordered before its second
+  ///   argument; otherwise, `false`.
+  /// - Returns: A tuple with the sequence's minimum element, followed by its
+  ///   maximum element. For either member, if the sequence provides multiple
+  ///   qualifying elements, the one chosen is unspecified. The same element may
+  ///   be used for both members if all the elements are equivalent. If the
+  ///   sequence has no elements, returns `nil`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  public func extrema(
+    by areInIncreasingOrder: (Element, Element) throws -> Bool
+  ) rethrows -> (min: Element, max: Element)? {
+    var iterator = makeIterator()
+    guard var lowest = iterator.next() else { return nil }
+
+    var highest = lowest
+    while let element = iterator.next() {
+      if try areInIncreasingOrder(element, lowest) {
+        lowest = element
+      } else if try areInIncreasingOrder(highest, element) {
+        highest = element
+      }
+    }
+    return (lowest, highest)
+  }
+}
+
+extension Sequence where Element: Comparable {
+  /// Returns both the minimum and maximum elements in the sequence.
+  ///
+  /// This example finds the smallest and largest values in an array of height
+  /// measurements.
+  ///
+  ///     let heights = [67.5, 65.7, 64.3, 61.1, 58.5, 60.3, 64.9]
+  ///     let bounds = heights.extrema()
+  ///     let lowestHeight = bounds?.min, greatestHeight = bounds?.max
+  ///     print(lowestHeight, greatestHeight)
+  ///     // Prints "Optional(58.5) Optional(67.5)"
+  ///
+  /// - Returns: A tuple with the sequence's minimum element, followed by its
+  ///   maximum element. For either member, if there is a tie for the extreme
+  ///   value, the element chosen is unspecified. The same element may be used
+  ///   for both members if all the elements are equal. If the sequence has no
+  ///   elements, returns `nil`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  @inlinable
+  public func extrema() -> (min: Element, max: Element)? {
+    return extrema(by: <)
+  }
+}
