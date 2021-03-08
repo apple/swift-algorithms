@@ -9,16 +9,16 @@ This has the behaviour of reduce, but instead of returning the final result
 value, it returns the a sequence of the results returned from each element.
 
 ```swift
-let runningTotal = (1...5).reductions(0, +)
-print(Array(runningTotal))
+let runningTotalExclusive = (1...5).reductions(0, +)
+print(runningTotalExclusive)
 // prints [0, 1, 3, 6, 10, 15]
 
-let runningTotal = (1...5).reductions(+)
-print(Array(runningTotal))
+let runningTotalInclusive = (1...5).reductions(+)
+print(runningTotalInclusive)
 // prints [1, 3, 6, 10, 15]
 
 let runningMinimum = [3, 4, 2, 3, 1].reductions(min)
-print(Array(runningMinimum))
+print(runningMinimum)
 // prints [3, 3, 2, 2, 1]
 ```
 
