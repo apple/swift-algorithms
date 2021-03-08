@@ -319,3 +319,55 @@ extension ReductionsIndexRepresentation: Comparable {
     }
   }
 }
+
+// MARK: - Scan
+
+extension LazySequenceProtocol {
+
+  @available(*, deprecated, message: "Use reductions(_:_:) instead.")
+  public func scan<Result>(
+    _ initial: Result,
+    _ transform: @escaping (Result, Element) -> Result
+  ) -> ExclusiveReductions<Result, Self> {
+    reductions(initial, transform)
+  }
+}
+
+extension Sequence {
+
+  @available(*, deprecated, message: "Use reductions(_:_:) instead.")
+  public func scan<Result>(
+    _ initial: Result,
+    _ transform: (Result, Element) throws -> Result
+  ) rethrows -> [Result] {
+    try reductions(initial, transform)
+  }
+
+  @available(*, deprecated, message: "Use reductions(into:_:) instead.")
+  public func scan<Result>(
+    into initial: inout Result,
+    _ transform: (inout Result, Element) throws -> Void
+  ) rethrows -> [Result] {
+    try reductions(into: &initial, transform)
+  }
+}
+
+extension LazySequenceProtocol {
+
+  @available(*, deprecated, message: "Use reductions(_:) instead.")
+  public func scan(
+    _ transform: @escaping (Element, Element) -> Element
+  ) -> InclusiveReductions<Self> {
+    reductions(transform)
+  }
+}
+
+extension Sequence {
+
+  @available(*, deprecated, message: "Use reductions(_:) instead.")
+  public func scan(
+    _ transform: (Element, Element) throws -> Element
+  ) rethrows -> [Element] {
+    try reductions(transform)
+  }
+}
