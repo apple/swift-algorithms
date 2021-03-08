@@ -359,3 +359,82 @@ extension Collection {
     return Permutations(self, k: k)
   }
 }
+
+//===----------------------------------------------------------------------===//
+// uniquePermutations()
+//===----------------------------------------------------------------------===//
+
+public struct UniquePermutations<Element: Comparable> {
+  @usableFromInline
+  let elements: [Element]
+  
+  @inlinable
+  init<S: Sequence>(_ elements: S) where S.Element == Element {
+    self.elements = elements.sorted()
+  }
+}
+
+extension UniquePermutations: Sequence {
+  public struct Iterator: IteratorProtocol {
+    @usableFromInline
+    var elements: [Element]
+    
+    @usableFromInline
+    var finished = false
+    
+    @inlinable
+    init(_ elements: [Element]) {
+      self.elements = elements
+    }
+    
+    @inlinable
+    public mutating func next() -> [Element]? {
+      if finished {
+        return nil
+      } else {
+        defer { finished = !elements.nextPermutation() }
+        return elements
+      }
+    }
+  }
+  
+  @inlinable
+  public func makeIterator() -> Iterator {
+    Iterator(elements)
+  }
+}
+
+extension Sequence where Element: Comparable {
+  /// Returns a sequence of the unique permutations of this sequence.
+  ///
+  /// Use this method to iterate over the unique permutations of a sequence
+  /// with repeating elements. This example prints every permutation of an
+  /// array of numbers:
+  ///
+  ///     let numbers = [1, 2, 2]
+  ///     for perm in numbers.uniquePermutations() {
+  ///         print(perm)
+  ///     }
+  ///     // [1, 2, 2]
+  ///     // [2, 1, 2]
+  ///     // [2, 2, 1]
+  ///
+  /// By contrast, the unadorned `permutations()` method permutes over a
+  /// collection by position, which includes permutations with equal elements
+  /// in each permutation:
+  ///
+  ///     for perm in numbers.permutations()
+  ///         print(perm)
+  ///     }
+  ///     // [1, 2, 2]
+  ///     // [1, 2, 2]
+  ///     // [2, 1, 2]
+  ///     // [2, 2, 1]
+  ///     // [2, 1, 2]
+  ///     // [2, 2, 1]
+  ///
+  /// The returned permutations are in lexicographically sorted order.
+  public func uniquePermutations() -> UniquePermutations<Element> {
+    UniquePermutations(self)
+  }
+}
