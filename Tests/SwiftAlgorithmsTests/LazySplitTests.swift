@@ -102,6 +102,26 @@ final class LazySplitTests: XCTestCase {
   }
 
   //===--------------------------------------------------------------------===//
+  // Length 4 with less than two separators.
+  //===--------------------------------------------------------------------===//
+
+  func testEEEE() {
+    Validator(subject: [1, 1, 1, 1], separator: .element(0), maxSplits: 0)
+      .validate()
+  }
+
+  func testAllEEES() {
+    let permutations = [
+      [1, 1, 1, 0], [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1]
+    ]
+
+    for permutation in permutations {
+      Validator(subject: permutation, separator: .element(0), maxSplits: 0)
+        .validate()
+    }
+  }
+
+  //===--------------------------------------------------------------------===//
   // Unique permutations of sequences with at least two separators, so there can
   // be multiple adjacent separators at the beginning, middle, or end.
   //===--------------------------------------------------------------------===//
