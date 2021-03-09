@@ -29,20 +29,8 @@ extension BidirectionalCollection {
   public func trimming(
     while predicate: (Element) throws -> Bool
   ) rethrows -> SubSequence {
-    // Consume elements from the front.
-    let sliceStart = try firstIndex { try predicate($0) == false } ?? endIndex
-    // sliceEnd is the index _after_ the last index to match the predicate.
-    var sliceEnd = endIndex
-    
-    while sliceStart != sliceEnd {
-      let idxBeforeSliceEnd = index(before: sliceEnd)
-      guard try predicate(self[idxBeforeSliceEnd]) else {
-        return self[sliceStart..<sliceEnd]
-      }
-      sliceEnd = idxBeforeSliceEnd
-    }
-    
-    // Trimmed everything.
-    return self[Range(uncheckedBounds: (sliceStart, sliceStart))]
+    let start = try endOfPrefix(while: predicate)
+    let end = try self[start...].startOfSuffix(while: predicate)
+    return self[start..<end]
   }
 }

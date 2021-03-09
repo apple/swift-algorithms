@@ -27,14 +27,7 @@ extension BidirectionalCollection {
   public func suffix(
     while predicate: (Element) throws -> Bool
   ) rethrows -> SubSequence {
-    let start = startIndex
-    var result = endIndex
-    while result != start {
-      let previous = index(before: result)
-      guard try predicate(self[previous]) else { break }
-      result = previous
-    }
-    return self[result...]
+    try self[startOfSuffix(while: predicate)...]
   }
 }
 

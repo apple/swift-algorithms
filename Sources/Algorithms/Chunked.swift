@@ -76,8 +76,7 @@ extension LazyChunked: LazyCollectionProtocol {
   internal func endOfChunk(startingAt start: Base.Index) -> Base.Index {
     let subject = projection(base[start])
     return base[base.index(after: start)...]
-      .firstIndex(where: { !belongInSameGroup(subject, projection($0)) })
-      ?? base.endIndex
+      .endOfPrefix(while: { belongInSameGroup(subject, projection($0)) })
   }
   
   @inlinable
@@ -119,20 +118,8 @@ extension LazyChunked: BidirectionalCollection
     
     // Get the projected value of the last element in the range ending at `end`.
     let subject = projection(base[indexBeforeEnd])
-    
-    // Search backward from `end` for the first element whose projection isn't
-    // equal to `subject`.
-    if let firstMismatch = base[..<indexBeforeEnd]
-      .lastIndex(where: { !belongInSameGroup(projection($0), subject) })
-    {
-      // If we found one, that's the last element of the _next_ previous chunk,
-      // and therefore one position _before_ the start of this chunk.
-      return base.index(after: firstMismatch)
-    } else {
-      // If we didn't find such an element, this chunk extends back to the start
-      // of the collection.
-      return base.startIndex
-    }
+    return base[..<indexBeforeEnd]
+      .startOfSuffix(while: { belongInSameGroup(projection($0), subject) })
   }
 
   @inlinable
