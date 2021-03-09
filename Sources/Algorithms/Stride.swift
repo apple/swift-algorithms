@@ -53,6 +53,7 @@ extension Collection {
   }
 }
 
+/// A wrapper that strides over a base sequence.
 public struct StrideSequence<Base: Sequence>: Sequence {
   
   @usableFromInline
@@ -130,8 +131,8 @@ extension Stride {
   }
 }
 
-extension Stride: Sequence & Collection {
-
+extension Stride: Collection {
+  
   /// A position in a `Stride` collection.
   public struct Index: Comparable {
     @usableFromInline
