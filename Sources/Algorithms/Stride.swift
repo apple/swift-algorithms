@@ -107,7 +107,7 @@ extension StrideSequence {
   }
 }
 
-/// A wrapper that strides over a base sequence or collection.
+/// A wrapper that strides over a base collection.
 public struct Stride<Base: Collection> {
   @usableFromInline
   internal let base: Base
