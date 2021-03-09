@@ -20,12 +20,11 @@ extension Sequence {
   ///     (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
   ///     (0...10).striding(by: 3) // == [0, 3, 6, 9]
   ///
-  /// - Complexity: O(1). Access to successive values is O(1) if the
-  /// collection conforms to `RandomAccessCollection`; otherwise,
-  /// O(_k_), where _k_ is the striding `step`.
+  /// - Complexity: O(1). Access to successive values is O(k) where
+  ///   _k_ is the striding `step`.
   ///
   /// - Parameter step: The amount to step with each iteration.
-  /// - Returns: Returns a sequence or collection for stepping through the
+  /// - Returns: Returns a sequence for stepping through the
   /// elements by the specified amount.
   @inlinable
   public func striding(by step: Int) -> StrideSequence<Self> {
@@ -45,7 +44,7 @@ extension Collection {
   /// O(_k_), where _k_ is the striding `step`.
   ///
   /// - Parameter step: The amount to step with each iteration.
-  /// - Returns: Returns a sequence or collection for stepping through the
+  /// - Returns: Returns a collection for stepping through the
   /// elements by the specified amount.
   @inlinable
   public func striding(by step: Int) -> Stride<Self> {
