@@ -20,21 +20,41 @@ extension Sequence {
   ///     (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
   ///     (0...10).striding(by: 3) // == [0, 3, 6, 9]
   ///
+  /// - Complexity: O(1). Access to successive values is O(k) where
+  ///   _k_ is the striding `step`.
+  ///
+  /// - Parameter step: The amount to step with each iteration.
+  /// - Returns: Returns a sequence for stepping through the
+  /// elements by the specified amount.
+  @inlinable
+  public func striding(by step: Int) -> StrideSequence<Self> {
+    StrideSequence(base: self, stride: step)
+  }
+}
+
+extension Collection {
+  /// Returns a sequence stepping through the elements every `step` starting
+  /// at the first value. Any remainders of the stride will be trimmed.
+  ///
+  ///     (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
+  ///     (0...10).striding(by: 3) // == [0, 3, 6, 9]
+  ///
   /// - Complexity: O(1). Access to successive values is O(1) if the
   /// collection conforms to `RandomAccessCollection`; otherwise,
   /// O(_k_), where _k_ is the striding `step`.
   ///
   /// - Parameter step: The amount to step with each iteration.
-  /// - Returns: Returns a sequence or collection for stepping through the
+  /// - Returns: Returns a collection for stepping through the
   /// elements by the specified amount.
   @inlinable
-  public func striding(by step: Int) -> Stride<Self> {
-    Stride(base: self, stride: step)
+  public func striding(by step: Int) -> StrideCollection<Self> {
+    StrideCollection(base: self, stride: step)
   }
 }
 
-/// A wrapper that strides over a base sequence or collection.
-public struct Stride<Base: Sequence> {
+/// A wrapper that strides over a base sequence.
+public struct StrideSequence<Base: Sequence>: Sequence {
+  
   @usableFromInline
   internal let base: Base
   
@@ -49,14 +69,8 @@ public struct Stride<Base: Sequence> {
   }
 }
 
-extension Stride {
-  @inlinable
-  public func striding(by step: Int) -> Self {
-    Stride(base: base, stride: stride * step)
-  }
-}
-
-extension Stride: Sequence {
+extension StrideSequence {
+  
   /// An iterator over a `Stride` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -88,12 +102,43 @@ extension Stride: Sequence {
   }
   
   @inlinable
-  public func makeIterator() -> Stride<Base>.Iterator {
+  public func makeIterator() -> Iterator {
     Iterator(iterator: base.makeIterator(), stride: stride)
   }
 }
 
-extension Stride: Collection where Base: Collection {
+extension StrideSequence {
+  @inlinable
+  public func striding(by step: Int) -> Self {
+    Self(base: base, stride: stride * step)
+  }
+}
+
+/// A wrapper that strides over a base collection.
+public struct StrideCollection<Base: Collection> {
+  @usableFromInline
+  internal let base: Base
+  
+  @usableFromInline
+  internal let stride: Int
+  
+  @usableFromInline
+  internal init(base: Base, stride: Int) {
+    precondition(stride > 0, "striding must be greater than zero")
+    self.base = base
+    self.stride = stride
+  }
+}
+
+extension StrideCollection {
+  @inlinable
+  public func striding(by step: Int) -> Self {
+    Self(base: base, stride: stride * step)
+  }
+}
+
+extension StrideCollection: Collection {
+  
   /// A position in a `Stride` collection.
   public struct Index: Comparable {
     @usableFromInline
@@ -213,7 +258,7 @@ extension Stride: Collection where Base: Collection {
   }
 }
 
-extension Stride: BidirectionalCollection
+extension StrideCollection: BidirectionalCollection
   where Base: RandomAccessCollection {
   
   @inlinable
@@ -223,16 +268,16 @@ extension Stride: BidirectionalCollection
   }
 }
 
-extension Stride: RandomAccessCollection where Base: RandomAccessCollection {}
+extension StrideCollection: RandomAccessCollection where Base: RandomAccessCollection {}
 
-extension Stride: Equatable where Base.Element: Equatable {
+extension StrideCollection: Equatable where Base.Element: Equatable {
   @inlinable
-  public static func == (lhs: Stride, rhs: Stride) -> Bool {
+  public static func == (lhs: StrideCollection, rhs: StrideCollection) -> Bool {
     lhs.elementsEqual(rhs, by: ==)
   }
 }
 
-extension Stride: Hashable where Base.Element: Hashable {
+extension StrideCollection: Hashable where Base.Element: Hashable {
   @inlinable
   public func hash(into hasher: inout Hasher) {
     hasher.combine(stride)
@@ -242,4 +287,4 @@ extension Stride: Hashable where Base.Element: Hashable {
   }
 }
 
-extension Stride.Index: Hashable where Base.Index: Hashable {}
+extension StrideCollection.Index: Hashable where Base.Index: Hashable {}
