@@ -68,7 +68,7 @@ final class StridingTests: XCTestCase {
     let a = (0...10)
     XCTAssertEqualSequences(a.striding(by: 6), a.striding(by: 2).striding(by: 3))
     XCTAssertTrue(a.striding(by: 6) == a.striding(by: 2).striding(by: 3))
-    XCTAssert(type(of: a.striding(by: 2).striding(by: 3)) == Stride<ClosedRange<Int>>.self)
+    XCTAssert(type(of: a.striding(by: 2).striding(by: 3)) == StrideCollection<ClosedRange<Int>>.self)
   }
   
   func testEquality() {

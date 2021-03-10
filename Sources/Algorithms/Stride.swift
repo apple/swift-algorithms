@@ -47,8 +47,8 @@ extension Collection {
   /// - Returns: Returns a collection for stepping through the
   /// elements by the specified amount.
   @inlinable
-  public func striding(by step: Int) -> Stride<Self> {
-    Stride(base: self, stride: step)
+  public func striding(by step: Int) -> StrideCollection<Self> {
+    StrideCollection(base: self, stride: step)
   }
 }
 
@@ -107,8 +107,15 @@ extension StrideSequence {
   }
 }
 
+extension StrideSequence {
+  @inlinable
+  public func striding(by step: Int) -> Self {
+    Self(base: base, stride: stride * step)
+  }
+}
+
 /// A wrapper that strides over a base collection.
-public struct Stride<Base: Collection> {
+public struct StrideCollection<Base: Collection> {
   @usableFromInline
   internal let base: Base
   
@@ -123,14 +130,14 @@ public struct Stride<Base: Collection> {
   }
 }
 
-extension Stride {
+extension StrideCollection {
   @inlinable
   public func striding(by step: Int) -> Self {
-    Stride(base: base, stride: stride * step)
+    Self(base: base, stride: stride * step)
   }
 }
 
-extension Stride: Collection {
+extension StrideCollection: Collection {
   
   /// A position in a `Stride` collection.
   public struct Index: Comparable {
@@ -251,7 +258,7 @@ extension Stride: Collection {
   }
 }
 
-extension Stride: BidirectionalCollection
+extension StrideCollection: BidirectionalCollection
   where Base: RandomAccessCollection {
   
   @inlinable
@@ -261,16 +268,16 @@ extension Stride: BidirectionalCollection
   }
 }
 
-extension Stride: RandomAccessCollection where Base: RandomAccessCollection {}
+extension StrideCollection: RandomAccessCollection where Base: RandomAccessCollection {}
 
-extension Stride: Equatable where Base.Element: Equatable {
+extension StrideCollection: Equatable where Base.Element: Equatable {
   @inlinable
-  public static func == (lhs: Stride, rhs: Stride) -> Bool {
+  public static func == (lhs: StrideCollection, rhs: StrideCollection) -> Bool {
     lhs.elementsEqual(rhs, by: ==)
   }
 }
 
-extension Stride: Hashable where Base.Element: Hashable {
+extension StrideCollection: Hashable where Base.Element: Hashable {
   @inlinable
   public func hash(into hasher: inout Hasher) {
     hasher.combine(stride)
@@ -280,4 +287,4 @@ extension Stride: Hashable where Base.Element: Hashable {
   }
 }
 
-extension Stride.Index: Hashable where Base.Index: Hashable {}
+extension StrideCollection.Index: Hashable where Base.Index: Hashable {}
