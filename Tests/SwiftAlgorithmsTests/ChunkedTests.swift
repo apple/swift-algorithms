@@ -145,4 +145,16 @@ final class ChunkedTests: XCTestCase {
       validateIndexTraversals(chunks)
     }
   }
+  
+  func testEvenChunks() {
+    validateIndexTraversals(
+      (0..<10).evenlyChunked(into: 1),
+      (0..<10).evenlyChunked(into: 2),
+      (0..<10).evenlyChunked(into: 3),
+      (0..<10).evenlyChunked(into: 10),
+      (0..<10).evenlyChunked(into: 20),
+      (0..<0).evenlyChunked(into: 0),
+      (0..<0).evenlyChunked(into: 1),
+      (0..<0).evenlyChunked(into: 10))
+  }
 }
