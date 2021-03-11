@@ -19,7 +19,9 @@ final class SuffixTests: XCTestCase {
     XCTAssertEqualSequences(a.suffix(while: { $0 > 10 }), [])
     XCTAssertEqualSequences(a.suffix(while: { $0 > 9 }), [10])
     XCTAssertEqualSequences(a.suffix(while: { $0 > -1 }), (0...10))
-    
+  }
+  
+  func testSuffixEmptyArray() {
     let empty: [Int] = []
     XCTAssertEqualSequences(empty.suffix(while: { $0 > 10 }), [])
   }
