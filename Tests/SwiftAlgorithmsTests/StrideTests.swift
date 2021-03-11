@@ -23,7 +23,9 @@ final class StridingTests: XCTestCase {
     XCTAssertEqualSequences(a.striding(by: 5), [0, 5, 10])
     XCTAssertEqualSequences(a.striding(by: 10), [0, 10])
     XCTAssertEqualSequences(a.striding(by: 11), [0])
-    
+  }
+
+  func testStridePrefixSequence() {
     let s = (0...).prefix(11)
     XCTAssertEqualSequences(s.striding(by: 1), (0...10))
     XCTAssertEqualSequences(s.striding(by: 2), [0, 2, 4, 6, 8, 10])
@@ -32,7 +34,9 @@ final class StridingTests: XCTestCase {
     XCTAssertEqualSequences(s.striding(by: 5), [0, 5, 10])
     XCTAssertEqualSequences(s.striding(by: 10), [0, 10])
     XCTAssertEqualSequences(s.striding(by: 11), [0])
-    
+  }
+
+  func testStridePrefixEmptySequence() {
     let empty = (0...).prefix(0)
     XCTAssertEqualSequences(empty.striding(by: 2), [])
   }
@@ -87,9 +91,12 @@ final class StridingTests: XCTestCase {
     XCTAssertEqual([Int]().striding(by: 2).last, nil) // empty
   }
   
-  func testCount() {
+  func testEmptyCount() {
     let empty = [Int]().striding(by: 2)
     XCTAssertEqual(empty.count, 0)
+  }
+
+  func testCount() {
     let a = (0...10)
     XCTAssertEqual(a.striding(by: 1).count, (0...10).count)
     XCTAssertEqual(a.striding(by: 2).count, [0, 2, 4, 6, 8, 10].count)
@@ -100,24 +107,34 @@ final class StridingTests: XCTestCase {
     XCTAssertEqual(a.striding(by: 11).count, [0].count)
   }
   
-  func testIndexTraversals() {
-    let empty = [Int]()
+  func testEmptyIndexTraversals() {
+    let empty: [Int] = []
     validateIndexTraversals(
       empty.striding(by: 1),
       empty.striding(by: 2)
     )
+  }
+
+  func testRangeIndexTraversal() {
     let zero_to_one_hundered_range = 0...100
     validateIndexTraversals(
       zero_to_one_hundered_range.striding(by: 10),
       zero_to_one_hundered_range.striding(by: 11),
       zero_to_one_hundered_range.striding(by: 101)
     )
+  }
+
+  func testArrayIndexTraversal() {
+    let zero_to_one_hundered_range = 0...100
     let zero_to_one_hundered_array = Array(zero_to_one_hundered_range)
     validateIndexTraversals(
       zero_to_one_hundered_array.striding(by: 10),
       zero_to_one_hundered_array.striding(by: 11),
       zero_to_one_hundered_array.striding(by: 101)
     )
+  }
+
+  func testStringIndexTraversal() {
     let string = "swift rocks".map(String.init)
     validateIndexTraversals(
       string.striding(by: 1),
