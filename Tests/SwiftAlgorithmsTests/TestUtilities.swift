@@ -46,6 +46,34 @@ struct SplitMix64: RandomNumberGenerator {
   }
 }
 
+// An eraser helper to any mutable collection
+struct AnyMutableCollection<Base> where Base: MutableCollection {
+  var base: Base
+}
+
+extension AnyMutableCollection: MutableCollection {
+  typealias Index = Base.Index
+  typealias Element = Base.Element
+  
+  var startIndex: Base.Index { base.startIndex }
+  var endIndex: Base.Index { base.endIndex }
+
+  func index(after i: Index) -> Index {
+    return base.index(after: i)
+  }
+
+  subscript(position: Base.Index) -> Base.Element {
+    _read { yield base[position] }
+    set { base[position] = newValue }
+  }
+}
+
+extension MutableCollection {
+  func eraseToAnyMutableCollection() -> AnyMutableCollection<Self> {
+    AnyMutableCollection(base: self)
+  }
+}
+
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
@@ -53,6 +81,33 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
   try XCTAssert(expression1().elementsEqual(expression2()), message(), file: file, line: line)
+}
+
+// Two sequences contains exactly the same element but not necessarily in the same order.
+func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
+  _ expression1: @autoclosure () throws -> S1,
+  _ expression2: @autoclosure () throws -> S2,
+  file: StaticString = #file, line: UInt = #line
+) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
+  var s1 = Array(try expression1())
+  var missing: [S1.Element] = []
+  for elt in try expression2() {
+    guard let idx = s1.firstIndex(of: elt) else {
+      missing.append(elt)
+      continue
+    }
+    s1.remove(at: idx)
+  }
+  
+  XCTAssertTrue(
+    missing.isEmpty, "first sequence missing '\(missing)' elements from second sequence",
+    file: file, line: line
+  )
+
+  XCTAssertTrue(
+    s1.isEmpty, "first sequence contains \(s1) missing from second sequence",
+    file: file, line: line
+  )
 }
 
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
