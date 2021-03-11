@@ -67,7 +67,7 @@ final class windowsTests: XCTestCase {
   }
 
   func testWindowsCountWithEmptyArray() {
-    let a3 = [Int]()
+    let a3: [Int] = []
     XCTAssertEqual(a3.windows(ofCount: 2).count, 0)
   }
   
