@@ -18,7 +18,9 @@ final class UniqueTests: XCTestCase {
     let b = a.uniqued()
     XCTAssertEqual(b.sorted(), Set(a).sorted())
     XCTAssertEqual(10, b.count)
-    
+  }
+
+  func testUniqueEmptyArray() {
     let c: [Int] = []
     XCTAssertEqual(c.uniqued(), [])
   }
@@ -27,7 +29,9 @@ final class UniqueTests: XCTestCase {
     let a = ["Albemarle", "Abeforth", "Astrology", "Brandywine", "Beatrice", "Axiom"]
     let b = a.uniqued(on: { $0.first })
     XCTAssertEqual(["Albemarle", "Brandywine"], b)
-    
+  }
+
+  func testUniqueOnEmptyArray() {
     let c: [Int] = []
     XCTAssertEqual(c.uniqued(on: { $0.bitWidth }), [])
   }
