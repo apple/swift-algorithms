@@ -56,13 +56,17 @@ final class windowsTests: XCTestCase {
     XCTAssertEqual(a2, 3 + 6 + 9 + 12 + 15)
   }
   
-  func testWindowsCount() {
+  func testWindowsCountWithInRangeCount() {
     let a = [0, 1, 2, 3, 4, 5]
     XCTAssertEqual(a.windows(ofCount: 3).count, 4)
-    
+  }
+
+  func testWindowsCountWithOutOfRangeCount() {
     let a2 = [0, 1, 2, 3, 4]
     XCTAssertEqual(a2.windows(ofCount: 6).count, 0)
-    
+  }
+
+  func testWindowsCountWithEmptyArray() {
     let a3 = [Int]()
     XCTAssertEqual(a3.windows(ofCount: 2).count, 0)
   }
