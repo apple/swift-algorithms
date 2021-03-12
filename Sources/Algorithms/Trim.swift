@@ -9,6 +9,31 @@
 //
 //===----------------------------------------------------------------------===//
 
+extension Collection {
+  /// Returns a `SubSequence` formed by discarding all elements at the start
+  /// of the collection which satisfy the given predicate.
+  ///
+  /// This example uses `trimmingPrefix(while:)` to get a substring without the white
+  /// space at the beginning of the string:
+  ///
+  ///     let myString = "  hello, world  "
+  ///     print(myString.trimmingPrefix(while: \.isWhitespace)) // "hello, world  "
+  ///
+  /// - Parameters:
+  ///    - predicate: A closure which determines if the element should be
+  ///                 omitted from the resulting slice.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of this collection.
+  ///
+  @inlinable
+  public func trimmingPrefix(
+    while predicate: (Element) throws -> Bool
+  ) rethrows -> SubSequence {
+    let start = try endOfPrefix(while: predicate)
+    return self[start..<endIndex]
+  }
+}
+
 extension BidirectionalCollection {
   /// Returns a `SubSequence` formed by discarding all elements at the start and
   /// end of the collection which satisfy the given predicate.
@@ -29,8 +54,29 @@ extension BidirectionalCollection {
   public func trimming(
     while predicate: (Element) throws -> Bool
   ) rethrows -> SubSequence {
-    let start = try endOfPrefix(while: predicate)
-    let end = try self[start...].startOfSuffix(while: predicate)
-    return self[start..<end]
+    return try trimmingPrefix(while: predicate).trimmingSuffix(while: predicate)
+  }
+
+  /// Returns a `SubSequence` formed by discarding all elements at the end
+  /// of the collection which satisfy the given predicate.
+  ///
+  /// This example uses `trimmingSuffix(while:)` to get a substring without the white
+  /// space at the end of the string:
+  ///
+  ///     let myString = "  hello, world  "
+  ///     print(myString.trimmingSuffix(while: \.isWhitespace)) // "  hello, world"
+  ///
+  /// - Parameters:
+  ///    - predicate: A closure which determines if the element should be
+  ///                 omitted from the resulting slice.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of this collection.
+  ///
+  @inlinable
+  public func trimmingSuffix(
+    while predicate: (Element) throws -> Bool
+  ) rethrows -> SubSequence {
+    let end = try self[startIndex...].startOfSuffix(while: predicate)
+    return self[startIndex..<end]
   }
 }

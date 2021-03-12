@@ -56,4 +56,14 @@ final class TrimTests: XCTestCase {
     let results_one = [2, 10, 12, 15, 20, 100].trimming { $0.isMultiple(of: 2) }
     XCTAssertEqual(results_one, [15])
   }
+    
+  func testTrimmingPrefix() {
+      let results = [2, 10, 12, 15, 20, 100].trimmingPrefix { $0.isMultiple(of: 2) }
+      XCTAssertEqual(results, [15, 20, 100])
+  }
+
+  func testTrimmingSuffix() {
+      let results = [2, 10, 12, 15, 20, 100].trimmingSuffix { $0.isMultiple(of: 2) }
+      XCTAssertEqual(results, [2, 10, 12, 15])
+  }
 }
