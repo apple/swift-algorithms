@@ -35,6 +35,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 #### Other useful operations
 
+- [`BreadthFirstTreeSequence`](https://github.com/apple/swift-algorithms/blob/main/Guides/BreadthFirstSearch.md): Breadth-first ordering of a tree as a `Sequence`
 - [`chunked(by:)`, `chunked(on:)`, `chunks(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chunked.md): Eager and lazy operations that break a collection into chunks based on either a binary predicate or when the result of a projection changes or chunks of a given count.
 - [`indexed()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Indexed.md): Iterate over tuples of a collection's indices and elements. 
 - [`interspersed(with:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Intersperse.md): Place a value between every two elements of a sequence.
