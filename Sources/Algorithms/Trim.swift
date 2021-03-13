@@ -34,6 +34,15 @@ extension Collection {
   }
 }
 
+extension Collection where Self == SubSequence {
+  @inlinable
+  public mutating func trimPrefix(
+    while predicate: (Element) throws -> Bool
+  ) rethrows {
+    self = try trimmingPrefix(while: predicate)
+  }
+}
+
 extension BidirectionalCollection {
   /// Returns a `SubSequence` formed by discarding all elements at the start and
   /// end of the collection which satisfy the given predicate.
@@ -78,5 +87,21 @@ extension BidirectionalCollection {
   ) rethrows -> SubSequence {
     let end = try self[startIndex...].startOfSuffix(while: predicate)
     return self[startIndex..<end]
+  }
+}
+
+extension BidirectionalCollection where Self == SubSequence {
+  @inlinable
+  public mutating func trim(
+    while predicate: (Element) throws -> Bool
+  ) rethrows {
+    self = try trimming(while: predicate)
+  }
+  
+  @inlinable
+  public mutating func trimSuffix(
+    while predicate: (Element) throws -> Bool
+  ) rethrows {
+    self = try trimmingPrefix(while: predicate)
   }
 }
