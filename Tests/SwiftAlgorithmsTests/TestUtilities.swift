@@ -52,7 +52,8 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   _ message: @autoclosure () -> String = "",
   file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
-  try XCTAssert(expression1().elementsEqual(expression2()), message(), file: file, line: line)
+  try XCTAssertEqualSequences(expression1(), expression2(), by: ==,
+    message(), file: file, line: line)
 }
 
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
@@ -62,7 +63,25 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   _ message: @autoclosure () -> String = "",
   file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element == S2.Element {
-  try XCTAssert(expression1().elementsEqual(expression2(), by: areEquivalent), message(), file: file, line: line)
+    var iter1 = try expression1().makeIterator()
+    var iter2 = try expression2().makeIterator()
+    while true {
+      switch (iter1.next(), iter2.next()) {
+      case let (e1?, e2?):
+        XCTAssertTrue(
+          areEquivalent(e1, e2),
+          "Element \(e1) in first sequence not equal to \(e2) in second sequence.",
+          file: file, line: line)
+        return
+      case (_?, nil):
+        XCTFail("Second sequence shorter than first")
+        return
+      case (nil, _?):
+        XCTFail("First sequence shorter than second")
+        return
+      case (nil, nil): return
+      }
+    }
 }
 
 func XCTAssertLazySequence<S: LazySequenceProtocol>(_: S) {}
