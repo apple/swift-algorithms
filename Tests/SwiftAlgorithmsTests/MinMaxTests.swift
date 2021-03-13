@@ -186,22 +186,22 @@ final class SortedPrefixTests: XCTestCase {
   }
 }
 
-final class ExtremaTests: XCTestCase {
+final class MinAndMaxTests: XCTestCase {
   /// Confirms that empty sequences yield no results.
   func testEmpty() {
-    XCTAssertNil(EmptyCollection<Int>().extrema())
+    XCTAssertNil(EmptyCollection<Int>().minAndMax())
   }
 
   /// Confirms the same element is used when there is only one.
   func testSingleElement() {
-    let result = CollectionOfOne(2).extrema()
+    let result = CollectionOfOne(2).minAndMax()
     XCTAssertEqual(result?.min, 2)
     XCTAssertEqual(result?.max, 2)
   }
 
   /// Confirms the same value is used when all the elements have it.
   func testSingleValueMultipleElements() {
-    let result = repeatElement(3.3, count: 5).extrema()
+    let result = repeatElement(3.3, count: 5).minAndMax()
     XCTAssertEqual(result?.min, 3.3)
     XCTAssertEqual(result?.max, 3.3)
   }
@@ -209,7 +209,7 @@ final class ExtremaTests: XCTestCase {
   /// Confirms when the minimum value is constantly updated, but the maximum
   /// never is.
   func testRampDown() {
-    let result = (1...5).reversed().extrema()
+    let result = (1...5).reversed().minAndMax()
     XCTAssertEqual(result?.min, 1)
     XCTAssertEqual(result?.max, 5)
   }
@@ -217,14 +217,14 @@ final class ExtremaTests: XCTestCase {
   /// Confirms when the maximum value is constantly updated, but the minimum
   /// never is.
   func testRampUp() {
-    let result = (1...5).extrema()
+    let result = (1...5).minAndMax()
     XCTAssertEqual(result?.min, 1)
     XCTAssertEqual(result?.max, 5)
   }
 
   /// Confirms when the maximum and minimum change during a run.
   func testUpsAndDowns() {
-    let result = [4, 3, 3, 5, 2, 0, 7, 6].extrema()
+    let result = [4, 3, 3, 5, 2, 0, 7, 6].minAndMax()
     XCTAssertEqual(result?.min, 0)
     XCTAssertEqual(result?.max, 7)
   }

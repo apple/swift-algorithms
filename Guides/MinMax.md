@@ -19,7 +19,7 @@ If you need both the minimum and maximum values of a collection, using these met
 
 ```swift
 let numbers = [7, 1, 6, 2, 8, 3, 9]
-if let (smallest, largest) = numbers.extrema(by: <) {
+if let (smallest, largest) = numbers.minAndMax(by: <) {
     // Work with 1 and 9....
 }
 ```
@@ -46,7 +46,7 @@ And the `Sequence` method:
 
 ```swift
 extension Sequence {
-    public func extrema(
+    public func minAndMax(
         by areInIncreasingOrder: (Element, Element) throws -> Bool
     ) rethrows -> (min: Element, max: Element)?
 }
@@ -62,7 +62,7 @@ extension Collection where Element: Comparable {
 }
 
 extension Sequence where Element: Comparable {
-    public func extrema() -> (min: Element, max: Element)?
+    public func minAndMax() -> (min: Element, max: Element)?
 }
 ```
 

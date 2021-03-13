@@ -405,12 +405,12 @@ extension Sequence {
   ///   and `c` are incomparable, then `a` and `c` are also incomparable.
   ///   (Transitive incomparability)
   ///
-  /// This example shows how to use the `extrema(by:)` method on a
+  /// This example shows how to use the `minAndMax(by:)` method on a
   /// dictionary to find the key-value pair with the lowest value and the pair
   /// with the highest value.
   ///
   ///     let hues = ["Heliotrope": 296, "Coral": 16, "Aquamarine": 156]
-  ///     let minmax = hues.extrema { a, b in a.value < b.value }
+  ///     let minmax = hues.minAndMax { a, b in a.value < b.value }
   ///     let leastHue = minmax?.min, greatestHue = minmax?.max
   ///     print(leastHue, greatestHue)
   ///     /*
@@ -430,7 +430,7 @@ extension Sequence {
   ///   sequence has no elements, returns `nil`.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
-  public func extrema(
+  public func minAndMax(
     by areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> (min: Element, max: Element)? {
     var iterator = makeIterator()
@@ -455,7 +455,7 @@ extension Sequence where Element: Comparable {
   /// measurements.
   ///
   ///     let heights = [67.5, 65.7, 64.3, 61.1, 58.5, 60.3, 64.9]
-  ///     let bounds = heights.extrema()
+  ///     let bounds = heights.minAndMax()
   ///     let lowestHeight = bounds?.min, greatestHeight = bounds?.max
   ///     print(lowestHeight, greatestHeight)
   ///     // Prints "Optional(58.5) Optional(67.5)"
@@ -468,7 +468,7 @@ extension Sequence where Element: Comparable {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   @inlinable
-  public func extrema() -> (min: Element, max: Element)? {
-    return extrema(by: <)
+  public func minAndMax() -> (min: Element, max: Element)? {
+    return minAndMax(by: <)
   }
 }
