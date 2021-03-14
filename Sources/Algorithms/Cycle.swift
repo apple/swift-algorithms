@@ -150,7 +150,7 @@ extension Collection {
   ///
   /// - Complexity: O(1)
   @inlinable
-  public func cycled(times: Int) -> FlattenSequence<Repeated<Self>> {
-    repeatElement(self, count: times).joined()
+  public func cycled(times: Int) -> FiniteCycle<Self> {
+    FiniteCycle(base: self, times: times)
   }
 }
