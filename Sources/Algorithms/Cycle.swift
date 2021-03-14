@@ -61,10 +61,10 @@ extension Cycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
 /// finite number of times.
 public struct FiniteCycle<Base: Collection> {
   /// The collection to repeat.
-  public let base: Base
+  internal let base: Base
 
   /// The number of times to repeat the collection.
-  public let times: Int
+  internal let times: Int
 
   @usableFromInline
   internal init(base: Base, times: Int) {
