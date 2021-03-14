@@ -56,6 +56,47 @@ extension Cycle: Sequence {
 
 extension Cycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
+
+/// A collection wrapper that repeats the elements of a base collection for a finite number of times.
+public struct FiniteCycle<Base: Collection> {
+  /// The collection to repeat.
+  public let base: Base
+
+  /// The number of times to repeat the collection.
+  public let times: Int
+
+  @usableFromInline
+  internal init(base: Base, times: Int) {
+    self.base = base
+    self.times = times
+  }
+}
+
+extension FiniteCycle: Sequence {
+  /// The iterator for a `FiniteCycle` sequence.
+  public struct Iterator : IteratorProtocol {
+    @usableFromInline
+    var productIterator: Product2<Range<Int>, Base>.Iterator
+
+    @usableFromInline
+    internal init(_ product: Product2<Range<Int>, Base>) {
+      self.productIterator = product.makeIterator()
+    }
+
+    @inlinable
+    public mutating func next() -> Base.Element? {
+      self.productIterator.next()?.1
+    }
+  }
+
+  public func makeIterator() -> Iterator {
+    let iterations: Range<Int> = 0..<times
+    return Iterator(Product2(iterations, base))
+  }
+}
+
+extension FiniteCycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
+
 //===----------------------------------------------------------------------===//
 // cycled()
 //===----------------------------------------------------------------------===//
