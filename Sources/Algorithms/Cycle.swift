@@ -57,7 +57,8 @@ extension Cycle: Sequence {
 extension Cycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
 
-/// A collection wrapper that repeats the elements of a base collection for a finite number of times.
+/// A collection wrapper that repeats the elements of a base collection for a
+/// finite number of times.
 public struct FiniteCycle<Base: Collection> {
   /// The collection to repeat.
   public let base: Base
