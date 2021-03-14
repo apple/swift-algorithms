@@ -44,7 +44,7 @@ extension Product2: Sequence {
     }
     
     @inlinable
-    public mutating func next() -> (Base1.Element, Base2.Element)? {
+    public mutating func next() -> (element1: Base1.Element, element2: Base2.Element)? {
       // This is the initial state, where i1.next() has never
       // been called, or the final state, where i1.next() has
       // already returned nil.
@@ -57,7 +57,7 @@ extension Product2: Sequence {
       // Get the next element from the second sequence, if not
       // at end.
       if let element2 = i2.next() {
-        return (element1!, element2)
+        return (element1: element1!, element2: element2)
       }
       
       // We've reached the end of the second sequence, so:
@@ -70,7 +70,7 @@ extension Product2: Sequence {
       
       i2 = base2.makeIterator()
       if let element2 = i2.next() {
-        return (element1, element2)
+        return (element1: element1, element2: element2)
       } else {
         return nil
       }
@@ -121,8 +121,8 @@ extension Product2: Collection where Base1: Collection {
   }
   
   @inlinable
-  public subscript(position: Index) -> (Base1.Element, Base2.Element) {
-    (base1[position.i1], base2[position.i2])
+  public subscript(position: Index) -> (element1: Base1.Element, element2: Base2.Element) {
+    (element1: base1[position.i1], element2: base2[position.i2])
   }
   
   /// Forms an index from a pair of base indices, normalizing

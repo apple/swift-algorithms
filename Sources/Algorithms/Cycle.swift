@@ -85,7 +85,7 @@ extension FiniteCycle: Sequence {
 
     @inlinable
     public mutating func next() -> Base.Element? {
-      self.productIterator.next()?.1
+      self.productIterator.next()?.element2
     }
   }
 
