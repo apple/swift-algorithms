@@ -15,11 +15,17 @@ public struct SubSequenceFinder<Base: Collection, Other: Collection>
   internal var base: Base
   internal var other: Other
   internal var firstRange: Range<Base.Index>?
+  internal var areEquivalent: (Base.Element, Base.Element) -> Bool
   
-  internal init(base: Base, other: Other) {
+  internal init(
+    base: Base,
+    other: Other,
+    by areEquivalent: @escaping (Base.Element, Base.Element) -> Bool)
+  {
     self.base = base
     self.other = other
-    self.firstRange = base.firstRange(of: other)
+    self.areEquivalent = areEquivalent
+    self.firstRange = base.firstRange(of: other, by: areEquivalent)
   }
 }
 
@@ -86,14 +92,58 @@ extension SubSequenceFinder: Collection {
   }
 }
 
+extension SubSequenceFinder: BidirectionalCollection
+  where Base: BidirectionalCollection, Other: BidirectionalCollection
+{
+  public func index(before i: Index) -> Index {
+    let endingPoint: Base.Index
+    switch i.base {
+    case .match(let range):
+      precondition(range != firstRange, "Can't move before startIndex")
+      endingPoint = base.index(before: range.upperBound)
+    case .end:
+      endingPoint = base.endIndex
+    }
+    return Index(base[..<endingPoint].lastRange(of: other)!)
+  }
+}
+
+// MARK: allRanges(of:by:) / allRanges(of:)
+
+extension Collection {
+  public func allRanges<Other: Collection>(
+    of other: Other,
+    by areEquivalent: @escaping (Element, Element) -> Bool
+  )
+    -> SubSequenceFinder<Self, Other>
+  {
+    SubSequenceFinder(base: self, other: other, by: areEquivalent)
+  }
+}
+
 extension Collection where Element: Equatable {
-  public func firstRange<Other: Collection>(of other: Other) -> Range<Index>?
+  public func allRanges<Other: Collection>(of other: Other) -> SubSequenceFinder<Self, Other>
+    where Element == Other.Element
+  {
+    allRanges(of: other, by: ==)
+  }
+}
+
+// MARK: - firstRange(of:by:) / firstRange(of:)
+
+extension Collection {
+  public func firstRange<Other: Collection>(
+    of other: Other,
+    by areEquivalent: (Element, Element) throws -> Bool
+  ) rethrows -> Range<Index>?
     where Other.Element == Element
   {
     var searchStart = startIndex
     guard let needleFirst = other.first else { return nil }
     
-    while let matchStart = self[searchStart...].firstIndex(of: needleFirst) {
+    while let matchStart = try self[searchStart...]
+            .firstIndex(where: { try areEquivalent($0, needleFirst) })
+    {
       var selfPos = index(after: matchStart)
       var otherPos = other.index(after: other.startIndex)
       
@@ -104,7 +154,7 @@ extension Collection where Element: Equatable {
         if selfPos == self.endIndex {
           return nil
         }
-        if self[selfPos] != other[otherPos] {
+        if try !areEquivalent(self[selfPos], other[otherPos]) {
           break
         }
         
@@ -117,13 +167,17 @@ extension Collection where Element: Equatable {
     
     return nil
   }
-  
-  public func allRanges<Other: Collection>(of other: Other)
-    -> SubSequenceFinder<Self, Other>
+}
+
+extension Collection where Element: Equatable {
+  public func firstRange<Other: Collection>(of other: Other) -> Range<Index>?
+    where Element == Other.Element
   {
-    SubSequenceFinder(base: self, other: other)
+    firstRange(of: other, by: ==)
   }
 }
+
+// MARK: - lastRange(of:by:) / lastRange(of:)
 
 extension BidirectionalCollection where Element: Equatable {
   public func lastRange<Other: BidirectionalCollection>(of other: Other) -> Range<Index>?
@@ -235,59 +289,3 @@ extension SubSequenceFinderFromEnd: Collection {
     return range
   }
 }
-
-public protocol CollectionOfRanges: Collection where
-  Element == Range<Bound>
-{
-  associatedtype Bound: Comparable
-  associatedtype AscendingRangeCollection: Collection
-    where AscendingRangeCollection.Element == Element
-  
-  func ascendingRanges() -> AscendingRangeCollection
-}
-
-extension CollectionOfRanges where Element == Range<Bound> {
-  public func ascendingRanges() -> [Range<Bound>] {
-    sorted(by: { $0.lowerBound < $1.lowerBound })
-  }
-}
-
-extension CollectionOfRanges where AscendingRangeCollection == Self {
-  public func ascendingRanges() -> Self {
-    self
-  }
-}
-
-extension SubSequenceFinder: CollectionOfRanges {
-  public typealias Bound = Base.Index
-  public typealias AscendingRangeCollection = Self
-}
-
-extension SubSequenceFinderFromEnd: CollectionOfRanges {
-  public typealias Bound = Base.Index
-  public typealias AscendingRangeCollection = [Range<Base.Index>]
-  
-  public func ascendingRanges() -> [Range<Base.Index>] {
-    self.reversed()
-  }
-}
-
-extension Slice: CollectionOfRanges where Base: CollectionOfRanges {
-  public typealias Bound = Base.Bound
-  public typealias AscendingRangeCollection = [Range<Base.Bound>]
-}
-
-extension ReversedCollection: CollectionOfRanges
-  where Base: CollectionOfRanges,
-        Base.AscendingRangeCollection: BidirectionalCollection
-{
-  public typealias Bound = Base.Bound
-  public typealias AscendingRangeCollection = ReversedCollection<Base.AscendingRangeCollection>
-  
-  public func ascendingRanges() -> ReversedCollection<Base.AscendingRangeCollection> {
-    // base.ascendingRanges().reversed()
-    fatalError()
-  }
-}
-
-extension LazyF
