@@ -16,7 +16,7 @@ public struct Product2<Base1: Sequence, Base2: Collection> {
   /// The inner sequence in the product.
   public let base2: Base2
   
-  @usableFromInline
+  @inlinable
   internal init(_ base1: Base1, _ base2: Base2) {
     self.base1 = base1
     self.base2 = base2
@@ -35,7 +35,7 @@ extension Product2: Sequence {
     @usableFromInline
     internal let base2: Base2
 
-    @usableFromInline
+    @inlinable
     internal init(_ c: Product2) {
       self.base2 = c.base2
       self.i1 = c.base1.makeIterator()
@@ -90,7 +90,7 @@ extension Product2: Collection where Base1: Collection {
     @usableFromInline
     internal var i2: Base2.Index
     
-    @usableFromInline
+    @inlinable
     internal init(i1: Base1.Index, i2: Base2.Index) {
       self.i1 = i1
       self.i2 = i2
@@ -128,7 +128,7 @@ extension Product2: Collection where Base1: Collection {
   /// Forms an index from a pair of base indices, normalizing
   /// `(i, base2.endIndex)` to `(base1.index(after: i), base2.startIndex)` if
   /// necessary.
-  @usableFromInline
+  @inlinable
   internal func normalizeIndex(_ i1: Base1.Index, _ i2: Base2.Index) -> Index {
     i2 == base2.endIndex
       ? Index(i1: base1.index(after: i1), i2: base2.startIndex)
@@ -195,6 +195,7 @@ extension Product2: Collection where Base1: Collection {
     }
   }
   
+  @inlinable
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     guard distance != 0 else { return i }
     
@@ -203,6 +204,7 @@ extension Product2: Collection where Base1: Collection {
       : offsetBackward(i, by: -distance)
   }
   
+  @inlinable
   public func index(
     _ i: Index,
     offsetBy distance: Int,
@@ -219,21 +221,21 @@ extension Product2: Collection where Base1: Collection {
     }
   }
 
-  @usableFromInline
+  @inlinable
   internal func offsetForward(_ i: Index, by distance: Int) -> Index {
     guard let index = offsetForward(i, by: distance, limitedBy: endIndex)
       else { fatalError("Index is out of bounds") }
     return index
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(_ i: Index, by distance: Int) -> Index {
     guard let index = offsetBackward(i, by: distance, limitedBy: startIndex)
       else { fatalError("Index is out of bounds") }
     return index
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetForward(
     _ i: Index, by distance: Int, limitedBy limit: Index
   ) -> Index? {
@@ -311,7 +313,7 @@ extension Product2: Collection where Base1: Collection {
       .map { i2 in Index(i1: i1, i2: i2) }
   }
 
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(
     _ i: Index, by distance: Int, limitedBy limit: Index
   ) -> Index? {

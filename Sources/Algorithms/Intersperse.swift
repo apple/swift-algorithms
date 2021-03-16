@@ -18,7 +18,7 @@ public struct Intersperse<Base: Sequence> {
   @usableFromInline
   internal let separator: Base.Element
   
-  @usableFromInline
+  @inlinable
   internal init(base: Base, separator: Base.Element) {
     self.base = base
     self.separator = separator
@@ -37,7 +37,7 @@ extension Intersperse: Sequence {
     @usableFromInline
     internal var state = State.start
     
-    @usableFromInline
+    @inlinable
     internal init(iterator: Base.Iterator, separator: Base.Element) {
       self.iterator = iterator
       self.separator = separator
@@ -90,6 +90,11 @@ extension Intersperse: Collection where Base: Collection {
     internal let representation: Representation
 
     @inlinable
+    init(representation: Representation) {
+      self.representation = representation
+    }
+
+    @inlinable
     public static func < (lhs: Index, rhs: Index) -> Bool {
       switch (lhs.representation, rhs.representation) {
       case let (.element(li), .element(ri)),
@@ -101,12 +106,12 @@ extension Intersperse: Collection where Base: Collection {
       }
     }
     
-    @usableFromInline
+    @inlinable
     static func element(_ index: Base.Index) -> Self {
       Self(representation: .element(index))
     }
 
-    @usableFromInline
+    @inlinable
     static func separator(next: Base.Index) -> Self {
       Self(representation: .separator(next: next))
     }

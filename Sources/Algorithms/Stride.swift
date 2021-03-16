@@ -61,7 +61,7 @@ public struct StrideSequence<Base: Sequence>: Sequence {
   @usableFromInline
   internal let stride: Int
   
-  @usableFromInline
+  @inlinable
   internal init(base: Base, stride: Int) {
     precondition(stride > 0, "striding must be greater than zero")
     self.base = base
@@ -82,7 +82,7 @@ extension StrideSequence {
     @usableFromInline
     internal var striding: Bool = false
     
-    @usableFromInline
+    @inlinable
     internal init(iterator: Base.Iterator, stride: Int) {
       self.iterator = iterator
       self.stride = stride
@@ -122,7 +122,7 @@ public struct StrideCollection<Base: Collection> {
   @usableFromInline
   internal let stride: Int
   
-  @usableFromInline
+  @inlinable
   internal init(base: Base, stride: Int) {
     precondition(stride > 0, "striding must be greater than zero")
     self.base = base
@@ -190,7 +190,7 @@ extension StrideCollection: Collection {
       : offsetBackward(i, offsetBy: -n, limitedBy: limit)
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetForward(
     _ i: Index,
     offsetBy n: Int,
@@ -220,7 +220,7 @@ extension StrideCollection: Collection {
     }
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(
     _ i: Index,
     offsetBy n: Int,

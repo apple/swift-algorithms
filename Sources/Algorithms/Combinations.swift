@@ -27,7 +27,7 @@ public struct Combinations<Base: Collection> {
   /// - Parameters:
   ///   - base: The collection to iterate over for combinations.
   ///   - k: The expected size of each combination.
-  @usableFromInline
+  @inlinable
   internal init(_ base: Base, k: Int) {
     self.init(base, kRange: k...k)
   }
@@ -37,7 +37,7 @@ public struct Combinations<Base: Collection> {
   /// - Parameters:
   ///   - base: The collection to iterate over for combinations.
   ///   - kRange: The range of accepted sizes of combinations.
-  @usableFromInline
+  @inlinable
   internal init<R: RangeExpression>(
     _ base: Base, kRange: R
   ) where R.Bound == Int {
@@ -89,7 +89,7 @@ extension Combinations: Sequence {
     internal var kRange: Range<Int>
     
     /// Whether or not iteration is finished (`kRange` is empty)
-    @usableFromInline
+    @inlinable
     internal var isFinished: Bool {
       return kRange.isEmpty
     }
@@ -97,6 +97,7 @@ extension Combinations: Sequence {
     @usableFromInline
     internal var indexes: [Base.Index]
     
+    @inlinable
     internal init(_ combinations: Combinations) {
       self.base = combinations.base
       self.kRange = combinations.kRange ?? 0..<0
@@ -121,7 +122,7 @@ extension Combinations: Sequence {
     ///     [2, 3, 4] *
     ///     // Can't advance without needing to go past `base.endIndex`,
     ///     // so the iteration is finished.
-    @usableFromInline
+    @inlinable
     internal mutating func advance() {
       /// Advances `kRange` by incrementing its `lowerBound` until the range is
       /// empty, when iteration is finished.

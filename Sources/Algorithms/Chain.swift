@@ -19,7 +19,7 @@ public struct Chain2<Base1: Sequence, Base2: Sequence>
   /// The second sequence in this chain.
   public let base2: Base2
 
-  @usableFromInline
+  @inlinable
   internal init(base1: Base1, base2: Base2) {
     self.base1 = base1
     self.base2 = base2
@@ -35,7 +35,7 @@ extension Chain2: Sequence {
     @usableFromInline
     internal var iterator2: Base2.Iterator
     
-    @usableFromInline
+    @inlinable
     internal init(_ concatenation: Chain2) {
       iterator1 = concatenation.base1.makeIterator()
       iterator2 = concatenation.base2.makeIterator()
@@ -71,13 +71,13 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
     internal let position: Representation
 
     /// Creates a new index into the first underlying collection.
-    @usableFromInline
+    @inlinable
     internal init(first i: Base1.Index) {
       position = .first(i)
     }
 
     /// Creates a new index into the second underlying collection.
-    @usableFromInline
+    @inlinable
     internal init(second i: Base2.Index) {
       position = .second(i)
     }
@@ -99,7 +99,7 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
   
   /// Converts an index of `Base1` to the corresponding `Index` by mapping
   /// `base1.endIndex` to `base2.startIndex`.
-  @usableFromInline
+  @inlinable
   internal func convertIndex(_ i: Base1.Index) -> Index {
     i == base1.endIndex ? Index(second: base2.startIndex) : Index(first: i)
   }
@@ -157,7 +157,7 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
       : offsetBackward(i, by: -n, limitedBy: limit)
   }
 
-  @usableFromInline
+  @inlinable
   internal func offsetForward(
     _ i: Index, by n: Int, limitedBy limit: Index
   ) -> Index? {
@@ -197,7 +197,7 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
     }
   }
 
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(
     _ i: Index, by n: Int, limitedBy limit: Index
   ) -> Index? {

@@ -34,7 +34,7 @@ public struct LazySplitSequence<Base: Sequence> {
   @usableFromInline
   internal let omittingEmptySubsequences: Bool
 
-  @usableFromInline
+  @inlinable
   internal init(
     base: Base,
     isSeparator: @escaping (Base.Element) -> Bool,
@@ -72,7 +72,7 @@ extension LazySplitSequence {
     @usableFromInline
     internal var sequenceLength = 0
 
-    @usableFromInline
+    @inlinable
     internal init(
       base: Base.Iterator,
       whereSeparator: @escaping (Base.Element) -> Bool,
@@ -360,7 +360,7 @@ public struct LazySplitCollection<Base: Collection> {
   @usableFromInline
   internal var _startIndex: Index
 
-  @usableFromInline
+  @inlinable
   internal init(
     base: Base,
     isSeparator: @escaping (Base.Element) -> Bool,
@@ -415,7 +415,7 @@ extension LazySplitCollection: LazyCollectionProtocol {
     @usableFromInline
     internal let splitCount: Int
 
-    @usableFromInline
+    @inlinable
     internal init(
       baseRange: Range<Base.Index>,
       sequenceLength: Int,
@@ -441,7 +441,7 @@ extension LazySplitCollection: LazyCollectionProtocol {
 
   /// Returns the index of the subsequence starting at or after the given base
   /// collection index.
-  @usableFromInline
+  @inlinable
   internal func indexForSubsequence(
     atOrAfter lowerBound: Base.Index,
     sequenceLength: Int,

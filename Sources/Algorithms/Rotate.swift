@@ -29,7 +29,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Postcondition: For returned indices `(lower, upper)`:
   ///   `lower == limit || upper == limit`
-  @usableFromInline
+  @inlinable
   @discardableResult
   internal mutating func _reverse(
     subrange: Range<Index>, until limit: Index
@@ -94,7 +94,7 @@ extension MutableCollection {
   ///   - distance(from: lhs.lowerBound, to: p) == distance(from:
   ///     rhs.lowerBound, to: q)
   ///   - p == lhs.upperBound || q == rhs.upperBound
-  @usableFromInline
+  @inlinable
   internal mutating func _swapNonemptySubrangePrefixes(
     _ lhs: Range<Index>, _ rhs: Range<Index>
   ) -> (Index, Index) {
