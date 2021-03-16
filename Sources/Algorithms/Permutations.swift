@@ -9,6 +9,100 @@
 //
 //===----------------------------------------------------------------------===//
 
+//===----------------------------------------------------------------------===//
+// nextPermutation()
+//===----------------------------------------------------------------------===//
+
+extension MutableCollection
+  where Self: BidirectionalCollection, Element: Comparable
+{
+  /// Permutes this collection's elements through all the lexical orderings.
+  ///
+  /// Call `nextPermutation()` repeatedly starting with the collection in
+  /// sorted order. When the full cycle of all permutations has been completed,
+  /// the collection will be back in sorted order and this method will return
+  /// `false`.
+  ///
+  /// - Returns: A Boolean value indicating whether the collection still has
+  ///   remaining permutations. When this method returns `false`, the collection
+  ///   is in ascending order according to `areInIncreasingOrder`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the collection.
+  @inlinable
+  internal mutating func nextPermutation() -> Bool {
+    // Ensure we have > 1 element in the collection.
+    guard !isEmpty else { return false }
+    var i = index(before: endIndex)
+    if i == startIndex { return false }
+    
+    while true {
+      let ip1 = i
+      formIndex(before: &i)
+      
+      if self[i] < self[ip1] {
+        var j = index(before: endIndex)
+        while self[i] >= self[j] {
+          formIndex(before: &j)
+        }
+        swapAt(i, j)
+        self.reverse(subrange: ip1 ..< endIndex)
+        
+        // check here if i < the prefix, if so, return true, if not, continue
+        return true
+      }
+      
+      if i == startIndex {
+        self.reverse()
+        return false
+      }
+    }
+  }
+
+  @inlinable
+  internal mutating func nextPermutation(upperBound: Index) -> Bool {
+    // Ensure we have > 1 element in the collection.
+    guard !isEmpty else { return false }
+    var i = index(before: endIndex)
+    if i == startIndex { return false }
+    
+    while true {
+      let ip1 = i
+      formIndex(before: &i)
+      
+      // Find the last ascending pair (ie. ..., a, b, ... where a < b)
+      if self[i] < self[ip1] {
+        // Find the last element greater than self[i]
+        // This is _always_ at most `ip1` due to if statement above
+        let j = lastIndex(where: { $0 > self[i] })!
+        
+        // At this point we have something like this:
+        //    0, 1, 4, 3, 2
+        //       ^        ^
+        //       i        j
+        swapAt(i, j)
+        self.reverse(subrange: ip1 ..< endIndex)
+        
+        // Only return if we've made a change within ..<upperBound region
+        if i < upperBound {
+          return true
+        } else {
+          i = index(before: endIndex)
+          continue
+        }
+      }
+      
+      if i == startIndex {
+        self.reverse()
+        return false
+      }
+    }
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// struct Permutations<Base>
+//===----------------------------------------------------------------------===//
+
 /// A sequence of all the permutations of a collection's elements.
 public struct Permutations<Base: Collection> {
   /// The base collection to iterate over for permutations.
@@ -195,54 +289,6 @@ extension Permutations: Sequence {
 extension Permutations: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
-// nextPermutation()
-//===----------------------------------------------------------------------===//
-
-extension MutableCollection
-where Self: BidirectionalCollection, Element: Comparable
-{
-  /// Permutes this collection's elements through all the lexical orderings.
-  ///
-  /// Call `nextPermutation()` repeatedly starting with the collection in
-  /// sorted order. When the full cycle of all permutations has been completed,
-  /// the collection will be back in sorted order and this method will return
-  /// `false`.
-  ///
-  /// - Returns: A Boolean value indicating whether the collection still has
-  ///   remaining permutations. When this method returns `false`, the collection
-  ///   is in ascending order according to `areInIncreasingOrder`.
-  ///
-  /// - Complexity: O(*n*), where *n* is the length of the collection.
-  @usableFromInline
-  internal mutating func nextPermutation() -> Bool {
-    // Ensure we have > 1 element in the collection.
-    guard !isEmpty else { return false }
-    var i = index(before: endIndex)
-    if i == startIndex { return false }
-    
-    while true {
-      let ip1 = i
-      formIndex(before: &i)
-      
-      if self[i] < self[ip1] {
-        var j = index(before: endIndex)
-        while self[i] >= self[j] {
-          formIndex(before: &j)
-        }
-        swapAt(i, j)
-        self.reverse(subrange: ip1 ..< endIndex)
-        return true
-      }
-      
-      if i == startIndex {
-        self.reverse()
-        return false
-      }
-    }
-  }
-}
-
-//===----------------------------------------------------------------------===//
 // permutations(ofCount:)
 //===----------------------------------------------------------------------===//
 
@@ -366,11 +412,25 @@ extension Collection {
 
 public struct UniquePermutations<Element: Comparable> {
   @usableFromInline
-  let elements: [Element]
+  internal let elements: [Element]
   
+  @usableFromInline
+  internal let kRange: Range<Int>
+
   @inlinable
-  init<S: Sequence>(_ elements: S) where S.Element == Element {
+  internal init<S: Sequence>(_ elements: S) where S.Element == Element {
+    self.init(elements, 0..<Int.max)
+  }
+
+  @inlinable
+  internal init<S: Sequence, R: RangeExpression>(_ elements: S, _ range: R)
+    where S.Element == Element, R.Bound == Int
+  {
     self.elements = elements.sorted()
+    
+    let upperBound = self.elements.count + 1
+    self.kRange = range.relative(to: 0 ..< .max)
+      .clamped(to: 0 ..< upperBound)
   }
 }
 
@@ -380,27 +440,51 @@ extension UniquePermutations: Sequence {
     var elements: [Element]
     
     @usableFromInline
-    var finished = false
+    enum State {
+      case start, middle, end
+    }
+    
+    @usableFromInline
+    var state = State.start
+    
+    @usableFromInline
+    var lengths: Range<Int>
     
     @inlinable
-    init(_ elements: [Element]) {
+    init(_ elements: [Element], lengths: Range<Int>) {
       self.elements = elements
+      self.lengths = lengths
     }
     
     @inlinable
-    public mutating func next() -> [Element]? {
-      if finished {
+    public mutating func next() -> ArraySlice<Element>? {
+      switch state {
+      case .start:
+        state = .middle
+        return elements[..<lengths.lowerBound]
+      case .middle:
+        if !elements.nextPermutation(upperBound: lengths.lowerBound) {
+          lengths = (lengths.lowerBound + 1)..<lengths.upperBound
+
+          if lengths.isEmpty {
+            state = .end
+            return nil
+          }
+
+          elements.sort()
+          state = .start
+        }
+        return elements[..<lengths.lowerBound]
+        
+      case .end:
         return nil
-      } else {
-        defer { finished = !elements.nextPermutation() }
-        return elements
       }
     }
   }
   
   @inlinable
   public func makeIterator() -> Iterator {
-    Iterator(elements)
+    Iterator(elements, lengths: kRange)
   }
 }
 
@@ -436,5 +520,15 @@ extension Sequence where Element: Comparable {
   /// The returned permutations are in lexicographically sorted order.
   public func uniquePermutations() -> UniquePermutations<Element> {
     UniquePermutations(self)
+  }
+
+  public func uniquePermutations(ofCount k: Int) -> UniquePermutations<Element> {
+    UniquePermutations(self, k ..< (k + 1))
+  }
+
+  public func uniquePermutations<R: RangeExpression>(ofCount kRange: R) -> UniquePermutations<Element>
+    where R.Bound == Int
+  {
+    UniquePermutations(self, kRange)
   }
 }
