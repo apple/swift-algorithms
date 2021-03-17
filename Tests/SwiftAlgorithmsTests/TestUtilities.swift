@@ -78,7 +78,7 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
       idx += 1
       continue
     case let (e1?, e2?):
-      fail("unequal elements at index \(idx) (\(e1) != \(e2))")
+      fail("element \(e1) on first sequence does not match element \(e2) on second sequence at position \(idx)")
     case (_?, nil):
       fail("second sequence shorter than first")
     case (nil, _?):
