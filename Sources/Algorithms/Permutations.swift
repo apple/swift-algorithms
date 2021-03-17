@@ -57,9 +57,11 @@ extension MutableCollection
       }
     }
   }
+}
 
+extension MutableCollection where Self: BidirectionalCollection {
   @inlinable
-  internal mutating func nextPermutation(upperBound: Index) -> Bool {
+  internal mutating func nextPermutation(upperBound: Index, by areInIncreasingOrder: (Element, Element) -> Bool) -> Bool {
     // Ensure we have > 1 element in the collection.
     guard !isEmpty else { return false }
     var i = index(before: endIndex)
@@ -70,10 +72,10 @@ extension MutableCollection
       formIndex(before: &i)
       
       // Find the last ascending pair (ie. ..., a, b, ... where a < b)
-      if self[i] < self[ip1] {
+      if areInIncreasingOrder(self[i], self[ip1]) {
         // Find the last element greater than self[i]
         // This is _always_ at most `ip1` due to if statement above
-        let j = lastIndex(where: { $0 > self[i] })!
+        let j = lastIndex(where: { areInIncreasingOrder(self[i], $0) })!
         
         // At this point we have something like this:
         //    0, 1, 4, 3, 2
@@ -410,23 +412,27 @@ extension Collection {
 // uniquePermutations()
 //===----------------------------------------------------------------------===//
 
-public struct UniquePermutations<Element: Comparable> {
+public struct UniquePermutations<Element> {
   @usableFromInline
   internal let elements: [Element]
   
   @usableFromInline
   internal let kRange: Range<Int>
 
+  @usableFromInline
+  internal let areInIncreasingOrder: (Element, Element) -> Bool
+  
   @inlinable
-  internal init<S: Sequence>(_ elements: S) where S.Element == Element {
-    self.init(elements, 0..<Int.max)
+  internal init<S: Sequence>(_ elements: S, by areInIncreasingOrder: @escaping (Element, Element) -> Bool) where S.Element == Element {
+    self.init(elements, 0..<Int.max, by: areInIncreasingOrder)
   }
 
   @inlinable
-  internal init<S: Sequence, R: RangeExpression>(_ elements: S, _ range: R)
+  internal init<S: Sequence, R: RangeExpression>(_ elements: S, _ range: R, by areInIncreasingOrder: @escaping (Element, Element) -> Bool)
     where S.Element == Element, R.Bound == Int
   {
-    self.elements = elements.sorted()
+    self.elements = elements.sorted(by: areInIncreasingOrder)
+    self.areInIncreasingOrder = areInIncreasingOrder
     
     let upperBound = self.elements.count + 1
     self.kRange = range.relative(to: 0 ..< .max)
@@ -438,22 +444,21 @@ extension UniquePermutations: Sequence {
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     var elements: [Element]
-    
-    @usableFromInline
-    enum State {
-      case start, middle, end
-    }
-    
+        
     @usableFromInline
     var initial = true
     
     @usableFromInline
     var lengths: Range<Int>
     
+    @usableFromInline
+    internal let areInIncreasingOrder: (Element, Element) -> Bool
+    
     @inlinable
-    init(_ elements: [Element], lengths: Range<Int>) {
+    init(_ elements: [Element], lengths: Range<Int>, by areInIncreasingOrder: @escaping (Element, Element) -> Bool) {
       self.elements = elements
       self.lengths = lengths
+      self.areInIncreasingOrder = areInIncreasingOrder
     }
     
     @inlinable
@@ -472,7 +477,7 @@ extension UniquePermutations: Sequence {
         return elements[..<lengths.lowerBound]
       }
 
-      if !elements.nextPermutation(upperBound: lengths.lowerBound) {
+      if !elements.nextPermutation(upperBound: lengths.lowerBound, by: areInIncreasingOrder) {
         lengths = (lengths.lowerBound + 1)..<lengths.upperBound
 
         if lengths.isEmpty {
@@ -486,7 +491,7 @@ extension UniquePermutations: Sequence {
   
   @inlinable
   public func makeIterator() -> Iterator {
-    Iterator(elements, lengths: kRange)
+    Iterator(elements, lengths: kRange, by: areInIncreasingOrder)
   }
 }
 
@@ -521,16 +526,32 @@ extension Sequence where Element: Comparable {
   ///
   /// The returned permutations are in lexicographically sorted order.
   public func uniquePermutations() -> UniquePermutations<Element> {
-    UniquePermutations(self)
+    UniquePermutations(self, by: <)
   }
 
   public func uniquePermutations(ofCount k: Int) -> UniquePermutations<Element> {
-    UniquePermutations(self, k ..< (k + 1))
+    UniquePermutations(self, k ..< (k + 1), by: <)
   }
 
   public func uniquePermutations<R: RangeExpression>(ofCount kRange: R) -> UniquePermutations<Element>
     where R.Bound == Int
   {
-    UniquePermutations(self, kRange)
+    UniquePermutations(self, kRange, by: <)
+  }
+}
+
+extension Sequence {
+  public func uniquePermutations(by areInIncreasingOrder: @escaping (Element, Element) -> Bool) -> UniquePermutations<Element> {
+    UniquePermutations(self, by: areInIncreasingOrder)
+  }
+
+  public func uniquePermutations(ofCount k: Int, by areInIncreasingOrder: @escaping (Element, Element) -> Bool) -> UniquePermutations<Element> {
+    UniquePermutations(self, k ..< (k + 1), by: areInIncreasingOrder)
+  }
+
+  public func uniquePermutations<R: RangeExpression>(ofCount kRange: R, by areInIncreasingOrder: @escaping (Element, Element) -> Bool) -> UniquePermutations<Element>
+    where R.Bound == Int
+  {
+    UniquePermutations(self, kRange, by: areInIncreasingOrder)
   }
 }
