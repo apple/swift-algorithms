@@ -445,7 +445,7 @@ extension UniquePermutations: Sequence {
     }
     
     @usableFromInline
-    var state = State.start
+    var initial = true
     
     @usableFromInline
     var lengths: Range<Int>
@@ -458,27 +458,29 @@ extension UniquePermutations: Sequence {
     
     @inlinable
     public mutating func next() -> ArraySlice<Element>? {
-      switch state {
-      case .start:
-        state = .middle
-        return elements[..<lengths.lowerBound]
-      case .middle:
-        if !elements.nextPermutation(upperBound: lengths.lowerBound) {
-          lengths = (lengths.lowerBound + 1)..<lengths.upperBound
-
-          if lengths.isEmpty {
-            state = .end
-            return nil
-          }
-
-          elements.sort()
-          state = .start
-        }
-        return elements[..<lengths.lowerBound]
-        
-      case .end:
+      // In the end case, `lengths` is an empty range.
+      if lengths.isEmpty {
         return nil
       }
+      
+      // The first iteration must produce the original sorted array, before any
+      // permutations. We skip the permutation the first time so that we can
+      // always mutate the array _before_ returning a slice, which avoids
+      // copying when possible.
+      if initial {
+        initial = false
+        return elements[..<lengths.lowerBound]
+      }
+
+      if !elements.nextPermutation(upperBound: lengths.lowerBound) {
+        lengths = (lengths.lowerBound + 1)..<lengths.upperBound
+
+        if lengths.isEmpty {
+          return nil
+        }
+      }
+      
+      return elements[..<lengths.lowerBound]
     }
   }
   
