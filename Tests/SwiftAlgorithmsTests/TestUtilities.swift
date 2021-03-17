@@ -65,7 +65,8 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
 ) rethrows where S1.Element == S2.Element {
 
   func fail(_ reason: String) {
-    XCTFail(message().isEmpty ? reason : "\(message()) - \(reason)",
+    let message = message()
+    XCTFail(message.isEmpty ? reason : "\(message) - \(reason)",
             file: file, line: line)
   }
 
