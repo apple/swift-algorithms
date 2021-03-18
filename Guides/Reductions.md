@@ -73,7 +73,11 @@ Calling the eager methods, those returning an array, is O(_n_).
 
 While the name `scan` is the term of art for this function, it has been 
 discussed that `reductions` aligns better with the existing `reduce` function 
-and will aid newcomers that might not know the existing `scan` term.
+and will aid newcomers that might not know the existing `scan` term. 
+
+Deprecated `scan` methods have been added for people who are familiar with the
+term, so they can easily discover the `reductions` methods via compiler
+deprecation warnings.
 
 Below are two quotes from the Swift forum [discussion about SE-0045][SE-0045] 
 which proposed adding `scan` to the standard library and one from
