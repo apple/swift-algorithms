@@ -316,34 +316,37 @@ extension Collection {
   ///     // Davide, Celeste
   ///
   /// This example prints _all_ the permutations (including an empty array) from
-  /// the an array of numbers:
+  /// an array of numbers:
   ///
   ///     let numbers = [10, 20, 30]
-  ///    for perm in numbers.permutations(ofCount: 0...) {
-  ///        print(perm)
-  ///    }
-  ///    // []
-  ///    // [10]
-  ///    // [20]
-  ///    // [30]
-  ///    // [10, 20]
-  ///    // [10, 30]
-  ///    // [20, 10]
-  ///    // [20, 30]
-  ///    // [30, 10]
-  ///    // [30, 20]
-  ///    // [10, 20, 30]
-  ///    // [10, 30, 20]
-  ///    // [20, 10, 30]
-  ///    // [20, 30, 10]
-  ///    // [30, 10, 20]
-  ///    // [30, 20, 10]
+  ///     for perm in numbers.permutations(ofCount: 0...) {
+  ///         print(perm)
+  ///     }
+  ///     // []
+  ///     // [10]
+  ///     // [20]
+  ///     // [30]
+  ///     // [10, 20]
+  ///     // [10, 30]
+  ///     // [20, 10]
+  ///     // [20, 30]
+  ///     // [30, 10]
+  ///     // [30, 20]
+  ///     // [10, 20, 30]
+  ///     // [10, 30, 20]
+  ///     // [20, 10, 30]
+  ///     // [20, 30, 10]
+  ///     // [30, 10, 20]
+  ///     // [30, 20, 10]
+  ///
+  /// The returned permutations are in ascending order by length, and then
+  /// lexicographically within each group of the same length.
   ///
   /// - Parameter kRange: The number of elements to include in each permutation.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
-  /// is the number of elements in the base collection, since `Permutations`
-  /// accesses the `count` of the base collection.
+  ///   is the number of elements in the base collection, since `Permutations`
+  ///   accesses the `count` of the base collection.
   @inlinable
   public func permutations<R: RangeExpression>(
     ofCount kRange: R
@@ -412,6 +415,11 @@ extension Collection {
 // uniquePermutations()
 //===----------------------------------------------------------------------===//
 
+/// A sequence of the unique permutations of the elements of a sequence or
+/// collection.
+///
+/// To create a `UniquePermutations` instance, call one of the
+/// `uniquePermutations` methods on your collection.
 public struct UniquePermutations<Element> {
   @usableFromInline
   internal let elements: [Element]
@@ -441,6 +449,7 @@ public struct UniquePermutations<Element> {
 }
 
 extension UniquePermutations: Sequence {
+  /// The iterator for a `UniquePermutations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     var elements: [Element]
@@ -510,9 +519,9 @@ extension Sequence where Element: Comparable {
   ///     // [2, 1, 2]
   ///     // [2, 2, 1]
   ///
-  /// By contrast, the unadorned `permutations()` method permutes over a
-  /// collection by position, which includes permutations with equal elements
-  /// in each permutation:
+  /// By contrast, the unadorned `permutations()` method permutes a collection's
+  /// elements by position, and includes permutations with equal elements in
+  /// each permutation:
   ///
   ///     for perm in numbers.permutations()
   ///         print(perm)
@@ -529,10 +538,60 @@ extension Sequence where Element: Comparable {
     UniquePermutations(self, by: <)
   }
 
+  /// Returns a sequence of the unique permutations of this sequence of the
+  /// specified length.
+  ///
+  /// Use this method to iterate over the unique permutations of a sequence
+  /// with repeating elements. This example prints every unique two-element
+  /// permutation of an array of numbers:
+  ///
+  ///     let numbers = [1, 1, 2]
+  ///     for perm in numbers.uniquePermutations(ofCount: 2) {
+  ///         print(perm)
+  ///     }
+  ///     // [1, 1]
+  ///     // [1, 2]
+  ///     // [2, 1]
+  ///
+  /// By contrast, the `permutations(ofCount:)` method permutes a collection's
+  /// elements by position, and can include permutations with equal elements
+  /// in each permutation:
+  ///
+  ///     for perm in numbers.permutations(ofCount: 2)
+  ///         print(perm)
+  ///     }
+  ///     // [1, 1]
+  ///     // [1, 1]
+  ///     // [1, 2]
+  ///     // [1, 2]
+  ///     // [2, 1]
+  ///     // [2, 1]
+  ///
+  /// The returned permutations are in lexicographically sorted order.
   public func uniquePermutations(ofCount k: Int) -> UniquePermutations<Element> {
     UniquePermutations(self, k ..< (k + 1), by: <)
   }
 
+  /// Returns a collection of the unique permutations of this sequence with
+  /// lengths in the specified range.
+  ///
+  /// Use this method to iterate over the unique permutations of a sequence
+  /// with repeating elements. This example prints every unique permutation
+  /// of an array of numbers with lengths through 2 elements:
+  ///
+  ///     let numbers = [1, 1, 2]
+  ///     for perm in numbers.uniquePermutations(ofCount: ...2) {
+  ///         print(perm)
+  ///     }
+  ///     // []
+  ///     // [1]
+  ///     // [2]
+  ///     // [1, 1]
+  ///     // [1, 2]
+  ///     // [2, 1]
+  ///
+  /// The returned permutations are in ascending order by length, and then
+  /// lexicographically within each group of the same length.
   public func uniquePermutations<R: RangeExpression>(ofCount kRange: R) -> UniquePermutations<Element>
     where R.Bound == Int
   {
@@ -541,15 +600,29 @@ extension Sequence where Element: Comparable {
 }
 
 extension Sequence {
-  public func uniquePermutations(by areInIncreasingOrder: @escaping (Element, Element) -> Bool) -> UniquePermutations<Element> {
+  /// Returns a sequence of the unique permutations of this sequence.
+  public func uniquePermutations(
+    by areInIncreasingOrder: @escaping (Element, Element) -> Bool
+  ) -> UniquePermutations<Element> {
     UniquePermutations(self, by: areInIncreasingOrder)
   }
 
-  public func uniquePermutations(ofCount k: Int, by areInIncreasingOrder: @escaping (Element, Element) -> Bool) -> UniquePermutations<Element> {
+  /// Returns a sequence of the unique permutations of this sequence of the
+  /// specified length.
+  ///
+  public func uniquePermutations(
+    ofCount k: Int,
+    by areInIncreasingOrder: @escaping (Element, Element) -> Bool
+  ) -> UniquePermutations<Element> {
     UniquePermutations(self, k ..< (k + 1), by: areInIncreasingOrder)
   }
 
-  public func uniquePermutations<R: RangeExpression>(ofCount kRange: R, by areInIncreasingOrder: @escaping (Element, Element) -> Bool) -> UniquePermutations<Element>
+  /// Returns a collection of the unique permutations of this sequence with
+  /// lengths in the specified range.
+  public func uniquePermutations<R: RangeExpression>(
+    ofCount kRange: R,
+    by areInIncreasingOrder: @escaping (Element, Element) -> Bool
+  ) -> UniquePermutations<Element>
     where R.Bound == Int
   {
     UniquePermutations(self, kRange, by: areInIncreasingOrder)

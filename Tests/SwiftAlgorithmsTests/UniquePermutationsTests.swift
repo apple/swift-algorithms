@@ -60,7 +60,9 @@ final class UniquePermutationsTests: XCTestCase {
   static var numbersAndNilsPermutations: [[ArraySlice<Int?>]] {
     numbersPermutations.map { $0.map { ArraySlice($0.map { $0 == 1 ? nil : $0 }) }}
   }
+}
 
+extension UniquePermutationsTests {
   func testEmpty() {
     XCTAssertEqualSequences(([] as [Int]).uniquePermutations(), [[]])
     XCTAssertEqualSequences(([] as [Int]).uniquePermutations(ofCount: 0), [[]])
