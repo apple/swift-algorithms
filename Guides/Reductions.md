@@ -5,8 +5,7 @@
 
 Produces a sequence of values.
 
-This has the behaviour of reduce, but instead of returning the final result
-value, it returns the a sequence of the results returned from each element.
+This has the behaviour of reduce, but also returns all intermediate results.
 
 ```swift
 let runningTotalExclusive = (1...5).reductions(0, +)
