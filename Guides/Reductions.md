@@ -24,8 +24,8 @@ print(runningMinimum)
 
 ## Detailed Design
 
-One pair of methods are added to `LazySequenceProtocol` for a lazily evaluated.
-sequence and another pair are added to `Sequence` which are eagerly evaluated.
+One trio of methods are added to `LazySequenceProtocol` for a lazily evaluated
+sequence and another trio are added to `Sequence` which are eagerly evaluated.
 
 ```swift
 extension LazySequenceProtocol {
@@ -33,6 +33,11 @@ extension LazySequenceProtocol {
   public func reductions<Result>(
     _ initial: Result,
     _ transform: @escaping (Result, Element) -> Result
+  ) -> ExclusiveReductions<Result, Self>
+
+  public func reductions<Result>(
+    into initial: inout Result,
+    _ transform: @escaping (inout Result, Element) -> Void
   ) -> ExclusiveReductions<Result, Self>
 
   public func reductions(
@@ -48,7 +53,12 @@ extension Sequence {
     _ initial: Result, 
     _ transform: (Result, Element) throws -> Result
   ) rethrows -> [Result]
-  
+
+  public func reductions<Result>(
+    into initial: inout Result,
+    _ transform: (inout Result, Element) throws -> Void
+  ) rethrows -> [Result]
+
   public func reductions(
     _ transform: (Element, Element) throws -> Element
   ) rethrows -> [Element]
