@@ -36,6 +36,17 @@ extension LazySequenceProtocol {
     _ initial: Result,
     _ transform: @escaping (Result, Element) -> Result
   ) -> ExclusiveReductions<Result, Self> {
+
+    var result = initial
+    return reductions(into: &result) { result, element in
+      result = transform(result, element)
+    }
+  }
+
+  public func reductions<Result>(
+    into initial: inout Result,
+    _ transform: @escaping (inout Result, Element) -> Void
+  ) -> ExclusiveReductions<Result, Self> {
     ExclusiveReductions(base: self, initial: initial, transform: transform)
   }
 }
@@ -76,18 +87,22 @@ extension Sequence {
 public struct ExclusiveReductions<Result, Base: Sequence> {
   let base: Base
   let initial: Result
-  let transform: (Result, Base.Element) -> Result
+  let transform: (inout Result, Base.Element) -> Void
 }
 
 extension ExclusiveReductions: Sequence {
   public struct Iterator: IteratorProtocol {
     var iterator: Base.Iterator
     var current: Result?
-    let transform: (Result, Base.Element) -> Result
+    let transform: (inout Result, Base.Element) -> Void
 
     public mutating func next() -> Result? {
       guard let result = current else { return nil }
-      current = iterator.next().map { transform(result, $0) }
+      current = iterator.next().map { element in
+        var result = result
+        transform(&result, element)
+        return result
+      }
       return result
     }
   }
@@ -124,7 +139,9 @@ extension ExclusiveReductions: Collection where Base: Collection {
   public func index(after i: Index) -> Index {
     func index(base index: Base.Index, previous: Result) -> Index {
       guard index != base.endIndex else { return endIndex }
-      return .base(index: index, result: transform(previous, base[index]))
+      var previous = previous
+      transform(&previous, base[index])
+      return .base(index: index, result: previous)
     }
     switch i.representation {
     case .start:
@@ -330,6 +347,14 @@ extension LazySequenceProtocol {
     _ transform: @escaping (Result, Element) -> Result
   ) -> ExclusiveReductions<Result, Self> {
     reductions(initial, transform)
+  }
+
+  @available(*, deprecated, message: "Use reductions(into:_:) instead.")
+  public func scan<Result>(
+    into initial: inout Result,
+    _ transform: @escaping (inout Result, Element) -> Void
+  ) -> ExclusiveReductions<Result, Self> {
+    reductions(into: &initial, transform)
   }
 }
 
