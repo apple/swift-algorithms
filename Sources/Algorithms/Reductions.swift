@@ -20,9 +20,8 @@ extension LazySequenceProtocol {
   /// providing the initial value followed by these results as a sequence.
   ///
   /// ```
-  /// let values = [1, 2, 3, 4]
-  /// let sequence = values.reductions(0, +)
-  /// print(Array(sequence))
+  /// let runningTotal = [1, 2, 3, 4].lazy.reductions(0, +)
+  /// print(Array(runningTotal))
   ///
   /// // prints [0, 1, 3, 6, 10]
   /// ```
