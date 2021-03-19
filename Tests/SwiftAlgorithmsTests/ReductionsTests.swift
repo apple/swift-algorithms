@@ -16,6 +16,8 @@ final class ReductionsTests: XCTestCase {
 
   struct TestError: Error {}
 
+  func add(lhs: inout Int, rhs: Int) { lhs += rhs }
+
   // MARK: - Exclusive Reductions
 
   func testExclusiveLazy() {
@@ -27,13 +29,17 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqualCollections([1].lazy.reductions(0, +), [0, 1])
     XCTAssertEqualCollections(EmptyCollection<Int>().lazy.reductions(0, +), [0])
 
-    var value0 = 0
-    var value1 = 0
-    var value2 = 0
-    func add(lhs: inout Int, rhs: Int) { lhs += rhs }
-    XCTAssertEqual([1, 2, 3, 4].lazy.reductions(into: &value0, add), [0, 1, 3, 6, 10])
-    XCTAssertEqual([1].lazy.reductions(into: &value1, add), [0, 1])
-    XCTAssertEqual(EmptyCollection<Int>().lazy.reductions(into: &value2, add), [0])
+    var value = 0
+    XCTAssertEqual([1, 2, 3, 4].lazy.reductions(into: &value, add), [0, 1, 3, 6, 10])
+    XCTAssertEqual(value, 10)
+
+    value = 0
+    XCTAssertEqual([1].lazy.reductions(into: &value, add), [0, 1])
+    XCTAssertEqual(value, 1)
+
+    value = 0
+    XCTAssertEqual(EmptyCollection<Int>().lazy.reductions(into: &value, add), [0])
+    XCTAssertEqual(value, 0)
 
     XCTAssertLazySequence((1...).prefix(1).lazy.reductions(0, +))
     XCTAssertLazySequence([1].lazy.reductions(0, +))
@@ -45,13 +51,17 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqual([1].reductions(0, +), [0, 1])
     XCTAssertEqual(EmptyCollection<Int>().reductions(0, +), [0])
 
-    var value0 = 0
-    var value1 = 0
-    var value2 = 0
-    func add(lhs: inout Int, rhs: Int) { lhs += rhs }
-    XCTAssertEqual([1, 2, 3, 4].reductions(into: &value0, add), [0, 1, 3, 6, 10])
-    XCTAssertEqual([1].reductions(into: &value1, add), [0, 1])
-    XCTAssertEqual(EmptyCollection<Int>().reductions(into: &value2, add), [0])
+    var value = 0
+    XCTAssertEqual([1, 2, 3, 4].reductions(into: &value, add), [0, 1, 3, 6, 10])
+    XCTAssertEqual(value, 10)
+
+    value = 0
+    XCTAssertEqual([1].reductions(into: &value, add), [0, 1])
+    XCTAssertEqual(value, 1)
+
+    value = 0
+    XCTAssertEqual(EmptyCollection<Int>().reductions(into: &value, add), [0])
+    XCTAssertEqual(value, 0)
 
     XCTAssertNoThrow(try [].reductions(0) { _, _ in throw TestError() })
     XCTAssertThrowsError(try [1].reductions(0) { _, _ in throw TestError() })
