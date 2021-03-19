@@ -8,17 +8,20 @@ Produces a sequence of values.
 This has the behaviour of reduce, but also returns all intermediate results.
 
 ```swift
-let runningTotalExclusive = (1...5).reductions(0, +)
-print(runningTotalExclusive)
+let exclusiveRunningTotal = (1...5).reductions(0, +)
+print(exclusiveRunningTotal)
 // prints [0, 1, 3, 6, 10, 15]
 
-let runningTotalInclusive = (1...5).reductions(+)
-print(runningTotalInclusive)
-// prints [1, 3, 6, 10, 15]
+var value = 0
+let intoRunningTotal = (1...5).reductions(into: &value, +=)
+print(intoRunningTotal)
+// prints [0, 1, 3, 6, 10, 15]
+print(value)
+// prints 15
 
-let runningMinimum = [3, 4, 2, 3, 1].reductions(min)
-print(runningMinimum)
-// prints [3, 3, 2, 2, 1]
+let inclusiveRunningTotal = (1...5).reductions(+)
+print(inclusiveRunningTotal)
+// prints [1, 3, 6, 10, 15]
 ```
 
 ## Detailed Design
