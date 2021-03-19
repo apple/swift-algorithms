@@ -13,8 +13,8 @@
 
 extension LazySequenceProtocol {
 
-  /// Returns a sequence containing the results of combining the elements of
-  /// the sequence using the given transform.
+  /// Returns a sequence containing the accumulated results of combining the
+  /// elements of the sequence using the given closure.
   ///
   /// This can be seen as applying the reduce function to each element and
   /// providing the initial value followed by these results as a sequence.
@@ -31,6 +31,8 @@ extension LazySequenceProtocol {
   ///   - transform: A closure that combines the previously reduced result and
   ///   the next element in the receiving sequence.
   /// - Returns: A sequence of transformed elements.
+  ///
+  /// - Complexity: O(1)
   @inlinable
   public func reductions<Result>(
     _ initial: Result,
@@ -43,6 +45,26 @@ extension LazySequenceProtocol {
     }
   }
 
+  /// Returns a sequence containing the accumulated results of combining the
+  /// elements of the sequence using the given closure.
+  ///
+  /// This can be seen as applying the reduce function to each element and
+  /// providing the initial value followed by these results as a sequence.
+  ///
+  /// ```
+  /// let runningTotal = [1, 2, 3, 4].lazy.reductions(into: 0, +)
+  /// print(Array(runningTotal))
+  ///
+  /// // prints [0, 1, 3, 6, 10]
+  /// ```
+  ///
+  /// - Parameters:
+  ///   - initial: The value to use as the initial value.
+  ///   - transform: A closure that combines the previously reduced result and
+  ///   the next element in the receiving sequence.
+  /// - Returns: A sequence of transformed elements.
+  ///
+  /// - Complexity: O(1)
   @inlinable
   public func reductions<Result>(
     into initial: inout Result,
@@ -54,6 +76,26 @@ extension LazySequenceProtocol {
 
 extension Sequence {
 
+  /// Returns an array containing the accumulated results of combining the
+  /// elements of the sequence using the given closure.
+  ///
+  /// This can be seen as applying the reduce function to each element and
+  /// providing the initial value followed by these results as a sequence.
+  ///
+  /// ```
+  /// let runningTotal = [1, 2, 3, 4].reductions(0, +)
+  /// print(runningTotal)
+  ///
+  /// // prints [0, 1, 3, 6, 10]
+  /// ```
+  ///
+  /// - Parameters:
+  ///   - initial: The value to use as the initial value.
+  ///   - transform: A closure that combines the previously reduced result and
+  ///   the next element in the receiving sequence.
+  /// - Returns: An array of transformed elements.
+  ///
+  /// - Complexity: O(n)
   @inlinable
   public func reductions<Result>(
     _ initial: Result,
@@ -66,6 +108,26 @@ extension Sequence {
     }
   }
 
+  /// Returns an array containing the accumulated results of combining the
+  /// elements of the sequence using the given closure.
+  ///
+  /// This can be seen as applying the reduce function to each element and
+  /// providing the initial value followed by these results as a sequence.
+  ///
+  /// ```
+  /// let runningTotal = [1, 2, 3, 4].reductions(into: 0, +)
+  /// print(runningTotal)
+  ///
+  /// // prints [0, 1, 3, 6, 10]
+  /// ```
+  ///
+  /// - Parameters:
+  ///   - initial: The value to use as the initial value.
+  ///   - transform: A closure that combines the previously reduced result and
+  ///   the next element in the receiving sequence.
+  /// - Returns: An array of transformed elements.
+  ///
+  /// - Complexity: O(n)
   @inlinable
   public func reductions<Result>(
     into initial: inout Result,
@@ -241,6 +303,25 @@ extension ExclusiveReductions: LazyCollectionProtocol
 
 extension LazySequenceProtocol {
 
+  /// Returns a sequence containing the accumulated results of combining the
+  /// elements of the sequence using the given closure.
+  ///
+  /// This can be seen as applying the reduce function to each element and
+  /// providing the initial value followed by these results as a sequence.
+  ///
+  /// ```
+  /// let runningTotal = [1, 2, 3, 4].lazy.reductions(+)
+  /// print(Array(runningTotal))
+  ///
+  /// // prints [1, 3, 6, 10]
+  /// ```
+  ///
+  /// - Parameters:
+  ///   - transform: A closure that combines the previously reduced result and
+  ///   the next element in the receiving sequence.
+  /// - Returns: An array of accumulated elements.
+  ///
+  /// - Complexity: O(1)
   @inlinable
   public func reductions(
     _ transform: @escaping (Element, Element) -> Element
@@ -251,6 +332,25 @@ extension LazySequenceProtocol {
 
 extension Sequence {
 
+  /// Returns an array containing the accumulated results of combining the
+  /// elements of the sequence using the given closure.
+  ///
+  /// This can be seen as applying the reduce function to each element and
+  /// providing the initial value followed by these results as a sequence.
+  ///
+  /// ```
+  /// let runningTotal = [1, 2, 3, 4].reductions(+)
+  /// print(runningTotal)
+  ///
+  /// // prints [1, 3, 6, 10]
+  /// ```
+  ///
+  /// - Parameters:
+  ///   - transform: A closure that combines the previously reduced result and
+  ///   the next element in the receiving sequence.
+  /// - Returns: An array of accumulated elements.
+  ///
+  /// - Complexity: O(n)
   @inlinable
   public func reductions(
     _ transform: (Element, Element) throws -> Element
