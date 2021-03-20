@@ -97,8 +97,8 @@ extension FiniteCycle: Collection {
 
   public typealias Index = Product2<Range<Int>, Base>.Index
 
-  public subscript(_ index: Index) -> Element {
-    product[index].element2
+  public var count: Int {
+    product.count
   }
 
   public var startIndex: Index {
@@ -109,8 +109,16 @@ extension FiniteCycle: Collection {
     product.endIndex
   }
 
+  public subscript(_ index: Index) -> Element {
+    product[index].element2
+  }
+
   public func index(after i: Index) -> Index {
     product.index(after: i)
+  }
+
+  public func distance(from start: Index, to end: Index) -> Int {
+    product.distance(from: start, to: end)
   }
 
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
@@ -123,10 +131,6 @@ extension FiniteCycle: Collection {
     limitedBy limit: Index
   ) -> Index? {
     product.index(i, offsetBy: distance, limitedBy: limit)
-  }
-
-  public func distance(from start: Index, to end: Index) -> Int {
-    product.distance(from: start, to: end)
   }
 }
 

@@ -80,4 +80,9 @@ final class CycleTests: XCTestCase {
     let previousIndex = cycle.index(before: nextIndex)
     XCTAssertEqual(cycle.distance(from: startIndex, to: previousIndex), 7)
   }
+
+  func testRepeatedCount() {
+    let cycle = (1..<5).cycled(times: 2)
+    XCTAssertEqual(cycle.count, 8)
+  }
 }
