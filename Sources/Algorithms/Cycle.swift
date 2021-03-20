@@ -93,6 +93,53 @@ extension FiniteCycle: Sequence {
 
 extension FiniteCycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
+extension FiniteCycle: Collection {
+
+  public typealias Index = Product2<Range<Int>, Base>.Index
+
+  public subscript(_ index: Index) -> Element {
+    product[index].element2
+  }
+
+  public var startIndex: Index {
+    product.startIndex
+  }
+
+  public var endIndex: Index {
+    product.endIndex
+  }
+
+  public func index(after i: Index) -> Index {
+    product.index(after: i)
+  }
+
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    product.index(i, offsetBy: distance)
+  }
+
+  public func index(
+    _ i: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    product.index(i, offsetBy: distance, limitedBy: limit)
+  }
+
+  public func distance(from start: Index, to end: Index) -> Int {
+    product.distance(from: start, to: end)
+  }
+}
+
+extension FiniteCycle: BidirectionalCollection
+  where Base: BidirectionalCollection {
+  public func index(before i: Index) -> Index {
+    product.index(before: i)
+  }
+}
+
+extension FiniteCycle: RandomAccessCollection
+  where Base: RandomAccessCollection { }
+
 //===----------------------------------------------------------------------===//
 // cycled()
 //===----------------------------------------------------------------------===//
