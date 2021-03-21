@@ -16,7 +16,7 @@ final class UniquePermutationsTests: XCTestCase {
   static let numbers = [1, 1, 1, 2, 3]
   
   static let numbersPermutations: [[[Int]]] = [
-    // 0
+    // k = 0
     [[]],
     // 1
     [[1], [2], [3]],
@@ -44,14 +44,6 @@ final class UniquePermutationsTests: XCTestCase {
      [2, 1, 1, 1, 3], [2, 1, 1, 3, 1], [2, 1, 3, 1, 1], [2, 3, 1, 1, 1],
      [3, 1, 1, 1, 2], [3, 1, 1, 2, 1], [3, 1, 2, 1, 1], [3, 2, 1, 1, 1]]
   ]
-  
-  static var numbersAndNils: [Int?] {
-    numbers.map { $0 == 1 ? nil : $0 }
-  }
-  
-  static var numbersAndNilsPermutations: [[ArraySlice<Int?>]] {
-    numbersPermutations.map { $0.map { ArraySlice($0.map { $0 == 1 ? nil : $0 }) }}
-  }
 }
 
 extension UniquePermutationsTests {
@@ -59,13 +51,20 @@ extension UniquePermutationsTests {
     XCTAssertEqualSequences(([] as [Int]).uniquePermutations(), [[]])
     XCTAssertEqualSequences(([] as [Int]).uniquePermutations(ofCount: 0), [[]])
     XCTAssertEqualSequences(([] as [Int]).uniquePermutations(ofCount: 1), [])
-    XCTAssertEqualSequences(([] as [Int]).uniquePermutations(ofCount: 1...3), [])
+    XCTAssertEqualSequences(
+      ([] as [Int]).uniquePermutations(ofCount: 1...3), [])
   }
   
   func testSingleCounts() {
     for (k, expectation) in Self.numbersPermutations.enumerated() {
-      XCTAssertEqualSequences(expectation, Self.numbers.uniquePermutations(ofCount: k))
+      XCTAssertEqualSequences(
+        expectation,
+        Self.numbers.uniquePermutations(ofCount: k))
     }
+    
+    XCTAssertEqualSequences(
+      Self.numbersPermutations[5],
+      Self.numbers.uniquePermutations())
   }
   
   func testRanges() {
@@ -87,40 +86,31 @@ extension UniquePermutationsTests {
       }
     }
   }
+}
 
-//  func testEmptyWithPredicate() {
-//    XCTAssertEqualSequences(([] as [Int?]).uniquePermutations(by: <), [[]])
-//    XCTAssertEqualSequences(([] as [Int?]).uniquePermutations(ofCount: 0, by: <), [[]])
-//    XCTAssertEqualSequences(([] as [Int?]).uniquePermutations(ofCount: 1, by: <), [])
-//    XCTAssertEqualSequences(([] as [Int?]).uniquePermutations(ofCount: 1...3, by: <), [])
-//  }
-//
-//  func testSingleCountsWithPredicate() {
-//    for (k, expectation) in Self.numbersAndNilsPermutations.enumerated() {
-//      XCTAssertEqualSequences(expectation, Self.numbersAndNils.uniquePermutations(ofCount: k, by: <))
-//    }
-//  }
-//
-//  func testRangesWithPredicate() {
-//    let numbersAndNils = Self.numbersAndNils
-//    let numbersAndNilsPermutations = Self.numbersAndNilsPermutations
-//
-//    for lower in numbersAndNilsPermutations.indices {
-//      // upper bounded
-//      XCTAssertEqualSequences(
-//        numbersAndNilsPermutations[...lower].joined(),
-//        numbersAndNils.uniquePermutations(ofCount: ...lower, by: <))
-//
-//      // lower bounded
-//      XCTAssertEqualSequences(
-//        numbersAndNilsPermutations[lower...].joined(),
-//        numbersAndNils.uniquePermutations(ofCount: lower..., by: <))
-//
-//      for upper in lower..<numbersAndNilsPermutations.count {
-//        XCTAssertEqualSequences(
-//          numbersAndNilsPermutations[lower..<upper].joined(),
-//          numbersAndNils.uniquePermutations(ofCount: lower..<upper, by: <))
-//      }
-//    }
-//  }
+extension UniquePermutationsTests {
+  private final class IntBox: Hashable {
+    var value: Int
+    
+    init(_ value: Int) {
+      self.value = value
+    }
+    
+    static func == (lhs: IntBox, rhs: IntBox) -> Bool {
+      lhs.value == rhs.value
+    }
+
+    func hash(into hasher: inout Hasher) {
+      hasher.combine(value)
+    }
+  }
+
+  func testFirstUnique() {
+    let numbers = Self.numbers.map(IntBox.init)
+    for k in 0...numbers.count {
+      for p in numbers.uniquePermutations(ofCount: k) {
+        XCTAssertTrue(p.filter { $0.value == 1 }.allSatisfy { $0 === numbers[0] })
+      }
+    }
+  }
 }
