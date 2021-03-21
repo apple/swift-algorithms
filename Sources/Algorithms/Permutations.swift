@@ -431,26 +431,32 @@ public struct UniquePermutations<Base: Collection> where Base.Element: Hashable 
   internal let kRange: Range<Int>
 
   @inlinable
+  static func _indexes(_ elements: Base) -> [Base.Index] {
+    let firstIndexesAndCountsByElement = Dictionary(
+      elements.indices.lazy.map { (elements[$0], ($0, 1)) },
+      uniquingKeysWith: { indexAndCount, _ in (indexAndCount.0, indexAndCount.1 + 1) })
+    
+    return Array(firstIndexesAndCountsByElement
+      .values.sorted(by: { $0.0 < $1.0 })
+      .map { index, count in repeatElement(index, count: count) }
+      .joined())
+  }
+  
+  @inlinable
   internal init(_ elements: Base) {
-    self.init(elements, 0..<Int.max)
+    self.indexes = Self._indexes(elements)
+    self.elements = elements
+    self.kRange = self.indexes.count ..< (self.indexes.count + 1)
   }
 
   @inlinable
   internal init<R: RangeExpression>(_ elements: Base, _ range: R)
     where R.Bound == Int
   {
-    let firstIndexesAndCountsByElement = Dictionary(
-      elements.indices.lazy.map { (elements[$0], ($0, 1)) },
-      uniquingKeysWith: { indexAndCount, _ in (indexAndCount.0, indexAndCount.1 + 1) })
-    
-    self.indexes = Array(firstIndexesAndCountsByElement
-      .values.sorted(by: { $0.0 < $1.0 })
-      .map { index, count in repeatElement(index, count: count) }
-      .joined())
-    
+    self.indexes = Self._indexes(elements)
     self.elements = elements
     
-    let upperBound = self.elements.count + 1
+    let upperBound = self.indexes.count + 1
     self.kRange = range.relative(to: 0 ..< .max)
       .clamped(to: 0 ..< upperBound)
   }
@@ -515,39 +521,6 @@ extension UniquePermutations: Sequence {
 }
 
 extension Collection where Element: Hashable {
-  /// Returns a sequence of the unique permutations of this sequence.
-  ///
-  /// Use this method to iterate over the unique permutations of a sequence
-  /// with repeating elements. This example prints every permutation of an
-  /// array of numbers:
-  ///
-  ///     let numbers = [1, 2, 2]
-  ///     for perm in numbers.uniquePermutations() {
-  ///         print(perm)
-  ///     }
-  ///     // [1, 2, 2]
-  ///     // [2, 1, 2]
-  ///     // [2, 2, 1]
-  ///
-  /// By contrast, the unadorned `permutations()` method permutes a collection's
-  /// elements by position, and includes permutations with equal elements in
-  /// each permutation:
-  ///
-  ///     for perm in numbers.permutations()
-  ///         print(perm)
-  ///     }
-  ///     // [1, 2, 2]
-  ///     // [1, 2, 2]
-  ///     // [2, 1, 2]
-  ///     // [2, 2, 1]
-  ///     // [2, 1, 2]
-  ///     // [2, 2, 1]
-  ///
-  /// The returned permutations are in lexicographically sorted order.
-  public func uniquePermutations() -> UniquePermutations<Self> {
-    UniquePermutations(self)
-  }
-
   /// Returns a sequence of the unique permutations of this sequence of the
   /// specified length.
   ///
@@ -578,8 +551,12 @@ extension Collection where Element: Hashable {
   ///     // [2, 1]
   ///
   /// The returned permutations are in lexicographically sorted order.
-  public func uniquePermutations(ofCount k: Int) -> UniquePermutations<Self> {
-    UniquePermutations(self, k ..< (k + 1))
+  public func uniquePermutations(ofCount k: Int? = nil) -> UniquePermutations<Self> {
+    if let k = k {
+      return UniquePermutations(self, k ..< (k + 1))
+    } else {
+      return UniquePermutations(self)
+    }
   }
 
   /// Returns a collection of the unique permutations of this sequence with
