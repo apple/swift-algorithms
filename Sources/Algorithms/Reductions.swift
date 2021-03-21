@@ -30,7 +30,8 @@ extension LazySequenceProtocol {
   ///   - initial: The value to use as the initial value.
   ///   - transform: A closure that combines the previously reduced result and
   ///   the next element in the receiving sequence.
-  /// - Returns: A sequence of transformed elements.
+  /// - Returns: A sequence of the initial value followed by the reduced
+  /// elements.
   ///
   /// - Complexity: O(1)
   @inlinable
@@ -62,7 +63,8 @@ extension LazySequenceProtocol {
   ///   - initial: The value to use as the initial value.
   ///   - transform: A closure that combines the previously reduced result and
   ///   the next element in the receiving sequence.
-  /// - Returns: A sequence of transformed elements.
+  /// - Returns: A sequence of the initial value followed by the reduced
+  /// elements.
   ///
   /// - Complexity: O(1)
   @inlinable
@@ -93,7 +95,7 @@ extension Sequence {
   ///   - initial: The value to use as the initial value.
   ///   - transform: A closure that combines the previously reduced result and
   ///   the next element in the receiving sequence.
-  /// - Returns: An array of transformed elements.
+  /// - Returns: An array of the initial value followed by the reduced elements.
   ///
   /// - Complexity: O(n)
   @inlinable
@@ -125,7 +127,7 @@ extension Sequence {
   ///   - initial: The value to use as the initial value.
   ///   - transform: A closure that combines the previously reduced result and
   ///   the next element in the receiving sequence.
-  /// - Returns: An array of transformed elements.
+  /// - Returns: An array of the initial value followed by the reduced elements.
   ///
   /// - Complexity: O(n)
   @inlinable
@@ -319,7 +321,7 @@ extension LazySequenceProtocol {
   /// - Parameters:
   ///   - transform: A closure that combines the previously reduced result and
   ///   the next element in the receiving sequence.
-  /// - Returns: An array of accumulated elements.
+  /// - Returns: A sequence of the reduced elements.
   ///
   /// - Complexity: O(1)
   @inlinable
@@ -348,7 +350,7 @@ extension Sequence {
   /// - Parameters:
   ///   - transform: A closure that combines the previously reduced result and
   ///   the next element in the receiving sequence.
-  /// - Returns: An array of accumulated elements.
+  /// - Returns: An array of the reduced elements.
   ///
   /// - Complexity: O(n)
   @inlinable
