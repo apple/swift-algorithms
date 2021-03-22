@@ -91,6 +91,20 @@ extension Sequence {
   /// // prints [0, 1, 3, 6, 10]
   /// ```
   ///
+  /// When `reductions(_:_:)` is called, the following steps occur:
+  ///
+  ///   1. The `initial` result is added to an array of results.
+  ///   2. The `transform` closure is called with the `initial` result and the
+  ///   first element of the sequence, appending the result to the array.
+  ///   3. The closure is called again repeatedly with the updated accumulating
+  ///   result and each element of the sequence, adding each result to the
+  ///   array.
+  ///   4. When the sequence is exhausted, the results array is returned to the
+  ///   caller.
+  ///
+  ///   If the sequence has no elements, `transform` is never executed and
+  ///   an array containing only the `initial` result is returned.
+  ///
   /// - Parameters:
   ///   - initial: The value to use as the initial value.
   ///   - transform: A closure that combines the previously reduced result and
@@ -122,6 +136,20 @@ extension Sequence {
   ///
   /// // prints [0, 1, 3, 6, 10]
   /// ```
+  ///
+  /// When `reductions(into:_:_)` is called, the following steps occur:
+  ///
+  ///   1. The `initial` result is added to an array of results.
+  ///   2. The `transform` closure is called with the `initial` result and the
+  ///   first element of the sequence, appending the result to the array.
+  ///   3. The closure is called again repeatedly with the updated accumulating
+  ///   result and each element of the sequence, adding each result to the
+  ///   array.
+  ///   4. When the sequence is exhausted, the results array is returned to the
+  ///   caller.
+  ///
+  ///   If the sequence has no elements, `transform` is never executed and
+  ///   an array containing only the `initial` result is returned.
   ///
   /// - Parameters:
   ///   - initial: The value to use as the initial value.
@@ -346,6 +374,22 @@ extension Sequence {
   ///
   /// // prints [1, 3, 6, 10]
   /// ```
+  ///
+  /// When `reductions(_:)` is called, the following steps occur:
+  ///
+  ///   1. The `transform` closure is called with the first and second elements
+  ///   of the sequence, appending the result to an array of results.
+  ///   2. The closure is called again repeatedly with the updated accumulating
+  ///   result and the next element of the sequence, adding each result to the
+  ///   array.
+  ///   3. When the sequence is exhausted, the results array is returned to the
+  ///   caller.
+  ///
+  ///   If the sequence has no elements, `transform` is never executed and
+  ///   an empty array is returned.
+  ///
+  ///   If the sequence has one element, `transform` is never executed and
+  ///   an array containing only that first element is returned.
   ///
   /// - Parameters:
   ///   - transform: A closure that combines the previously reduced result and
