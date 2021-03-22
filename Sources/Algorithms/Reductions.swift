@@ -97,7 +97,7 @@ extension Sequence {
   ///   the next element in the receiving sequence.
   /// - Returns: An array of the initial value followed by the reduced elements.
   ///
-  /// - Complexity: O(n)
+  /// - Complexity: O(_n_), where _n_ is the length of the sequence.
   @inlinable
   public func reductions<Result>(
     _ initial: Result,
@@ -129,7 +129,7 @@ extension Sequence {
   ///   the next element in the receiving sequence.
   /// - Returns: An array of the initial value followed by the reduced elements.
   ///
-  /// - Complexity: O(n)
+  /// - Complexity: O(_n_), where _n_ is the length of the sequence.
   @inlinable
   public func reductions<Result>(
     into initial: inout Result,
@@ -352,7 +352,7 @@ extension Sequence {
   ///   the next element in the receiving sequence.
   /// - Returns: An array of the reduced elements.
   ///
-  /// - Complexity: O(n)
+  /// - Complexity: O(_n_), where _n_ is the length of the sequence.
   @inlinable
   public func reductions(
     _ transform: (Element, Element) throws -> Element
