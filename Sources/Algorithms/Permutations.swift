@@ -28,7 +28,7 @@ public struct Permutations<Base: Collection> {
   ///   - base: The collection to iterate over for permutations
   ///   - k: The expected size of each permutation, or `nil` (default) to
   ///   iterate over all permutations of the same size as the base collection.
-  @usableFromInline
+  @inlinable
   internal init(_ base: Base, k: Int? = nil) {
     let kRange: ClosedRange<Int>?
     if let countToChoose = k {
@@ -45,7 +45,7 @@ public struct Permutations<Base: Collection> {
   ///   - base: The collection to iterate over for permutations.
   ///   - kRange: The range of accepted sizes of permutations, or `nil` to
   ///   iterate over all permutations of the same size as the base collection.
-  @usableFromInline
+  @inlinable
   internal init<R: RangeExpression>(
     _ base: Base, kRange: R?
   ) where R.Bound == Int {
@@ -84,7 +84,7 @@ extension Permutations: Sequence {
     internal var kRange: Range<Int>
     
     /// Whether or not iteration is finished (`kRange` is empty)
-    @usableFromInline
+    @inlinable
     internal var isFinished: Bool {
       return kRange.isEmpty
     }
@@ -92,7 +92,7 @@ extension Permutations: Sequence {
     @usableFromInline
     internal var indexes: [Base.Index]
     
-    @usableFromInline
+    @inlinable
     internal init(_ permutations: Permutations) {
       self.base = permutations.base
       self.baseCount = permutations.baseCount
@@ -111,7 +111,7 @@ extension Permutations: Sequence {
     ///   is in ascending order.
     ///
     /// - Complexity: O(*n*), where *n* is the length of the collection.
-    @usableFromInline
+    @inlinable
     internal mutating func nextState() -> Bool {
       let countToChoose = self.kRange.lowerBound
       let edge = countToChoose - 1

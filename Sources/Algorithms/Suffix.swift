@@ -45,7 +45,7 @@ extension Collection {
   ///   be called again.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
-  @usableFromInline
+  @inlinable
   internal func endOfPrefix(
     while predicate: (Element) throws -> Bool
   ) rethrows -> Index {
@@ -71,7 +71,7 @@ extension BidirectionalCollection {
   ///   be called again.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
-  @usableFromInline
+  @inlinable
   internal func startOfSuffix(
     while predicate: (Element) throws -> Bool
   ) rethrows -> Index {

@@ -53,7 +53,7 @@ public struct Windows<Base: Collection> {
   @usableFromInline
   internal var firstUpperBound: Base.Index?
 
-  @usableFromInline
+  @inlinable
   internal init(base: Base, size: Int) {
     precondition(size > 0, "Windows size must be greater than zero")
     self.base = base
@@ -72,7 +72,7 @@ extension Windows: Collection {
     @usableFromInline
     internal var upperBound: Base.Index
     
-    @usableFromInline
+    @inlinable
     internal init(lowerBound: Base.Index, upperBound: Base.Index) {
       self.lowerBound = lowerBound
       self.upperBound = upperBound
@@ -150,21 +150,21 @@ extension Windows: Collection {
     }
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetForward(_ i: Index, by distance: Int) -> Index {
     guard let index = offsetForward(i, by: distance, limitedBy: endIndex)
       else { fatalError("Index is out of bounds") }
     return index
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(_ i: Index, by distance: Int) -> Index {
     guard let index = offsetBackward(i, by: distance, limitedBy: startIndex)
       else { fatalError("Index is out of bounds") }
     return index
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetForward(
     _ i: Index, by distance: Int, limitedBy limit: Index
   ) -> Index? {
@@ -235,7 +235,7 @@ extension Windows: Collection {
     }
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(
       _ i: Index, by distance: Int, limitedBy limit: Index
     ) -> Index? {

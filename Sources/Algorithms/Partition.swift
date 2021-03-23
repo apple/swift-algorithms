@@ -21,7 +21,7 @@ extension MutableCollection {
   /// - Complexity: O(*n* log *n*), where *n* is the number of elements.
   /// - Precondition:
   ///   `n == distance(from: range.lowerBound, to: range.upperBound)`
-  @usableFromInline
+  @inlinable
   internal mutating func stablePartition(
     count n: Int,
     subrange: Range<Index>,

@@ -14,7 +14,7 @@ public struct Cycle<Base: Collection> {
   /// The collection to repeat.
   public let base: Base
   
-  @usableFromInline
+  @inlinable
   internal init(base: Base) {
     self.base = base
   }
@@ -29,7 +29,7 @@ extension Cycle: Sequence {
     @usableFromInline
     var current: Base.Index
     
-    @usableFromInline
+    @inlinable
     internal init(base: Base) {
       self.base = base
       self.current = base.startIndex

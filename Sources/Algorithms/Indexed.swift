@@ -18,7 +18,7 @@ public struct Indexed<Base: Collection> {
   /// The base collection.
   public let base: Base
   
-  @usableFromInline
+  @inlinable
   internal init(base: Base) {
     self.base = base
   }
