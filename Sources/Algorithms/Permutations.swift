@@ -342,7 +342,11 @@ extension Collection {
   /// The returned permutations are in ascending order by length, and then
   /// lexicographically within each group of the same length.
   ///
-  /// - Parameter kRange: The number of elements to include in each permutation.
+  /// - Parameter kRange: A range of the number of elements to include in each
+  ///   permutation. `kRange` can be any integer range expression, and is
+  ///   clamped to the number of elements in this collection. Passing a range
+  ///   covering sizes greater than the number of elements in this collection
+  ///   results in an empty sequence.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
   ///   is the number of elements in the base collection, since `Permutations`
@@ -397,11 +401,12 @@ extension Collection {
   ///
   /// - Parameter k: The number of elements to include in each permutation.
   ///   If `k` is `nil`, the resulting sequence represents permutations of this
-  ///   entire collection.
+  ///   entire collection. If `k` is greater than the number of elements in
+  ///   this collection, the resulting sequence is empty.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
-  /// is the number of elements in the base collection, since `Permutations`
-  /// accesses the `count` of the base collection.
+  ///   is the number of elements in the base collection, since `Permutations`
+  ///   accesses the `count` of the base collection.
   @inlinable
   public func permutations(ofCount k: Int? = nil) -> Permutations<Self> {
     precondition(
@@ -551,6 +556,14 @@ extension Collection where Element: Hashable {
   ///     // [2, 1]
   ///
   /// The returned permutations are in lexicographically sorted order.
+  ///
+  /// - Parameter k: The number of elements to include in each permutation.
+  ///   If `k` is `nil`, the resulting sequence represents permutations of this
+  ///   entire collection. If `k` is greater than the number of elements in
+  ///   this collection, the resulting sequence is empty.
+  ///
+  /// - Complexity: O(*n*), where *n* is the number of elements in this
+  ///   collection.
   public func uniquePermutations(ofCount k: Int? = nil) -> UniquePermutations<Self> {
     if let k = k {
       return UniquePermutations(self, k ..< (k + 1))
@@ -579,6 +592,15 @@ extension Collection where Element: Hashable {
   ///
   /// The returned permutations are in ascending order by length, and then
   /// lexicographically within each group of the same length.
+  ///
+  /// - Parameter kRange: A range of the number of elements to include in each
+  ///   permutation. `kRange` can be any integer range expression, and is
+  ///   clamped to the number of elements in this collection. Passing a range
+  ///   covering sizes greater than the number of elements in this collection
+  ///   results in an empty sequence.
+  ///
+  /// - Complexity: O(*n*), where *n* is the number of elements in this
+  ///   collection.
   public func uniquePermutations<R: RangeExpression>(ofCount kRange: R) -> UniquePermutations<Self>
     where R.Bound == Int
   {
