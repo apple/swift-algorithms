@@ -64,14 +64,17 @@ final class PartitionTests: XCTestCase {
   func testStablePartitionWithSubrange() {
     for length in 10...20 {
       let a = Array(0..<length)
-      for j in 0..<length {
-        var b = a
-        let partitionRange = 0..<j
-        let condition = { $0 < j - 1 }
-        let p = b.stablePartition(subrange: partitionRange, by: condition)
-        XCTAssertEqual(p, partitionRange.count > 0 ? 1 : 0)
-        XCTAssertEqualSequences(b[partitionRange.lowerBound..<p], a[partitionRange].filter { !condition($0) })
-        XCTAssertEqualSequences(b[p..<partitionRange.upperBound], a[partitionRange].filter(condition))
+      for i in 0..<length {
+        for j in 0...i {
+          var b = a
+          let partitionRange = j..<i
+          let condition = { $0 < i - 1 }
+          let p = b.stablePartition(subrange: partitionRange, by: condition)
+
+          XCTAssertEqual(p, partitionRange.count == 0 ? j : j + 1)
+          XCTAssertEqualSequences(b[partitionRange.lowerBound..<p], a[partitionRange].filter { !condition($0) })
+          XCTAssertEqualSequences(b[p..<partitionRange.upperBound], a[partitionRange].filter(condition))
+        }
       }
     }
   }
@@ -84,6 +87,48 @@ final class PartitionTests: XCTestCase {
           XCTAssertGreaterThanOrEqual(p, i)
           XCTAssertLessThanOrEqual(p, j)
           XCTAssertEqual(p, k)
+        }
+      }
+    }
+  }
+  
+  func testPartitionWithSubrangeBidirectionalCollection() {
+    for length in 10...20 {
+      let a = Array(0..<length)
+      for i in 0..<length {
+        for j in 0...i {
+          var b = a
+          let partitionRange = j..<i
+          let condition = { $0 < i - 1 }
+          let p = b.partition(subrange: partitionRange, by: condition)
+          
+          XCTAssertEqual(p, partitionRange.count == 0 ? j : j + 1)
+          XCTAssertEqualSequences(b[partitionRange.lowerBound..<p], a[partitionRange].filter { !condition($0) })
+          XCTAssertUnorderedEqualSequences(b[p..<partitionRange.upperBound], a[partitionRange].filter(condition))
+        }
+      }
+    }
+  }
+
+  func testPartitionWithSubrangeMutableCollection() {
+    for length in 10...20 {
+      let a = Array(0..<length)
+      for i in 0..<length {
+        for j in 0...i {
+          var b = a.eraseToAnyMutableCollection()
+          var bdc = a
+          let partitionRange = j..<i
+          let condition = { $0 < i - 1 }
+          let p = b.partition(subrange: partitionRange, by: condition)
+          let bdcp = bdc.partition(subrange: partitionRange, by: condition)
+          
+          XCTAssertEqual(p, partitionRange.count == 0 ? j : j + 1)
+          XCTAssertEqualSequences(b[partitionRange.lowerBound..<p], a[partitionRange].filter { !condition($0) })
+          XCTAssertUnorderedEqualSequences(b[p..<partitionRange.upperBound], a[partitionRange].filter(condition))
+          
+          // Must produce the same result as the `BidirectionalCollection` specialized overload.
+          XCTAssertEqualSequences(b[partitionRange.lowerBound..<p], bdc[partitionRange.lowerBound..<bdcp])
+          XCTAssertUnorderedEqualSequences(b[p..<partitionRange.upperBound], bdc[bdcp..<partitionRange.upperBound])
         }
       }
     }
