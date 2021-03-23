@@ -395,16 +395,18 @@ extension Collection {
 ///
 /// To create a `UniquePermutations` instance, call one of the
 /// `uniquePermutations` methods on your collection.
-public struct UniquePermutations<Base: Collection> where Base.Element: Hashable {
-  @usableFromInline
-  internal let elements: Base
+public struct UniquePermutations<Base: Collection> {
+  /// The base collection to iterate over for permutations.
+  public let elements: Base
   
   @usableFromInline
   internal var indexes: [Base.Index]
   
   @usableFromInline
   internal let kRange: Range<Int>
+}
 
+extension UniquePermutations where Base.Element: Hashable {
   @inlinable
   static func _indexes(_ elements: Base) -> [Base.Index] {
     let firstIndexesAndCountsByElement = Dictionary(
@@ -438,8 +440,6 @@ public struct UniquePermutations<Base: Collection> where Base.Element: Hashable 
 }
 
 extension UniquePermutations: Sequence {
-  public typealias Element = [Base.Element]
-
   /// The iterator for a `UniquePermutations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -494,6 +494,13 @@ extension UniquePermutations: Sequence {
     Iterator(elements, indexes: indexes, lengths: kRange)
   }
 }
+
+// FIXME: Why isn't Permutations running into this error?
+//
+//     error: 'LazySequenceProtocol' requires the types 'Array<Base.Element>' and 'Base.Element' be equivalent
+//     note: requirement specified as 'Self.Element' == 'Self.Elements.Element' [with Self = UniquePermutations<Base>]
+//
+// extension UniquePermutations: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
 extension Collection where Element: Hashable {
   /// Returns a sequence of the unique permutations of this sequence of the
