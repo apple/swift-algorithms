@@ -7,6 +7,9 @@
 //
 // See https://swift.org/LICENSE.txt for license information
 //
+
+//===----------------------------------------------------------------------===//
+// trimmingPrefix(while:)
 //===----------------------------------------------------------------------===//
 
 extension Collection {
@@ -34,14 +37,22 @@ extension Collection {
   }
 }
 
-extension Collection where Self == SubSequence {
+//===----------------------------------------------------------------------===//
+// trimPrefix(toStartAt:)
+//===----------------------------------------------------------------------===//
+
+extension Collection where Self: RangeReplaceableCollection {
   @inlinable
   public mutating func trimPrefix(
     while predicate: (Element) throws -> Bool
   ) rethrows {
-    self = try trimmingPrefix(while: predicate)
+    replaceSubrange(startIndex..<endIndex, with: try trimmingPrefix(while: predicate))
   }
 }
+
+//===----------------------------------------------------------------------===//
+// trimming(toStartAt:) / trimmingSuffix(while:)
+//===----------------------------------------------------------------------===//
 
 extension BidirectionalCollection {
   /// Returns a `SubSequence` formed by discarding all elements at the start and
@@ -90,18 +101,22 @@ extension BidirectionalCollection {
   }
 }
 
-extension BidirectionalCollection where Self == SubSequence {
+//===----------------------------------------------------------------------===//
+// trim(toStartAt:) / trimSuffix(while:)
+//===----------------------------------------------------------------------===//
+
+extension BidirectionalCollection where Self: RangeReplaceableCollection {
   @inlinable
   public mutating func trim(
     while predicate: (Element) throws -> Bool
   ) rethrows {
-    self = try trimming(while: predicate)
+    replaceSubrange(startIndex..<endIndex, with: try trimming(while: predicate))
   }
   
   @inlinable
   public mutating func trimSuffix(
     while predicate: (Element) throws -> Bool
   ) rethrows {
-    self = try trimmingPrefix(while: predicate)
+    replaceSubrange(startIndex..<endIndex, with: try trimmingSuffix(while: predicate))
   }
 }
