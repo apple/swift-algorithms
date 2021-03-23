@@ -106,6 +106,8 @@ extension UniquePermutationsTests {
   }
 
   func testFirstUnique() {
+    // When duplicate elements are encountered, all permutations use the first
+    // instance of the duplicated elements.
     let numbers = Self.numbers.map(IntBox.init)
     for k in 0...numbers.count {
       for p in numbers.uniquePermutations(ofCount: k) {
