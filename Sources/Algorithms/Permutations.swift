@@ -29,36 +29,6 @@ extension MutableCollection
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
-  internal mutating func nextPermutation2() -> Bool {
-    // Ensure we have > 1 element in the collection.
-    guard !isEmpty else { return false }
-    var i = index(before: endIndex)
-    if i == startIndex { return false }
-    
-    while true {
-      let ip1 = i
-      formIndex(before: &i)
-      
-      if self[i] < self[ip1] {
-        var j = index(before: endIndex)
-        while self[i] >= self[j] {
-          formIndex(before: &j)
-        }
-        swapAt(i, j)
-        self.reverse(subrange: ip1 ..< endIndex)
-        
-        // check here if i < the prefix, if so, return true, if not, continue
-        return true
-      }
-      
-      if i == startIndex {
-        self.reverse()
-        return false
-      }
-    }
-  }
-
-  @inlinable
   internal mutating func nextPermutation(upperBound: Index? = nil) -> Bool {
     // Ensure we have > 1 element in the collection.
     guard !isEmpty else { return false }
