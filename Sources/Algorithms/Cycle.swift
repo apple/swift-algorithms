@@ -61,7 +61,7 @@ extension Cycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
 /// finite number of times.
 public struct FiniteCycle<Base: Collection> {
   /// A Product2 instance for iterating the Base collection.
-  internal let product: Product2<Range<Int>, Base>
+  public let product: Product2<Range<Int>, Base>
 
   @usableFromInline
   internal init(base: Base, times: Int) {
@@ -86,6 +86,7 @@ extension FiniteCycle: Sequence {
     }
   }
 
+  @inlinable
   public func makeIterator() -> Iterator {
     return Iterator(product: product)
   }
@@ -97,34 +98,42 @@ extension FiniteCycle: Collection {
 
   public typealias Index = Product2<Range<Int>, Base>.Index
 
+  @inlinable
   public var count: Int {
     product.count
   }
 
+  @inlinable
   public var startIndex: Index {
     product.startIndex
   }
 
+  @inlinable
   public var endIndex: Index {
     product.endIndex
   }
 
+  @inlinable
   public subscript(_ index: Index) -> Element {
     product[index].element2
   }
 
+  @inlinable
   public func index(after i: Index) -> Index {
     product.index(after: i)
   }
 
+  @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     product.distance(from: start, to: end)
   }
 
+  @inlinable
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     product.index(i, offsetBy: distance)
   }
 
+  @inlinable
   public func index(
     _ i: Index,
     offsetBy distance: Int,
@@ -136,6 +145,7 @@ extension FiniteCycle: Collection {
 
 extension FiniteCycle: BidirectionalCollection
   where Base: BidirectionalCollection {
+  @inlinable
   public func index(before i: Index) -> Index {
     product.index(before: i)
   }
