@@ -63,7 +63,7 @@ public struct FiniteCycle<Base: Collection> {
   /// A Product2 instance for iterating the Base collection.
   public let product: Product2<Range<Int>, Base>
 
-  @usableFromInline
+  @inlinable
   internal init(base: Base, times: Int) {
     self.product = Product2(0..<times, base)
   }
@@ -75,7 +75,7 @@ extension FiniteCycle {
     @usableFromInline
     var productIterator: Product2<Range<Int>, Base>.Iterator
 
-    @usableFromInline
+    @inlinable
     internal init(product: Product2<Range<Int>, Base>) {
       self.productIterator = product.makeIterator()
     }
