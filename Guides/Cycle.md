@@ -28,7 +28,7 @@ Two new methods are added to collections:
 extension Collection {
     func cycled() -> Cycle<Self>
 
-    func cycled(times: Int) -> FlattenSequence<Repeated<Self>>
+    func cycled(times: Int) -> FiniteCycle<Self>
 }
 ```
 
@@ -36,8 +36,8 @@ The new `Cycle` type is a sequence only, given that the `Collection` protocol
 design makes infinitely large types impossible/impractical. `Cycle` also
 conforms to `LazySequenceProtocol` when the base type conforms.
 
-Note that despite its name, the returned `FlattenSequence` will always have
-`Collection` conformance, and will have `BidirectionalCollection` conformance
+Note that the returned `FiniteCycle` will always have `Collection`
+conformance, and will have `BidirectionalCollection` conformance
 when called on a bidirectional collection.
 
 ### Complexity
