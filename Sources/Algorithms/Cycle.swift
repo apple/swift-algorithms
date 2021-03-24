@@ -69,7 +69,7 @@ public struct FiniteCycle<Base: Collection> {
   }
 }
 
-extension FiniteCycle: Sequence {
+extension FiniteCycle {
   /// The iterator for a `FiniteCycle` sequence.
   public struct Iterator : IteratorProtocol {
     @usableFromInline
@@ -92,7 +92,8 @@ extension FiniteCycle: Sequence {
   }
 }
 
-extension FiniteCycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension FiniteCycle: LazySequenceProtocol, LazyCollectionProtocol
+  where Base: LazyCollectionProtocol { }
 
 extension FiniteCycle: Collection {
 
