@@ -153,7 +153,10 @@ extension FiniteCycle: BidirectionalCollection
 }
 
 extension FiniteCycle: RandomAccessCollection
-  where Base: RandomAccessCollection { }
+  where Base: RandomAccessCollection {}
+
+extension FiniteCycle: Equatable where Base: Equatable {}
+extension FiniteCycle: Hashable where Base: Hashable {}
 
 //===----------------------------------------------------------------------===//
 // cycled()
