@@ -408,15 +408,14 @@ public struct UniquePermutations<Base: Collection> {
 
 extension UniquePermutations where Base.Element: Hashable {
   @inlinable
-  static func _indexes(_ elements: Base) -> [Base.Index] {
+  internal static func _indexes(_ elements: Base) -> [Base.Index] {
     let firstIndexesAndCountsByElement = Dictionary(
       elements.indices.lazy.map { (elements[$0], ($0, 1)) },
       uniquingKeysWith: { indexAndCount, _ in (indexAndCount.0, indexAndCount.1 + 1) })
     
-    return Array(firstIndexesAndCountsByElement
+    return firstIndexesAndCountsByElement
       .values.sorted(by: { $0.0 < $1.0 })
-      .map { index, count in repeatElement(index, count: count) }
-      .joined())
+      .flatMap { index, count in repeatElement(index, count: count) }
   }
   
   @inlinable
@@ -478,7 +477,7 @@ extension UniquePermutations: Sequence {
       }
 
       if !indexes.nextPermutation(upperBound: lengths.lowerBound) {
-        lengths = (lengths.lowerBound + 1)..<lengths.upperBound
+        lengths.removeFirst()
 
         if lengths.isEmpty {
           return nil

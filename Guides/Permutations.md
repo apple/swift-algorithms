@@ -98,7 +98,7 @@ for perm in numbers.permutations(ofCount: 0...) {
 
 ## Detailed Design
 
-The `permutations(ofCount:)` and `uniquePermutations(ofCount:)` methods are declared as a `Collection` extensions,
+The `permutations(ofCount:)` and `uniquePermutations(ofCount:)` methods are declared as `Collection` extensions,
 and return `Permutations` and `UniquePermutations` instances, respectively:
 
 ```swift
