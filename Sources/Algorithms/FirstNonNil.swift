@@ -14,15 +14,15 @@
 //===----------------------------------------------------------------------===//
 
 public extension Sequence {
-    /// Returns the first element in `self` that `transform` maps to a `.some`.
+  /// Returns the first element in `self` that `transform` maps to a `.some`.
   func firstNonNil<Result>(
     _ transform: (Element) throws -> Result?
   ) rethrows -> Result? {
-        for value in self {
-            if let value = try transform(value) {
-                return value
-            }
-        }
-        return nil
+    for value in self {
+      if let value = try transform(value) {
+        return value
+      }
     }
+    return nil
+  }
 }
