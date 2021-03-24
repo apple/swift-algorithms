@@ -397,7 +397,7 @@ extension Collection {
 /// `uniquePermutations` methods on your collection.
 public struct UniquePermutations<Base: Collection> {
   /// The base collection to iterate over for permutations.
-  public let elements: Base
+  public let base: Base
   
   @usableFromInline
   internal var indexes: [Base.Index]
@@ -408,9 +408,9 @@ public struct UniquePermutations<Base: Collection> {
 
 extension UniquePermutations where Base.Element: Hashable {
   @inlinable
-  internal static func _indexes(_ elements: Base) -> [Base.Index] {
+  internal static func _indexes(_ base: Base) -> [Base.Index] {
     let firstIndexesAndCountsByElement = Dictionary(
-      elements.indices.lazy.map { (elements[$0], ($0, 1)) },
+      base.indices.lazy.map { (base[$0], ($0, 1)) },
       uniquingKeysWith: { indexAndCount, _ in (indexAndCount.0, indexAndCount.1 + 1) })
     
     return firstIndexesAndCountsByElement
@@ -421,16 +421,16 @@ extension UniquePermutations where Base.Element: Hashable {
   @inlinable
   internal init(_ elements: Base) {
     self.indexes = Self._indexes(elements)
-    self.elements = elements
+    self.base = elements
     self.kRange = self.indexes.count ..< (self.indexes.count + 1)
   }
 
   @inlinable
-  internal init<R: RangeExpression>(_ elements: Base, _ range: R)
+  internal init<R: RangeExpression>(_ base: Base, _ range: R)
     where R.Bound == Int
   {
-    self.indexes = Self._indexes(elements)
-    self.elements = elements
+    self.indexes = Self._indexes(base)
+    self.base = base
     
     let upperBound = self.indexes.count + 1
     self.kRange = range.relative(to: 0 ..< .max)
@@ -442,7 +442,7 @@ extension UniquePermutations: Sequence {
   /// The iterator for a `UniquePermutations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
-    internal let elements: Base
+    internal let base: Base
     
     @usableFromInline
     internal var indexes: [Base.Index]
@@ -455,7 +455,7 @@ extension UniquePermutations: Sequence {
 
     @inlinable
     internal init(_ elements: Base, indexes: [Base.Index], lengths: Range<Int>) {
-      self.elements = elements
+      self.base = elements
       self.indexes = indexes
       self.lengths = lengths
     }
@@ -473,7 +473,7 @@ extension UniquePermutations: Sequence {
       // copying when possible.
       if initial {
         initial = false
-        return indexes[..<lengths.lowerBound].map { elements[$0] }
+        return indexes[..<lengths.lowerBound].map { base[$0] }
       }
 
       if !indexes.nextPermutation(upperBound: lengths.lowerBound) {
@@ -484,22 +484,17 @@ extension UniquePermutations: Sequence {
         }
       }
       
-      return indexes[..<lengths.lowerBound].map { elements[$0] }
+      return indexes[..<lengths.lowerBound].map { base[$0] }
     }
   }
   
   @inlinable
   public func makeIterator() -> Iterator {
-    Iterator(elements, indexes: indexes, lengths: kRange)
+    Iterator(base, indexes: indexes, lengths: kRange)
   }
 }
 
-// FIXME: Why isn't Permutations running into this error?
-//
-//     error: 'LazySequenceProtocol' requires the types 'Array<Base.Element>' and 'Base.Element' be equivalent
-//     note: requirement specified as 'Self.Element' == 'Self.Elements.Element' [with Self = UniquePermutations<Base>]
-//
-// extension UniquePermutations: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension UniquePermutations: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
 extension Collection where Element: Hashable {
   /// Returns a sequence of the unique permutations of this sequence of the

@@ -115,4 +115,8 @@ extension UniquePermutationsTests {
       }
     }
   }
+  
+  func testLaziness() {
+    XCTAssertLazySequence("ABCD".lazy.uniquePermutations())
+  }
 }
