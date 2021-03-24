@@ -148,6 +148,21 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
 func XCTAssertLazySequence<S: LazySequenceProtocol>(_: S) {}
 func XCTAssertLazyCollection<S: LazyCollectionProtocol>(_: S) {}
 
+/// Asserts two collections are equal by using their indices to access elements.
+func XCTAssertEqualCollections<C1: Collection, C2: Collection>(
+  _ expression1: @autoclosure () throws -> C1,
+  _ expression2: @autoclosure () throws -> C2,
+  _ message: @autoclosure () -> String = "",
+  file: StaticString = #file, line: UInt = #line
+) rethrows where C1.Element: Equatable, C1.Element == C2.Element {
+  let c1 = try expression1()
+  let c2 = try expression2()
+  XCTAssertEqual(c1.indices.count, c2.indices.count, message(), file: file, line: line)
+  for index in zip(c1.indices, c2.indices) {
+    XCTAssertEqual(c1[index.0], c2[index.1], message(), file: file, line: line)
+  }
+}
+
 /// Tests that all index traversal methods behave as expected.
 ///
 /// Verifies the correctness of the implementations of `startIndex`, `endIndex`,
