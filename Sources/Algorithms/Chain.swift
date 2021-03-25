@@ -100,7 +100,7 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
   /// Converts an index of `Base1` to the corresponding `Index` by mapping
   /// `base1.endIndex` to `base2.startIndex`.
   @inlinable
-  internal func convertIndex(_ i: Base1.Index) -> Index {
+  internal func normalizeIndex(_ i: Base1.Index) -> Index {
     i == base1.endIndex ? Index(second: base2.startIndex) : Index(first: i)
   }
 
@@ -108,7 +108,7 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
   public var startIndex: Index {
     // if `base1` is empty, this will return `base2.startIndex` - if `base2` is
     // also empty, this will correctly equal `base2.endIndex`
-    convertIndex(base1.startIndex)
+    normalizeIndex(base1.startIndex)
   }
 
   @inlinable
@@ -131,7 +131,7 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
     switch i.position {
     case let .first(i):
       assert(i != base1.endIndex)
-      return convertIndex(base1.index(after: i))
+      return normalizeIndex(base1.index(after: i))
     case let .second(i):
       return Index(second: base2.index(after: i))
     }
@@ -192,7 +192,7 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
     case let (.first(i), .second(limit)):
       if let j = base1.index(i, offsetBy: distance, limitedBy: base1.endIndex) {
         // the offset stays within the bounds of `base1`
-        return convertIndex(j)
+        return normalizeIndex(j)
       } else {
         // the offset overflows the bounds of `base1` by `n - d`
         let d = base1.distance(from: i, to: base1.endIndex)
