@@ -189,7 +189,7 @@ public struct ExclusiveReductions<Result, Base: Sequence> {
   @usableFromInline
   internal let transform: (inout Result, Base.Element) -> Void
 
-  @usableFromInline
+  @inlinable
   internal init(
     base: Base,
     initial: Result,
@@ -212,7 +212,7 @@ extension ExclusiveReductions: Sequence {
     @usableFromInline
     internal let transform: (inout Result, Base.Element) -> Void
 
-    @usableFromInline
+    @inlinable
     internal init(
       iterator: Base.Iterator,
       current: Result? = nil,
@@ -249,27 +249,23 @@ extension ExclusiveReductions: Collection where Base: Collection {
     internal let representation: ReductionsIndexRepresentation<Base.Index, Result>
 
     @inlinable
+    internal init(
+      _ representation: ReductionsIndexRepresentation<Base.Index, Result>
+    ) {
+      self.representation = representation
+    }
+
+    @inlinable
     public static func < (lhs: Self, rhs: Self) -> Bool {
       lhs.representation < rhs.representation
     }
-
-    @usableFromInline
-    internal static func base(index: Base.Index, result: Result) -> Self {
-      Self(representation: .base(index: index, result: result))
-    }
-
-    @usableFromInline
-    internal static var start: Self { Self(representation: .start) }
-
-    @usableFromInline
-    internal static var end: Self { Self(representation: .end) }
   }
 
   @inlinable
-  public var startIndex: Index { .start }
+  public var startIndex: Index { Index(.start) }
 
   @inlinable
-  public var endIndex: Index { .end }
+  public var endIndex: Index { Index(.end) }
 
   @inlinable
   public subscript(position: Index) -> Result {
@@ -286,7 +282,7 @@ extension ExclusiveReductions: Collection where Base: Collection {
       guard index != base.endIndex else { return endIndex }
       var previous = previous
       transform(&previous, base[index])
-      return .base(index: index, result: previous)
+      return Index(.base(index: index, result: previous))
     }
     switch i.representation {
     case .start:
@@ -414,7 +410,7 @@ public struct InclusiveReductions<Base: Sequence> {
   @usableFromInline
   internal let transform: (Base.Element, Base.Element) -> Base.Element
 
-  @usableFromInline
+  @inlinable
   internal init(
     base: Base,
     transform: @escaping (Base.Element, Base.Element) -> Base.Element
@@ -435,7 +431,7 @@ extension InclusiveReductions: Sequence {
     @usableFromInline
     internal let transform: (Base.Element, Base.Element) -> Base.Element
 
-    @usableFromInline
+    @inlinable
     internal init(
       iterator: Base.Iterator,
       element: Base.Element? = nil,
@@ -471,30 +467,26 @@ extension InclusiveReductions: Collection where Base: Collection {
     internal let representation: ReductionsIndexRepresentation<Base.Index, Base.Element>
 
     @inlinable
+    internal init(
+      _ representation: ReductionsIndexRepresentation<Base.Index, Base.Element>
+    ) {
+      self.representation = representation
+    }
+
+    @inlinable
     public static func < (lhs: Self, rhs: Self) -> Bool {
       lhs.representation < rhs.representation
     }
-
-    @usableFromInline
-    internal static func base(index: Base.Index, result: Base.Element) -> Self {
-      Self(representation: .base(index: index, result: result))
-    }
-
-    @usableFromInline
-    internal static var start: Self { Self(representation: .start) }
-
-    @usableFromInline
-    internal static var end: Self { Self(representation: .end) }
   }
 
   @inlinable
   public var startIndex: Index {
     guard base.startIndex != base.endIndex else { return endIndex }
-    return .start
+    return Index(.start)
   }
 
   @inlinable
-  public var endIndex: Index { .end }
+  public var endIndex: Index { Index(.end) }
 
   @inlinable
   public subscript(position: Index) -> Base.Element {
@@ -510,7 +502,7 @@ extension InclusiveReductions: Collection where Base: Collection {
     func index(after i: Base.Index, previous: Base.Element) -> Index {
       let index = base.index(after: i)
       guard index != base.endIndex else { return endIndex }
-      return .base(index: index, result: transform(previous, base[index]))
+      return Index(.base(index: index, result: transform(previous, base[index])))
     }
     switch i.representation {
     case .start:
@@ -563,7 +555,7 @@ enum ReductionsIndexRepresentation<BaseIndex: Comparable, Result> {
 }
 
 extension ReductionsIndexRepresentation: Equatable {
-  @usableFromInline
+  @inlinable
   static func == (lhs: Self, rhs: Self) -> Bool {
     switch (lhs, rhs) {
     case (.start, .start): return true
@@ -575,7 +567,7 @@ extension ReductionsIndexRepresentation: Equatable {
 }
 
 extension ReductionsIndexRepresentation: Comparable {
-  @usableFromInline
+  @inlinable
   static func < (lhs: Self, rhs: Self) -> Bool {
     switch (lhs, rhs) {
     case (_, .start): return false
