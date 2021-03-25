@@ -120,7 +120,7 @@ extension Sequence {
     return try _minImplementation(count: count, sortedBy: areInIncreasingOrder)
   }
 
-  /// Returns the largets elements of this sequence, as sorted by the given
+  /// Returns the largest elements of this sequence, as sorted by the given
   /// predicate.
   ///
   /// This example partially sorts an array of integers to retrieve its three
@@ -275,7 +275,7 @@ extension Collection {
     return try _minImplementation(count: count, sortedBy: areInIncreasingOrder)
   }
 
-  /// Returns the largets elements of this collection, as sorted by the given
+  /// Returns the largest elements of this collection, as sorted by the given
   /// predicate.
   ///
   /// This example partially sorts an array of integers to retrieve its three
