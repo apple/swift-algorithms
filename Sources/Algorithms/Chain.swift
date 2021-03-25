@@ -138,102 +138,109 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
   }
   
   @inlinable
-  public func index(_ i: Index, offsetBy n: Int) -> Index {
-    if n == 0 { return i }
-    return n > 0
-      ? offsetForward(i, by: n, limitedBy: endIndex)!
-      : offsetBackward(i, by: -n, limitedBy: startIndex)!
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    guard distance != 0 else { return i }
+    
+    return distance > 0
+      ? offsetForward(i, by: distance)
+      : offsetBackward(i, by: -distance)
   }
-
+  
   @inlinable
   public func index(
     _ i: Index,
-    offsetBy n: Int,
+    offsetBy distance: Int,
     limitedBy limit: Index
   ) -> Index? {
-    if n == 0 { return i }
-    return n > 0
-      ? offsetForward(i, by: n, limitedBy: limit)
-      : offsetBackward(i, by: -n, limitedBy: limit)
+    if distance >= 0 {
+      return limit >= i
+        ? offsetForward(i, by: distance, limitedBy: limit)
+        : offsetForward(i, by: distance)
+    } else {
+      return limit <= i
+        ? offsetBackward(i, by: -distance, limitedBy: limit)
+        : offsetBackward(i, by: -distance)
+    }
+  }
+
+  @inlinable
+  internal func offsetForward(_ i: Index, by distance: Int) -> Index {
+    guard let index = offsetForward(i, by: distance, limitedBy: endIndex)
+      else { fatalError("Index is out of bounds") }
+    return index
+  }
+  
+  @inlinable
+  internal func offsetBackward(_ i: Index, by distance: Int) -> Index {
+    guard let index = offsetBackward(i, by: distance, limitedBy: startIndex)
+      else { fatalError("Index is out of bounds") }
+    return index
   }
 
   @inlinable
   internal func offsetForward(
-    _ i: Index, by n: Int, limitedBy limit: Index
+    _ i: Index, by distance: Int, limitedBy limit: Index
   ) -> Index? {
+    assert(distance >= 0)
+    assert(limit >= i)
+    
     switch (i.position, limit.position) {
     case let (.first(i), .first(limit)):
-      if limit >= i {
-        // `limit` is relevant, so `base2` cannot be reached
-        return base1.index(i, offsetBy: n, limitedBy: limit)
-          .map(Index.init(first:))
-      } else if let j = base1.index(i, offsetBy: n, limitedBy: base1.endIndex) {
-        // the offset stays within the bounds of `base1`
-        return convertIndex(j)
-      } else {
-        // the offset overflows the bounds of `base1` by `n - d`
-        let d = base1.distance(from: i, to: base1.endIndex)
-        return Index(second: base2.index(base2.startIndex, offsetBy: n - d))
-      }
+      return base1.index(i, offsetBy: distance, limitedBy: limit)
+        .map(Index.init(first:))
     
     case let (.first(i), .second(limit)):
-      if let j = base1.index(i, offsetBy: n, limitedBy: base1.endIndex) {
+      if let j = base1.index(i, offsetBy: distance, limitedBy: base1.endIndex) {
         // the offset stays within the bounds of `base1`
         return convertIndex(j)
       } else {
         // the offset overflows the bounds of `base1` by `n - d`
         let d = base1.distance(from: i, to: base1.endIndex)
-        return base2.index(base2.startIndex, offsetBy: n - d, limitedBy: limit)
+        return base2.index(base2.startIndex, offsetBy: distance - d, limitedBy: limit)
           .map(Index.init(second:))
       }
       
-    case let (.second(i), .first):
-      // `limit` has no effect here
-      return Index(second: base2.index(i, offsetBy: n))
+    case (.second, .first):
+      // impossible because `limit >= i`
+      fatalError()
       
     case let (.second(i), .second(limit)):
-      return base2.index(i, offsetBy: n, limitedBy: limit)
+      return base2.index(i, offsetBy: distance, limitedBy: limit)
         .map(Index.init(second:))
     }
   }
 
   @inlinable
   internal func offsetBackward(
-    _ i: Index, by n: Int, limitedBy limit: Index
+    _ i: Index, by distance: Int, limitedBy limit: Index
   ) -> Index? {
+    assert(distance >= 0)
+    assert(limit <= i)
+    
     switch (i.position, limit.position) {
     case let (.first(i), .first(limit)):
-      return base1.index(i, offsetBy: -n, limitedBy: limit)
+      return base1.index(i, offsetBy: -distance, limitedBy: limit)
         .map(Index.init(first:))
       
-    case let (.first(i), .second):
-      // `limit` has no effect here
-      return Index(first: base1.index(i, offsetBy: -n))
+    case (.first, .second):
+      // impossible because `limit <= i`
+      fatalError()
       
     case let (.second(i), .first(limit)):
-      if let j = base2.index(i, offsetBy: -n, limitedBy: base2.startIndex) {
+      if let j = base2.index(i, offsetBy: -distance, limitedBy: base2.startIndex) {
         // the offset stays within the bounds of `base2`
         return Index(second: j)
       } else {
         // the offset overflows the bounds of `base2` by `n - d`
         let d = base2.distance(from: base2.startIndex, to: i)
-        return base1.index(base1.endIndex, offsetBy: -(n - d), limitedBy: limit)
+        return base1.index(base1.endIndex, offsetBy: -(distance - d), limitedBy: limit)
           .map(Index.init(first:))
       }
 
     case let (.second(i), .second(limit)):
-      if limit <= i {
-        // `limit` is relevant, so `base1` cannot be reached
-        return base2.index(i, offsetBy: -n, limitedBy: limit)
-          .map(Index.init(second:))
-      } else if let j = base2.index(i, offsetBy: -n, limitedBy: base2.startIndex) {
-        // the offset stays within the bounds of `base2`
-        return Index(second: j)
-      } else {
-        // the offset overflows the bounds of `base2` by `n - d`
-        let d = base2.distance(from: base2.startIndex, to: i)
-        return Index(first: base1.index(base1.endIndex, offsetBy: -(n - d)))
-      }
+      // `limit` is relevant, so `base1` cannot be reached
+      return base2.index(i, offsetBy: -distance, limitedBy: limit)
+        .map(Index.init(second:))
     }
   }
   
