@@ -12,12 +12,9 @@ let exclusiveRunningTotal = (1...5).reductions(0, +)
 print(exclusiveRunningTotal)
 // prints [0, 1, 3, 6, 10, 15]
 
-var value = 0
-let intoRunningTotal = (1...5).reductions(into: &value, +=)
+let intoRunningTotal = (1...5).reductions(into: 0, +=)
 print(intoRunningTotal)
 // prints [0, 1, 3, 6, 10, 15]
-print(value)
-// prints 15
 
 let inclusiveRunningTotal = (1...5).reductions(+)
 print(inclusiveRunningTotal)
@@ -38,7 +35,7 @@ extension LazySequenceProtocol {
   ) -> ExclusiveReductions<Result, Self>
 
   public func reductions<Result>(
-    into initial: inout Result,
+    into initial: Result,
     _ transform: @escaping (inout Result, Element) -> Void
   ) -> ExclusiveReductions<Result, Self>
 
@@ -57,7 +54,7 @@ extension Sequence {
   ) rethrows -> [Result]
 
   public func reductions<Result>(
-    into initial: inout Result,
+    into initial: Result,
     _ transform: (inout Result, Element) throws -> Void
   ) rethrows -> [Result]
 

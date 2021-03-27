@@ -27,17 +27,11 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqualCollections([1].lazy.reductions(0, +), [0, 1])
     XCTAssertEqualCollections(EmptyCollection<Int>().lazy.reductions(0, +), [0])
 
-    var value = 0
-    XCTAssertEqual([1, 2, 3, 4].lazy.reductions(into: &value, +=), [0, 1, 3, 6, 10])
-    XCTAssertEqual(value, 10)
+    XCTAssertEqual([1, 2, 3, 4].lazy.reductions(into: 0, +=), [0, 1, 3, 6, 10])
 
-    value = 0
-    XCTAssertEqual([1].lazy.reductions(into: &value, +=), [0, 1])
-    XCTAssertEqual(value, 1)
+    XCTAssertEqual([1].lazy.reductions(into: 0, +=), [0, 1])
 
-    value = 0
-    XCTAssertEqual(EmptyCollection<Int>().lazy.reductions(into: &value, +=), [0])
-    XCTAssertEqual(value, 0)
+    XCTAssertEqual(EmptyCollection<Int>().lazy.reductions(into: 0, +=), [0])
 
     XCTAssertLazySequence((1...).prefix(1).lazy.reductions(0, +))
     XCTAssertLazySequence([1].lazy.reductions(0, +))
@@ -49,17 +43,11 @@ final class ReductionsTests: XCTestCase {
     XCTAssertEqual([1].reductions(0, +), [0, 1])
     XCTAssertEqual(EmptyCollection<Int>().reductions(0, +), [0])
 
-    var value = 0
-    XCTAssertEqual([1, 2, 3, 4].reductions(into: &value, +=), [0, 1, 3, 6, 10])
-    XCTAssertEqual(value, 10)
+    XCTAssertEqual([1, 2, 3, 4].reductions(into: 0, +=), [0, 1, 3, 6, 10])
 
-    value = 0
-    XCTAssertEqual([1].reductions(into: &value, +=), [0, 1])
-    XCTAssertEqual(value, 1)
+    XCTAssertEqual([1].reductions(into: 0, +=), [0, 1])
 
-    value = 0
-    XCTAssertEqual(EmptyCollection<Int>().reductions(into: &value, +=), [0])
-    XCTAssertEqual(value, 0)
+    XCTAssertEqual(EmptyCollection<Int>().reductions(into: 0, +=), [0])
 
     XCTAssertNoThrow(try [].reductions(0) { _, _ in throw TestError() })
     XCTAssertThrowsError(try [1].reductions(0) { _, _ in throw TestError() })

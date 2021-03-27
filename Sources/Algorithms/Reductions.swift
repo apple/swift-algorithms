@@ -39,9 +39,7 @@ extension LazySequenceProtocol {
     _ initial: Result,
     _ transform: @escaping (Result, Element) -> Result
   ) -> ExclusiveReductions<Result, Self> {
-
-    var result = initial
-    return reductions(into: &result) { result, element in
+    return reductions(into: initial) { result, element in
       result = transform(result, element)
     }
   }
@@ -69,7 +67,7 @@ extension LazySequenceProtocol {
   /// - Complexity: O(1)
   @inlinable
   public func reductions<Result>(
-    into initial: inout Result,
+    into initial: Result,
     _ transform: @escaping (inout Result, Element) -> Void
   ) -> ExclusiveReductions<Result, Self> {
     ExclusiveReductions(base: self, initial: initial, transform: transform)
@@ -117,9 +115,7 @@ extension Sequence {
     _ initial: Result,
     _ transform: (Result, Element) throws -> Result
   ) rethrows -> [Result] {
-
-    var result = initial
-    return try reductions(into: &result) { result, element in
+    return try reductions(into: initial) { result, element in
       result = try transform(result, element)
     }
   }
@@ -160,7 +156,7 @@ extension Sequence {
   /// - Complexity: O(_n_), where _n_ is the length of the sequence.
   @inlinable
   public func reductions<Result>(
-    into initial: inout Result,
+    into initial: Result,
     _ transform: (inout Result, Element) throws -> Void
   ) rethrows -> [Result] {
 
@@ -168,6 +164,7 @@ extension Sequence {
     output.reserveCapacity(underestimatedCount + 1)
     output.append(initial)
 
+    var initial = initial
     for element in self {
       try transform(&initial, element)
       output.append(initial)
@@ -595,10 +592,10 @@ extension LazySequenceProtocol {
   @available(*, deprecated, message: "Use reductions(into:_:) instead.")
   @inlinable
   public func scan<Result>(
-    into initial: inout Result,
+    into initial: Result,
     _ transform: @escaping (inout Result, Element) -> Void
   ) -> ExclusiveReductions<Result, Self> {
-    reductions(into: &initial, transform)
+    reductions(into: initial, transform)
   }
 }
 
@@ -616,10 +613,10 @@ extension Sequence {
   @available(*, deprecated, message: "Use reductions(into:_:) instead.")
   @inlinable
   public func scan<Result>(
-    into initial: inout Result,
+    into initial: Result,
     _ transform: (inout Result, Element) throws -> Void
   ) rethrows -> [Result] {
-    try reductions(into: &initial, transform)
+    try reductions(into: initial, transform)
   }
 }
 
