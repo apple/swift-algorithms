@@ -420,6 +420,8 @@ extension Sequence {
   ///         """
   ///      */
   ///
+  /// - Precondition: The sequence is finite.
+  ///
   /// - Parameter areInIncreasingOrder: A predicate that returns `true`
   ///   if its first argument should be ordered before its second
   ///   argument; otherwise, `false`.
@@ -459,6 +461,8 @@ extension Sequence where Element: Comparable {
   ///     let lowestHeight = bounds?.min, greatestHeight = bounds?.max
   ///     print(lowestHeight, greatestHeight)
   ///     // Prints "Optional(58.5) Optional(67.5)"
+  ///
+  /// - Precondition: The sequence is finite.
   ///
   /// - Returns: A tuple with the sequence's minimum element, followed by its
   ///   maximum element. For either member, if there is a tie for the extreme
