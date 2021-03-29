@@ -16,6 +16,33 @@ package updates, you can specify your package dependency using
 
 ---
 
+## [0.0.4] - 2021-03-29
+
+### Additions
+
+More new algorithms to join the party:
+
+- A lazy version of the standard library's two `split` methods. ([#78])
+- `firstNonNil(_:)` returns the first non-`nil` element from an
+  optional-generating transform. ([#31])
+- `uniquePermutations()` skips duplicates when generating permutations of a
+  collection. ([#91])
+- The `reductions` methods return all the in-between states of reducing a
+  sequence or collection. ([#46])
+
+### Fixes
+
+- Methods and computed properties are more consistently marked as inlinable, 
+  resolving a performance regression. 
+- The `Stride` type now efficiently calculates distances between positions,
+  supported by the underlying collection.
+- Better test coverage and improved diagnostics for comparing sequences.
+- Fixed links and improved documentation.
+
+The 0.0.4 release includes contributions from [bjhomer], [danielctull],
+[hashemi], [karwa], [kylemacomber], [LucianoPAlmeida], [mdznr], [natecook1000],
+[ollieatkinson], [Qata], [timvermeulen], and [toddthomas]. Thank you!
+
 ## [0.0.3] - 2021-02-26
 
 ### Additions
@@ -96,7 +123,8 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for releases -->
 
-[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.0.3...HEAD
+[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.0.4...HEAD
+[0.0.4]: https://github.com/apple/swift-algorithms/compare/0.0.3...0.0.4
 [0.0.3]: https://github.com/apple/swift-algorithms/compare/0.0.2...0.0.3
 [0.0.2]: https://github.com/apple/swift-algorithms/compare/0.0.1...0.0.2
 [0.0.1]: https://github.com/apple/swift-algorithms/releases/tag/0.0.1
@@ -107,20 +135,26 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#9]: https://github.com/apple/swift-algorithms/pull/9
 [#20]: https://github.com/apple/swift-algorithms/pull/20
 [#24]: https://github.com/apple/swift-algorithms/pull/24
+[#31]: https://github.com/apple/swift-algorithms/pull/31
 [#35]: https://github.com/apple/swift-algorithms/pull/35
+[#46]: https://github.com/apple/swift-algorithms/pull/46
 [#51]: https://github.com/apple/swift-algorithms/pull/51
 [#54]: https://github.com/apple/swift-algorithms/pull/54
 [#56]: https://github.com/apple/swift-algorithms/pull/56
 [#65]: https://github.com/apple/swift-algorithms/pull/65
 [#77]: https://github.com/apple/swift-algorithms/pull/77
+[#78]: https://github.com/apple/swift-algorithms/pull/78
+[#91]: https://github.com/apple/swift-algorithms/pull/91
 
 <!-- Link references for contributors -->
 
 [AustinConlon]: https://github.com/apple/swift-algorithms/commits?author=AustinConlon
 [benrimmington]: https://github.com/apple/swift-algorithms/commits?author=benrimmington
+[bjhomer]: https://github.com/apple/swift-algorithms/commits?author=bjhomer
 [danielctull]: https://github.com/apple/swift-algorithms/commits?author=danielctull
 [dhruvshah8]: https://github.com/apple/swift-algorithms/commits?author=dhruvshah8
 [egorzhdan]: https://github.com/apple/swift-algorithms/commits?author=egorzhdan
+[hashemi]: https://github.com/apple/swift-algorithms/commits?author=hashemi
 [IanKeen]: https://github.com/apple/swift-algorithms/commits?author=IanKeen
 [iSame7]: https://github.com/apple/swift-algorithms/commits?author=iSame7
 [karwa]: https://github.com/apple/swift-algorithms/commits?author=karwa
@@ -133,6 +167,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [nordicio]: https://github.com/apple/swift-algorithms/commits?author=nordicio
 [ollieatkinson]: https://github.com/apple/swift-algorithms/commits?author=ollieatkinson
 [pmtao]: https://github.com/apple/swift-algorithms/commits?author=pmtao
+[Qata]: https://github.com/apple/swift-algorithms/commits?author=Qata
 [rakaramos]: https://github.com/apple/swift-algorithms/commits?author=rakaramos
 [rockbruno]: https://github.com/apple/swift-algorithms/commits?author=rockbruno
 [Roshankumar350]: https://github.com/apple/swift-algorithms/commits?author=Roshankumar350
@@ -140,3 +175,4 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [sidepelican]: https://github.com/apple/swift-algorithms/commits?author=sidepelican
 [stephentyrone]: https://github.com/apple/swift-algorithms/commits?author=stephentyrone
 [timvermeulen]: https://github.com/apple/swift-algorithms/commits?author=timvermeulen
+[toddthomas]: https://github.com/apple/swift-algorithms/commits?author=toddthomas

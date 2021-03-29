@@ -3,9 +3,7 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Reductions.swift) |
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/ReductionsTests.swift)]
 
-Produces a sequence of values.
-
-This has the behaviour of reduce, but also returns all intermediate results.
+Produces all the intermediate results of reducing a sequence's elements using a closure.
 
 ```swift
 let exclusiveRunningTotal = (1...5).reductions(0, +)
