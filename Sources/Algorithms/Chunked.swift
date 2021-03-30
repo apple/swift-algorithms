@@ -11,7 +11,7 @@
 
 /// A collection wrapper that breaks a collection into chunks based on a
 /// predicate or projection.
-public struct LazyChunked<Base: Collection, Subject> {
+public struct Chunked<Base: Collection, Subject> {
   /// The collection that this instance provides a view onto.
   public let base: Base
   
@@ -44,7 +44,7 @@ public struct LazyChunked<Base: Collection, Subject> {
   }
 }
 
-extension LazyChunked: LazyCollectionProtocol {
+extension Chunked: LazyCollectionProtocol {
   /// A position in a chunked collection.
   public struct Index: Comparable {
     /// The range corresponding to the chunk at this position.
@@ -105,9 +105,9 @@ extension LazyChunked: LazyCollectionProtocol {
   }
 }
 
-extension LazyChunked.Index: Hashable where Base.Index: Hashable {}
+extension Chunked.Index: Hashable where Base.Index: Hashable {}
 
-extension LazyChunked: BidirectionalCollection
+extension Chunked: BidirectionalCollection
   where Base: BidirectionalCollection
 {
   /// Returns the index in the base collection of the start of the chunk ending
@@ -142,8 +142,8 @@ extension LazyCollectionProtocol {
   @inlinable
   public func chunked(
     by belongInSameGroup: @escaping (Element, Element) -> Bool
-  ) -> LazyChunked<Elements, Element> {
-    LazyChunked(
+  ) -> Chunked<Elements, Element> {
+    Chunked(
       base: elements,
       projection: { $0 },
       belongInSameGroup: belongInSameGroup)
@@ -156,8 +156,8 @@ extension LazyCollectionProtocol {
   @inlinable
   public func chunked<Subject: Equatable>(
     on projection: @escaping (Element) -> Subject
-  ) -> LazyChunked<Elements, Subject> {
-    LazyChunked(
+  ) -> Chunked<Elements, Subject> {
+    Chunked(
       base: elements,
       projection: projection,
       belongInSameGroup: ==)
