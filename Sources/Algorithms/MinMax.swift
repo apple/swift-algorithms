@@ -438,6 +438,38 @@ extension Sequence {
     var iterator = makeIterator()
     guard var lowest = iterator.next() else { return nil }
 
+    #if true
+    var highest = iterator.next() ?? lowest
+    if try areInIncreasingOrder(highest, lowest) {
+      swap(&lowest, &highest)
+    }
+    while let element = iterator.next() {
+      guard let following = iterator.next() else {
+        if try areInIncreasingOrder(element, lowest) {
+          lowest = element
+        } else if try !areInIncreasingOrder(element, highest) {
+          highest = element
+        }
+        break
+      }
+
+      if try areInIncreasingOrder(following, element) {
+        if try areInIncreasingOrder(following, lowest) {
+          lowest = following
+        }
+        if try !areInIncreasingOrder(element, highest) {
+          highest = element
+        }
+      } else {
+        if try areInIncreasingOrder(element, lowest) {
+          lowest = element
+        }
+        if try !areInIncreasingOrder(following, highest) {
+          highest = following
+        }
+      }
+    }
+    #else
     var highest = lowest
     while let element = iterator.next() {
       if try areInIncreasingOrder(element, lowest) {
@@ -446,6 +478,7 @@ extension Sequence {
         highest = element
       }
     }
+    #endif
     return (lowest, highest)
   }
 }

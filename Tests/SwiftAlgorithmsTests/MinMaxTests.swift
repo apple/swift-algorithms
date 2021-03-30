@@ -204,6 +204,11 @@ final class MinAndMaxTests: XCTestCase {
     let result = repeatElement(3.3, count: 5).minAndMax()
     XCTAssertEqual(result?.min, 3.3)
     XCTAssertEqual(result?.max, 3.3)
+
+    // Even count
+    let result2 = repeatElement("c" as Character, count: 6).minAndMax()
+    XCTAssertEqual(result2?.min, "c")
+    XCTAssertEqual(result2?.max, "c")
   }
 
   /// Confirms when the minimum value is constantly updated, but the maximum
@@ -212,6 +217,11 @@ final class MinAndMaxTests: XCTestCase {
     let result = (1...5).reversed().minAndMax()
     XCTAssertEqual(result?.min, 1)
     XCTAssertEqual(result?.max, 5)
+
+    // Even count
+    let result2 = "fedcba".minAndMax()
+    XCTAssertEqual(result2?.min, "a")
+    XCTAssertEqual(result2?.max, "f")
   }
 
   /// Confirms when the maximum value is constantly updated, but the minimum
@@ -220,6 +230,11 @@ final class MinAndMaxTests: XCTestCase {
     let result = (1...5).minAndMax()
     XCTAssertEqual(result?.min, 1)
     XCTAssertEqual(result?.max, 5)
+
+    // Even count
+    let result2 = "abcdef".minAndMax()
+    XCTAssertEqual(result2?.min, "a")
+    XCTAssertEqual(result2?.max, "f")
   }
 
   /// Confirms when the maximum and minimum change during a run.
@@ -227,5 +242,10 @@ final class MinAndMaxTests: XCTestCase {
     let result = [4, 3, 3, 5, 2, 0, 7, 6].minAndMax()
     XCTAssertEqual(result?.min, 0)
     XCTAssertEqual(result?.max, 7)
+
+    // Odd count
+    let result2 = "gfabdec".minAndMax()
+    XCTAssertEqual(result2?.min, "a")
+    XCTAssertEqual(result2?.max, "g")
   }
 }
