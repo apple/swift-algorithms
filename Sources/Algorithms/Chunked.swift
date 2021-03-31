@@ -154,7 +154,7 @@ public struct EvenChunks<Base: Collection> {
   @usableFromInline
   internal var firstUpperBound: Base.Index
   
-  @usableFromInline
+  @inlinable
   internal init(
     base: Base,
     numberOfChunks: Int,
@@ -167,7 +167,7 @@ public struct EvenChunks<Base: Collection> {
     self.firstUpperBound = firstUpperBound
   }
   
-  @usableFromInline
+  @inlinable
   internal init(base: Base, numberOfChunks: Int) {
     self.base = base
     self.numberOfChunks = numberOfChunks
@@ -183,19 +183,19 @@ public struct EvenChunks<Base: Collection> {
 extension EvenChunks {
   /// Returns the number of chunks with size `smallChunkSize + 1` at the start
   /// of this collection.
-  @usableFromInline
+  @inlinable
   internal var numberOfLargeChunks: Int {
     baseCount % numberOfChunks
   }
   
   /// Returns the size of the small chunks at the end of this collection.
-  @usableFromInline
+  @inlinable
   internal var smallChunkSize: Int {
     baseCount / numberOfChunks
   }
   
   /// Returns the size of a chunk at a given offset.
-  @usableFromInline
+  @inlinable
   internal func sizeOfChunk(offset: Int) -> Int {
     let isLargeChunk = offset < numberOfLargeChunks
     return baseCount / numberOfChunks + (isLargeChunk ? 1 : 0)
@@ -203,21 +203,21 @@ extension EvenChunks {
   
   /// Returns the index in the base collection of the end of the chunk starting
   /// at the given index.
-  @usableFromInline
+  @inlinable
   internal func endOfChunk(startingAt start: Base.Index, offset: Int) -> Base.Index {
     base.index(start, offsetBy: sizeOfChunk(offset: offset))
   }
   
   /// Returns the index in the base collection of the start of the chunk ending
   /// at the given index.
-  @usableFromInline
+  @inlinable
   internal func startOfChunk(endingAt end: Base.Index, offset: Int) -> Base.Index {
     base.index(end, offsetBy: -sizeOfChunk(offset: offset))
   }
   
   /// Returns the index that corresponds to the chunk that starts at the given
   /// base index.
-  @usableFromInline
+  @inlinable
   internal func indexOfChunk(startingAt start: Base.Index, offset: Int) -> Index {
     guard offset != numberOfChunks else { return endIndex }
     let end = endOfChunk(startingAt: start, offset: offset)
@@ -226,7 +226,7 @@ extension EvenChunks {
   
   /// Returns the index that corresponds to the chunk that ends at the given
   /// base index.
-  @usableFromInline
+  @inlinable
   internal func indexOfChunk(endingAt end: Base.Index, offset: Int) -> Index {
     let start = startOfChunk(endingAt: end, offset: offset)
     return Index(start..<end, offset: offset)
@@ -244,7 +244,7 @@ public struct EvenChunksIndex<Base: Comparable>: Comparable {
   @usableFromInline
   internal var offset: Int
   
-  @usableFromInline
+  @inlinable
   internal init(_ baseRange: Range<Base>, offset: Int) {
     self.baseRange = baseRange
     self.offset = offset
