@@ -197,6 +197,7 @@ extension CompactedSequence: Equatable
 
 extension CompactedSequence: Hashable
   where Element: Hashable {
+
   @inlinable
   public func hash(into hasher: inout Hasher) {
     for element in self {
