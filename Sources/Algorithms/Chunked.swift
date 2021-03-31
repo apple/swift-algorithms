@@ -130,6 +130,9 @@ extension Chunked: BidirectionalCollection
   }
 }
 
+@available(*, deprecated, renamed: "Chunked")
+public typealias LazyChunked<Base: Collection, Subject> = Chunked<Base, Subject>
+
 //===----------------------------------------------------------------------===//
 // lazy.chunked(by:)
 //===----------------------------------------------------------------------===//
