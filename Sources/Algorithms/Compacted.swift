@@ -107,7 +107,7 @@ public struct CompactedCollection<Base: Collection, Element>: Collection
   
   @inlinable
   public func index(after i: Index) -> Index {
-    precondition(i < endIndex, "Index out of bounds")
+    precondition(i != endIndex, "Index out of bounds")
     
     let baseIdx = base.index(after: i.base)
     guard let idx = base[baseIdx...].firstIndex(where: { $0 != nil })
@@ -121,7 +121,7 @@ extension CompactedCollection: BidirectionalCollection
 
   @inlinable
   public func index(before i: Index) -> Index {
-    precondition(i > startIndex, "Index out of bounds")
+    precondition(i != startIndex, "Index out of bounds")
     
     guard let idx =
             base[startIndex.base..<i.base]
@@ -175,8 +175,6 @@ extension Collection {
 extension CompactedSequence: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
 
-extension CompactedCollection: RandomAccessCollection
-  where Base: RandomAccessCollection {}
 extension CompactedCollection: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
 extension CompactedCollection: LazyCollectionProtocol

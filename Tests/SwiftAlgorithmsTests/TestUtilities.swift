@@ -190,7 +190,7 @@ func hash<T: Hashable>(_ value: T) -> Int {
   return hasher.finalize()
 }
 
-/// Asserts two hashable value produce the same hash value.
+/// Asserts that two hashable instances produce the same hash value.
 func XCTAssertEqualHashValue<T: Hashable, U: Hashable>(
   _ expression1: @autoclosure () throws -> T,
   _ expression2: @autoclosure () throws -> U,
