@@ -38,7 +38,7 @@ extension Collection {
 }
 
 //===----------------------------------------------------------------------===//
-// trimPrefix(toStartAt:)
+// trimPrefix(while:)
 //===----------------------------------------------------------------------===//
 
 extension Collection where Self: RangeReplaceableCollection {
@@ -46,12 +46,13 @@ extension Collection where Self: RangeReplaceableCollection {
   public mutating func trimPrefix(
     while predicate: (Element) throws -> Bool
   ) rethrows {
-    replaceSubrange(startIndex..<endIndex, with: try trimmingPrefix(while: predicate))
+    let end = try endOfPrefix(while: predicate)
+    removeSubrange(startIndex..<end)
   }
 }
 
 //===----------------------------------------------------------------------===//
-// trimming(toStartAt:) / trimmingSuffix(while:)
+// trimming(while:) / trimmingSuffix(while:)
 //===----------------------------------------------------------------------===//
 
 extension BidirectionalCollection {
@@ -76,7 +77,7 @@ extension BidirectionalCollection {
   ) rethrows -> SubSequence {
     return try trimmingPrefix(while: predicate).trimmingSuffix(while: predicate)
   }
-
+  
   /// Returns a `SubSequence` formed by discarding all elements at the end
   /// of the collection which satisfy the given predicate.
   ///
@@ -96,13 +97,13 @@ extension BidirectionalCollection {
   public func trimmingSuffix(
     while predicate: (Element) throws -> Bool
   ) rethrows -> SubSequence {
-    let end = try self[startIndex...].startOfSuffix(while: predicate)
+    let end = try startOfSuffix(while: predicate)
     return self[startIndex..<end]
   }
 }
 
 //===----------------------------------------------------------------------===//
-// trim(toStartAt:) / trimSuffix(while:)
+// trim(while:) / trimSuffix(while:)
 //===----------------------------------------------------------------------===//
 
 extension BidirectionalCollection where Self: RangeReplaceableCollection {
@@ -117,6 +118,7 @@ extension BidirectionalCollection where Self: RangeReplaceableCollection {
   public mutating func trimSuffix(
     while predicate: (Element) throws -> Bool
   ) rethrows {
-    replaceSubrange(startIndex..<endIndex, with: try trimmingSuffix(while: predicate))
+    let start = try startOfSuffix(while: predicate)
+    removeSubrange(start..<endIndex)
   }
 }
