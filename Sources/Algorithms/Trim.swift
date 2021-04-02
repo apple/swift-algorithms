@@ -51,6 +51,15 @@ extension Collection where Self: RangeReplaceableCollection {
   }
 }
 
+extension Collection where Self == Self.SubSequence {
+  @inlinable
+  public mutating func trimPrefix(
+    while predicate: (Element) throws -> Bool
+  ) rethrows {
+    self = try trimmingPrefix(while: predicate)
+  }
+}
+
 //===----------------------------------------------------------------------===//
 // trimming(while:) / trimmingSuffix(while:)
 //===----------------------------------------------------------------------===//
@@ -120,5 +129,21 @@ extension BidirectionalCollection where Self: RangeReplaceableCollection {
   ) rethrows {
     let start = try startOfSuffix(while: predicate)
     removeSubrange(start..<endIndex)
+  }
+}
+
+extension BidirectionalCollection where Self == Self.SubSequence {
+  @inlinable
+  public mutating func trim(
+    while predicate: (Element) throws -> Bool
+  ) rethrows {
+    self = try trimming(while: predicate)
+  }
+
+  @inlinable
+  public mutating func trimSuffix(
+    while predicate: (Element) throws -> Bool
+  ) rethrows {
+    self = try trimmingSuffix(while: predicate)
   }
 }
