@@ -61,7 +61,8 @@ extension Cycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
 /// finite number of times.
 public struct FiniteCycle<Base: Collection> {
   /// A Product2 instance for iterating the Base collection.
-  public let product: Product2<Range<Int>, Base>
+  @usableFromInline
+  internal let product: Product2<Range<Int>, Base>
 
   @inlinable
   internal init(base: Base, times: Int) {
