@@ -145,4 +145,16 @@ final class ChunkedTests: XCTestCase {
       validateIndexTraversals(chunks)
     }
   }
+  
+  func testChunksOfCountHash() {
+    let collection1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    let collection2 = [1, 2, 3, 4, 5]
+    
+    XCTAssertEqualHashValue(
+      collection1.chunks(ofCount: 1), collection1.chunks(ofCount: 1))
+    XCTAssertNotEqualHashValue(
+      collection1.chunks(ofCount: 1), collection2.chunks(ofCount: 1))
+    XCTAssertNotEqualHashValue(
+      collection1.chunks(ofCount: 2), collection2.chunks(ofCount: 4))
+  }
 }
