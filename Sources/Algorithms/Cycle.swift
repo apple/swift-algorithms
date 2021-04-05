@@ -69,69 +69,64 @@ public struct FiniteCycle<Base: Collection> {
   }
 }
 
-extension FiniteCycle {
-  /// The iterator for a `FiniteCycle` sequence.
-  public struct Iterator : IteratorProtocol {
-    @usableFromInline
-    var productIterator: Product2<Range<Int>, Base>.Iterator
-
-    @inlinable
-    internal init(product: Product2<Range<Int>, Base>) {
-      self.productIterator = product.makeIterator()
-    }
-
-    @inlinable
-    public mutating func next() -> Base.Element? {
-      self.productIterator.next()?.element2
-    }
-  }
-
-  @inlinable
-  public func makeIterator() -> Iterator {
-    return Iterator(product: product)
-  }
-}
-
 extension FiniteCycle: LazySequenceProtocol, LazyCollectionProtocol
   where Base: LazyCollectionProtocol { }
 
 extension FiniteCycle: Collection {
 
-  public typealias Index = Product2<Range<Int>, Base>.Index
+  public typealias Element = Base.Element
 
-  @inlinable
-  public var count: Int {
-    product.count
+  public struct Index: Comparable {
+    /// The index corresponding to the Product2 index at this position.
+    @usableFromInline
+    internal let productIndex: Product2<Range<Int>, Base>.Index
+
+    @inlinable
+    internal init(_ productIndex: Product2<Range<Int>, Base>.Index) {
+      self.productIndex = productIndex
+    }
+
+    @inlinable
+    public static func == (lhs: Index, rhs: Index) -> Bool {
+      lhs.productIndex == rhs.productIndex
+    }
+
+    @inlinable
+    public static func < (lhs: Index, rhs: Index) -> Bool {
+      lhs.productIndex < rhs.productIndex
+    }
   }
 
   @inlinable
   public var startIndex: Index {
-    product.startIndex
+    Index(product.startIndex)
   }
 
   @inlinable
   public var endIndex: Index {
-    product.endIndex
+    Index(product.endIndex)
   }
 
   @inlinable
   public subscript(_ index: Index) -> Element {
-    product[index].element2
+    product[index.productIndex].element2
   }
 
   @inlinable
   public func index(after i: Index) -> Index {
-    product.index(after: i)
+    let productIndex = product.index(after: i.productIndex)
+    return Index(productIndex)
   }
 
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
-    product.distance(from: start, to: end)
+    product.distance(from: start.productIndex, to: end.productIndex)
   }
 
   @inlinable
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
-    product.index(i, offsetBy: distance)
+    let productIndex = product.index(i.productIndex, offsetBy: distance)
+    return Index(productIndex)
   }
 
   @inlinable
@@ -140,7 +135,17 @@ extension FiniteCycle: Collection {
     offsetBy distance: Int,
     limitedBy limit: Index
   ) -> Index? {
-    product.index(i, offsetBy: distance, limitedBy: limit)
+    guard let productIndex = product.index(i.productIndex,
+                                           offsetBy: distance,
+                                           limitedBy: limit.productIndex) else {
+      return nil
+    }
+    return Index(productIndex)
+  }
+
+  @inlinable
+  public var count: Int {
+    product.count
   }
 }
 
@@ -148,7 +153,8 @@ extension FiniteCycle: BidirectionalCollection
   where Base: BidirectionalCollection {
   @inlinable
   public func index(before i: Index) -> Index {
-    product.index(before: i)
+    let productIndex = product.index(before: i.productIndex)
+    return Index(productIndex)
   }
 }
 
