@@ -110,7 +110,7 @@ extension FiniteCycle: Collection {
 
   @inlinable
   public subscript(_ index: Index) -> Element {
-    product[index.productIndex].element2
+    product[index.productIndex].1
   }
 
   @inlinable
