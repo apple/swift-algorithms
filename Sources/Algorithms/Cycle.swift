@@ -12,7 +12,8 @@
 /// A collection wrapper that repeats the elements of a base collection.
 public struct Cycle<Base: Collection> {
   /// The collection to repeat.
-  public let base: Base
+  @usableFromInline
+  internal let base: Base
   
   @inlinable
   internal init(base: Base) {
@@ -24,10 +25,10 @@ extension Cycle: Sequence {
   /// The iterator for a `Cycle` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
-    let base: Base
+    internal let base: Base
     
     @usableFromInline
-    var current: Base.Index
+    internal var current: Base.Index
     
     @inlinable
     internal init(base: Base) {

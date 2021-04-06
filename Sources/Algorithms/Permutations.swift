@@ -78,7 +78,8 @@ extension MutableCollection
 /// A sequence of all the permutations of a collection's elements.
 public struct Permutations<Base: Collection> {
   /// The base collection to iterate over for permutations.
-  public let base: Base
+  @usableFromInline
+  internal let base: Base
   
   @usableFromInline
   internal let baseCount: Int
@@ -137,7 +138,7 @@ extension Permutations: Sequence {
   /// The iterator for a `Permutations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
-    internal var base: Base
+    internal let base: Base
     
     @usableFromInline
     internal let baseCount: Int

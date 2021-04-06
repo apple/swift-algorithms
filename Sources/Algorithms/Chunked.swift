@@ -13,7 +13,8 @@
 /// predicate or projection.
 public struct LazyChunked<Base: Collection, Subject> {
   /// The collection that this instance provides a view onto.
-  public let base: Base
+  @usableFromInline
+  internal let base: Base
   
   /// The projection function.
   @usableFromInline

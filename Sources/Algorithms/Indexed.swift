@@ -16,7 +16,8 @@ public struct Indexed<Base: Collection> {
   public typealias Element = (index: Base.Index, element: Base.Element)
   
   /// The base collection.
-  public let base: Base
+  @usableFromInline
+  internal let base: Base
   
   @inlinable
   internal init(base: Base) {

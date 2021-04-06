@@ -12,7 +12,8 @@
 /// A collection wrapper that generates combinations of a base collection.
 public struct Combinations<Base: Collection> {
   /// The collection to iterate over for combinations.
-  public let base: Base
+  @usableFromInline
+  internal let base: Base
   
   @usableFromInline
   internal let baseCount: Int
