@@ -16,8 +16,7 @@ for x in (1...3).cycled(times: 3) {
 // Prints 1 through 3 three times
 ```
 
-`cycled(times:)` combines two other existing standard library functions
-(`repeatElement` and `joined`) to provide a more expressive way of repeating a
+`cycled(times:)` provides a more expressive way of repeating a
 collection's elements a limited number of times.
 
 ## Detailed Design
@@ -38,7 +37,8 @@ conforms to `LazySequenceProtocol` when the base type conforms.
 
 Note that the returned `FiniteCycle` will always have `Collection`
 conformance, and will have `BidirectionalCollection` conformance
-when called on a bidirectional collection.
+when called on a bidirectional collection. `FiniteCycle` also
+conforms to `LazyCollectionProtocol` when the base type conforms.
 
 ### Complexity
 
