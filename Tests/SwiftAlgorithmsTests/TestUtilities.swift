@@ -203,6 +203,19 @@ func XCTAssertEqualHashValue<T: Hashable, U: Hashable>(
   )
 }
 
+/// Asserts that two hashable instances don't produce the same hash value.
+func XCTAssertNotEqualHashValue<T: Hashable, U: Hashable>(
+  _ expression1: @autoclosure () throws -> T,
+  _ expression2: @autoclosure () throws -> U,
+  _ message: @autoclosure () -> String = "",
+  file: StaticString = #file, line: UInt = #line
+) {
+  XCTAssertNotEqual(
+    hash(try expression1()), hash(try expression2()),
+    message(), file: file, line: line
+  )
+}
+
 /// Tests that all index traversal methods behave as expected.
 ///
 /// Verifies the correctness of the implementations of `startIndex`, `endIndex`,

@@ -515,12 +515,13 @@ extension ChunkedByCount: Equatable where Base: Equatable {}
 // Since we have another stored property of type `Index` on the
 // collection, synthesis of `Hashble` conformace would require
 // a `Base.Index: Hashable` constraint, so we implement the hasher
-// only in terms of `base`. Since the computed index is based on it,
-// it should not make a difference here.
+// only in terms of `base` and `chunkCount`. Since the computed
+// index is based on it, it should not make a difference here.
 extension ChunkedByCount: Hashable where Base: Hashable {
   @inlinable
   public func hash(into hasher: inout Hasher) {
     hasher.combine(base)
+    hasher.combine(chunkCount)
   }
 }
 extension ChunkedByCount.Index: Hashable where Base.Index: Hashable {}
