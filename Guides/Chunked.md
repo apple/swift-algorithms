@@ -76,15 +76,15 @@ extension Collection {
   extension LazyCollectionProtocol {
     public func chunked(
         by belongInSameGroup: @escaping (Element, Element) -> Bool
-    ) -> LazyChunked<Elements>
+    ) -> Chunked<Elements>
 
     public func chunked<Subject: Equatable>(
         on projection: @escaping (Element) -> Subject
-    ) -> LazyChunked<Elements>
+    ) -> Chunked<Elements>
 }
 ```
 
-The `LazyChunked` type is bidirectional when the wrapped collection is
+The `Chunked` type is bidirectional when the wrapped collection is
 bidirectional.
 
 ### Complexity
