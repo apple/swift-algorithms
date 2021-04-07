@@ -16,8 +16,7 @@ for x in (1...3).cycled(times: 3) {
 // Prints 1 through 3 three times
 ```
 
-`cycled(times:)` combines two other existing standard library functions
-(`repeatElement` and `joined`) to provide a more expressive way of repeating a
+`cycled(times:)` provides a more expressive way of repeating a
 collection's elements a limited number of times.
 
 ## Detailed Design
@@ -28,7 +27,7 @@ Two new methods are added to collections:
 extension Collection {
     func cycled() -> Cycle<Self>
 
-    func cycled(times: Int) -> FlattenSequence<Repeated<Self>>
+    func cycled(times: Int) -> FiniteCycle<Self>
 }
 ```
 
@@ -36,9 +35,10 @@ The new `Cycle` type is a sequence only, given that the `Collection` protocol
 design makes infinitely large types impossible/impractical. `Cycle` also
 conforms to `LazySequenceProtocol` when the base type conforms.
 
-Note that despite its name, the returned `FlattenSequence` will always have
-`Collection` conformance, and will have `BidirectionalCollection` conformance
-when called on a bidirectional collection.
+Note that the returned `FiniteCycle` will always have `Collection`
+conformance, and will have `BidirectionalCollection` conformance
+when called on a bidirectional collection. `FiniteCycle` also
+conforms to `LazyCollectionProtocol` when the base type conforms.
 
 ### Complexity
 

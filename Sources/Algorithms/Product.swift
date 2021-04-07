@@ -47,7 +47,8 @@ extension Product2: Sequence {
     }
     
     @inlinable
-    public mutating func next() -> (Base1.Element, Base2.Element)? {
+    public mutating func next() -> (Base1.Element,
+                                    Base2.Element)? {
       // This is the initial state, where i1.next() has never
       // been called, or the final state, where i1.next() has
       // already returned nil.
@@ -124,7 +125,8 @@ extension Product2: Collection where Base1: Collection {
   }
   
   @inlinable
-  public subscript(position: Index) -> (Base1.Element, Base2.Element) {
+  public subscript(position: Index) -> (Base1.Element,
+                                        Base2.Element) {
     (base1[position.i1], base2[position.i2])
   }
   
