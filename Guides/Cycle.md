@@ -17,7 +17,8 @@ for x in (1...3).cycled(times: 3) {
 ```
 
 `cycled(times:)` provides a more expressive way of repeating a
-collection's elements a limited number of times.
+collection's elements a limited number of times than 
+combining `repeatElement(_:count:)` and `joined()`.
 
 ## Detailed Design
 
@@ -35,8 +36,8 @@ The new `Cycle` type is a sequence only, given that the `Collection` protocol
 design makes infinitely large types impossible/impractical. `Cycle` also
 conforms to `LazySequenceProtocol` when the base type conforms.
 
-Note that the returned `FiniteCycle` will always have `Collection`
-conformance, and will have `BidirectionalCollection` conformance
+The `FiniteCycle` type always has `Collection` conformance, with
+`BidirectionalCollection` conformance
 when called on a bidirectional collection. `FiniteCycle` also
 conforms to `LazyCollectionProtocol` when the base type conforms.
 
