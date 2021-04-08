@@ -75,7 +75,7 @@ Here are some benchmarks we made that demonstrates how this implementation (Smal
 ![Benchmark](Resources/SortedPrefix/FewElements.png)
 ![Benchmark 2](Resources/SortedPrefix/ManyElements.png)
 
-The algorithm used for simultaneous minimum and maximum is the straightforward approach. At each iteration, either one or two comparisons will be needed. Assuming the chances for each comparison count are approximately equal, then 1.5 times the sequence length is the average count of comparisons needed.
+The algorithm used for simultaneous minimum and maximum is slightly optimized. At each iteration, two elements are read, their relative order is determined, then each is compared against exactly one of the current extrema for potential replacement. When a comparison predicate has to analyze every component of both operands, the optimized algorithm isn't much faster than the straightforward approach. But when a predicate only needs to compare a small part of each instance, the optimization shines through.
 
 ### Comparison with other languages
 
