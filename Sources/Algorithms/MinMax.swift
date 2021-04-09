@@ -410,15 +410,12 @@ extension Sequence {
   /// with the highest value.
   ///
   ///     let hues = ["Heliotrope": 296, "Coral": 16, "Aquamarine": 156]
-  ///     let minmax = hues.minAndMax { a, b in a.value < b.value }
-  ///     let leastHue = minmax?.min, greatestHue = minmax?.max
-  ///     print(leastHue, greatestHue)
-  ///     /*
-  ///       Prints:
-  ///         """
-  ///         Optional((key: "Coral", value: 16)) Optional((key: "Heliotrope", value: 296))
-  ///         """
-  ///      */
+  ///     if let extremeHues = hues.minAndMax(by: {$0.value < $1.value}) {
+  ///         print(extremeHues.min, extremeHues.max)
+  ///     } else {
+  ///         print("There are no hues")
+  ///     }
+  ///     // Prints: "(key: "Coral", value: 16) (key: "Heliotrope", value: 296)"
   ///
   /// - Precondition: The sequence is finite.
   ///
@@ -479,10 +476,12 @@ extension Sequence where Element: Comparable {
   /// measurements.
   ///
   ///     let heights = [67.5, 65.7, 64.3, 61.1, 58.5, 60.3, 64.9]
-  ///     let bounds = heights.minAndMax()
-  ///     let lowestHeight = bounds?.min, greatestHeight = bounds?.max
-  ///     print(lowestHeight, greatestHeight)
-  ///     // Prints "Optional(58.5) Optional(67.5)"
+  ///     if let (lowestHeight, greatestHeight) = heights.minAndMax() {
+  ///         print(lowestHeight, greatestHeight)
+  ///     } else {
+  ///         print("The list of heights is empty")
+  ///     }
+  ///     // Prints: "58.5 67.5"
   ///
   /// - Precondition: The sequence is finite.
   ///
