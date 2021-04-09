@@ -46,27 +46,6 @@ struct SplitMix64: RandomNumberGenerator {
   }
 }
 
-// An eraser helper to any hashable sequence.
-struct AnyHashableSequence<Base>
-  where Base: Sequence, Base: Hashable {
-  var base: Base
-}
-
-extension AnyHashableSequence: Hashable {}
-extension AnyHashableSequence: Sequence {
-  typealias Iterator = Base.Iterator
-  
-  func makeIterator() -> Iterator {
-    base.makeIterator()
-  }
-}
-
-extension Sequence where Self: Hashable {
-  func eraseToAnyHashableSequence() -> AnyHashableSequence<Self> {
-    AnyHashableSequence(base: self)
-  }
-}
-
 // An eraser helper to any mutable collection
 struct AnyMutableCollection<Base> where Base: MutableCollection {
   var base: Base
@@ -182,38 +161,6 @@ func XCTAssertEqualCollections<C1: Collection, C2: Collection>(
   for index in zip(c1.indices, c2.indices) {
     XCTAssertEqual(c1[index.0], c2[index.1], message(), file: file, line: line)
   }
-}
-
-func hash<T: Hashable>(_ value: T) -> Int {
-  var hasher = Hasher()
-  value.hash(into: &hasher)
-  return hasher.finalize()
-}
-
-/// Asserts that two hashable instances produce the same hash value.
-func XCTAssertEqualHashValue<T: Hashable, U: Hashable>(
-  _ expression1: @autoclosure () throws -> T,
-  _ expression2: @autoclosure () throws -> U,
-  _ message: @autoclosure () -> String = "",
-  file: StaticString = #file, line: UInt = #line
-) {
-  XCTAssertEqual(
-    hash(try expression1()), hash(try expression2()),
-    message(), file: file, line: line
-  )
-}
-
-/// Asserts that two hashable instances don't produce the same hash value.
-func XCTAssertNotEqualHashValue<T: Hashable, U: Hashable>(
-  _ expression1: @autoclosure () throws -> T,
-  _ expression2: @autoclosure () throws -> U,
-  _ message: @autoclosure () -> String = "",
-  file: StaticString = #file, line: UInt = #line
-) {
-  XCTAssertNotEqual(
-    hash(try expression1()), hash(try expression2()),
-    message(), file: file, line: line
-  )
 }
 
 /// Tests that all index traversal methods behave as expected.

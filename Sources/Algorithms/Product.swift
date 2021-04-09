@@ -438,8 +438,6 @@ extension Product2: RandomAccessCollection
   where Base1: RandomAccessCollection, Base2: RandomAccessCollection {}
 
 extension Product2.Index: Hashable where Base1.Index: Hashable, Base2.Index: Hashable {}
-extension Product2: Equatable where Base1: Equatable, Base2: Equatable {}
-extension Product2: Hashable where Base1: Hashable, Base2: Hashable {}
 
 //===----------------------------------------------------------------------===//
 // product(_:_:)

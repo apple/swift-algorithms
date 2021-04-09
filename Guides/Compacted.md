@@ -31,8 +31,8 @@ extension Collection {
 ```
 
 One is a more general `CompactedSequence` for any `Sequence` base. And the other a more specialized `CompactedCollection` 
-where base is a `Collection` and with conditional conformance to `BidirectionalCollection`, `RandomAccessCollection`, 
-`LazyCollectionProtocol`, `Equatable` and `Hashable` when base collection conforms to them.
+where base is a `Collection` and with conditional conformance to `BidirectionalCollection`, `RandomAccessCollection` and
+`LazyCollectionProtocol` when base collection conforms to them.
 
 ### Naming
 

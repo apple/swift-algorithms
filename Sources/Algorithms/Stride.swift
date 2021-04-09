@@ -269,22 +269,4 @@ extension StrideCollection: BidirectionalCollection
 }
 
 extension StrideCollection: RandomAccessCollection where Base: RandomAccessCollection {}
-
-extension StrideCollection: Equatable where Base.Element: Equatable {
-  @inlinable
-  public static func == (lhs: StrideCollection, rhs: StrideCollection) -> Bool {
-    lhs.elementsEqual(rhs, by: ==)
-  }
-}
-
-extension StrideCollection: Hashable where Base.Element: Hashable {
-  @inlinable
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(stride)
-    for element in self {
-      hasher.combine(element)
-    }
-  }
-}
-
 extension StrideCollection.Index: Hashable where Base.Index: Hashable {}
