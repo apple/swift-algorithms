@@ -110,7 +110,7 @@ these terms carry through as the name for the lazy sequences;
 [David Rönnqvist]: https://forums.swift.org/t/review-se-0045-add-scan-prefix-while-drop-while-and-iterate-to-the-stdlib/2382/8
 [Kyle Macomber]: https://github.com/apple/swift-algorithms/issues/25#issuecomment-709317894
 
-### Comparison with other langauges
+### Comparison with other languages
 
 **C++:** As of C++17, the `<algorithm>` library includes both
 [`exclusive_scan`][C++ Exclusive] and [`inclusive_scan`][C++ Inclusive]
@@ -122,7 +122,7 @@ functions.
 `Traversable` type, which is akin to Swift's `Sequence`.
 
 **Python:** Python’s `itertools` includes an `accumulate` method. In version
-3.3, a function paramenter was added. Version 3.8 added the optional initial
+3.3, a function parameter was added. Version 3.8 added the optional initial
 parameter.
 
 **[Rust][Rust]:** Rust provides a `scan` function.
