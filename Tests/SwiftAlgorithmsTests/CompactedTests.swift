@@ -41,41 +41,4 @@ final class CompactedTests: XCTestCase {
       validateIndexTraversals(array.compacted())
     }
   }
-
-  func testCollectionEquatableConformances() {
-    for array in self.tests {
-      XCTAssertEqual(
-        array.eraseToAnyHashableSequence().compacted(),
-        array.compactMap({ $0 }).eraseToAnyHashableSequence().compacted()
-      )
-      XCTAssertEqual(
-        array.compacted(), array.compactMap({ $0 }).compacted()
-      )
-    }
-  }
-  
-  func testCollectionHashableConformances() {
-    for array1 in self.tests {
-      for array2 in self.tests {
-        // For non-equal Collections and Sequences that produce the same
-        // compacted, the compacted wrapper should produce the same hash.
-        // e.g. [1, 2, 3, nil, nil, 4].compacted() should produce the
-        // same hash as [1, nil, 2, nil, 3, 4].compacted()
-        guard !array1.elementsEqual(array2) &&
-               array1.compacted() == array2.compacted() else {
-          continue
-        }
-        
-        let seq = array1.eraseToAnyHashableSequence()
-        let seq2 = array2.eraseToAnyHashableSequence()
-        
-        XCTAssertEqualHashValue(
-          seq.compacted(), seq2.compacted()
-        )
-        XCTAssertEqualHashValue(
-          array1.compacted(), array2.compacted()
-        )
-      }
-    }
-  }
 }

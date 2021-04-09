@@ -64,19 +64,6 @@ final class StridingTests: XCTestCase {
 //    a.index(after: a.endIndex) // Precondition failed: Advancing past end index
   }
   
-  func testStrideCompositionEquivalence() {
-    let a = (0...10)
-    XCTAssertEqualSequences(a.striding(by: 6), a.striding(by: 2).striding(by: 3))
-    XCTAssertTrue(a.striding(by: 6) == a.striding(by: 2).striding(by: 3))
-    XCTAssert(type(of: a.striding(by: 2).striding(by: 3)) == StrideCollection<ClosedRange<Int>>.self)
-  }
-  
-  func testEquality() {
-    let a = [1, 2, 3, 4, 5].striding(by: 2)
-    let b = [1, 0, 3, 0, 5].striding(by: 2)
-    XCTAssertEqual(a, b)
-  }
-  
   func testStrideLast() {
     XCTAssertEqual((1...10).striding(by: 2).last, 9) // 1, 3, 5, 7, 9
     XCTAssertEqual((1...10).striding(by: 3).last, 10) // 1, 4, 7, 10
