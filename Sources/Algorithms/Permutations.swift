@@ -398,7 +398,8 @@ extension Collection {
 /// `uniquePermutations` methods on your collection.
 public struct UniquePermutations<Base: Collection> {
   /// The base collection to iterate over for permutations.
-  public let base: Base
+  @usableFromInline
+  internal let base: Base
   
   @usableFromInline
   internal var indexes: [Base.Index]
