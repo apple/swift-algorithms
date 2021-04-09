@@ -233,37 +233,37 @@ extension EvenChunks {
   }
 }
 
-public struct EvenChunksIndex<Base: Comparable>: Comparable {
-  /// The range corresponding to the chunk at this position.
-  @usableFromInline
-  internal var baseRange: Range<Base>
-  
-  /// The offset corresponding to the chunk at this position. The first chunk
-  /// has offset `0` and all other chunks have an offset `1` greater than the
-  /// previous.
-  @usableFromInline
-  internal var offset: Int
-  
-  @inlinable
-  internal init(_ baseRange: Range<Base>, offset: Int) {
-    self.baseRange = baseRange
-    self.offset = offset
-  }
-  
-  @inlinable
-  public static func == (lhs: Self, rhs: Self) -> Bool {
-    lhs.offset == rhs.offset
-  }
-  
-  @inlinable
-  public static func < (lhs: Self, rhs: Self) -> Bool {
-    lhs.offset < rhs.offset
-  }
-}
-
 extension EvenChunks: Collection {
+  public struct _Index: Comparable {
+    /// The range corresponding to the chunk at this position.
+    @usableFromInline
+    internal var baseRange: Range<Base.Index>
+    
+    /// The offset corresponding to the chunk at this position. The first chunk
+    /// has offset `0` and all other chunks have an offset `1` greater than the
+    /// previous.
+    @usableFromInline
+    internal var offset: Int
+    
+    @inlinable
+    internal init(_ baseRange: Range<Base.Index>, offset: Int) {
+      self.baseRange = baseRange
+      self.offset = offset
+    }
+    
+    @inlinable
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+      lhs.offset == rhs.offset
+    }
+    
+    @inlinable
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+      lhs.offset < rhs.offset
+    }
+  }
+  
   public typealias Element = Base.SubSequence
-  public typealias Index = EvenChunksIndex<Base.Index>
+  public typealias Index = SubSequence._Index
   public typealias SubSequence = EvenChunks<Base.SubSequence>
 
   @inlinable
@@ -355,7 +355,7 @@ extension EvenChunks: Collection {
   }
 }
 
-extension EvenChunksIndex: Hashable where Base: Hashable {}
+extension EvenChunks._Index: Hashable where Base.Index: Hashable {}
 
 extension EvenChunks: BidirectionalCollection
   where Base: BidirectionalCollection
