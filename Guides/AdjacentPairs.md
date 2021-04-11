@@ -15,17 +15,21 @@ let pairs = numbers.adjacentPairs()
 
 ## Detailed Design
 
-The `adjacentPairs()` method is declared as a `Sequence` extension returning `AdjacentPairs`.
+The `adjacentPairs()` method is declared as a `Sequence` extension returning `AdjacentPairsSequence` and as a `Collection` extension returning `AdjacentPairsCollection`.
 
 ```swift
 extension Sequence {
-  public func adjacentPairs() -> AdjacentPairs<Self>
+  public func adjacentPairs() -> AdjacentPairsSequence<Self>
 }
 ```
 
-The resulting `AdjacentPairs` type is a sequence, with conditional conformance to `Collection`, `BidirectionalCollection`, and `RandomAccessCollection` when the underlying sequence conforms.
+```swift
+extension Collection {
+  public func adjacentPairs() -> AdjacentPairsCollection<Self>
+}
+```
 
-The spelling `zip(s, s.dropFirst())` for a sequence `s` is an equivalent operation on collection types; however, this implementation is undefined behavior on single-pass sequences, and `Zip2Sequence` does not conditionally conform to the `Collection` family of protocols.
+The `AdjacentPairsSequence` type is a sequence, and the `AdjacentPairsCollection` type is a collection with conditional conformance to `BidirectionalCollection` and `RandomAccessCollection` when the underlying collection conforms.
 
 ### Complexity
 
@@ -44,3 +48,5 @@ This function is often written as a `zip` of a sequence together with itself, mi
 **Haskell:** This operation is spelled ``s `zip` tail s``.
 
 **Python:** Python users may write `zip(s, s[1:])` for a list with at least one element. For natural language processing, the `nltk` package offers a `bigrams` function akin to this method.
+
+ Note that in Swift, the spelling `zip(s, s.dropFirst())` is undefined behavior for a single-pass sequence `s`.
