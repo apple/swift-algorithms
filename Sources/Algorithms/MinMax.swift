@@ -432,38 +432,31 @@ extension Sequence {
   public func minAndMax(
     by areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> (min: Element, max: Element)? {
+    // Check short sequences.
     var iterator = makeIterator()
     guard var lowest = iterator.next() else { return nil }
+    guard var highest = iterator.next() else { return (lowest, lowest) }
 
-    var highest = iterator.next() ?? lowest
-    if try areInIncreasingOrder(highest, lowest) {
-      swap(&lowest, &highest)
-    }
-    while let element = iterator.next() {
-      guard let following = iterator.next() else {
-        if try areInIncreasingOrder(element, lowest) {
-          lowest = element
-        } else if try !areInIncreasingOrder(element, highest) {
-          highest = element
-        }
-        break
-      }
+    // Confirm the initial bounds.
+    if try areInIncreasingOrder(highest, lowest) { swap(&lowest, &highest) }
 
-      if try areInIncreasingOrder(following, element) {
-        if try areInIncreasingOrder(following, lowest) {
-          lowest = following
-        }
-        if try !areInIncreasingOrder(element, highest) {
-          highest = element
-        }
+    // Read the elements in pairwise.  Structuring the comparisons around this
+    // is actually faster than loops based on extracting and testing elements
+    // one-at-a-time.
+    while var low = iterator.next() {
+      if var high = iterator.next() {
+        // Update the upper bound with the larger new element.
+        if try areInIncreasingOrder(high, low) { swap(&low, &high) }
+        if try !areInIncreasingOrder(high, highest) { highest = high }
       } else {
-        if try areInIncreasingOrder(element, lowest) {
-          lowest = element
-        }
-        if try !areInIncreasingOrder(following, highest) {
-          highest = following
-        }
+        // Update the upper bound by reusing the last element.  The next element
+        // iteration will also fail, ending the loop.
+        if try !areInIncreasingOrder(low, highest) { highest = low }
       }
+
+      // Update the lower bound with the smaller new element, which may need a
+      // swap first to determine.
+      if try areInIncreasingOrder(low, lowest) { lowest = low }
     }
     return (lowest, highest)
   }
