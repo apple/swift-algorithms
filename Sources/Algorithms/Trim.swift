@@ -43,6 +43,7 @@ extension Collection {
 
 extension Collection where Self: RangeReplaceableCollection {
   @inlinable
+  @_disfavoredOverload
   public mutating func trimPrefix(
     while predicate: (Element) throws -> Bool
   ) rethrows {
@@ -117,6 +118,7 @@ extension BidirectionalCollection {
 
 extension BidirectionalCollection where Self: RangeReplaceableCollection {
   @inlinable
+  @_disfavoredOverload
   public mutating func trim(
     while predicate: (Element) throws -> Bool
   ) rethrows {
@@ -124,6 +126,7 @@ extension BidirectionalCollection where Self: RangeReplaceableCollection {
   }
   
   @inlinable
+  @_disfavoredOverload
   public mutating func trimSuffix(
     while predicate: (Element) throws -> Bool
   ) rethrows {
