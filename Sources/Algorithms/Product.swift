@@ -27,6 +27,8 @@ public struct Product2<Base1: Sequence, Base2: Collection> {
 }
 
 extension Product2: Sequence {
+  public typealias Element = (Base1.Element, Base2.Element)
+  
   /// The iterator for a `Product2` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
