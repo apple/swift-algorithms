@@ -62,7 +62,7 @@ If you don't want potentially source-breaking package updates,
 use this dependency specification instead:
 
 ```swift
-.package(url: "https://github.com/apple/swift-algorithms", .upToNextMinor(from: "0.0.1")),
+.package(url: "https://github.com/apple/swift-algorithms", .upToNextMinor(from: "0.1.0")),
 ```
 
 Finally, include `"Algorithms"` as a dependency for your executable target:
@@ -71,7 +71,7 @@ Finally, include `"Algorithms"` as a dependency for your executable target:
 let package = Package(
     // name, platforms, products, etc.
     dependencies: [
-        .package(url: "https://github.com/apple/swift-algorithms", from: "0.0.1"),
+        .package(url: "https://github.com/apple/swift-algorithms", from: "0.1.0"),
         // other dependencies
     ],
     targets: [
