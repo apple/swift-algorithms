@@ -25,7 +25,7 @@ extension MutableCollection {
   internal mutating func stablePartition(
     count n: Int,
     subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws-> Bool
+    by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     if n == 0 { return subrange.lowerBound }
     if n == 1 {
@@ -33,8 +33,9 @@ extension MutableCollection {
         ? subrange.lowerBound
         : subrange.upperBound
     }
-    
-    let h = n / 2, i = index(subrange.lowerBound, offsetBy: h)
+
+    let h = n / 2
+    let i = index(subrange.lowerBound, offsetBy: h)
     let j = try stablePartition(
       count: h,
       subrange: subrange.lowerBound..<i,
@@ -45,7 +46,7 @@ extension MutableCollection {
       by: belongsInSecondPartition)
     return rotate(subrange: j..<k, toStartAt: i)
   }
-  
+
   /// Moves all elements satisfying the given predicate into a suffix of the
   /// given range, preserving the relative order of the elements in both
   /// partitions, and returns the start of the resulting suffix.
@@ -60,14 +61,14 @@ extension MutableCollection {
   @inlinable
   public mutating func stablePartition(
     subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws-> Bool
+    by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     try stablePartition(
       count: distance(from: subrange.lowerBound, to: subrange.upperBound),
       subrange: subrange,
       by: belongsInSecondPartition)
   }
-  
+
   /// Moves all elements satisfying the given predicate into a suffix of this
   /// collection, preserving the relative order of the elements in both
   /// partitions, and returns the start of the resulting suffix.
@@ -79,7 +80,7 @@ extension MutableCollection {
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
   @inlinable
   public mutating func stablePartition(
-    by belongsInSecondPartition: (Element) throws-> Bool
+    by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     try stablePartition(
       subrange: startIndex..<endIndex,
@@ -104,8 +105,8 @@ extension MutableCollection {
     // This version of `partition(subrange:)` is half stable; the elements in
     // the first partition retain their original relative order.
     guard var i = try self[subrange].firstIndex(where: belongsInSecondPartition)
-      else { return subrange.upperBound }
-    
+    else { return subrange.upperBound }
+
     var j = index(after: i)
     while j != subrange.upperBound {
       if try !belongsInSecondPartition(self[j]) {
@@ -114,7 +115,7 @@ extension MutableCollection {
       }
       formIndex(after: &j)
     }
-    
+
     return i
   }
 }
@@ -189,7 +190,7 @@ extension Collection {
   ) rethrows -> Index {
     var n = count
     var l = startIndex
-    
+
     while n > 0 {
       let half = n / 2
       let mid = index(l, offsetBy: half)
@@ -203,4 +204,3 @@ extension Collection {
     return l
   }
 }
-

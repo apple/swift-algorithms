@@ -14,11 +14,11 @@ public struct Product2<Base1: Sequence, Base2: Collection> {
   /// The outer sequence in the product.
   @usableFromInline
   internal let base1: Base1
-  
+
   /// The inner sequence in the product.
   @usableFromInline
   internal let base2: Base2
-  
+
   @inlinable
   internal init(_ base1: Base1, _ base2: Base2) {
     self.base1 = base1
@@ -28,7 +28,7 @@ public struct Product2<Base1: Sequence, Base2: Collection> {
 
 extension Product2: Sequence {
   public typealias Element = (Base1.Element, Base2.Element)
-  
+
   /// The iterator for a `Product2` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -47,10 +47,12 @@ extension Product2: Sequence {
       self.i2 = c.base2.makeIterator()
       self.element1 = nil
     }
-    
+
     @inlinable
-    public mutating func next() -> (Base1.Element,
-                                    Base2.Element)? {
+    public mutating func next() -> (
+      Base1.Element,
+      Base2.Element
+    )? {
       // This is the initial state, where i1.next() has never
       // been called, or the final state, where i1.next() has
       // already returned nil.
@@ -59,21 +61,21 @@ extension Product2: Sequence {
         // once Base1 is exhausted, return `nil` forever
         if element1 == nil { return nil }
       }
-      
+
       // Get the next element from the second sequence, if not
       // at end.
       if let element2 = i2.next() {
         return (element1!, element2)
       }
-      
+
       // We've reached the end of the second sequence, so:
       // 1) Get the next element of the first sequence, if exists
       // 2) Restart iteration of the second sequence
       // 3) Get the first element of the second sequence, if exists
       element1 = i1.next()
       guard let element1 = element1
-        else { return nil }
-      
+      else { return nil }
+
       i2 = base2.makeIterator()
       if let element2 = i2.next() {
         return (element1, element2)
@@ -95,43 +97,45 @@ extension Product2: Collection where Base1: Collection {
     internal var i1: Base1.Index
     @usableFromInline
     internal var i2: Base2.Index
-    
+
     @inlinable
     internal init(i1: Base1.Index, i2: Base2.Index) {
       self.i1 = i1
       self.i2 = i2
     }
-    
+
     @inlinable
     public static func < (lhs: Index, rhs: Index) -> Bool {
       (lhs.i1, lhs.i2) < (rhs.i1, rhs.i2)
     }
   }
-  
+
   @inlinable
   public var count: Int {
     base1.count * base2.count
   }
-  
+
   @inlinable
   public var startIndex: Index {
     Index(
       i1: base2.isEmpty ? base1.endIndex : base1.startIndex,
       i2: base2.startIndex)
   }
-  
+
   @inlinable
   public var endIndex: Index {
     // `base2.startIndex` simplifies index calculations.
     Index(i1: base1.endIndex, i2: base2.startIndex)
   }
-  
+
   @inlinable
-  public subscript(position: Index) -> (Base1.Element,
-                                        Base2.Element) {
+  public subscript(position: Index) -> (
+    Base1.Element,
+    Base2.Element
+  ) {
     (base1[position.i1], base2[position.i2])
   }
-  
+
   /// Forms an index from a pair of base indices, normalizing
   /// `(i, base2.endIndex)` to `(base1.index(after: i), base2.startIndex)` if
   /// necessary.
@@ -141,24 +145,24 @@ extension Product2: Collection where Base1: Collection {
       ? Index(i1: base1.index(after: i1), i2: base2.startIndex)
       : Index(i1: i1, i2: i2)
   }
-  
+
   @inlinable
   public func index(after i: Index) -> Index {
     precondition(i.i1 != base1.endIndex, "Can't advance past endIndex")
     return normalizeIndex(i.i1, base2.index(after: i.i2))
   }
-  
+
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     guard start.i1 <= end.i1
-      else { return -distance(from: end, to: start) }
+    else { return -distance(from: end, to: start) }
     guard start.i1 != end.i1
-      else { return base2.distance(from: start.i2, to: end.i2) }
-    
+    else { return base2.distance(from: start.i2, to: end.i2) }
+
     // The number of full cycles through `base2` between `start` and `end`,
     // excluding the cycles that `start` and `end` are on.
     let fullBase2Cycles = base1[start.i1..<end.i1].count - 1
-    
+
     if start.i2 <= end.i2 {
       //               start.i2
       //                  v
@@ -169,11 +173,11 @@ extension Product2: Collection where Base1: Collection {
       //   end.i1 > [l l l c c c c c c|r r r]
       //                              ^
       //                            end.i2
-      
+
       let left = base2[..<start.i2].count
       let center = base2[start.i2..<end.i2].count
       let right = base2[end.i2...].count
-      
+
       return center + right
         + fullBase2Cycles * (left + center + right)
         + left + center
@@ -187,30 +191,30 @@ extension Product2: Collection where Base1: Collection {
       //   end.i1 > [l l l|c c c c c c r r r]
       //                  ^
       //                end.i2
-      
+
       let left = base2[..<end.i2].count
       let right = base2[start.i2...].count
-      
+
       // We can avoid traversing `base2[end.i2..<start.i2]` if `start` and `end`
       // are on consecutive cycles.
       guard fullBase2Cycles > 0 else { return right + left }
-      
+
       let center = base2[end.i2..<start.i2].count
       return right
         + fullBase2Cycles * (left + center + right)
         + left
     }
   }
-  
+
   @inlinable
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     guard distance != 0 else { return i }
-    
+
     return distance > 0
       ? offsetForward(i, by: distance)
       : offsetBackward(i, by: -distance)
   }
-  
+
   @inlinable
   public func index(
     _ i: Index,
@@ -231,36 +235,35 @@ extension Product2: Collection where Base1: Collection {
   @inlinable
   internal func offsetForward(_ i: Index, by distance: Int) -> Index {
     guard let index = offsetForward(i, by: distance, limitedBy: endIndex)
-      else { fatalError("Index is out of bounds") }
+    else { fatalError("Index is out of bounds") }
     return index
   }
-  
+
   @inlinable
   internal func offsetBackward(_ i: Index, by distance: Int) -> Index {
     guard let index = offsetBackward(i, by: distance, limitedBy: startIndex)
-      else { fatalError("Index is out of bounds") }
+    else { fatalError("Index is out of bounds") }
     return index
   }
-  
+
   @inlinable
   internal func offsetForward(
     _ i: Index, by distance: Int, limitedBy limit: Index
   ) -> Index? {
     assert(distance >= 0)
     assert(limit >= i)
-    
+
     if limit.i1 == i.i1 {
       // Delegate to `base2` if the offset is limited to `i.i1`.
       //
       //             i.i2      limit.i2
       //              v           v
       // i.i1 > [x x x|x x x x x x|x x x]
-      
+
       return base2.index(i.i2, offsetBy: distance, limitedBy: limit.i2)
         .map { i2 in Index(i1: i.i1, i2: i2) }
     }
-    
-    
+
     if let i2 = base2.index(i.i2, offsetBy: distance, limitedBy: base2.endIndex) {
       // `distance` does not overflow `base2[i.i2...]`.
       //
@@ -268,14 +271,14 @@ extension Product2: Collection where Base1: Collection {
       //              v           v
       // i.i1 > [x x x|x x x x x x|x x x]
       //        [     |> > > > > >|     ]   (`distance`)
-      
+
       return normalizeIndex(i.i1, i2)
     }
-    
+
     let suffixCount = base2[i.i2...].count
     let remaining = distance - suffixCount
     let nextI1 = base1.index(after: i.i1)
-    
+
     if limit.i1 == nextI1 {
       // Delegate to `base2` if the offset is limited to `nextI1`.
       //
@@ -285,11 +288,11 @@ extension Product2: Collection where Base1: Collection {
       // nextI1 > [x x x x x x x x x|x x x]
       //                            ^
       //                         limit.i2
-      
+
       return base2.index(base2.startIndex, offsetBy: remaining, limitedBy: limit.i2)
         .map { i2 in Index(i1: nextI1, i2: i2) }
     }
-    
+
     if let i2 = base2.index(base2.startIndex, offsetBy: remaining, limitedBy: i.i2) {
       // `remaining` does not overflow `base2[..<i.i2]`.
       //
@@ -301,20 +304,20 @@ extension Product2: Collection where Base1: Collection {
       // nextI1 > [x x x|x x x x x x x x x]
       //                ^
       //                i2
-      
+
       return Index(i1: nextI1, i2: i2)
     }
-    
+
     let prefixCount = base2[..<i.i2].count
     let base2Count = prefixCount + suffixCount
     let base1Distance = remaining / base2Count
-    
+
     guard let i1 = base1.index(nextI1, offsetBy: base1Distance, limitedBy: limit.i1)
-      else { return nil }
-    
+    else { return nil }
+
     // The distance from `base2.startIndex` to the target.
     let base2Distance = remaining % base2Count
-    
+
     let base2Limit = limit.i1 == i1 ? limit.i2 : base2.endIndex
     return base2.index(base2.startIndex, offsetBy: base2Distance, limitedBy: base2Limit)
       .map { i2 in Index(i1: i1, i2: i2) }
@@ -326,18 +329,18 @@ extension Product2: Collection where Base1: Collection {
   ) -> Index? {
     assert(distance >= 0)
     assert(limit <= i)
-    
+
     if limit.i1 == i.i1 {
       // Delegate to `base2` if the offset is limited to `i.i1`.
       //
       //           limit.i2      i.i2
       //              v           v
       // i.i1 > [x x x|x x x x x x|x x x]
-      
+
       return base2.index(i.i2, offsetBy: -distance, limitedBy: limit.i2)
         .map { i2 in Index(i1: i.i1, i2: i2) }
     }
-    
+
     if let i2 = base2.index(i.i2, offsetBy: -distance, limitedBy: base2.startIndex) {
       // `distance` does not underflow `base2[..<i.i2]`.
       //
@@ -345,14 +348,14 @@ extension Product2: Collection where Base1: Collection {
       //              v           v
       // i.i1 > [x x x|x x x x x x|x x x]
       //        [     |< < < < < <|     ]   (`distance`)
-      
+
       return Index(i1: i.i1, i2: i2)
     }
-    
+
     let prefixCount = base2[..<i.i2].count
     let remaining = distance - prefixCount
     let previousI1 = base1.index(i.i1, offsetBy: -1)
-    
+
     if limit.i1 == previousI1 {
       // Delegate to `base2` if the offset is limited to `previousI1`.
       //
@@ -362,11 +365,11 @@ extension Product2: Collection where Base1: Collection {
       //       i.i1 > [x x x x x x x x x|x x x]
       //                                ^
       //                               i.i2
-      
+
       return base2.index(base2.endIndex, offsetBy: -remaining, limitedBy: limit.i2)
         .map { i2 in Index(i1: previousI1, i2: i2) }
     }
-    
+
     if let i2 = base2.index(base2.endIndex, offsetBy: -remaining, limitedBy: i.i2) {
       // `remaining` does not underflow `base2[i.i2...]`.
       //
@@ -378,17 +381,17 @@ extension Product2: Collection where Base1: Collection {
       //       i.i1 > [x x x|x x x x x x x x x]
       //                    ^
       //                   i.i2
-      
+
       return Index(i1: previousI1, i2: i2)
     }
-    
+
     let suffixCount = base2[i.i2...].count
     let base2Count = prefixCount + suffixCount
     let base1Distance = remaining / base2Count
-    
+
     // The distance from `base2.endIndex` to the target.
     let base2Distance = remaining % base2Count
-    
+
     if base2Distance == 0 {
       // We end up exactly between two cycles, so `base1Distance` would
       // overshoot the target by 1.
@@ -401,7 +404,7 @@ extension Product2: Collection where Base1: Collection {
       //       i.i1 > [x x x|x x x x x x x x x]
       //                    ^
       //                   i.i2
-      
+
       if let i1 = base1.index(previousI1, offsetBy: -(base1Distance - 1), limitedBy: limit.i1) {
         let index = Index(i1: i1, i2: base2.startIndex)
         return index < limit ? nil : index
@@ -409,10 +412,10 @@ extension Product2: Collection where Base1: Collection {
         return nil
       }
     }
-    
+
     guard let i1 = base1.index(previousI1, offsetBy: -base1Distance, limitedBy: limit.i1)
-      else { return nil }
-    
+    else { return nil }
+
     let base2Limit = limit.i1 == i1 ? limit.i2 : base2.startIndex
     return base2.index(base2.endIndex, offsetBy: -base2Distance, limitedBy: base2Limit)
       .map { i2 in Index(i1: i1, i2: i2) }
@@ -420,12 +423,12 @@ extension Product2: Collection where Base1: Collection {
 }
 
 extension Product2: BidirectionalCollection
-  where Base1: BidirectionalCollection, Base2: BidirectionalCollection
-{
+where Base1: BidirectionalCollection, Base2: BidirectionalCollection {
   @inlinable
   public func index(before i: Index) -> Index {
-    precondition(i != startIndex,
-                 "Can't move before startIndex")
+    precondition(
+      i != startIndex,
+      "Can't move before startIndex")
     if i.i2 == base2.startIndex {
       return Index(
         i1: base1.index(before: i.i1),
@@ -437,7 +440,7 @@ extension Product2: BidirectionalCollection
 }
 
 extension Product2: RandomAccessCollection
-  where Base1: RandomAccessCollection, Base2: RandomAccessCollection {}
+where Base1: RandomAccessCollection, Base2: RandomAccessCollection {}
 
 extension Product2.Index: Hashable where Base1.Index: Hashable, Base2.Index: Hashable {}
 

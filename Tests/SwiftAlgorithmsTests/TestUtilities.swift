@@ -32,16 +32,16 @@ extension Numeric {
 
 struct SplitMix64: RandomNumberGenerator {
   private var state: UInt64
-  
+
   init(seed: UInt64) {
     self.state = seed
   }
-  
+
   mutating func next() -> UInt64 {
-    self.state &+= 0x9e3779b97f4a7c15
+    self.state &+= 0x9e37_79b9_7f4a_7c15
     var z: UInt64 = self.state
-    z = (z ^ (z &>> 30)) &* 0xbf58476d1ce4e5b9
-    z = (z ^ (z &>> 27)) &* 0x94d049bb133111eb
+    z = (z ^ (z &>> 30)) &* 0xbf58_476d_1ce4_e5b9
+    z = (z ^ (z &>> 27)) &* 0x94d0_49bb_1331_11eb
     return z ^ (z &>> 31)
   }
 }
@@ -54,7 +54,7 @@ struct AnyMutableCollection<Base> where Base: MutableCollection {
 extension AnyMutableCollection: MutableCollection {
   typealias Index = Base.Index
   typealias Element = Base.Element
-  
+
   var startIndex: Base.Index { base.startIndex }
   var endIndex: Base.Index { base.endIndex }
 
@@ -80,7 +80,8 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   _ message: @autoclosure () -> String = "",
   file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
-  try XCTAssertEqualSequences(expression1(), expression2(), by: ==,
+  try XCTAssertEqualSequences(
+    expression1(), expression2(), by: ==,
     message(), file: file, line: line)
 }
 
@@ -99,7 +100,7 @@ func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
     }
     s1.remove(at: idx)
   }
-  
+
   XCTAssertTrue(
     missing.isEmpty, "first sequence missing '\(missing)' elements from second sequence",
     file: file, line: line
@@ -121,8 +122,9 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
 
   func fail(_ reason: String) {
     let message = message()
-    XCTFail(message.isEmpty ? reason : "\(message) - \(reason)",
-            file: file, line: line)
+    XCTFail(
+      message.isEmpty ? reason : "\(message) - \(reason)",
+      file: file, line: line)
   }
 
   var iter1 = try expression1().makeIterator()
@@ -134,7 +136,9 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
       idx += 1
       continue
     case let (e1?, e2?):
-      fail("element \(e1) on first sequence does not match element \(e2) on second sequence at position \(idx)")
+      fail(
+        "element \(e1) on first sequence does not match element \(e2) on second sequence at position \(idx)"
+      )
     case (_?, nil):
       fail("second sequence shorter than first")
     case (nil, _?):
@@ -190,7 +194,7 @@ func validateIndexTraversals<C>(
   for c in collections {
     let indicesIncludingEnd = indices?(c) ?? (c.indices + [c.endIndex])
     let count = indicesIncludingEnd.count - 1
-    
+
     XCTAssertEqual(
       c.count, count,
       "Count mismatch",
@@ -207,11 +211,11 @@ func validateIndexTraversals<C>(
       c.endIndex, indicesIncludingEnd.last,
       "`endIndex` does not equal the last index",
       file: file, line: line)
-    
+
     // `index(after:)`
     do {
       var index = c.startIndex
-      
+
       for (offset, expected) in indicesIncludingEnd.enumerated().dropFirst() {
         c.formIndex(after: &index)
         XCTAssertEqual(
@@ -223,7 +227,7 @@ func validateIndexTraversals<C>(
           file: file, line: line)
       }
     }
-    
+
     // `index(before:)`
     do {
       var index = c.endIndex
@@ -239,7 +243,7 @@ func validateIndexTraversals<C>(
           file: file, line: line)
       }
     }
-    
+
     // `indices`
     XCTAssertEqual(c.indices.count, count)
     for (offset, index) in c.indices.enumerated() {
@@ -248,7 +252,7 @@ func validateIndexTraversals<C>(
         "Index mismatch at offset \(offset) in `indices`",
         file: file, line: line)
     }
-    
+
     // index comparison
     for (offsetA, a) in indicesIncludingEnd.enumerated() {
       XCTAssertEqual(
@@ -259,7 +263,7 @@ func validateIndexTraversals<C>(
         a < a,
         "Index at offset \(offsetA) is less than itself",
         file: file, line: line)
-      
+
       for (offsetB, b) in indicesIncludingEnd[..<offsetA].enumerated() {
         XCTAssertNotEqual(
           a, b,
@@ -273,12 +277,12 @@ func validateIndexTraversals<C>(
           file: file, line: line)
       }
     }
-    
+
     // `index(_:offsetBy:)` and `distance(from:to:)`
     for (startOffset, start) in indicesIncludingEnd.enumerated() {
       for (endOffset, end) in indicesIncludingEnd.enumerated() {
         let distance = endOffset - startOffset
-        
+
         XCTAssertEqual(
           c.index(start, offsetBy: distance), end,
           """
@@ -295,7 +299,7 @@ func validateIndexTraversals<C>(
           file: file, line: line)
       }
     }
-    
+
     // `index(_:offsetBy:limitedBy:)`
     for (startOffset, start) in indicesIncludingEnd.enumerated() {
       for (limitOffset, limit) in indicesIncludingEnd.enumerated() {
@@ -307,7 +311,7 @@ func validateIndexTraversals<C>(
           for targetOffset in range {
             let distance = targetOffset - startOffset
             let end = c.index(start, offsetBy: distance, limitedBy: limit)
-            
+
             if pastLimit {
               XCTAssertNil(
                 end,
@@ -328,7 +332,7 @@ func validateIndexTraversals<C>(
             }
           }
         }
-        
+
         // forward offsets
         if limit >= start {
           // the limit has an effect
@@ -338,7 +342,7 @@ func validateIndexTraversals<C>(
           // the limit has no effect
           checkTargetRange(startOffset...count, pastLimit: false)
         }
-        
+
         // backward offsets
         if limit <= start {
           // the limit has an effect

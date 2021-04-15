@@ -234,9 +234,10 @@ extension ExclusiveReductions: Sequence {
 
   @inlinable
   public func makeIterator() -> Iterator {
-    Iterator(iterator: base.makeIterator(),
-             current: initial,
-             transform: transform)
+    Iterator(
+      iterator: base.makeIterator(),
+      current: initial,
+      transform: transform)
   }
 }
 
@@ -317,10 +318,10 @@ extension ExclusiveReductions: Collection where Base: Collection {
 }
 
 extension ExclusiveReductions: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 extension ExclusiveReductions: LazyCollectionProtocol
-  where Base: LazyCollectionProtocol {}
+where Base: LazyCollectionProtocol {}
 
 // MARK: - Inclusive Reductions
 
@@ -453,8 +454,9 @@ extension InclusiveReductions: Sequence {
 
   @inlinable
   public func makeIterator() -> Iterator {
-    Iterator(iterator: base.makeIterator(),
-             transform: transform)
+    Iterator(
+      iterator: base.makeIterator(),
+      transform: transform)
   }
 }
 
@@ -537,10 +539,10 @@ extension InclusiveReductions: Collection where Base: Collection {
 }
 
 extension InclusiveReductions: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 extension InclusiveReductions: LazyCollectionProtocol
-  where Base: LazyCollectionProtocol {}
+where Base: LazyCollectionProtocol {}
 
 // MARK: - ReductionsIndexRepresentation
 

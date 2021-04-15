@@ -14,7 +14,7 @@ public struct Cycle<Base: Collection> {
   /// The collection to repeat.
   @usableFromInline
   internal let base: Base
-  
+
   @inlinable
   internal init(base: Base) {
     self.base = base
@@ -26,29 +26,29 @@ extension Cycle: Sequence {
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal let base: Base
-    
+
     @usableFromInline
     internal var current: Base.Index
-    
+
     @inlinable
     internal init(base: Base) {
       self.base = base
       self.current = base.startIndex
     }
-    
+
     @inlinable
     public mutating func next() -> Base.Element? {
       guard !base.isEmpty else { return nil }
-      
+
       if current == base.endIndex {
         current = base.startIndex
       }
-      
+
       defer { base.formIndex(after: &current) }
       return base[current]
     }
   }
-  
+
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(base: base)
@@ -56,7 +56,6 @@ extension Cycle: Sequence {
 }
 
 extension Cycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
-
 
 /// A collection wrapper that repeats the elements of a base collection for a
 /// finite number of times.
@@ -72,7 +71,7 @@ public struct FiniteCycle<Base: Collection> {
 }
 
 extension FiniteCycle: LazySequenceProtocol, LazyCollectionProtocol
-  where Base: LazyCollectionProtocol { }
+where Base: LazyCollectionProtocol {}
 
 extension FiniteCycle: Collection {
 
@@ -137,9 +136,12 @@ extension FiniteCycle: Collection {
     offsetBy distance: Int,
     limitedBy limit: Index
   ) -> Index? {
-    guard let productIndex = product.index(i.productIndex,
-                                           offsetBy: distance,
-                                           limitedBy: limit.productIndex) else {
+    guard
+      let productIndex = product.index(
+        i.productIndex,
+        offsetBy: distance,
+        limitedBy: limit.productIndex)
+    else {
       return nil
     }
     return Index(productIndex)
@@ -152,7 +154,7 @@ extension FiniteCycle: Collection {
 }
 
 extension FiniteCycle: BidirectionalCollection
-  where Base: BidirectionalCollection {
+where Base: BidirectionalCollection {
   @inlinable
   public func index(before i: Index) -> Index {
     let productIndex = product.index(before: i.productIndex)
@@ -161,7 +163,7 @@ extension FiniteCycle: BidirectionalCollection
 }
 
 extension FiniteCycle: RandomAccessCollection
-  where Base: RandomAccessCollection {}
+where Base: RandomAccessCollection {}
 
 //===----------------------------------------------------------------------===//
 // cycled()
@@ -197,7 +199,7 @@ extension Collection {
   public func cycled() -> Cycle<Self> {
     Cycle(base: self)
   }
-  
+
   /// Returns a sequence that repeats the elements of this collection the
   /// specified number of times.
   ///

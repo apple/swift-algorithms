@@ -14,11 +14,11 @@
 public struct Indexed<Base: Collection> {
   /// The element type for an `Indexed` collection.
   public typealias Element = (index: Base.Index, element: Base.Element)
-  
+
   /// The base collection.
   @usableFromInline
   internal let base: Base
-  
+
   @inlinable
   internal init(base: Base) {
     self.base = base
@@ -30,32 +30,34 @@ extension Indexed: Collection {
   public var startIndex: Base.Index {
     base.startIndex
   }
-  
+
   @inlinable
   public var endIndex: Base.Index {
     base.endIndex
   }
-  
+
   @inlinable
   public subscript(position: Base.Index) -> Element {
     (index: position, element: base[position])
   }
-  
+
   @inlinable
   public func index(after i: Base.Index) -> Base.Index {
     base.index(after: i)
   }
-  
+
   @inlinable
   public func index(_ i: Base.Index, offsetBy distance: Int) -> Base.Index {
     base.index(i, offsetBy: distance)
   }
-  
+
   @inlinable
-  public func index(_ i: Base.Index, offsetBy distance: Int, limitedBy limit: Base.Index) -> Base.Index? {
+  public func index(_ i: Base.Index, offsetBy distance: Int, limitedBy limit: Base.Index) -> Base
+    .Index?
+  {
     base.index(i, offsetBy: distance, limitedBy: limit)
   }
-  
+
   @inlinable
   public func distance(from start: Base.Index, to end: Base.Index) -> Int {
     base.distance(from: start, to: end)

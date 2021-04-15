@@ -10,6 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
+
 @testable import Algorithms
 
 final class ProductTests: XCTestCase {
@@ -22,7 +23,7 @@ final class ProductTests: XCTestCase {
     XCTAssertEqualSequences(product(1...10, ""), [], by: ==)
     XCTAssertEqualSequences(product("", 1...10), [], by: ==)
   }
-  
+
   func testProductReversed() {
     XCTAssertEqualSequences(
       [(2, "B" as Character), (2, "A"), (1, "B"), (1, "A")],
@@ -32,12 +33,12 @@ final class ProductTests: XCTestCase {
     XCTAssertEqualSequences(product(1...10, "").reversed(), [], by: ==)
     XCTAssertEqualSequences(product("", 1...10).reversed(), [], by: ==)
   }
-  
+
   func testProductDistanceFromTo() {
     let p = product([1, 2], "abc")
     XCTAssertEqual(p.distance(from: p.startIndex, to: p.endIndex), 6)
   }
-  
+
   func testProductIndexTraversals() {
     validateIndexTraversals(
       product([1, 2, 3, 4], "abc"),

@@ -14,11 +14,11 @@ public struct Uniqued<Base: Sequence, Subject: Hashable> {
   /// The base collection.
   @usableFromInline
   internal let base: Base
-  
+
   /// The projection function.
   @usableFromInline
   internal let projection: (Base.Element) -> Subject
-  
+
   @usableFromInline
   internal init(base: Base, projection: @escaping (Base.Element) -> Subject) {
     self.base = base
@@ -31,13 +31,13 @@ extension Uniqued: Sequence {
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var base: Base.Iterator
-    
+
     @usableFromInline
     internal let projection: (Base.Element) -> Subject
-    
+
     @usableFromInline
     internal var seen: Set<Subject> = []
-    
+
     @usableFromInline
     internal init(
       base: Base.Iterator,
@@ -46,7 +46,7 @@ extension Uniqued: Sequence {
       self.base = base
       self.projection = projection
     }
-    
+
     @inlinable
     public mutating func next() -> Base.Element? {
       while let element = base.next() {
@@ -57,7 +57,7 @@ extension Uniqued: Sequence {
       return nil
     }
   }
-  
+
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(base: base.makeIterator(), projection: projection)

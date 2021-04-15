@@ -9,13 +9,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class IntersperseTests: XCTestCase {
   func testSequence() {
     let interspersed = (1...).prefix(5).interspersed(with: 0)
-    XCTAssertEqualSequences(interspersed, [1,0,2,0,3,0,4,0,5])
+    XCTAssertEqualSequences(interspersed, [1, 0, 2, 0, 3, 0, 4, 0, 5])
   }
 
   func testSequenceEmpty() {
@@ -36,8 +36,8 @@ final class IntersperseTests: XCTestCase {
   }
 
   func testArray() {
-    let interspersed = [1,2,3,4].interspersed(with: 0)
-    XCTAssertEqualSequences(interspersed, [1,0,2,0,3,0,4])
+    let interspersed = [1, 2, 3, 4].interspersed(with: 0)
+    XCTAssertEqualSequences(interspersed, [1, 0, 2, 0, 3, 0, 4])
     validateIndexTraversals(interspersed)
   }
 
@@ -48,7 +48,7 @@ final class IntersperseTests: XCTestCase {
   }
 
   func testCollection() {
-    let interspersed = ["A","B","C","D"].interspersed(with: "-")
+    let interspersed = ["A", "B", "C", "D"].interspersed(with: "-")
     XCTAssertEqual(interspersed.count, 7)
   }
 

@@ -14,10 +14,10 @@
 public struct Intersperse<Base: Sequence> {
   @usableFromInline
   internal let base: Base
-  
+
   @usableFromInline
   internal let separator: Base.Element
-  
+
   @inlinable
   internal init(base: Base, separator: Base.Element) {
     self.base = base
@@ -30,19 +30,19 @@ extension Intersperse: Sequence {
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var iterator: Base.Iterator
-    
+
     @usableFromInline
     internal let separator: Base.Element
-    
+
     @usableFromInline
     internal var state = State.start
-    
+
     @inlinable
     internal init(iterator: Base.Iterator, separator: Base.Element) {
       self.iterator = iterator
       self.separator = separator
     }
-    
+
     @usableFromInline
     enum State {
       case start
@@ -85,7 +85,7 @@ extension Intersperse: Collection where Base: Collection {
       case element(Base.Index)
       case separator(next: Base.Index)
     }
-    
+
     @usableFromInline
     internal let representation: Representation
 
@@ -98,14 +98,14 @@ extension Intersperse: Collection where Base: Collection {
     public static func < (lhs: Index, rhs: Index) -> Bool {
       switch (lhs.representation, rhs.representation) {
       case let (.element(li), .element(ri)),
-           let (.separator(next: li), .separator(next: ri)),
-           let (.element(li), .separator(next: ri)):
+        let (.separator(next: li), .separator(next: ri)),
+        let (.element(li), .separator(next: ri)):
         return li < ri
       case let (.separator(next: li), .element(ri)):
         return li <= ri
       }
     }
-    
+
     @inlinable
     static func element(_ index: Base.Index) -> Self {
       Self(representation: .element(index))
@@ -145,7 +145,7 @@ extension Intersperse: Collection where Base: Collection {
     case .separator: return separator
     }
   }
-  
+
   @inlinable
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     switch (i.representation, distance.isMultiple(of: 2)) {
@@ -169,15 +169,14 @@ extension Intersperse: Collection where Base: Collection {
     case let (.separator(next: separator), .element(element)):
       return 2 * base.distance(from: separator, to: element) + 1
     case let (.element(start), .element(end)),
-         let (.separator(start), .separator(end)):
+      let (.separator(start), .separator(end)):
       return 2 * base.distance(from: start, to: end)
     }
   }
 }
 
 extension Intersperse: BidirectionalCollection
-  where Base: BidirectionalCollection
-{
+where Base: BidirectionalCollection {
   @inlinable
   public func index(before i: Index) -> Index {
     precondition(i != startIndex, "Can't move before startIndex")
@@ -191,13 +190,13 @@ extension Intersperse: BidirectionalCollection
 }
 
 extension Intersperse: RandomAccessCollection
-  where Base: RandomAccessCollection {}
+where Base: RandomAccessCollection {}
 
 extension Intersperse: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 extension Intersperse: LazyCollectionProtocol
-  where Base: LazyCollectionProtocol {}
+where Base: LazyCollectionProtocol {}
 
 extension Sequence {
 

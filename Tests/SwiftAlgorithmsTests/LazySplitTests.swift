@@ -112,7 +112,7 @@ final class LazySplitTests: XCTestCase {
 
   func testAllEEES() {
     let permutations = [
-      [1, 1, 1, 0], [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1]
+      [1, 1, 1, 0], [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1],
     ]
 
     for permutation in permutations {

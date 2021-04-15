@@ -14,8 +14,7 @@
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection
-  where Self: BidirectionalCollection, Element: Comparable
-{
+where Self: BidirectionalCollection, Element: Comparable {
   /// Permutes this collection's elements through all the lexical orderings.
   ///
   /// Call `nextPermutation()` repeatedly starting with the collection in
@@ -34,26 +33,26 @@ extension MutableCollection
     guard !isEmpty else { return false }
     var i = index(before: endIndex)
     if i == startIndex { return false }
-    
+
     let upperBound = upperBound ?? endIndex
-    
+
     while true {
       let ip1 = i
       formIndex(before: &i)
-      
+
       // Find the last ascending pair (ie. ..., a, b, ... where a < b)
       if self[i] < self[ip1] {
         // Find the last element greater than self[i]
         // This is _always_ at most `ip1` due to if statement above
         let j = lastIndex(where: { self[i] < $0 })!
-        
+
         // At this point we have something like this:
         //    0, 1, 4, 3, 2
         //       ^        ^
         //       i        j
         swapAt(i, j)
-        self.reverse(subrange: ip1 ..< endIndex)
-        
+        self.reverse(subrange: ip1..<endIndex)
+
         // Only return if we've made a change within ..<upperBound region
         if i < upperBound {
           return true
@@ -62,7 +61,7 @@ extension MutableCollection
           continue
         }
       }
-      
+
       if i == startIndex {
         self.reverse()
         return false
@@ -80,16 +79,16 @@ public struct Permutations<Base: Collection> {
   /// The base collection to iterate over for permutations.
   @usableFromInline
   internal let base: Base
-  
+
   @usableFromInline
   internal let baseCount: Int
-  
+
   /// The range of accepted sizes of permutations.
   /// - Note: This may be empty if the attempted range entirely exceeds the
   /// bounds of the size of the `base` collection.
   @usableFromInline
   internal let kRange: Range<Int>
-  
+
   /// Initializes a `Permutations` for all permutations of `base` of size `k`.
   /// - Parameters:
   ///   - base: The collection to iterate over for permutations
@@ -99,13 +98,13 @@ public struct Permutations<Base: Collection> {
   internal init(_ base: Base, k: Int? = nil) {
     let kRange: ClosedRange<Int>?
     if let countToChoose = k {
-      kRange = countToChoose ... countToChoose
+      kRange = countToChoose...countToChoose
     } else {
       kRange = nil
     }
     self.init(base, kRange: kRange)
   }
-  
+
   /// Initializes a `Permutations` for all combinations of `base` of sizes
   /// within a given range.
   /// - Parameters:
@@ -120,11 +119,11 @@ public struct Permutations<Base: Collection> {
     let baseCount = base.count
     self.baseCount = baseCount
     let upperBound = baseCount + 1
-    self.kRange = kRange?.relative(to: 0 ..< .max)
-      .clamped(to: 0 ..< upperBound) ??
-      baseCount ..< upperBound
+    self.kRange =
+      kRange?.relative(to: 0 ..< .max)
+      .clamped(to: 0..<upperBound) ?? baseCount..<upperBound
   }
-  
+
   /// The total number of permutations.
   @inlinable
   public var count: Int {
@@ -139,26 +138,26 @@ extension Permutations: Sequence {
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal let base: Base
-    
+
     @usableFromInline
     internal let baseCount: Int
-    
+
     /// The current range of accepted sizes of permutations.
     /// - Note: The range is contracted until empty while iterating over
     /// permutations of different sizes. When the range is empty, iteration is
     /// finished.
     @usableFromInline
     internal var kRange: Range<Int>
-    
+
     /// Whether or not iteration is finished (`kRange` is empty)
     @inlinable
     internal var isFinished: Bool {
       return kRange.isEmpty
     }
-    
+
     @usableFromInline
     internal var indexes: [Base.Index]
-    
+
     @inlinable
     internal init(_ permutations: Permutations) {
       self.base = permutations.base
@@ -166,7 +165,7 @@ extension Permutations: Sequence {
       self.kRange = permutations.kRange
       self.indexes = Array(permutations.base.indices)
     }
-    
+
     /// Advances the `indexes` array such that the first `countToChoose`
     /// elements contain the next lexicographic ordering of elements.
     ///
@@ -182,44 +181,44 @@ extension Permutations: Sequence {
     internal mutating func nextState() -> Bool {
       let countToChoose = self.kRange.lowerBound
       let edge = countToChoose - 1
-      
+
       // Find first index greater than the one at `edge`.
       if let i = indexes[countToChoose...].firstIndex(where: { indexes[edge] < $0 }) {
         indexes.swapAt(edge, i)
       } else {
-        indexes.reverse(subrange: countToChoose ..< indexes.endIndex)
-        
+        indexes.reverse(subrange: countToChoose..<indexes.endIndex)
+
         // Find last increasing pair below `edge`.
         // TODO: This could be indexes[..<edge].adjacentPairs().lastIndex(where: ...)
         var lastAscent = edge - 1
-        while (lastAscent >= 0 && indexes[lastAscent] >= indexes[lastAscent + 1]) {
+        while lastAscent >= 0 && indexes[lastAscent] >= indexes[lastAscent + 1] {
           lastAscent -= 1
         }
         if lastAscent < 0 {
           return false
         }
-        
+
         // Find rightmost index less than that at `lastAscent`.
         if let i = indexes[lastAscent...].lastIndex(where: { indexes[lastAscent] < $0 }) {
           indexes.swapAt(lastAscent, i)
         }
-        indexes.reverse(subrange: (lastAscent + 1) ..< indexes.endIndex)
+        indexes.reverse(subrange: (lastAscent + 1)..<indexes.endIndex)
       }
-      
+
       return true
     }
-    
+
     @inlinable
     public mutating func next() -> [Base.Element]? {
       guard !isFinished else { return nil }
-      
+
       /// Advances `kRange` by incrementing its `lowerBound` until the range is
       /// empty, when iteration is finished.
       func advanceKRange() {
         kRange.removeFirst()
         indexes = Array(base.indices)
       }
-      
+
       let countToChoose = self.kRange.lowerBound
       if countToChoose == 0 {
         defer {
@@ -227,7 +226,7 @@ extension Permutations: Sequence {
         }
         return []
       }
-      
+
       let permutesFullCollection = (countToChoose == baseCount)
       if permutesFullCollection {
         // If we're permuting the full collection, each iteration is just a
@@ -252,7 +251,7 @@ extension Permutations: Sequence {
       }
     }
   }
-  
+
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(self)
@@ -328,7 +327,7 @@ extension Collection {
   ) -> Permutations<Self> where R.Bound == Int {
     return Permutations(self, kRange: kRange)
   }
-  
+
   /// Returns a collection of the permutations of this collection of the
   /// specified length.
   ///
@@ -400,10 +399,10 @@ public struct UniquePermutations<Base: Collection> {
   /// The base collection to iterate over for permutations.
   @usableFromInline
   internal let base: Base
-  
+
   @usableFromInline
   internal var indexes: [Base.Index]
-  
+
   @usableFromInline
   internal let kRange: Range<Int>
 }
@@ -414,29 +413,28 @@ extension UniquePermutations where Base.Element: Hashable {
     let firstIndexesAndCountsByElement = Dictionary(
       base.indices.lazy.map { (base[$0], ($0, 1)) },
       uniquingKeysWith: { indexAndCount, _ in (indexAndCount.0, indexAndCount.1 + 1) })
-    
+
     return firstIndexesAndCountsByElement
       .values.sorted(by: { $0.0 < $1.0 })
       .flatMap { index, count in repeatElement(index, count: count) }
   }
-  
+
   @inlinable
   internal init(_ elements: Base) {
     self.indexes = Self._indexes(elements)
     self.base = elements
-    self.kRange = self.indexes.count ..< (self.indexes.count + 1)
+    self.kRange = self.indexes.count..<(self.indexes.count + 1)
   }
 
   @inlinable
   internal init<R: RangeExpression>(_ base: Base, _ range: R)
-    where R.Bound == Int
-  {
+  where R.Bound == Int {
     self.indexes = Self._indexes(base)
     self.base = base
-    
+
     let upperBound = self.indexes.count + 1
     self.kRange = range.relative(to: 0 ..< .max)
-      .clamped(to: 0 ..< upperBound)
+      .clamped(to: 0..<upperBound)
   }
 }
 
@@ -445,10 +443,10 @@ extension UniquePermutations: Sequence {
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal let base: Base
-    
+
     @usableFromInline
     internal var indexes: [Base.Index]
-    
+
     @usableFromInline
     internal var lengths: Range<Int>
 
@@ -461,14 +459,14 @@ extension UniquePermutations: Sequence {
       self.indexes = indexes
       self.lengths = lengths
     }
-    
+
     @inlinable
     public mutating func next() -> [Base.Element]? {
       // In the end case, `lengths` is an empty range.
       if lengths.isEmpty {
         return nil
       }
-      
+
       // The first iteration must produce the original sorted array, before any
       // permutations. We skip the permutation the first time so that we can
       // always mutate the array _before_ returning a slice, which avoids
@@ -485,11 +483,11 @@ extension UniquePermutations: Sequence {
           return nil
         }
       }
-      
+
       return indexes[..<lengths.lowerBound].map { base[$0] }
     }
   }
-  
+
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(base, indexes: indexes, lengths: kRange)
@@ -539,7 +537,7 @@ extension Collection where Element: Hashable {
   ///   collection.
   public func uniquePermutations(ofCount k: Int? = nil) -> UniquePermutations<Self> {
     if let k = k {
-      return UniquePermutations(self, k ..< (k + 1))
+      return UniquePermutations(self, k..<(k + 1))
     } else {
       return UniquePermutations(self)
     }
@@ -575,8 +573,7 @@ extension Collection where Element: Hashable {
   /// - Complexity: O(*n*), where *n* is the number of elements in this
   ///   collection.
   public func uniquePermutations<R: RangeExpression>(ofCount kRange: R) -> UniquePermutations<Self>
-    where R.Bound == Int
-  {
+  where R.Bound == Int {
     UniquePermutations(self, kRange)
   }
 }

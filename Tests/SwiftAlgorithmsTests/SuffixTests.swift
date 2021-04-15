@@ -10,6 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
+
 @testable import Algorithms
 
 final class SuffixTests: XCTestCase {
@@ -19,29 +20,29 @@ final class SuffixTests: XCTestCase {
     XCTAssertEqualSequences(a.suffix(while: { $0 > 10 }), [])
     XCTAssertEqualSequences(a.suffix(while: { $0 > 9 }), [10])
     XCTAssertEqualSequences(a.suffix(while: { $0 > -1 }), (0...10))
-    
+
     let empty: [Int] = []
     XCTAssertEqualSequences(empty.suffix(while: { $0 > 10 }), [])
   }
-  
+
   func testEndOfPrefix() {
     let array = Array(0..<10)
     XCTAssertEqual(array.endOfPrefix(while: { $0 < 3 }), 3)
     XCTAssertEqual(array.endOfPrefix(while: { _ in false }), array.startIndex)
     XCTAssertEqual(array.endOfPrefix(while: { _ in true }), array.endIndex)
-    
+
     let empty = [Int]()
     XCTAssertEqual(empty.endOfPrefix(while: { $0 < 3 }), 0)
     XCTAssertEqual(empty.endOfPrefix(while: { _ in false }), empty.startIndex)
     XCTAssertEqual(empty.endOfPrefix(while: { _ in true }), empty.endIndex)
   }
-  
+
   func testStartOfSuffix() {
     let array = Array(0..<10)
     XCTAssertEqual(array.startOfSuffix(while: { $0 >= 3 }), 3)
     XCTAssertEqual(array.startOfSuffix(while: { _ in false }), array.endIndex)
     XCTAssertEqual(array.startOfSuffix(while: { _ in true }), array.startIndex)
-    
+
     let empty = [Int]()
     XCTAssertEqual(empty.startOfSuffix(while: { $0 < 3 }), 0)
     XCTAssertEqual(empty.startOfSuffix(while: { _ in false }), empty.endIndex)

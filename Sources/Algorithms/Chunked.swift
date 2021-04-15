@@ -15,19 +15,19 @@ public struct Chunked<Base: Collection, Subject> {
   /// The collection that this instance provides a view onto.
   @usableFromInline
   internal let base: Base
-  
+
   /// The projection function.
   @usableFromInline
   internal let projection: (Base.Element) -> Subject
-  
+
   /// The predicate.
   @usableFromInline
   internal let belongInSameGroup: (Subject, Subject) -> Bool
-  
+
   /// The upper bound of the first chunk.
   @usableFromInline
   internal var firstUpperBound: Base.Index
-  
+
   @inlinable
   internal init(
     base: Base,
@@ -38,7 +38,7 @@ public struct Chunked<Base: Collection, Subject> {
     self.projection = projection
     self.belongInSameGroup = belongInSameGroup
     self.firstUpperBound = base.startIndex
-    
+
     if !base.isEmpty {
       firstUpperBound = endOfChunk(startingAt: base.startIndex)
     }
@@ -51,19 +51,19 @@ extension Chunked: LazyCollectionProtocol {
     /// The range corresponding to the chunk at this position.
     @usableFromInline
     internal var baseRange: Range<Base.Index>
-    
+
     @inlinable
     internal init(_ baseRange: Range<Base.Index>) {
       self.baseRange = baseRange
     }
-    
+
     @inlinable
     public static func == (lhs: Index, rhs: Index) -> Bool {
       // Since each index represents the range of a disparate chunk, no two
       // unique indices will have the same lower bound.
       lhs.baseRange.lowerBound == rhs.baseRange.lowerBound
     }
-    
+
     @inlinable
     public static func < (lhs: Index, rhs: Index) -> Bool {
       // Only use the lower bound to test for ordering, as above.
@@ -79,17 +79,17 @@ extension Chunked: LazyCollectionProtocol {
     return base[base.index(after: start)...]
       .endOfPrefix(while: { belongInSameGroup(subject, projection($0)) })
   }
-  
+
   @inlinable
   public var startIndex: Index {
     Index(base.startIndex..<firstUpperBound)
   }
-  
+
   @inlinable
   public var endIndex: Index {
     Index(base.endIndex..<base.endIndex)
   }
-  
+
   @inlinable
   public func index(after i: Index) -> Index {
     precondition(i != endIndex, "Can't advance past endIndex")
@@ -98,7 +98,7 @@ extension Chunked: LazyCollectionProtocol {
     let end = endOfChunk(startingAt: upperBound)
     return Index(upperBound..<end)
   }
-  
+
   @inlinable
   public subscript(position: Index) -> Base.SubSequence {
     precondition(position != endIndex, "Can't subscript using endIndex")
@@ -109,14 +109,13 @@ extension Chunked: LazyCollectionProtocol {
 extension Chunked.Index: Hashable where Base.Index: Hashable {}
 
 extension Chunked: BidirectionalCollection
-  where Base: BidirectionalCollection
-{
+where Base: BidirectionalCollection {
   /// Returns the index in the base collection of the start of the chunk ending
   /// at the given index.
   @inlinable
   internal func startOfChunk(endingAt end: Base.Index) -> Base.Index {
     let indexBeforeEnd = base.index(before: end)
-    
+
     // Get the projected value of the last element in the range ending at `end`.
     let subject = projection(base[indexBeforeEnd])
     return base[..<indexBeforeEnd]
@@ -152,7 +151,7 @@ extension LazyCollectionProtocol {
       projection: { $0 },
       belongInSameGroup: belongInSameGroup)
   }
-  
+
   /// Returns a lazy collection of subsequences of this collection, chunked by
   /// grouping elements that project to the same value.
   ///
@@ -185,10 +184,10 @@ extension Collection {
   ) rethrows -> [SubSequence] {
     guard !isEmpty else { return [] }
     var result: [SubSequence] = []
-    
+
     var start = startIndex
     var subject = try projection(self[start])
-    
+
     for (index, element) in indexed().dropFirst() {
       let nextSubject = try projection(element)
       if try !belongInSameGroup(subject, nextSubject) {
@@ -197,14 +196,14 @@ extension Collection {
         subject = nextSubject
       }
     }
-    
+
     if start != endIndex {
       result.append(self[start..<endIndex])
     }
-    
+
     return result
   }
-  
+
   /// Returns a collection of subsequences of this collection, chunked by
   /// the given predicate.
   ///
@@ -242,15 +241,15 @@ extension Collection {
 /// * `c.chunks(ofCount: 3).map(f)` maps eagerly and returns a new array
 /// * `c.lazy.chunks(ofCount: 3).map(f)` maps lazily and returns a `LazyMapCollection`
 public struct ChunkedByCount<Base: Collection> {
-  
+
   public typealias Element = Base.SubSequence
-  
+
   @usableFromInline
   internal let base: Base
-  
+
   @usableFromInline
   internal let chunkCount: Int
-  
+
   @usableFromInline
   internal var startUpperBound: Base.Index
 
@@ -262,13 +261,14 @@ public struct ChunkedByCount<Base: Collection> {
   internal init(_base: Base, _chunkCount: Int) {
     self.base = _base
     self.chunkCount = _chunkCount
-    
+
     // Compute the start index upfront in order to make
     // start index a O(1) lookup.
-    self.startUpperBound = _base.index(
-      _base.startIndex, offsetBy: _chunkCount,
-      limitedBy: _base.endIndex
-    ) ?? _base.endIndex
+    self.startUpperBound =
+      _base.index(
+        _base.startIndex, offsetBy: _chunkCount,
+        limitedBy: _base.endIndex
+      ) ?? _base.endIndex
   }
 }
 
@@ -276,7 +276,7 @@ extension ChunkedByCount: Collection {
   public struct Index {
     @usableFromInline
     internal let baseRange: Range<Base.Index>
-    
+
     @inlinable
     internal init(_baseRange: Range<Base.Index>) {
       self.baseRange = _baseRange
@@ -292,35 +292,40 @@ extension ChunkedByCount: Collection {
   public var endIndex: Index {
     Index(_baseRange: base.endIndex..<base.endIndex)
   }
-  
+
   /// - Complexity: O(1)
   @inlinable
   public subscript(i: Index) -> Element {
     precondition(i < endIndex, "Index out of range")
     return base[i.baseRange]
   }
-  
+
   @inlinable
   public func index(after i: Index) -> Index {
     precondition(i < endIndex, "Advancing past end index")
-    let baseIdx = base.index(
-      i.baseRange.upperBound, offsetBy: chunkCount,
-      limitedBy: base.endIndex
-    ) ?? base.endIndex
+    let baseIdx =
+      base.index(
+        i.baseRange.upperBound, offsetBy: chunkCount,
+        limitedBy: base.endIndex
+      ) ?? base.endIndex
     return Index(_baseRange: i.baseRange.upperBound..<baseIdx)
   }
 }
 
 extension ChunkedByCount.Index: Comparable {
   @inlinable
-  public static func == (lhs: ChunkedByCount.Index,
-                         rhs: ChunkedByCount.Index) -> Bool {
+  public static func == (
+    lhs: ChunkedByCount.Index,
+    rhs: ChunkedByCount.Index
+  ) -> Bool {
     lhs.baseRange.lowerBound == rhs.baseRange.lowerBound
   }
-  
+
   @inlinable
-  public static func < (lhs: ChunkedByCount.Index,
-                        rhs: ChunkedByCount.Index) -> Bool {
+  public static func < (
+    lhs: ChunkedByCount.Index,
+    rhs: ChunkedByCount.Index
+  ) -> Bool {
     lhs.baseRange.lowerBound < rhs.baseRange.lowerBound
   }
 }
@@ -331,19 +336,20 @@ where Base: RandomAccessCollection {
   @inlinable
   public func index(before i: Index) -> Index {
     precondition(i > startIndex, "Advancing past start index")
-    
+
     var offset = chunkCount
     if i.baseRange.lowerBound == base.endIndex {
-      let remainder = base.count%chunkCount
+      let remainder = base.count % chunkCount
       if remainder != 0 {
         offset = remainder
       }
     }
-    
-    let baseIdx = base.index(
-      i.baseRange.lowerBound, offsetBy: -offset,
-      limitedBy: base.startIndex
-    ) ?? base.startIndex
+
+    let baseIdx =
+      base.index(
+        i.baseRange.lowerBound, offsetBy: -offset,
+        limitedBy: base.startIndex
+      ) ?? base.startIndex
     return Index(_baseRange: baseIdx..<i.baseRange.lowerBound)
   }
 }
@@ -352,8 +358,9 @@ extension ChunkedByCount {
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     let distance =
-      base.distance(from: start.baseRange.lowerBound,
-                    to: end.baseRange.lowerBound)
+      base.distance(
+        from: start.baseRange.lowerBound,
+        to: end.baseRange.lowerBound)
     let (quotient, remainder) =
       distance.quotientAndRemainder(dividingBy: chunkCount)
     return quotient + remainder.signum()
@@ -365,14 +372,14 @@ extension ChunkedByCount {
       base.count.quotientAndRemainder(dividingBy: chunkCount)
     return quotient + remainder.signum()
   }
-  
+
   @inlinable
   public func index(
     _ i: Index, offsetBy offset: Int, limitedBy limit: Index
   ) -> Index? {
     guard offset != 0 else { return i }
     guard limit != i else { return nil }
-    
+
     if offset > 0 {
       return limit > i
         ? offsetForward(i, offsetBy: offset, limit: limit)
@@ -387,16 +394,17 @@ extension ChunkedByCount {
   @inlinable
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     guard distance != 0 else { return i }
-    
-    let idx = distance > 0
-        ? offsetForward(i, offsetBy: distance)
-        : offsetBackward(i, offsetBy: distance)
+
+    let idx =
+      distance > 0
+      ? offsetForward(i, offsetBy: distance)
+      : offsetBackward(i, offsetBy: distance)
     guard let index = idx else {
       fatalError("Out of bounds")
     }
     return index
   }
-  
+
   @inlinable
   internal func offsetForward(
     _ i: Index, offsetBy distance: Int, limit: Index? = nil
@@ -409,14 +417,14 @@ extension ChunkedByCount {
       limit: limit, by: >
     )
   }
-  
+
   // Convenience to compute offset backward base distance.
   @inlinable
   internal func computeOffsetBackwardBaseDistance(
     _ i: Index, _ distance: Int
   ) -> Int {
     if i == endIndex {
-      let remainder = base.count%chunkCount
+      let remainder = base.count % chunkCount
       // We have to take it into account when calculating offsets.
       if remainder != 0 {
         // Distance "minus" one(at this point distance is negative)
@@ -427,21 +435,21 @@ extension ChunkedByCount {
     }
     return distance * chunkCount
   }
-  
+
   @inlinable
   internal func offsetBackward(
     _ i: Index, offsetBy distance: Int, limit: Index? = nil
   ) -> Index? {
     assert(distance < 0)
     let baseDistance =
-        computeOffsetBackwardBaseDistance(i, distance)
+      computeOffsetBackwardBaseDistance(i, distance)
     return makeOffsetIndex(
       from: i, baseBound: base.startIndex,
       distance: distance, baseDistance: baseDistance,
       limit: limit, by: <
     )
   }
-  
+
   // Helper to compute index(offsetBy:) index.
   @inlinable
   internal func makeOffsetIndex(
@@ -452,7 +460,7 @@ extension ChunkedByCount {
       i.baseRange.lowerBound, offsetBy: baseDistance,
       limitedBy: baseBound
     )
-    
+
     if let limit = limit {
       if baseIdx == nil {
         // If we past the bounds while advancing forward and the
@@ -478,12 +486,13 @@ extension ChunkedByCount {
         return nil
       }
     }
-    
+
     let baseStartIdx = baseIdx ?? baseBound
-    let baseEndIdx = base.index(
-      baseStartIdx, offsetBy: chunkCount, limitedBy: base.endIndex
-    ) ?? base.endIndex
-    
+    let baseEndIdx =
+      base.index(
+        baseStartIdx, offsetBy: chunkCount, limitedBy: base.endIndex
+      ) ?? base.endIndex
+
     return Index(_baseRange: baseStartIdx..<baseEndIdx)
   }
 }
@@ -516,6 +525,6 @@ extension ChunkedByCount.Index: Hashable where Base.Index: Hashable {}
 
 // Lazy conditional conformance.
 extension ChunkedByCount: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 extension ChunkedByCount: LazyCollectionProtocol
-  where Base: LazyCollectionProtocol {}
+where Base: LazyCollectionProtocol {}
