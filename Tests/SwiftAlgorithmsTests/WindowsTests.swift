@@ -50,9 +50,7 @@ final class windowsTests: XCTestCase {
     XCTAssertEqual(a.count, 3)
     XCTAssertEqual(a.map { $0.reduce(0, +) }, [1, 1, 1])
 
-    let a2 = [0, 1, 2, 3, 4, 5, 6].windows(ofCount: 3).map {
-      $0.reduce(0, +)
-    }.reduce(0, +)
+    let a2 = [0, 1, 2, 3, 4, 5, 6].windows(ofCount: 3).map { $0.reduce(0, +) }.reduce(0, +)
 
     XCTAssertEqual(a2, 3 + 6 + 9 + 12 + 15)
   }
@@ -89,24 +87,16 @@ final class windowsTests: XCTestCase {
 
   func testWindowsIndexTraversals() {
     validateIndexTraversals(
-      "".windows(ofCount: 1),
-      "a".windows(ofCount: 1),
-      "ab".windows(ofCount: 1),
-      "abc".windows(ofCount: 1),
-      "".windows(ofCount: 3),
-      "a".windows(ofCount: 3),
-      "abc".windows(ofCount: 3),
-      "abcdefgh".windows(ofCount: 3),
-      indices: { windows in
-        let endIndex = windows.base.endIndex
+      "".windows(ofCount: 1), "a".windows(ofCount: 1), "ab".windows(ofCount: 1),
+      "abc".windows(ofCount: 1), "".windows(ofCount: 3), "a".windows(ofCount: 3),
+      "abc".windows(ofCount: 3), "abcdefgh".windows(ofCount: 3),
+      indices: { windows in let endIndex = windows.base.endIndex
         let indices = windows.base.indices + [endIndex]
-        return zip(indices, indices.dropFirst(windows.size))
-          .map { .init(lowerBound: $0, upperBound: $1) }
-          + [.init(lowerBound: endIndex, upperBound: endIndex)]
+        return zip(indices, indices.dropFirst(windows.size)).map {
+          .init(lowerBound: $0, upperBound: $1)
+        } + [.init(lowerBound: endIndex, upperBound: endIndex)]
       })
   }
 
-  func testWindowsLazy() {
-    XCTAssertLazyCollection([0, 1, 2, 3].lazy.windows(ofCount: 2))
-  }
+  func testWindowsLazy() { XCTAssertLazyCollection([0, 1, 2, 3].lazy.windows(ofCount: 2)) }
 }

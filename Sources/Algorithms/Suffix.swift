@@ -23,10 +23,7 @@ extension BidirectionalCollection {
   ///   returns `false` it will not be called again.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
-  @inlinable
-  public func suffix(
-    while predicate: (Element) throws -> Bool
-  ) rethrows -> SubSequence {
+  @inlinable public func suffix(while predicate: (Element) throws -> Bool) rethrows -> SubSequence {
     try self[startOfSuffix(while: predicate)...]
   }
 }
@@ -45,14 +42,10 @@ extension Collection {
   ///   be called again.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
-  @inlinable
-  internal func endOfPrefix(
-    while predicate: (Element) throws -> Bool
-  ) rethrows -> Index {
+  @inlinable internal func endOfPrefix(while predicate: (Element) throws -> Bool) rethrows -> Index
+  {
     var index = startIndex
-    while try index != endIndex && predicate(self[index]) {
-      formIndex(after: &index)
-    }
+    while try index != endIndex && predicate(self[index]) { formIndex(after: &index) }
     return index
   }
 }
@@ -71,17 +64,14 @@ extension BidirectionalCollection {
   ///   be called again.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
-  @inlinable
-  internal func startOfSuffix(
-    while predicate: (Element) throws -> Bool
-  ) rethrows -> Index {
+  @inlinable internal func startOfSuffix(while predicate: (Element) throws -> Bool) rethrows
+    -> Index
+  {
     var index = endIndex
     while index != startIndex {
       let after = index
       formIndex(before: &index)
-      if try !predicate(self[index]) {
-        return after
-      }
+      if try !predicate(self[index]) { return after }
     }
     return index
   }

@@ -25,10 +25,8 @@ extension BidirectionalCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
   ///
-  @inlinable
-  public func trimming(
-    while predicate: (Element) throws -> Bool
-  ) rethrows -> SubSequence {
+  @inlinable public func trimming(while predicate: (Element) throws -> Bool) rethrows -> SubSequence
+  {
     let start = try endOfPrefix(while: predicate)
     let end = try self[start...].startOfSuffix(while: predicate)
     return self[start..<end]

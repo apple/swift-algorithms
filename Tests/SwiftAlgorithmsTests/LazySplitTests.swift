@@ -17,13 +17,7 @@ import XCTest
 //===----------------------------------------------------------------------===//
 
 final class LazySplitTests: XCTestCase {
-  func testEmpty() {
-    Validator(
-      subject: [],
-      separator: .element(0),
-      maxSplits: 1
-    ).validate()
-  }
+  func testEmpty() { Validator(subject: [], separator: .element(0), maxSplits: 1).validate() }
 
   // The following test names indicate the sequence being split, using the
   // notation
@@ -41,54 +35,35 @@ final class LazySplitTests: XCTestCase {
   // Length 1
   //===--------------------------------------------------------------------===//
 
-  func testE() {
-    Validator(subject: [1], separator: .element(0), maxSplits: 0).validate()
-  }
+  func testE() { Validator(subject: [1], separator: .element(0), maxSplits: 0).validate() }
 
-  func testS() {
-    Validator(subject: [0], separator: .element(0), maxSplits: 0).validate()
-  }
+  func testS() { Validator(subject: [0], separator: .element(0), maxSplits: 0).validate() }
 
   //===--------------------------------------------------------------------===//
   // Length 2
   //===--------------------------------------------------------------------===//
 
-  func testEE() {
-    Validator(subject: [1, 1], separator: .element(0), maxSplits: 0).validate()
-  }
+  func testEE() { Validator(subject: [1, 1], separator: .element(0), maxSplits: 0).validate() }
 
-  func testSS() {
-    Validator(subject: [0, 0], separator: .element(0), maxSplits: 1).validate()
-  }
+  func testSS() { Validator(subject: [0, 0], separator: .element(0), maxSplits: 1).validate() }
 
-  func testES() {
-    Validator(subject: [1, 0], separator: .element(0), maxSplits: 0).validate()
-  }
+  func testES() { Validator(subject: [1, 0], separator: .element(0), maxSplits: 0).validate() }
 
-  func testSE() {
-    Validator(subject: [0, 1], separator: .element(0), maxSplits: 0).validate()
-  }
+  func testSE() { Validator(subject: [0, 1], separator: .element(0), maxSplits: 0).validate() }
 
   //===--------------------------------------------------------------------===//
   // Length 3
   //===--------------------------------------------------------------------===//
 
-  func testEEE() {
-    Validator(subject: [1, 1, 1], separator: .element(0), maxSplits: 0)
-      .validate()
-  }
+  func testEEE() { Validator(subject: [1, 1, 1], separator: .element(0), maxSplits: 0).validate() }
 
-  func testSSS() {
-    Validator(subject: [0, 0, 0], separator: .element(0), maxSplits: 1)
-      .validate()
-  }
+  func testSSS() { Validator(subject: [0, 0, 0], separator: .element(0), maxSplits: 1).validate() }
 
   func testAllEES() {
     let permutations = [[1, 1, 0], [1, 0, 1], [0, 1, 1]]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 0)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 0).validate()
     }
   }
 
@@ -96,8 +71,7 @@ final class LazySplitTests: XCTestCase {
     let permutations = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1).validate()
     }
   }
 
@@ -106,18 +80,14 @@ final class LazySplitTests: XCTestCase {
   //===--------------------------------------------------------------------===//
 
   func testEEEE() {
-    Validator(subject: [1, 1, 1, 1], separator: .element(0), maxSplits: 0)
-      .validate()
+    Validator(subject: [1, 1, 1, 1], separator: .element(0), maxSplits: 0).validate()
   }
 
   func testAllEEES() {
-    let permutations = [
-      [1, 1, 1, 0], [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1],
-    ]
+    let permutations = [[1, 1, 1, 0], [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1]]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 0)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 0).validate()
     }
   }
 
@@ -128,48 +98,41 @@ final class LazySplitTests: XCTestCase {
 
   // All separators.
   func testSSSS() {
-    Validator(subject: [0, 0, 0, 0], separator: .element(0), maxSplits: 1)
-      .validate()
+    Validator(subject: [0, 0, 0, 0], separator: .element(0), maxSplits: 1).validate()
   }
 
   // Equal numbers of elements and separators.
   func testAllEESS() {
     let permutations = [
-      [1, 1, 0, 0], [1, 0, 1, 0], [1, 0, 0, 1],
-      [0, 1, 1, 0], [0, 1, 0, 1], [0, 0, 1, 1],
+      [1, 1, 0, 0], [1, 0, 1, 0], [1, 0, 0, 1], [0, 1, 1, 0], [0, 1, 0, 1], [0, 0, 1, 1],
     ]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1).validate()
     }
   }
 
   // More separators than elements.
   func testAllEESSS() {
     let permutations = [
-      [1, 1, 0, 0, 0], [1, 0, 1, 0, 0], [1, 0, 0, 1, 0], [1, 0, 0, 0, 1],
-      [0, 1, 1, 0, 0], [0, 1, 0, 1, 0], [0, 1, 0, 0, 1], [0, 0, 1, 1, 0],
-      [0, 0, 1, 0, 1], [0, 0, 0, 1, 1],
+      [1, 1, 0, 0, 0], [1, 0, 1, 0, 0], [1, 0, 0, 1, 0], [1, 0, 0, 0, 1], [0, 1, 1, 0, 0],
+      [0, 1, 0, 1, 0], [0, 1, 0, 0, 1], [0, 0, 1, 1, 0], [0, 0, 1, 0, 1], [0, 0, 0, 1, 1],
     ]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1).validate()
     }
   }
 
   // More elements than separators.
   func testAllEEESS() {
     let permutations = [
-      [1, 1, 1, 0, 0], [1, 1, 0, 1, 0], [1, 1, 0, 0, 1], [1, 0, 1, 1, 0],
-      [1, 0, 1, 0, 1], [1, 0, 0, 1, 1], [0, 1, 1, 1, 0], [0, 1, 1, 0, 1],
-      [0, 1, 0, 1, 1], [0, 0, 1, 1, 1],
+      [1, 1, 1, 0, 0], [1, 1, 0, 1, 0], [1, 1, 0, 0, 1], [1, 0, 1, 1, 0], [1, 0, 1, 0, 1],
+      [1, 0, 0, 1, 1], [0, 1, 1, 1, 0], [0, 1, 1, 0, 1], [0, 1, 0, 1, 1], [0, 0, 1, 1, 1],
     ]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1).validate()
     }
   }
 
@@ -178,35 +141,28 @@ final class LazySplitTests: XCTestCase {
   //===--------------------------------------------------------------------===//
 
   func testAllESSS() {
-    let permutations = [
-      [1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1],
-    ]
+    let permutations = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1).validate()
     }
   }
 
   func testAllEEEESSS() {
     let permutations = [
-      [1, 1, 1, 1, 0, 0, 0], [1, 1, 1, 0, 1, 0, 0], [1, 1, 1, 0, 0, 1, 0],
-      [1, 1, 1, 0, 0, 0, 1], [1, 1, 0, 1, 1, 0, 0], [1, 1, 0, 1, 0, 1, 0],
-      [1, 1, 0, 1, 0, 0, 1], [1, 1, 0, 0, 1, 1, 0], [1, 1, 0, 0, 1, 0, 1],
-      [1, 1, 0, 0, 0, 1, 1], [1, 0, 1, 1, 1, 0, 0], [1, 0, 1, 1, 0, 1, 0],
-      [1, 0, 1, 1, 0, 0, 1], [1, 0, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 0, 1],
-      [1, 0, 1, 0, 0, 1, 1], [1, 0, 0, 1, 1, 1, 0], [1, 0, 0, 1, 1, 0, 1],
-      [1, 0, 0, 1, 0, 1, 1], [1, 0, 0, 0, 1, 1, 1], [0, 1, 1, 1, 1, 0, 0],
-      [0, 1, 1, 1, 0, 1, 0], [0, 1, 1, 1, 0, 0, 1], [0, 1, 1, 0, 1, 1, 0],
-      [0, 1, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 1, 0, 1, 1, 1, 0],
-      [0, 1, 0, 1, 1, 0, 1], [0, 1, 0, 1, 0, 1, 1], [0, 1, 0, 0, 1, 1, 1],
-      [0, 0, 1, 1, 1, 1, 0], [0, 0, 1, 1, 1, 0, 1], [0, 0, 1, 1, 0, 1, 1],
-      [0, 0, 1, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1, 1],
+      [1, 1, 1, 1, 0, 0, 0], [1, 1, 1, 0, 1, 0, 0], [1, 1, 1, 0, 0, 1, 0], [1, 1, 1, 0, 0, 0, 1],
+      [1, 1, 0, 1, 1, 0, 0], [1, 1, 0, 1, 0, 1, 0], [1, 1, 0, 1, 0, 0, 1], [1, 1, 0, 0, 1, 1, 0],
+      [1, 1, 0, 0, 1, 0, 1], [1, 1, 0, 0, 0, 1, 1], [1, 0, 1, 1, 1, 0, 0], [1, 0, 1, 1, 0, 1, 0],
+      [1, 0, 1, 1, 0, 0, 1], [1, 0, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 0, 1], [1, 0, 1, 0, 0, 1, 1],
+      [1, 0, 0, 1, 1, 1, 0], [1, 0, 0, 1, 1, 0, 1], [1, 0, 0, 1, 0, 1, 1], [1, 0, 0, 0, 1, 1, 1],
+      [0, 1, 1, 1, 1, 0, 0], [0, 1, 1, 1, 0, 1, 0], [0, 1, 1, 1, 0, 0, 1], [0, 1, 1, 0, 1, 1, 0],
+      [0, 1, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 1, 0, 1, 1, 1, 0], [0, 1, 0, 1, 1, 0, 1],
+      [0, 1, 0, 1, 0, 1, 1], [0, 1, 0, 0, 1, 1, 1], [0, 0, 1, 1, 1, 1, 0], [0, 0, 1, 1, 1, 0, 1],
+      [0, 0, 1, 1, 0, 1, 1], [0, 0, 1, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1, 1],
     ]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1).validate()
     }
   }
 
@@ -219,143 +175,105 @@ final class LazySplitTests: XCTestCase {
   // Equal numbers of separators and elements.
   func testAllEEEESSSS() {
     let permutations = [
-      [1, 1, 1, 1, 0, 0, 0, 0], [1, 1, 1, 0, 1, 0, 0, 0],
-      [1, 1, 1, 0, 0, 1, 0, 0], [1, 1, 1, 0, 0, 0, 1, 0],
-      [1, 1, 1, 0, 0, 0, 0, 1], [1, 1, 0, 1, 1, 0, 0, 0],
-      [1, 1, 0, 1, 0, 1, 0, 0], [1, 1, 0, 1, 0, 0, 1, 0],
-      [1, 1, 0, 1, 0, 0, 0, 1], [1, 1, 0, 0, 1, 1, 0, 0],
-      [1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 0, 0, 1, 0, 0, 1],
-      [1, 1, 0, 0, 0, 1, 1, 0], [1, 1, 0, 0, 0, 1, 0, 1],
-      [1, 1, 0, 0, 0, 0, 1, 1], [1, 0, 1, 1, 1, 0, 0, 0],
-      [1, 0, 1, 1, 0, 1, 0, 0], [1, 0, 1, 1, 0, 0, 1, 0],
-      [1, 0, 1, 1, 0, 0, 0, 1], [1, 0, 1, 0, 1, 1, 0, 0],
-      [1, 0, 1, 0, 1, 0, 1, 0], [1, 0, 1, 0, 1, 0, 0, 1],
-      [1, 0, 1, 0, 0, 1, 1, 0], [1, 0, 1, 0, 0, 1, 0, 1],
-      [1, 0, 1, 0, 0, 0, 1, 1], [1, 0, 0, 1, 1, 1, 0, 0],
-      [1, 0, 0, 1, 1, 0, 1, 0], [1, 0, 0, 1, 1, 0, 0, 1],
-      [1, 0, 0, 1, 0, 1, 1, 0], [1, 0, 0, 1, 0, 1, 0, 1],
-      [1, 0, 0, 1, 0, 0, 1, 1], [1, 0, 0, 0, 1, 1, 1, 0],
-      [1, 0, 0, 0, 1, 1, 0, 1], [1, 0, 0, 0, 1, 0, 1, 1],
-      [1, 0, 0, 0, 0, 1, 1, 1], [0, 1, 1, 1, 1, 0, 0, 0],
-      [0, 1, 1, 1, 0, 1, 0, 0], [0, 1, 1, 1, 0, 0, 1, 0],
-      [0, 1, 1, 1, 0, 0, 0, 1], [0, 1, 1, 0, 1, 1, 0, 0],
-      [0, 1, 1, 0, 1, 0, 1, 0], [0, 1, 1, 0, 1, 0, 0, 1],
-      [0, 1, 1, 0, 0, 1, 1, 0], [0, 1, 1, 0, 0, 1, 0, 1],
-      [0, 1, 1, 0, 0, 0, 1, 1], [0, 1, 0, 1, 1, 1, 0, 0],
-      [0, 1, 0, 1, 1, 0, 1, 0], [0, 1, 0, 1, 1, 0, 0, 1],
-      [0, 1, 0, 1, 0, 1, 1, 0], [0, 1, 0, 1, 0, 1, 0, 1],
-      [0, 1, 0, 1, 0, 0, 1, 1], [0, 1, 0, 0, 1, 1, 1, 0],
-      [0, 1, 0, 0, 1, 1, 0, 1], [0, 1, 0, 0, 1, 0, 1, 1],
-      [0, 1, 0, 0, 0, 1, 1, 1], [0, 0, 1, 1, 1, 1, 0, 0],
-      [0, 0, 1, 1, 1, 0, 1, 0], [0, 0, 1, 1, 1, 0, 0, 1],
-      [0, 0, 1, 1, 0, 1, 1, 0], [0, 0, 1, 1, 0, 1, 0, 1],
-      [0, 0, 1, 1, 0, 0, 1, 1], [0, 0, 1, 0, 1, 1, 1, 0],
-      [0, 0, 1, 0, 1, 1, 0, 1], [0, 0, 1, 0, 1, 0, 1, 1],
-      [0, 0, 1, 0, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1, 1, 0],
-      [0, 0, 0, 1, 1, 1, 0, 1], [0, 0, 0, 1, 1, 0, 1, 1],
-      [0, 0, 0, 1, 0, 1, 1, 1], [0, 0, 0, 0, 1, 1, 1, 1],
+      [1, 1, 1, 1, 0, 0, 0, 0], [1, 1, 1, 0, 1, 0, 0, 0], [1, 1, 1, 0, 0, 1, 0, 0],
+      [1, 1, 1, 0, 0, 0, 1, 0], [1, 1, 1, 0, 0, 0, 0, 1], [1, 1, 0, 1, 1, 0, 0, 0],
+      [1, 1, 0, 1, 0, 1, 0, 0], [1, 1, 0, 1, 0, 0, 1, 0], [1, 1, 0, 1, 0, 0, 0, 1],
+      [1, 1, 0, 0, 1, 1, 0, 0], [1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 0, 0, 1, 0, 0, 1],
+      [1, 1, 0, 0, 0, 1, 1, 0], [1, 1, 0, 0, 0, 1, 0, 1], [1, 1, 0, 0, 0, 0, 1, 1],
+      [1, 0, 1, 1, 1, 0, 0, 0], [1, 0, 1, 1, 0, 1, 0, 0], [1, 0, 1, 1, 0, 0, 1, 0],
+      [1, 0, 1, 1, 0, 0, 0, 1], [1, 0, 1, 0, 1, 1, 0, 0], [1, 0, 1, 0, 1, 0, 1, 0],
+      [1, 0, 1, 0, 1, 0, 0, 1], [1, 0, 1, 0, 0, 1, 1, 0], [1, 0, 1, 0, 0, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 1, 1], [1, 0, 0, 1, 1, 1, 0, 0], [1, 0, 0, 1, 1, 0, 1, 0],
+      [1, 0, 0, 1, 1, 0, 0, 1], [1, 0, 0, 1, 0, 1, 1, 0], [1, 0, 0, 1, 0, 1, 0, 1],
+      [1, 0, 0, 1, 0, 0, 1, 1], [1, 0, 0, 0, 1, 1, 1, 0], [1, 0, 0, 0, 1, 1, 0, 1],
+      [1, 0, 0, 0, 1, 0, 1, 1], [1, 0, 0, 0, 0, 1, 1, 1], [0, 1, 1, 1, 1, 0, 0, 0],
+      [0, 1, 1, 1, 0, 1, 0, 0], [0, 1, 1, 1, 0, 0, 1, 0], [0, 1, 1, 1, 0, 0, 0, 1],
+      [0, 1, 1, 0, 1, 1, 0, 0], [0, 1, 1, 0, 1, 0, 1, 0], [0, 1, 1, 0, 1, 0, 0, 1],
+      [0, 1, 1, 0, 0, 1, 1, 0], [0, 1, 1, 0, 0, 1, 0, 1], [0, 1, 1, 0, 0, 0, 1, 1],
+      [0, 1, 0, 1, 1, 1, 0, 0], [0, 1, 0, 1, 1, 0, 1, 0], [0, 1, 0, 1, 1, 0, 0, 1],
+      [0, 1, 0, 1, 0, 1, 1, 0], [0, 1, 0, 1, 0, 1, 0, 1], [0, 1, 0, 1, 0, 0, 1, 1],
+      [0, 1, 0, 0, 1, 1, 1, 0], [0, 1, 0, 0, 1, 1, 0, 1], [0, 1, 0, 0, 1, 0, 1, 1],
+      [0, 1, 0, 0, 0, 1, 1, 1], [0, 0, 1, 1, 1, 1, 0, 0], [0, 0, 1, 1, 1, 0, 1, 0],
+      [0, 0, 1, 1, 1, 0, 0, 1], [0, 0, 1, 1, 0, 1, 1, 0], [0, 0, 1, 1, 0, 1, 0, 1],
+      [0, 0, 1, 1, 0, 0, 1, 1], [0, 0, 1, 0, 1, 1, 1, 0], [0, 0, 1, 0, 1, 1, 0, 1],
+      [0, 0, 1, 0, 1, 0, 1, 1], [0, 0, 1, 0, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1, 1, 0],
+      [0, 0, 0, 1, 1, 1, 0, 1], [0, 0, 0, 1, 1, 0, 1, 1], [0, 0, 0, 1, 0, 1, 1, 1],
+      [0, 0, 0, 0, 1, 1, 1, 1],
     ]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1).validate()
     }
   }
 
   // More separators than elements.
   func testAllEEESSSS() {
     let permutations = [
-      [1, 1, 1, 0, 0, 0, 0], [1, 1, 0, 1, 0, 0, 0], [1, 1, 0, 0, 1, 0, 0],
-      [1, 1, 0, 0, 0, 1, 0], [1, 1, 0, 0, 0, 0, 1], [1, 0, 1, 1, 0, 0, 0],
-      [1, 0, 1, 0, 1, 0, 0], [1, 0, 1, 0, 0, 1, 0], [1, 0, 1, 0, 0, 0, 1],
-      [1, 0, 0, 1, 1, 0, 0], [1, 0, 0, 1, 0, 1, 0], [1, 0, 0, 1, 0, 0, 1],
-      [1, 0, 0, 0, 1, 1, 0], [1, 0, 0, 0, 1, 0, 1], [1, 0, 0, 0, 0, 1, 1],
-      [0, 1, 1, 1, 0, 0, 0], [0, 1, 1, 0, 1, 0, 0], [0, 1, 1, 0, 0, 1, 0],
-      [0, 1, 1, 0, 0, 0, 1], [0, 1, 0, 1, 1, 0, 0], [0, 1, 0, 1, 0, 1, 0],
-      [0, 1, 0, 1, 0, 0, 1], [0, 1, 0, 0, 1, 1, 0], [0, 1, 0, 0, 1, 0, 1],
-      [0, 1, 0, 0, 0, 1, 1], [0, 0, 1, 1, 1, 0, 0], [0, 0, 1, 1, 0, 1, 0],
-      [0, 0, 1, 1, 0, 0, 1], [0, 0, 1, 0, 1, 1, 0], [0, 0, 1, 0, 1, 0, 1],
-      [0, 0, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 0], [0, 0, 0, 1, 1, 0, 1],
-      [0, 0, 0, 1, 0, 1, 1], [0, 0, 0, 0, 1, 1, 1],
+      [1, 1, 1, 0, 0, 0, 0], [1, 1, 0, 1, 0, 0, 0], [1, 1, 0, 0, 1, 0, 0], [1, 1, 0, 0, 0, 1, 0],
+      [1, 1, 0, 0, 0, 0, 1], [1, 0, 1, 1, 0, 0, 0], [1, 0, 1, 0, 1, 0, 0], [1, 0, 1, 0, 0, 1, 0],
+      [1, 0, 1, 0, 0, 0, 1], [1, 0, 0, 1, 1, 0, 0], [1, 0, 0, 1, 0, 1, 0], [1, 0, 0, 1, 0, 0, 1],
+      [1, 0, 0, 0, 1, 1, 0], [1, 0, 0, 0, 1, 0, 1], [1, 0, 0, 0, 0, 1, 1], [0, 1, 1, 1, 0, 0, 0],
+      [0, 1, 1, 0, 1, 0, 0], [0, 1, 1, 0, 0, 1, 0], [0, 1, 1, 0, 0, 0, 1], [0, 1, 0, 1, 1, 0, 0],
+      [0, 1, 0, 1, 0, 1, 0], [0, 1, 0, 1, 0, 0, 1], [0, 1, 0, 0, 1, 1, 0], [0, 1, 0, 0, 1, 0, 1],
+      [0, 1, 0, 0, 0, 1, 1], [0, 0, 1, 1, 1, 0, 0], [0, 0, 1, 1, 0, 1, 0], [0, 0, 1, 1, 0, 0, 1],
+      [0, 0, 1, 0, 1, 1, 0], [0, 0, 1, 0, 1, 0, 1], [0, 0, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 0],
+      [0, 0, 0, 1, 1, 0, 1], [0, 0, 0, 1, 0, 1, 1], [0, 0, 0, 0, 1, 1, 1],
     ]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1).validate()
     }
   }
 
   // More elements than separators.
   func testAllEEEEESSSS() {
     let permutations = [
-      [1, 1, 1, 1, 1, 0, 0, 0, 0], [1, 1, 1, 1, 0, 1, 0, 0, 0],
-      [1, 1, 1, 1, 0, 0, 1, 0, 0], [1, 1, 1, 1, 0, 0, 0, 1, 0],
-      [1, 1, 1, 1, 0, 0, 0, 0, 1], [1, 1, 1, 0, 1, 1, 0, 0, 0],
-      [1, 1, 1, 0, 1, 0, 1, 0, 0], [1, 1, 1, 0, 1, 0, 0, 1, 0],
-      [1, 1, 1, 0, 1, 0, 0, 0, 1], [1, 1, 1, 0, 0, 1, 1, 0, 0],
-      [1, 1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 1, 0, 0, 1, 0, 0, 1],
-      [1, 1, 1, 0, 0, 0, 1, 1, 0], [1, 1, 1, 0, 0, 0, 1, 0, 1],
-      [1, 1, 1, 0, 0, 0, 0, 1, 1], [1, 1, 0, 1, 1, 1, 0, 0, 0],
-      [1, 1, 0, 1, 1, 0, 1, 0, 0], [1, 1, 0, 1, 1, 0, 0, 1, 0],
-      [1, 1, 0, 1, 1, 0, 0, 0, 1], [1, 1, 0, 1, 0, 1, 1, 0, 0],
-      [1, 1, 0, 1, 0, 1, 0, 1, 0], [1, 1, 0, 1, 0, 1, 0, 0, 1],
-      [1, 1, 0, 1, 0, 0, 1, 1, 0], [1, 1, 0, 1, 0, 0, 1, 0, 1],
-      [1, 1, 0, 1, 0, 0, 0, 1, 1], [1, 1, 0, 0, 1, 1, 1, 0, 0],
-      [1, 1, 0, 0, 1, 1, 0, 1, 0], [1, 1, 0, 0, 1, 1, 0, 0, 1],
-      [1, 1, 0, 0, 1, 0, 1, 1, 0], [1, 1, 0, 0, 1, 0, 1, 0, 1],
-      [1, 1, 0, 0, 1, 0, 0, 1, 1], [1, 1, 0, 0, 0, 1, 1, 1, 0],
-      [1, 1, 0, 0, 0, 1, 1, 0, 1], [1, 1, 0, 0, 0, 1, 0, 1, 1],
-      [1, 1, 0, 0, 0, 0, 1, 1, 1], [1, 0, 1, 1, 1, 1, 0, 0, 0],
-      [1, 0, 1, 1, 1, 0, 1, 0, 0], [1, 0, 1, 1, 1, 0, 0, 1, 0],
-      [1, 0, 1, 1, 1, 0, 0, 0, 1], [1, 0, 1, 1, 0, 1, 1, 0, 0],
-      [1, 0, 1, 1, 0, 1, 0, 1, 0], [1, 0, 1, 1, 0, 1, 0, 0, 1],
-      [1, 0, 1, 1, 0, 0, 1, 1, 0], [1, 0, 1, 1, 0, 0, 1, 0, 1],
-      [1, 0, 1, 1, 0, 0, 0, 1, 1], [1, 0, 1, 0, 1, 1, 1, 0, 0],
-      [1, 0, 1, 0, 1, 1, 0, 1, 0], [1, 0, 1, 0, 1, 1, 0, 0, 1],
-      [1, 0, 1, 0, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 0, 1, 0, 1],
-      [1, 0, 1, 0, 1, 0, 0, 1, 1], [1, 0, 1, 0, 0, 1, 1, 1, 0],
-      [1, 0, 1, 0, 0, 1, 1, 0, 1], [1, 0, 1, 0, 0, 1, 0, 1, 1],
-      [1, 0, 1, 0, 0, 0, 1, 1, 1], [1, 0, 0, 1, 1, 1, 1, 0, 0],
-      [1, 0, 0, 1, 1, 1, 0, 1, 0], [1, 0, 0, 1, 1, 1, 0, 0, 1],
-      [1, 0, 0, 1, 1, 0, 1, 1, 0], [1, 0, 0, 1, 1, 0, 1, 0, 1],
-      [1, 0, 0, 1, 1, 0, 0, 1, 1], [1, 0, 0, 1, 0, 1, 1, 1, 0],
-      [1, 0, 0, 1, 0, 1, 1, 0, 1], [1, 0, 0, 1, 0, 1, 0, 1, 1],
-      [1, 0, 0, 1, 0, 0, 1, 1, 1], [1, 0, 0, 0, 1, 1, 1, 1, 0],
-      [1, 0, 0, 0, 1, 1, 1, 0, 1], [1, 0, 0, 0, 1, 1, 0, 1, 1],
-      [1, 0, 0, 0, 1, 0, 1, 1, 1], [1, 0, 0, 0, 0, 1, 1, 1, 1],
-      [0, 1, 1, 1, 1, 1, 0, 0, 0], [0, 1, 1, 1, 1, 0, 1, 0, 0],
-      [0, 1, 1, 1, 1, 0, 0, 1, 0], [0, 1, 1, 1, 1, 0, 0, 0, 1],
-      [0, 1, 1, 1, 0, 1, 1, 0, 0], [0, 1, 1, 1, 0, 1, 0, 1, 0],
-      [0, 1, 1, 1, 0, 1, 0, 0, 1], [0, 1, 1, 1, 0, 0, 1, 1, 0],
-      [0, 1, 1, 1, 0, 0, 1, 0, 1], [0, 1, 1, 1, 0, 0, 0, 1, 1],
-      [0, 1, 1, 0, 1, 1, 1, 0, 0], [0, 1, 1, 0, 1, 1, 0, 1, 0],
-      [0, 1, 1, 0, 1, 1, 0, 0, 1], [0, 1, 1, 0, 1, 0, 1, 1, 0],
-      [0, 1, 1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 1, 0, 0, 1, 1],
-      [0, 1, 1, 0, 0, 1, 1, 1, 0], [0, 1, 1, 0, 0, 1, 1, 0, 1],
-      [0, 1, 1, 0, 0, 1, 0, 1, 1], [0, 1, 1, 0, 0, 0, 1, 1, 1],
-      [0, 1, 0, 1, 1, 1, 1, 0, 0], [0, 1, 0, 1, 1, 1, 0, 1, 0],
-      [0, 1, 0, 1, 1, 1, 0, 0, 1], [0, 1, 0, 1, 1, 0, 1, 1, 0],
-      [0, 1, 0, 1, 1, 0, 1, 0, 1], [0, 1, 0, 1, 1, 0, 0, 1, 1],
-      [0, 1, 0, 1, 0, 1, 1, 1, 0], [0, 1, 0, 1, 0, 1, 1, 0, 1],
-      [0, 1, 0, 1, 0, 1, 0, 1, 1], [0, 1, 0, 1, 0, 0, 1, 1, 1],
-      [0, 1, 0, 0, 1, 1, 1, 1, 0], [0, 1, 0, 0, 1, 1, 1, 0, 1],
-      [0, 1, 0, 0, 1, 1, 0, 1, 1], [0, 1, 0, 0, 1, 0, 1, 1, 1],
-      [0, 1, 0, 0, 0, 1, 1, 1, 1], [0, 0, 1, 1, 1, 1, 1, 0, 0],
-      [0, 0, 1, 1, 1, 1, 0, 1, 0], [0, 0, 1, 1, 1, 1, 0, 0, 1],
-      [0, 0, 1, 1, 1, 0, 1, 1, 0], [0, 0, 1, 1, 1, 0, 1, 0, 1],
-      [0, 0, 1, 1, 1, 0, 0, 1, 1], [0, 0, 1, 1, 0, 1, 1, 1, 0],
-      [0, 0, 1, 1, 0, 1, 1, 0, 1], [0, 0, 1, 1, 0, 1, 0, 1, 1],
-      [0, 0, 1, 1, 0, 0, 1, 1, 1], [0, 0, 1, 0, 1, 1, 1, 1, 0],
-      [0, 0, 1, 0, 1, 1, 1, 0, 1], [0, 0, 1, 0, 1, 1, 0, 1, 1],
-      [0, 0, 1, 0, 1, 0, 1, 1, 1], [0, 0, 1, 0, 0, 1, 1, 1, 1],
-      [0, 0, 0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 1, 1, 1, 1, 0, 1],
-      [0, 0, 0, 1, 1, 1, 0, 1, 1], [0, 0, 0, 1, 1, 0, 1, 1, 1],
-      [0, 0, 0, 1, 0, 1, 1, 1, 1], [0, 0, 0, 0, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 0, 0, 0, 0], [1, 1, 1, 1, 0, 1, 0, 0, 0], [1, 1, 1, 1, 0, 0, 1, 0, 0],
+      [1, 1, 1, 1, 0, 0, 0, 1, 0], [1, 1, 1, 1, 0, 0, 0, 0, 1], [1, 1, 1, 0, 1, 1, 0, 0, 0],
+      [1, 1, 1, 0, 1, 0, 1, 0, 0], [1, 1, 1, 0, 1, 0, 0, 1, 0], [1, 1, 1, 0, 1, 0, 0, 0, 1],
+      [1, 1, 1, 0, 0, 1, 1, 0, 0], [1, 1, 1, 0, 0, 1, 0, 1, 0], [1, 1, 1, 0, 0, 1, 0, 0, 1],
+      [1, 1, 1, 0, 0, 0, 1, 1, 0], [1, 1, 1, 0, 0, 0, 1, 0, 1], [1, 1, 1, 0, 0, 0, 0, 1, 1],
+      [1, 1, 0, 1, 1, 1, 0, 0, 0], [1, 1, 0, 1, 1, 0, 1, 0, 0], [1, 1, 0, 1, 1, 0, 0, 1, 0],
+      [1, 1, 0, 1, 1, 0, 0, 0, 1], [1, 1, 0, 1, 0, 1, 1, 0, 0], [1, 1, 0, 1, 0, 1, 0, 1, 0],
+      [1, 1, 0, 1, 0, 1, 0, 0, 1], [1, 1, 0, 1, 0, 0, 1, 1, 0], [1, 1, 0, 1, 0, 0, 1, 0, 1],
+      [1, 1, 0, 1, 0, 0, 0, 1, 1], [1, 1, 0, 0, 1, 1, 1, 0, 0], [1, 1, 0, 0, 1, 1, 0, 1, 0],
+      [1, 1, 0, 0, 1, 1, 0, 0, 1], [1, 1, 0, 0, 1, 0, 1, 1, 0], [1, 1, 0, 0, 1, 0, 1, 0, 1],
+      [1, 1, 0, 0, 1, 0, 0, 1, 1], [1, 1, 0, 0, 0, 1, 1, 1, 0], [1, 1, 0, 0, 0, 1, 1, 0, 1],
+      [1, 1, 0, 0, 0, 1, 0, 1, 1], [1, 1, 0, 0, 0, 0, 1, 1, 1], [1, 0, 1, 1, 1, 1, 0, 0, 0],
+      [1, 0, 1, 1, 1, 0, 1, 0, 0], [1, 0, 1, 1, 1, 0, 0, 1, 0], [1, 0, 1, 1, 1, 0, 0, 0, 1],
+      [1, 0, 1, 1, 0, 1, 1, 0, 0], [1, 0, 1, 1, 0, 1, 0, 1, 0], [1, 0, 1, 1, 0, 1, 0, 0, 1],
+      [1, 0, 1, 1, 0, 0, 1, 1, 0], [1, 0, 1, 1, 0, 0, 1, 0, 1], [1, 0, 1, 1, 0, 0, 0, 1, 1],
+      [1, 0, 1, 0, 1, 1, 1, 0, 0], [1, 0, 1, 0, 1, 1, 0, 1, 0], [1, 0, 1, 0, 1, 1, 0, 0, 1],
+      [1, 0, 1, 0, 1, 0, 1, 1, 0], [1, 0, 1, 0, 1, 0, 1, 0, 1], [1, 0, 1, 0, 1, 0, 0, 1, 1],
+      [1, 0, 1, 0, 0, 1, 1, 1, 0], [1, 0, 1, 0, 0, 1, 1, 0, 1], [1, 0, 1, 0, 0, 1, 0, 1, 1],
+      [1, 0, 1, 0, 0, 0, 1, 1, 1], [1, 0, 0, 1, 1, 1, 1, 0, 0], [1, 0, 0, 1, 1, 1, 0, 1, 0],
+      [1, 0, 0, 1, 1, 1, 0, 0, 1], [1, 0, 0, 1, 1, 0, 1, 1, 0], [1, 0, 0, 1, 1, 0, 1, 0, 1],
+      [1, 0, 0, 1, 1, 0, 0, 1, 1], [1, 0, 0, 1, 0, 1, 1, 1, 0], [1, 0, 0, 1, 0, 1, 1, 0, 1],
+      [1, 0, 0, 1, 0, 1, 0, 1, 1], [1, 0, 0, 1, 0, 0, 1, 1, 1], [1, 0, 0, 0, 1, 1, 1, 1, 0],
+      [1, 0, 0, 0, 1, 1, 1, 0, 1], [1, 0, 0, 0, 1, 1, 0, 1, 1], [1, 0, 0, 0, 1, 0, 1, 1, 1],
+      [1, 0, 0, 0, 0, 1, 1, 1, 1], [0, 1, 1, 1, 1, 1, 0, 0, 0], [0, 1, 1, 1, 1, 0, 1, 0, 0],
+      [0, 1, 1, 1, 1, 0, 0, 1, 0], [0, 1, 1, 1, 1, 0, 0, 0, 1], [0, 1, 1, 1, 0, 1, 1, 0, 0],
+      [0, 1, 1, 1, 0, 1, 0, 1, 0], [0, 1, 1, 1, 0, 1, 0, 0, 1], [0, 1, 1, 1, 0, 0, 1, 1, 0],
+      [0, 1, 1, 1, 0, 0, 1, 0, 1], [0, 1, 1, 1, 0, 0, 0, 1, 1], [0, 1, 1, 0, 1, 1, 1, 0, 0],
+      [0, 1, 1, 0, 1, 1, 0, 1, 0], [0, 1, 1, 0, 1, 1, 0, 0, 1], [0, 1, 1, 0, 1, 0, 1, 1, 0],
+      [0, 1, 1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 1, 0, 0, 1, 1], [0, 1, 1, 0, 0, 1, 1, 1, 0],
+      [0, 1, 1, 0, 0, 1, 1, 0, 1], [0, 1, 1, 0, 0, 1, 0, 1, 1], [0, 1, 1, 0, 0, 0, 1, 1, 1],
+      [0, 1, 0, 1, 1, 1, 1, 0, 0], [0, 1, 0, 1, 1, 1, 0, 1, 0], [0, 1, 0, 1, 1, 1, 0, 0, 1],
+      [0, 1, 0, 1, 1, 0, 1, 1, 0], [0, 1, 0, 1, 1, 0, 1, 0, 1], [0, 1, 0, 1, 1, 0, 0, 1, 1],
+      [0, 1, 0, 1, 0, 1, 1, 1, 0], [0, 1, 0, 1, 0, 1, 1, 0, 1], [0, 1, 0, 1, 0, 1, 0, 1, 1],
+      [0, 1, 0, 1, 0, 0, 1, 1, 1], [0, 1, 0, 0, 1, 1, 1, 1, 0], [0, 1, 0, 0, 1, 1, 1, 0, 1],
+      [0, 1, 0, 0, 1, 1, 0, 1, 1], [0, 1, 0, 0, 1, 0, 1, 1, 1], [0, 1, 0, 0, 0, 1, 1, 1, 1],
+      [0, 0, 1, 1, 1, 1, 1, 0, 0], [0, 0, 1, 1, 1, 1, 0, 1, 0], [0, 0, 1, 1, 1, 1, 0, 0, 1],
+      [0, 0, 1, 1, 1, 0, 1, 1, 0], [0, 0, 1, 1, 1, 0, 1, 0, 1], [0, 0, 1, 1, 1, 0, 0, 1, 1],
+      [0, 0, 1, 1, 0, 1, 1, 1, 0], [0, 0, 1, 1, 0, 1, 1, 0, 1], [0, 0, 1, 1, 0, 1, 0, 1, 1],
+      [0, 0, 1, 1, 0, 0, 1, 1, 1], [0, 0, 1, 0, 1, 1, 1, 1, 0], [0, 0, 1, 0, 1, 1, 1, 0, 1],
+      [0, 0, 1, 0, 1, 1, 0, 1, 1], [0, 0, 1, 0, 1, 0, 1, 1, 1], [0, 0, 1, 0, 0, 1, 1, 1, 1],
+      [0, 0, 0, 1, 1, 1, 1, 1, 0], [0, 0, 0, 1, 1, 1, 1, 0, 1], [0, 0, 0, 1, 1, 1, 0, 1, 1],
+      [0, 0, 0, 1, 1, 0, 1, 1, 1], [0, 0, 0, 1, 0, 1, 1, 1, 1], [0, 0, 0, 0, 1, 1, 1, 1, 1],
     ]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1).validate()
     }
   }
 
@@ -367,53 +285,38 @@ final class LazySplitTests: XCTestCase {
   // More separators than elements.
   func testAllEEESSSSSS() {
     let permutations = [
-      [1, 1, 1, 0, 0, 0, 0, 0, 0], [1, 1, 0, 1, 0, 0, 0, 0, 0],
-      [1, 1, 0, 0, 1, 0, 0, 0, 0], [1, 1, 0, 0, 0, 1, 0, 0, 0],
-      [1, 1, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 0, 0, 0, 0, 1, 0],
-      [1, 1, 0, 0, 0, 0, 0, 0, 1], [1, 0, 1, 1, 0, 0, 0, 0, 0],
-      [1, 0, 1, 0, 1, 0, 0, 0, 0], [1, 0, 1, 0, 0, 1, 0, 0, 0],
-      [1, 0, 1, 0, 0, 0, 1, 0, 0], [1, 0, 1, 0, 0, 0, 0, 1, 0],
-      [1, 0, 1, 0, 0, 0, 0, 0, 1], [1, 0, 0, 1, 1, 0, 0, 0, 0],
-      [1, 0, 0, 1, 0, 1, 0, 0, 0], [1, 0, 0, 1, 0, 0, 1, 0, 0],
-      [1, 0, 0, 1, 0, 0, 0, 1, 0], [1, 0, 0, 1, 0, 0, 0, 0, 1],
-      [1, 0, 0, 0, 1, 1, 0, 0, 0], [1, 0, 0, 0, 1, 0, 1, 0, 0],
-      [1, 0, 0, 0, 1, 0, 0, 1, 0], [1, 0, 0, 0, 1, 0, 0, 0, 1],
-      [1, 0, 0, 0, 0, 1, 1, 0, 0], [1, 0, 0, 0, 0, 1, 0, 1, 0],
-      [1, 0, 0, 0, 0, 1, 0, 0, 1], [1, 0, 0, 0, 0, 0, 1, 1, 0],
-      [1, 0, 0, 0, 0, 0, 1, 0, 1], [1, 0, 0, 0, 0, 0, 0, 1, 1],
-      [0, 1, 1, 1, 0, 0, 0, 0, 0], [0, 1, 1, 0, 1, 0, 0, 0, 0],
-      [0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 1, 1, 0, 0, 0, 1, 0, 0],
-      [0, 1, 1, 0, 0, 0, 0, 1, 0], [0, 1, 1, 0, 0, 0, 0, 0, 1],
-      [0, 1, 0, 1, 1, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 0, 0],
-      [0, 1, 0, 1, 0, 0, 1, 0, 0], [0, 1, 0, 1, 0, 0, 0, 1, 0],
-      [0, 1, 0, 1, 0, 0, 0, 0, 1], [0, 1, 0, 0, 1, 1, 0, 0, 0],
-      [0, 1, 0, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 1, 0, 0, 1, 0],
-      [0, 1, 0, 0, 1, 0, 0, 0, 1], [0, 1, 0, 0, 0, 1, 1, 0, 0],
-      [0, 1, 0, 0, 0, 1, 0, 1, 0], [0, 1, 0, 0, 0, 1, 0, 0, 1],
-      [0, 1, 0, 0, 0, 0, 1, 1, 0], [0, 1, 0, 0, 0, 0, 1, 0, 1],
-      [0, 1, 0, 0, 0, 0, 0, 1, 1], [0, 0, 1, 1, 1, 0, 0, 0, 0],
-      [0, 0, 1, 1, 0, 1, 0, 0, 0], [0, 0, 1, 1, 0, 0, 1, 0, 0],
-      [0, 0, 1, 1, 0, 0, 0, 1, 0], [0, 0, 1, 1, 0, 0, 0, 0, 1],
-      [0, 0, 1, 0, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 0, 1, 0, 0],
-      [0, 0, 1, 0, 1, 0, 0, 1, 0], [0, 0, 1, 0, 1, 0, 0, 0, 1],
-      [0, 0, 1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 0, 0, 1, 0, 1, 0],
-      [0, 0, 1, 0, 0, 1, 0, 0, 1], [0, 0, 1, 0, 0, 0, 1, 1, 0],
-      [0, 0, 1, 0, 0, 0, 1, 0, 1], [0, 0, 1, 0, 0, 0, 0, 1, 1],
-      [0, 0, 0, 1, 1, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0, 1, 0, 0],
-      [0, 0, 0, 1, 1, 0, 0, 1, 0], [0, 0, 0, 1, 1, 0, 0, 0, 1],
-      [0, 0, 0, 1, 0, 1, 1, 0, 0], [0, 0, 0, 1, 0, 1, 0, 1, 0],
-      [0, 0, 0, 1, 0, 1, 0, 0, 1], [0, 0, 0, 1, 0, 0, 1, 1, 0],
-      [0, 0, 0, 1, 0, 0, 1, 0, 1], [0, 0, 0, 1, 0, 0, 0, 1, 1],
-      [0, 0, 0, 0, 1, 1, 1, 0, 0], [0, 0, 0, 0, 1, 1, 0, 1, 0],
-      [0, 0, 0, 0, 1, 1, 0, 0, 1], [0, 0, 0, 0, 1, 0, 1, 1, 0],
-      [0, 0, 0, 0, 1, 0, 1, 0, 1], [0, 0, 0, 0, 1, 0, 0, 1, 1],
-      [0, 0, 0, 0, 0, 1, 1, 1, 0], [0, 0, 0, 0, 0, 1, 1, 0, 1],
-      [0, 0, 0, 0, 0, 1, 0, 1, 1], [0, 0, 0, 0, 0, 0, 1, 1, 1],
+      [1, 1, 1, 0, 0, 0, 0, 0, 0], [1, 1, 0, 1, 0, 0, 0, 0, 0], [1, 1, 0, 0, 1, 0, 0, 0, 0],
+      [1, 1, 0, 0, 0, 1, 0, 0, 0], [1, 1, 0, 0, 0, 0, 1, 0, 0], [1, 1, 0, 0, 0, 0, 0, 1, 0],
+      [1, 1, 0, 0, 0, 0, 0, 0, 1], [1, 0, 1, 1, 0, 0, 0, 0, 0], [1, 0, 1, 0, 1, 0, 0, 0, 0],
+      [1, 0, 1, 0, 0, 1, 0, 0, 0], [1, 0, 1, 0, 0, 0, 1, 0, 0], [1, 0, 1, 0, 0, 0, 0, 1, 0],
+      [1, 0, 1, 0, 0, 0, 0, 0, 1], [1, 0, 0, 1, 1, 0, 0, 0, 0], [1, 0, 0, 1, 0, 1, 0, 0, 0],
+      [1, 0, 0, 1, 0, 0, 1, 0, 0], [1, 0, 0, 1, 0, 0, 0, 1, 0], [1, 0, 0, 1, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 1, 1, 0, 0, 0], [1, 0, 0, 0, 1, 0, 1, 0, 0], [1, 0, 0, 0, 1, 0, 0, 1, 0],
+      [1, 0, 0, 0, 1, 0, 0, 0, 1], [1, 0, 0, 0, 0, 1, 1, 0, 0], [1, 0, 0, 0, 0, 1, 0, 1, 0],
+      [1, 0, 0, 0, 0, 1, 0, 0, 1], [1, 0, 0, 0, 0, 0, 1, 1, 0], [1, 0, 0, 0, 0, 0, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 1, 1], [0, 1, 1, 1, 0, 0, 0, 0, 0], [0, 1, 1, 0, 1, 0, 0, 0, 0],
+      [0, 1, 1, 0, 0, 1, 0, 0, 0], [0, 1, 1, 0, 0, 0, 1, 0, 0], [0, 1, 1, 0, 0, 0, 0, 1, 0],
+      [0, 1, 1, 0, 0, 0, 0, 0, 1], [0, 1, 0, 1, 1, 0, 0, 0, 0], [0, 1, 0, 1, 0, 1, 0, 0, 0],
+      [0, 1, 0, 1, 0, 0, 1, 0, 0], [0, 1, 0, 1, 0, 0, 0, 1, 0], [0, 1, 0, 1, 0, 0, 0, 0, 1],
+      [0, 1, 0, 0, 1, 1, 0, 0, 0], [0, 1, 0, 0, 1, 0, 1, 0, 0], [0, 1, 0, 0, 1, 0, 0, 1, 0],
+      [0, 1, 0, 0, 1, 0, 0, 0, 1], [0, 1, 0, 0, 0, 1, 1, 0, 0], [0, 1, 0, 0, 0, 1, 0, 1, 0],
+      [0, 1, 0, 0, 0, 1, 0, 0, 1], [0, 1, 0, 0, 0, 0, 1, 1, 0], [0, 1, 0, 0, 0, 0, 1, 0, 1],
+      [0, 1, 0, 0, 0, 0, 0, 1, 1], [0, 0, 1, 1, 1, 0, 0, 0, 0], [0, 0, 1, 1, 0, 1, 0, 0, 0],
+      [0, 0, 1, 1, 0, 0, 1, 0, 0], [0, 0, 1, 1, 0, 0, 0, 1, 0], [0, 0, 1, 1, 0, 0, 0, 0, 1],
+      [0, 0, 1, 0, 1, 1, 0, 0, 0], [0, 0, 1, 0, 1, 0, 1, 0, 0], [0, 0, 1, 0, 1, 0, 0, 1, 0],
+      [0, 0, 1, 0, 1, 0, 0, 0, 1], [0, 0, 1, 0, 0, 1, 1, 0, 0], [0, 0, 1, 0, 0, 1, 0, 1, 0],
+      [0, 0, 1, 0, 0, 1, 0, 0, 1], [0, 0, 1, 0, 0, 0, 1, 1, 0], [0, 0, 1, 0, 0, 0, 1, 0, 1],
+      [0, 0, 1, 0, 0, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0, 1, 0, 0],
+      [0, 0, 0, 1, 1, 0, 0, 1, 0], [0, 0, 0, 1, 1, 0, 0, 0, 1], [0, 0, 0, 1, 0, 1, 1, 0, 0],
+      [0, 0, 0, 1, 0, 1, 0, 1, 0], [0, 0, 0, 1, 0, 1, 0, 0, 1], [0, 0, 0, 1, 0, 0, 1, 1, 0],
+      [0, 0, 0, 1, 0, 0, 1, 0, 1], [0, 0, 0, 1, 0, 0, 0, 1, 1], [0, 0, 0, 0, 1, 1, 1, 0, 0],
+      [0, 0, 0, 0, 1, 1, 0, 1, 0], [0, 0, 0, 0, 1, 1, 0, 0, 1], [0, 0, 0, 0, 1, 0, 1, 1, 0],
+      [0, 0, 0, 0, 1, 0, 1, 0, 1], [0, 0, 0, 0, 1, 0, 0, 1, 1], [0, 0, 0, 0, 0, 1, 1, 1, 0],
+      [0, 0, 0, 0, 0, 1, 1, 0, 1], [0, 0, 0, 0, 0, 1, 0, 1, 1], [0, 0, 0, 0, 0, 0, 1, 1, 1],
     ]
 
     for permutation in permutations {
-      Validator(subject: permutation, separator: .element(0), maxSplits: 1)
-        .validate()
+      Validator(subject: permutation, separator: .element(0), maxSplits: 1).validate()
     }
   }
 
@@ -424,11 +327,7 @@ final class LazySplitTests: XCTestCase {
   // The motivating example from
   // https://github.com/apple/swift-algorithms/issues/59.
   func testSplitFilenameComponents() {
-    Validator(
-      subject: "archive.tar.gz",
-      separator: .element("."),
-      maxSplits: 1
-    ).validate()
+    Validator(subject: "archive.tar.gz", separator: .element("."), maxSplits: 1).validate()
   }
 
   // Examples from documentation.
@@ -436,15 +335,12 @@ final class LazySplitTests: XCTestCase {
     // Closure version.
     let numbers = stride(from: 1, through: 16, by: 1)
     Validator(
-      subject: Array(numbers),
-      separator: .closure({ $0 % 3 == 0 || $0 % 5 == 0 }),
-      maxSplits: 1
+      subject: Array(numbers), separator: .closure({ $0 % 3 == 0 || $0 % 5 == 0 }), maxSplits: 1
     ).validate()
 
     // Equatable element version.
     let numbers2 = [1, 2, 0, 3, 4, 0, 0, 5]
-    Validator(subject: numbers2, separator: .element(0), maxSplits: 1)
-      .validate()
+    Validator(subject: numbers2, separator: .element(0), maxSplits: 1).validate()
   }
 
   func testCollectionDocExample() {
@@ -456,22 +352,17 @@ final class LazySplitTests: XCTestCase {
   // above. Preserved to ensure we're not losing any test coverage.
   func testVintagePatterns() {
     let pattern1 = [1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
-    Validator(subject: pattern1, separator: .element(42), maxSplits: 2)
-      .validate()
-    Validator(subject: pattern1, separator: .element(42), maxSplits: 0)
-      .validate()
+    Validator(subject: pattern1, separator: .element(42), maxSplits: 2).validate()
+    Validator(subject: pattern1, separator: .element(42), maxSplits: 0).validate()
 
     let pattern2 = [42, 1, 2, 42, 3, 4, 42, 5, 6, 42, 7]
-    Validator(subject: pattern2, separator: .element(42), maxSplits: 2)
-      .validate()
+    Validator(subject: pattern2, separator: .element(42), maxSplits: 2).validate()
 
     let pattern3 = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7]
-    Validator(subject: pattern3, separator: .element(42), maxSplits: 2)
-      .validate()
+    Validator(subject: pattern3, separator: .element(42), maxSplits: 2).validate()
 
     let pattern4 = [1, 2, 42, 3, 4, 42, 42, 5, 6, 42, 7, 42, 42, 42]
-    Validator(subject: pattern4, separator: .element(42), maxSplits: 1)
-      .validate()
+    Validator(subject: pattern4, separator: .element(42), maxSplits: 1).validate()
   }
 
   //===--------------------------------------------------------------------===//
@@ -507,8 +398,7 @@ final class LazySplitTests: XCTestCase {
   ///    determine the element--on which to split.
   ///  - maxSplits: The value to pass for `maxSplits` during validation. The
   ///    default value is also validated.
-  fileprivate struct Validator<C: Collection>
-  where C.Element: Equatable, C.SubSequence: Equatable {
+  fileprivate struct Validator<C: Collection> where C.Element: Equatable, C.SubSequence: Equatable {
     enum Separator {
       case element(C.Element)
       case closure((C.Element) -> Bool)
@@ -529,10 +419,8 @@ final class LazySplitTests: XCTestCase {
 
       var description: String {
         switch self {
-        case .provided(let value):
-          return "maxSplits: \(value)"
-        case .defaultValue:
-          return "maxSplits: default"
+        case .provided(let value): return "maxSplits: \(value)"
+        case .defaultValue: return "maxSplits: default"
         }
       }
     }
@@ -543,159 +431,108 @@ final class LazySplitTests: XCTestCase {
 
       var description: String {
         switch self {
-        case .provided(let value):
-          return "omittingEmptySubsequences: \(value)"
-        case .defaultValue:
-          return "omittingEmptySubsequences: default"
+        case .provided(let value): return "omittingEmptySubsequences: \(value)"
+        case .defaultValue: return "omittingEmptySubsequences: default"
         }
       }
     }
 
     private func failureMessage<L: LazySequenceProtocol, S: Sequence>(
-      actual: L,
-      expected: S,
-      maxSplits: MaxSplits,
+      actual: L, expected: S, maxSplits: MaxSplits,
       omittingEmptySubsequences: OmittingEmptySubsequences
     ) -> String {
       "for \(Array(subject).debugDescription), \(maxSplits), \(omittingEmptySubsequences): \(Array(actual).debugDescription) != \(Array(expected).debugDescription)"
     }
 
-    private func _validateAsSequence<T: Sequence>(_ s: T)
-    where T.Element == C.Element {
+    private func _validateAsSequence<T: Sequence>(_ s: T) where T.Element == C.Element {
       // Default max splits, omitting empty sequences
       switch separator {
       case let .element(element):
         let expected = s.split(separator: element).map { Array($0) }
         let actual = s.lazy.split(separator: element)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .defaultValue,
-            omittingEmptySubsequences: .defaultValue)
-        )
+            omittingEmptySubsequences: .defaultValue))
       case let .closure(closure):
         let expected = s.split(whereSeparator: closure).map { Array($0) }
         let actual = s.lazy.split(whereSeparator: closure)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .defaultValue,
-            omittingEmptySubsequences: .defaultValue)
-        )
+            omittingEmptySubsequences: .defaultValue))
       }
 
       // Provided max splits, omitting empty sequences
       switch separator {
       case let .element(element):
-        let expected = s.split(
-          separator: element,
-          maxSplits: maxSplits
-        ).map { Array($0) }
-        let actual = s.lazy.split(
-          separator: element,
-          maxSplits: maxSplits
-        )
+        let expected = s.split(separator: element, maxSplits: maxSplits).map { Array($0) }
+        let actual = s.lazy.split(separator: element, maxSplits: maxSplits)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
-            omittingEmptySubsequences: .defaultValue)
-        )
+            omittingEmptySubsequences: .defaultValue))
       case let .closure(closure):
-        let expected = s.split(
-          maxSplits: maxSplits,
-          whereSeparator: closure
-        ).map { Array($0) }
-        let actual = s.lazy.split(
-          maxSplits: maxSplits,
-          whereSeparator: closure
-        )
+        let expected = s.split(maxSplits: maxSplits, whereSeparator: closure).map { Array($0) }
+        let actual = s.lazy.split(maxSplits: maxSplits, whereSeparator: closure)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
-            omittingEmptySubsequences: .defaultValue)
-        )
+            omittingEmptySubsequences: .defaultValue))
       }
 
       // Default max splits, including empty sequences
       switch separator {
       case let .element(element):
-        let expected = s.split(
-          separator: element,
-          omittingEmptySubsequences: false
-        ).map { Array($0) }
-        let actual = s.lazy.split(
-          separator: element,
-          omittingEmptySubsequences: false
-        )
+        let expected = s.split(separator: element, omittingEmptySubsequences: false).map {
+          Array($0)
+        }
+        let actual = s.lazy.split(separator: element, omittingEmptySubsequences: false)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .defaultValue,
-            omittingEmptySubsequences: .provided(false))
-        )
+            omittingEmptySubsequences: .provided(false)))
       case let .closure(closure):
-        let expected = s.split(
-          omittingEmptySubsequences: false,
-          whereSeparator: closure
-        ).map { Array($0) }
-        let actual = s.lazy.split(
-          omittingEmptySubsequences: false,
-          whereSeparator: closure
-        )
+        let expected = s.split(omittingEmptySubsequences: false, whereSeparator: closure).map {
+          Array($0)
+        }
+        let actual = s.lazy.split(omittingEmptySubsequences: false, whereSeparator: closure)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .defaultValue,
-            omittingEmptySubsequences: .provided(false))
-        )
+            omittingEmptySubsequences: .provided(false)))
       }
 
       // Provided max splits, including empty sequences
       switch separator {
       case let .element(element):
         let expected = s.split(
-          separator: element,
-          maxSplits: maxSplits,
-          omittingEmptySubsequences: false
+          separator: element, maxSplits: maxSplits, omittingEmptySubsequences: false
         ).map { Array($0) }
         let actual = s.lazy.split(
-          separator: element,
-          maxSplits: maxSplits,
-          omittingEmptySubsequences: false
-        )
+          separator: element, maxSplits: maxSplits, omittingEmptySubsequences: false)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
-            omittingEmptySubsequences: .provided(false))
-        )
+            omittingEmptySubsequences: .provided(false)))
       case let .closure(closure):
         let expected = s.split(
-          maxSplits: maxSplits,
-          omittingEmptySubsequences: false,
-          whereSeparator: closure
+          maxSplits: maxSplits, omittingEmptySubsequences: false, whereSeparator: closure
         ).map { Array($0) }
         let actual = s.lazy.split(
-          maxSplits: maxSplits,
-          omittingEmptySubsequences: false,
-          whereSeparator: closure
-        )
+          maxSplits: maxSplits, omittingEmptySubsequences: false, whereSeparator: closure)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
-            omittingEmptySubsequences: .provided(false))
-        )
+            omittingEmptySubsequences: .provided(false)))
       }
     }
 
@@ -706,134 +543,82 @@ final class LazySplitTests: XCTestCase {
         let expected = c.split(separator: element)
         let actual = c.lazy.split(separator: element)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .defaultValue,
-            omittingEmptySubsequences: .defaultValue)
-        )
+            omittingEmptySubsequences: .defaultValue))
       case let .closure(closure):
         let expected = c.split(whereSeparator: closure)
         let actual = c.lazy.split(whereSeparator: closure)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .defaultValue,
-            omittingEmptySubsequences: .defaultValue)
-        )
+            omittingEmptySubsequences: .defaultValue))
       }
 
       // Provided max splits, omitting empty sequences
       switch separator {
       case let .element(element):
-        let expected = c.split(
-          separator: element,
-          maxSplits: maxSplits
-        )
-        let actual = c.lazy.split(
-          separator: element,
-          maxSplits: maxSplits
-        )
+        let expected = c.split(separator: element, maxSplits: maxSplits)
+        let actual = c.lazy.split(separator: element, maxSplits: maxSplits)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
-            omittingEmptySubsequences: .defaultValue)
-        )
+            omittingEmptySubsequences: .defaultValue))
       case let .closure(closure):
-        let expected = c.split(
-          maxSplits: maxSplits,
-          whereSeparator: closure
-        )
-        let actual = c.lazy.split(
-          maxSplits: maxSplits,
-          whereSeparator: closure
-        )
+        let expected = c.split(maxSplits: maxSplits, whereSeparator: closure)
+        let actual = c.lazy.split(maxSplits: maxSplits, whereSeparator: closure)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
-            omittingEmptySubsequences: .defaultValue)
-        )
+            omittingEmptySubsequences: .defaultValue))
       }
 
       // Default max splits, including empty sequences
       switch separator {
       case let .element(element):
-        let expected = c.split(
-          separator: element,
-          omittingEmptySubsequences: false
-        )
-        let actual = c.lazy.split(
-          separator: element,
-          omittingEmptySubsequences: false
-        )
+        let expected = c.split(separator: element, omittingEmptySubsequences: false)
+        let actual = c.lazy.split(separator: element, omittingEmptySubsequences: false)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .defaultValue,
-            omittingEmptySubsequences: .provided(false))
-        )
+            omittingEmptySubsequences: .provided(false)))
       case let .closure(closure):
-        let expected = c.split(
-          omittingEmptySubsequences: false,
-          whereSeparator: closure
-        )
-        let actual = c.lazy.split(
-          omittingEmptySubsequences: false,
-          whereSeparator: closure
-        )
+        let expected = c.split(omittingEmptySubsequences: false, whereSeparator: closure)
+        let actual = c.lazy.split(omittingEmptySubsequences: false, whereSeparator: closure)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .defaultValue,
-            omittingEmptySubsequences: .provided(false))
-        )
+            omittingEmptySubsequences: .provided(false)))
       }
 
       // Provided max splits, including empty sequences
       switch separator {
       case let .element(element):
         let expected = c.split(
-          separator: element,
-          maxSplits: maxSplits,
-          omittingEmptySubsequences: false
-        )
+          separator: element, maxSplits: maxSplits, omittingEmptySubsequences: false)
         let actual = c.lazy.split(
-          separator: element,
-          maxSplits: maxSplits,
-          omittingEmptySubsequences: false
-        )
+          separator: element, maxSplits: maxSplits, omittingEmptySubsequences: false)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
-            omittingEmptySubsequences: .provided(false))
-        )
+            omittingEmptySubsequences: .provided(false)))
       case let .closure(closure):
         let expected = c.split(
-          maxSplits: maxSplits,
-          omittingEmptySubsequences: false,
-          whereSeparator: closure
-        )
+          maxSplits: maxSplits, omittingEmptySubsequences: false, whereSeparator: closure)
         let actual = c.lazy.split(
-          maxSplits: maxSplits,
-          omittingEmptySubsequences: false,
-          whereSeparator: closure
-        )
+          maxSplits: maxSplits, omittingEmptySubsequences: false, whereSeparator: closure)
         XCTAssertEqualSequences(
-          expected,
-          actual,
+          expected, actual,
           failureMessage(
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
-            omittingEmptySubsequences: .provided(false))
-        )
+            omittingEmptySubsequences: .provided(false)))
       }
     }
   }

@@ -14,18 +14,12 @@ import XCTest
 @testable import Algorithms
 
 func validateRandomSamples<S: Sequence>(
-  _ samples: [Int: Int],
-  elements: S,
-  expectedValue: Int,
-  file: StaticString = #file, line: UInt = #line
+  _ samples: [Int: Int], elements: S, expectedValue: Int, file: StaticString = #file,
+  line: UInt = #line
 ) where S.Element == Int {
   let expectedRange = ((expectedValue / 3) * 2)...((expectedValue / 3) * 4)
-  XCTAssertEqualSequences(
-    samples.keys.sorted(), elements,
-    file: file, line: line)
-  for v in samples.values {
-    XCTAssert(expectedRange.contains(v), file: file, line: line)
-  }
+  XCTAssertEqualSequences(samples.keys.sorted(), elements, file: file, line: line)
+  for v in samples.values { XCTAssert(expectedRange.contains(v), file: file, line: line) }
 }
 
 private let n = 100
@@ -39,27 +33,21 @@ final class RandomSampleTests: XCTestCase {
     let samples: [Int: Int] = (0..<iterations).reduce(into: [:]) { result, _ in
       let sample = c.randomStableSample(count: k)
       XCTAssert(sample.isSorted())
-      for x in sample {
-        result[x, default: 0] += 1
-      }
+      for x in sample { result[x, default: 0] += 1 }
     }
     validateRandomSamples(samples, elements: c, expectedValue: (k * iterations) / n)
   }
 
   func testRandomSampleCollection() {
     let samples: [Int: Int] = (0..<iterations).reduce(into: [:]) { result, _ in
-      for x in c.randomSample(count: k) {
-        result[x, default: 0] += 1
-      }
+      for x in c.randomSample(count: k) { result[x, default: 0] += 1 }
     }
     validateRandomSamples(samples, elements: c, expectedValue: (k * iterations) / n)
   }
 
   func testRandomSampleSequence() {
     let samples: [Int: Int] = (0..<iterations).reduce(into: [:]) { result, _ in
-      for x in s.randomSample(count: k) {
-        result[x, default: 0] += 1
-      }
+      for x in s.randomSample(count: k) { result[x, default: 0] += 1 }
     }
     validateRandomSamples(samples, elements: s, expectedValue: (k * iterations) / n)
   }
@@ -99,9 +87,7 @@ final class RandomSampleTests: XCTestCase {
   }
 
   func testRandomSampleRandomEdgeCasesInternal() {
-    struct ZeroGenerator: RandomNumberGenerator {
-      mutating func next() -> UInt64 { 0 }
-    }
+    struct ZeroGenerator: RandomNumberGenerator { mutating func next() -> UInt64 { 0 } }
     var zero = ZeroGenerator()
     _ = nextOffset(w: 1, using: &zero)  // must not crash
 
@@ -109,9 +95,7 @@ final class RandomSampleTests: XCTestCase {
       private var forward: SplitMix64
       private var count: Int = 0
 
-      init(seed: UInt64) {
-        forward = SplitMix64(seed: seed)
-      }
+      init(seed: UInt64) { forward = SplitMix64(seed: seed) }
 
       mutating func next() -> UInt64 {
         defer { count &+= 1 }

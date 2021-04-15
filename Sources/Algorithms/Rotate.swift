@@ -29,9 +29,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Postcondition: For returned indices `(lower, upper)`:
   ///   `lower == limit || upper == limit`
-  @inlinable
-  @discardableResult
-  internal mutating func _reverse(
+  @inlinable @discardableResult internal mutating func _reverse(
     subrange: Range<Index>, until limit: Index
   ) -> (Index, Index) {
     var lower = subrange.lowerBound
@@ -56,8 +54,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   /// - Parameter subrange: The subrange of this collection to reverse.
   ///
   /// - Complexity: O(*n*), where *n* is the length of `subrange`.
-  @inlinable
-  public mutating func reverse(subrange: Range<Index>) {
+  @inlinable public mutating func reverse(subrange: Range<Index>) {
     if subrange.isEmpty { return }
     var lower = subrange.lowerBound
     var upper = subrange.upperBound
@@ -94,8 +91,7 @@ extension MutableCollection {
   ///   - distance(from: lhs.lowerBound, to: p) == distance(from:
   ///     rhs.lowerBound, to: q)
   ///   - p == lhs.upperBound || q == rhs.upperBound
-  @inlinable
-  internal mutating func _swapNonemptySubrangePrefixes(
+  @inlinable internal mutating func _swapNonemptySubrangePrefixes(
     _ lhs: Range<Index>, _ rhs: Range<Index>
   ) -> (Index, Index) {
     assert(!lhs.isEmpty)
@@ -132,11 +128,8 @@ extension MutableCollection {
   ///   `subrange` pre-rotation.
   ///
   /// - Complexity: O(*n*), where *n* is the length of `subrange`.
-  @inlinable
-  @discardableResult
-  public mutating func rotate(
-    subrange: Range<Index>,
-    toStartAt newStart: Index
+  @inlinable @discardableResult public mutating func rotate(
+    subrange: Range<Index>, toStartAt newStart: Index
   ) -> Index {
     var m = newStart
     var s = subrange.lowerBound
@@ -213,9 +206,7 @@ extension MutableCollection {
   /// - Returns: The new index of the element that was first pre-rotation.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
-  @inlinable
-  @discardableResult
-  public mutating func rotate(toStartAt newStart: Index) -> Index {
+  @inlinable @discardableResult public mutating func rotate(toStartAt newStart: Index) -> Index {
     rotate(subrange: startIndex..<endIndex, toStartAt: newStart)
   }
 }
@@ -242,11 +233,8 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///   `subrange` pre-rotation.
   ///
   /// - Complexity: O(*n*), where *n* is the length of `subrange`.
-  @inlinable
-  @discardableResult
-  public mutating func rotate(
-    subrange: Range<Index>,
-    toStartAt newStart: Index
+  @inlinable @discardableResult public mutating func rotate(
+    subrange: Range<Index>, toStartAt newStart: Index
   ) -> Index {
     reverse(subrange: subrange.lowerBound..<newStart)
     reverse(subrange: newStart..<subrange.upperBound)
@@ -273,9 +261,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   /// - Returns: The new index of the element that was first pre-rotation.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
-  @inlinable
-  @discardableResult
-  public mutating func rotate(toStartAt newStart: Index) -> Index {
+  @inlinable @discardableResult public mutating func rotate(toStartAt newStart: Index) -> Index {
     rotate(subrange: startIndex..<endIndex, toStartAt: newStart)
   }
 }
@@ -283,18 +269,11 @@ extension MutableCollection where Self: BidirectionalCollection {
 // Deprecations
 
 extension MutableCollection {
-  @available(*, deprecated, renamed: "rotate(subrange:toStartAt:)")
-  @discardableResult
-  public mutating func rotate(
-    subrange: Range<Index>,
-    at newStart: Index
-  ) -> Index {
+  @available(*, deprecated, renamed: "rotate(subrange:toStartAt:)") @discardableResult
+  public mutating func rotate(subrange: Range<Index>, at newStart: Index) -> Index {
     rotate(subrange: subrange, toStartAt: newStart)
   }
 
-  @available(*, deprecated, renamed: "rotate(toStartAt:)")
-  @discardableResult
-  public mutating func rotate(at newStart: Index) -> Index {
-    rotate(toStartAt: newStart)
-  }
+  @available(*, deprecated, renamed: "rotate(toStartAt:)") @discardableResult
+  public mutating func rotate(at newStart: Index) -> Index { rotate(toStartAt: newStart) }
 }

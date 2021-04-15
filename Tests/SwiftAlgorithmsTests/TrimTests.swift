@@ -21,9 +21,7 @@ final class TrimTests: XCTestCase {
 
   func testNoMatch() {
     // No match (nothing trimmed).
-    let results_nomatch = [1, 3, 5, 7, 9, 11, 13, 15].trimming {
-      $0.isMultiple(of: 2)
-    }
+    let results_nomatch = [1, 3, 5, 7, 9, 11, 13, 15].trimming { $0.isMultiple(of: 2) }
     XCTAssertEqual(results_nomatch, [1, 3, 5, 7, 9, 11, 13, 15])
   }
 

@@ -11,25 +11,20 @@
 
 extension Sequence {
   /// Implementation for min(count:areInIncreasingOrder:)
-  @inlinable
-  internal func _minImplementation(
-    count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
+  @inlinable internal func _minImplementation(
+    count: Int, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> [Element] {
     var iterator = makeIterator()
 
     var result: [Element] = []
     result.reserveCapacity(count)
-    while result.count < count, let e = iterator.next() {
-      result.append(e)
-    }
+    while result.count < count, let e = iterator.next() { result.append(e) }
     try result.sort(by: areInIncreasingOrder)
 
     while let e = iterator.next() {
       // To be part of `result`, `e` must be strictly less than `result.last`.
       guard try areInIncreasingOrder(e, result.last!) else { continue }
-      let insertionIndex =
-        try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
+      let insertionIndex = try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
 
       assert(insertionIndex != result.endIndex)
       result.removeLast()
@@ -40,25 +35,20 @@ extension Sequence {
   }
 
   /// Implementation for max(count:areInIncreasingOrder:)
-  @inlinable
-  internal func _maxImplementation(
-    count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
+  @inlinable internal func _maxImplementation(
+    count: Int, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> [Element] {
     var iterator = makeIterator()
 
     var result: [Element] = []
     result.reserveCapacity(count)
-    while result.count < count, let e = iterator.next() {
-      result.append(e)
-    }
+    while result.count < count, let e = iterator.next() { result.append(e) }
     try result.sort(by: areInIncreasingOrder)
 
     while let e = iterator.next() {
       // To be part of `result`, `e` must be greater/equal to `result.first`.
       guard try !areInIncreasingOrder(e, result.first!) else { continue }
-      let insertionIndex =
-        try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
+      let insertionIndex = try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
 
       assert(insertionIndex > 0)
       // Inserting `e` and then removing the first element (or vice versa)
@@ -102,22 +92,17 @@ extension Sequence {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   sequence and *k* is `count`.
-  @inlinable
-  public func min(
-    count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
+  @inlinable public func min(
+    count: Int, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> [Element] {
     precondition(
       count >= 0,
       """
       Cannot find a minimum with a negative count of elements!
-      """
-    )
+      """)
 
     // Do nothing if we're prefixing nothing.
-    guard count > 0 else {
-      return []
-    }
+    guard count > 0 else { return [] }
 
     return try _minImplementation(count: count, sortedBy: areInIncreasingOrder)
   }
@@ -149,22 +134,17 @@ extension Sequence {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   sequence and *k* is `count`.
-  @inlinable
-  public func max(
-    count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
+  @inlinable public func max(
+    count: Int, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> [Element] {
     precondition(
       count >= 0,
       """
       Cannot find a maximum with a negative count of elements!
-      """
-    )
+      """)
 
     // Do nothing if we're suffixing nothing.
-    guard count > 0 else {
-      return []
-    }
+    guard count > 0 else { return [] }
 
     return try _maxImplementation(count: count, sortedBy: areInIncreasingOrder)
   }
@@ -192,10 +172,7 @@ extension Sequence where Element: Comparable {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   sequence and *k* is `count`.
-  @inlinable
-  public func min(count: Int) -> [Element] {
-    return min(count: count, sortedBy: <)
-  }
+  @inlinable public func min(count: Int) -> [Element] { return min(count: count, sortedBy: <) }
 
   /// Returns the largest elements of this sequence.
   ///
@@ -218,10 +195,7 @@ extension Sequence where Element: Comparable {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   sequence and *k* is `count`.
-  @inlinable
-  public func max(count: Int) -> [Element] {
-    return max(count: count, sortedBy: <)
-  }
+  @inlinable public func max(count: Int) -> [Element] { return max(count: count, sortedBy: <) }
 }
 
 extension Collection {
@@ -252,22 +226,17 @@ extension Collection {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   collection and *k* is `count`.
-  @inlinable
-  public func min(
-    count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
+  @inlinable public func min(
+    count: Int, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> [Element] {
     precondition(
       count >= 0,
       """
       Cannot find a minimum with a negative count of elements!
-      """
-    )
+      """)
 
     // Do nothing if we're prefixing nothing.
-    guard count > 0 else {
-      return []
-    }
+    guard count > 0 else { return [] }
 
     // Make sure we are within bounds.
     let prefixCount = Swift.min(count, self.count)
@@ -308,22 +277,17 @@ extension Collection {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   collection and *k* is `count`.
-  @inlinable
-  public func max(
-    count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
+  @inlinable public func max(
+    count: Int, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> [Element] {
     precondition(
       count >= 0,
       """
       Cannot find a maximum with a negative count of elements!
-      """
-    )
+      """)
 
     // Do nothing if we're suffixing nothing.
-    guard count > 0 else {
-      return []
-    }
+    guard count > 0 else { return [] }
 
     // Make sure we are within bounds.
     let suffixCount = Swift.min(count, self.count)
@@ -360,10 +324,7 @@ extension Collection where Element: Comparable {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   collection and *k* is `count`.
-  @inlinable
-  public func min(count: Int) -> [Element] {
-    return min(count: count, sortedBy: <)
-  }
+  @inlinable public func min(count: Int) -> [Element] { return min(count: count, sortedBy: <) }
 
   /// Returns the largest elements of this collection.
   ///
@@ -386,8 +347,5 @@ extension Collection where Element: Comparable {
   ///
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   collection and *k* is `count`.
-  @inlinable
-  public func max(count: Int) -> [Element] {
-    return max(count: count, sortedBy: <)
-  }
+  @inlinable public func max(count: Int) -> [Element] { return max(count: count, sortedBy: <) }
 }

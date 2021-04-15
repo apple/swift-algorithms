@@ -29,11 +29,9 @@ final class PermutationsTests: XCTestCase {
     }
 
     func ts<R: RangeExpression>(count: R) where R.Bound == Int {
-      let p = count.relative(to: 0 ..< .max)
-        .clamped(to: 0..<c.count + 1)
-        .flatMap {
-          c.permutations(ofCount: $0)
-        }
+      let p = count.relative(to: 0 ..< .max).clamped(to: 0..<c.count + 1).flatMap {
+        c.permutations(ofCount: $0)
+      }
 
       let p2 = c.permutations(ofCount: count)
 
@@ -102,9 +100,7 @@ final class PermutationsTests: XCTestCase {
     XCTAssertEqual([1, 2, 3, 4, 5, 6, 7], numbers)
   }
 
-  func testPermutationsLazy() {
-    XCTAssertLazySequence("ABCD".lazy.permutations(ofCount: 2))
-  }
+  func testPermutationsLazy() { XCTAssertLazySequence("ABCD".lazy.permutations(ofCount: 2)) }
 
   func testDocumentationExample1() {
     // From Guides/Permutations.md
@@ -112,14 +108,7 @@ final class PermutationsTests: XCTestCase {
     let permutations = numbers.permutations()
     XCTAssertEqualSequences(
       permutations,
-      [
-        [10, 20, 30],
-        [10, 30, 20],
-        [20, 10, 30],
-        [20, 30, 10],
-        [30, 10, 20],
-        [30, 20, 10],
-      ])
+      [[10, 20, 30], [10, 30, 20], [20, 10, 30], [20, 30, 10], [30, 10, 20], [30, 20, 10]])
   }
 
   func testDocumentationExample2() {
@@ -127,15 +116,7 @@ final class PermutationsTests: XCTestCase {
     let numbers = [10, 20, 30]
     let permutations = numbers.permutations(ofCount: 2)
     XCTAssertEqualSequences(
-      permutations,
-      [
-        [10, 20],
-        [10, 30],
-        [20, 10],
-        [20, 30],
-        [30, 10],
-        [30, 20],
-      ])
+      permutations, [[10, 20], [10, 30], [20, 10], [20, 30], [30, 10], [30, 20]])
   }
 
   func testDocumentationExample3() {
@@ -144,14 +125,7 @@ final class PermutationsTests: XCTestCase {
     let permutations = numbers2.permutations()
     XCTAssertEqualSequences(
       permutations,
-      [
-        [20, 10, 10],
-        [20, 10, 10],
-        [10, 20, 10],
-        [10, 10, 20],
-        [10, 20, 10],
-        [10, 10, 20],
-      ])
+      [[20, 10, 10], [20, 10, 10], [10, 20, 10], [10, 10, 20], [10, 20, 10], [10, 10, 20]])
   }
 
   func testDocumentationExample4() {
@@ -161,22 +135,8 @@ final class PermutationsTests: XCTestCase {
     XCTAssertEqualSequences(
       permutations,
       [
-        [],
-        [10],
-        [20],
-        [30],
-        [10, 20],
-        [10, 30],
-        [20, 10],
-        [20, 30],
-        [30, 10],
-        [30, 20],
-        [10, 20, 30],
-        [10, 30, 20],
-        [20, 10, 30],
-        [20, 30, 10],
-        [30, 10, 20],
-        [30, 20, 10],
+        [], [10], [20], [30], [10, 20], [10, 30], [20, 10], [20, 30], [30, 10], [30, 20],
+        [10, 20, 30], [10, 30, 20], [20, 10, 30], [20, 30, 10], [30, 10, 20], [30, 20, 10],
       ])
   }
 
@@ -187,12 +147,8 @@ final class PermutationsTests: XCTestCase {
     XCTAssertEqualSequences(
       permutations,
       [
-        ["Alex", "Celeste"],
-        ["Alex", "Davide"],
-        ["Celeste", "Alex"],
-        ["Celeste", "Davide"],
-        ["Davide", "Alex"],
-        ["Davide", "Celeste"],
+        ["Alex", "Celeste"], ["Alex", "Davide"], ["Celeste", "Alex"], ["Celeste", "Davide"],
+        ["Davide", "Alex"], ["Davide", "Celeste"],
       ])
   }
 
@@ -203,15 +159,8 @@ final class PermutationsTests: XCTestCase {
     XCTAssertEqualSequences(
       permutations,
       [
-        ["Alex"],
-        ["Celeste"],
-        ["Davide"],
-        ["Alex", "Celeste"],
-        ["Alex", "Davide"],
-        ["Celeste", "Alex"],
-        ["Celeste", "Davide"],
-        ["Davide", "Alex"],
-        ["Davide", "Celeste"],
+        ["Alex"], ["Celeste"], ["Davide"], ["Alex", "Celeste"], ["Alex", "Davide"],
+        ["Celeste", "Alex"], ["Celeste", "Davide"], ["Davide", "Alex"], ["Davide", "Celeste"],
       ])
   }
 }

@@ -21,29 +21,21 @@ extension MutableCollection {
   /// - Complexity: O(*n* log *n*), where *n* is the number of elements.
   /// - Precondition:
   ///   `n == distance(from: range.lowerBound, to: range.upperBound)`
-  @inlinable
-  internal mutating func stablePartition(
-    count n: Int,
-    subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws -> Bool
+  @inlinable internal mutating func stablePartition(
+    count n: Int, subrange: Range<Index>, by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     if n == 0 { return subrange.lowerBound }
     if n == 1 {
       return try belongsInSecondPartition(self[subrange.lowerBound])
-        ? subrange.lowerBound
-        : subrange.upperBound
+        ? subrange.lowerBound : subrange.upperBound
     }
 
     let h = n / 2
     let i = index(subrange.lowerBound, offsetBy: h)
     let j = try stablePartition(
-      count: h,
-      subrange: subrange.lowerBound..<i,
-      by: belongsInSecondPartition)
+      count: h, subrange: subrange.lowerBound..<i, by: belongsInSecondPartition)
     let k = try stablePartition(
-      count: n - h,
-      subrange: i..<subrange.upperBound,
-      by: belongsInSecondPartition)
+      count: n - h, subrange: i..<subrange.upperBound, by: belongsInSecondPartition)
     return rotate(subrange: j..<k, toStartAt: i)
   }
 
@@ -58,14 +50,11 @@ extension MutableCollection {
   ///     all elements not satisfying it.
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
-  @inlinable
-  public mutating func stablePartition(
-    subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws -> Bool
+  @inlinable public mutating func stablePartition(
+    subrange: Range<Index>, by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     try stablePartition(
-      count: distance(from: subrange.lowerBound, to: subrange.upperBound),
-      subrange: subrange,
+      count: distance(from: subrange.lowerBound, to: subrange.upperBound), subrange: subrange,
       by: belongsInSecondPartition)
   }
 
@@ -78,13 +67,10 @@ extension MutableCollection {
   ///   all elements not satisfying it.
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
-  @inlinable
-  public mutating func stablePartition(
+  @inlinable public mutating func stablePartition(
     by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
-    try stablePartition(
-      subrange: startIndex..<endIndex,
-      by: belongsInSecondPartition)
+    try stablePartition(subrange: startIndex..<endIndex, by: belongsInSecondPartition)
   }
 }
 
@@ -97,15 +83,14 @@ extension MutableCollection {
   /// collection, returning the start position of the resulting suffix.
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
-  @inlinable
-  public mutating func partition(
-    subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws -> Bool
+  @inlinable public mutating func partition(
+    subrange: Range<Index>, by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     // This version of `partition(subrange:)` is half stable; the elements in
     // the first partition retain their original relative order.
-    guard var i = try self[subrange].firstIndex(where: belongsInSecondPartition)
-    else { return subrange.upperBound }
+    guard var i = try self[subrange].firstIndex(where: belongsInSecondPartition) else {
+      return subrange.upperBound
+    }
 
     var j = index(after: i)
     while j != subrange.upperBound {
@@ -125,10 +110,8 @@ extension MutableCollection where Self: BidirectionalCollection {
   /// collection, returning the start position of the resulting suffix.
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
-  @inlinable
-  public mutating func partition(
-    subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws -> Bool
+  @inlinable public mutating func partition(
+    subrange: Range<Index>, by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     var lo = subrange.lowerBound
     var hi = subrange.upperBound
@@ -184,10 +167,9 @@ extension Collection {
   ///
   /// - Complexity: O(log *n*), where *n* is the length of this collection if
   ///   the collection conforms to `RandomAccessCollection`, otherwise O(*n*).
-  @inlinable
-  public func partitioningIndex(
-    where belongsInSecondPartition: (Element) throws -> Bool
-  ) rethrows -> Index {
+  @inlinable public func partitioningIndex(where belongsInSecondPartition: (Element) throws -> Bool)
+    rethrows -> Index
+  {
     var n = count
     var l = startIndex
 

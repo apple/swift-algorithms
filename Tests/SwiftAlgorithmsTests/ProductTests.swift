@@ -16,9 +16,7 @@ import XCTest
 final class ProductTests: XCTestCase {
   func testProduct() {
     XCTAssertEqualSequences(
-      [(1, "A" as Character), (1, "B"), (2, "A"), (2, "B")],
-      product(1...2, "AB"),
-      by: ==)
+      [(1, "A" as Character), (1, "B"), (2, "A"), (2, "B")], product(1...2, "AB"), by: ==)
 
     XCTAssertEqualSequences(product(1...10, ""), [], by: ==)
     XCTAssertEqualSequences(product("", 1...10), [], by: ==)
@@ -26,9 +24,8 @@ final class ProductTests: XCTestCase {
 
   func testProductReversed() {
     XCTAssertEqualSequences(
-      [(2, "B" as Character), (2, "A"), (1, "B"), (1, "A")],
-      product(1...2, "AB").reversed(),
-      by: ==)
+      [(2, "B" as Character), (2, "A"), (1, "B"), (1, "A")], product(1...2, "AB").reversed(), by: ==
+    )
 
     XCTAssertEqualSequences(product(1...10, "").reversed(), [], by: ==)
     XCTAssertEqualSequences(product("", 1...10).reversed(), [], by: ==)
@@ -41,15 +38,10 @@ final class ProductTests: XCTestCase {
 
   func testProductIndexTraversals() {
     validateIndexTraversals(
-      product([1, 2, 3, 4], "abc"),
-      product([1, 2, 3, 4], ""),
-      product([], "abc"),
-      product([], ""),
+      product([1, 2, 3, 4], "abc"), product([1, 2, 3, 4], ""), product([], "abc"), product([], ""),
       indices: { product in
         product.base1.indices.flatMap { i1 in
-          product.base2.indices.map { i2 in
-            .init(i1: i1, i2: i2)
-          }
+          product.base2.indices.map { i2 in .init(i1: i1, i2: i2) }
         } + [.init(i1: product.base1.endIndex, i2: product.base2.startIndex)]
       })
   }

@@ -38,13 +38,9 @@ final class ChainTests: XCTestCase {
 
   func testChainIndexTraversals() {
     validateIndexTraversals(
-      chain("abcd", "XYZ"),
-      chain("abcd", ""),
-      chain("", "XYZ"),
-      chain("", ""),
+      chain("abcd", "XYZ"), chain("abcd", ""), chain("", "XYZ"), chain("", ""),
       indices: { chain in
-        chain.base1.indices.map { .init(first: $0) }
-          + chain.base2.indices.map { .init(second: $0) }
+        chain.base1.indices.map { .init(first: $0) } + chain.base2.indices.map { .init(second: $0) }
           + [.init(second: chain.base2.endIndex)]
       })
   }

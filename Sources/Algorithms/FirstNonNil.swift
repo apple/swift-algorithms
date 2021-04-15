@@ -30,14 +30,8 @@ extension Sequence {
   ///
   /// - Complexity: O(*n*), where *n* is the number of elements at the start of
   ///   the sequence that result in `nil` when applying the transformation.
-  public func firstNonNil<Result>(
-    _ transform: (Element) throws -> Result?
-  ) rethrows -> Result? {
-    for value in self {
-      if let value = try transform(value) {
-        return value
-      }
-    }
+  public func firstNonNil<Result>(_ transform: (Element) throws -> Result?) rethrows -> Result? {
+    for value in self { if let value = try transform(value) { return value } }
     return nil
   }
 }

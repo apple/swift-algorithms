@@ -14,24 +14,16 @@ import XCTest
 
 final class ChunkedTests: XCTestCase {
   let fruits = [
-    "Apple", "Apricot", "Avocado", "Banana",
-    "Bilberry", "Blackberry", "Blackcurrant", "Blueberry",
-    "Currant", "Cherry", "Cherimoya", "Clementine",
-    "Date", "Damson", "Dragonfruit", "Durian",
-    "Eggplant", "Elderberry", "Feijoa",
-    "Grape", "Grapefruit", "Guava",
+    "Apple", "Apricot", "Avocado", "Banana", "Bilberry", "Blackberry", "Blackcurrant", "Blueberry",
+    "Currant", "Cherry", "Cherimoya", "Clementine", "Date", "Damson", "Dragonfruit", "Durian",
+    "Eggplant", "Elderberry", "Feijoa", "Grape", "Grapefruit", "Guava",
   ]
 
   func validateFruitChunks<C: BidirectionalCollection>(_ fruitChunks: C)
   where C.Element == ArraySlice<String> {
     let expectedChunks: [ArraySlice<String>] = [
-      fruits[0..<3],
-      fruits[3..<8],
-      fruits[8..<12],
-      fruits[12..<16],
-      fruits[16..<18],
-      fruits[18..<19],
-      fruits[19..<22],
+      fruits[0..<3], fruits[3..<8], fruits[8..<12], fruits[12..<16], fruits[16..<18],
+      fruits[18..<19], fruits[19..<22],
     ]
     XCTAssertEqualSequences(expectedChunks, fruitChunks, by: ==)
 
@@ -85,22 +77,15 @@ final class ChunkedTests: XCTestCase {
 
     let collection1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     XCTAssertEqualSequences(
-      collection1.chunks(ofCount: 1),
-      [[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]])
+      collection1.chunks(ofCount: 1), [[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]])
     XCTAssertEqualSequences(
-      collection1.chunks(ofCount: 3),
-      [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
-    XCTAssertEqualSequences(
-      collection1.chunks(ofCount: 5),
-      [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-    XCTAssertEqualSequences(
-      collection1.chunks(ofCount: 11),
-      [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
+      collection1.chunks(ofCount: 3), [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
+    XCTAssertEqualSequences(collection1.chunks(ofCount: 5), [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+    XCTAssertEqualSequences(collection1.chunks(ofCount: 11), [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
 
     let collection2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     XCTAssertEqualSequences(
-      collection2.chunks(ofCount: 3),
-      [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]])
+      collection2.chunks(ofCount: 3), [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]])
   }
 
   func testChunksOfCountBidirectional() {
@@ -110,19 +95,15 @@ final class ChunkedTests: XCTestCase {
       collection1.chunks(ofCount: 1).reversed(),
       [[10], [9], [8], [7], [6], [5], [4], [3], [2], [1]])
     XCTAssertEqualSequences(
-      collection1.chunks(ofCount: 3).reversed(),
-      [[10], [7, 8, 9], [4, 5, 6], [1, 2, 3]])
+      collection1.chunks(ofCount: 3).reversed(), [[10], [7, 8, 9], [4, 5, 6], [1, 2, 3]])
     XCTAssertEqualSequences(
-      collection1.chunks(ofCount: 5).reversed(),
-      [[6, 7, 8, 9, 10], [1, 2, 3, 4, 5]])
+      collection1.chunks(ofCount: 5).reversed(), [[6, 7, 8, 9, 10], [1, 2, 3, 4, 5]])
     XCTAssertEqualSequences(
-      collection1.chunks(ofCount: 11).reversed(),
-      [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
+      collection1.chunks(ofCount: 11).reversed(), [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
 
     let collection2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     XCTAssertEqualSequences(
-      collection2.chunks(ofCount: 3).reversed(),
-      [[10, 11], [7, 8, 9], [4, 5, 6], [1, 2, 3]])
+      collection2.chunks(ofCount: 3).reversed(), [[10, 11], [7, 8, 9], [4, 5, 6], [1, 2, 3]])
   }
 
   func testChunksOfCountCount() {

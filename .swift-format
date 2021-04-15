@@ -14,7 +14,7 @@
   "lineLength" : 100,
   "maximumBlankLines" : 1,
   "prioritizeKeepingFunctionOutputTogether" : false,
-  "respectsExistingLineBreaks" : true,
+  "respectsExistingLineBreaks" : false,
   "rules" : {
     "AllPublicDeclarationsHaveDocumentation" : false,
     "AlwaysUseLowerCamelCase" : true,

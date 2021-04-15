@@ -16,9 +16,7 @@ final class CycleTests: XCTestCase {
   func testCycle() {
     let cycle = (1...4).cycled()
     XCTAssertEqualSequences(
-      [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
-      cycle.prefix(20)
-    )
+      [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4], cycle.prefix(20))
   }
 
   func testCycleClosedRangePrefix() {
@@ -31,15 +29,11 @@ final class CycleTests: XCTestCase {
     XCTAssert(empty.isEmpty)
   }
 
-  func testCycleLazy() {
-    XCTAssertLazySequence((1...4).lazy.cycled())
-  }
+  func testCycleLazy() { XCTAssertLazySequence((1...4).lazy.cycled()) }
 
   func testRepeated() {
     let repeats = (1...4).cycled(times: 3)
-    XCTAssertEqualSequences(
-      [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
-      repeats)
+    XCTAssertEqualSequences([1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4], repeats)
   }
 
   func testRepeatedClosedRange() {
@@ -57,9 +51,7 @@ final class CycleTests: XCTestCase {
     XCTAssert(empty2.isEmpty)
   }
 
-  func testRepeatedLazy() {
-    XCTAssertLazySequence((1...4).lazy.cycled(times: 3))
-  }
+  func testRepeatedLazy() { XCTAssertLazySequence((1...4).lazy.cycled(times: 3)) }
 
   func testRepeatedIndexMethods() {
     let cycle = (1..<5).cycled(times: 2)
@@ -73,9 +65,7 @@ final class CycleTests: XCTestCase {
     nextIndex = cycle.index(nextIndex, offsetBy: 2, limitedBy: cycle.endIndex)!
     XCTAssertEqual(cycle.distance(from: startIndex, to: nextIndex), 8)
 
-    let outOfBounds = cycle.index(
-      nextIndex, offsetBy: 1,
-      limitedBy: cycle.endIndex)
+    let outOfBounds = cycle.index(nextIndex, offsetBy: 1, limitedBy: cycle.endIndex)
     XCTAssertNil(outOfBounds)
 
     let previousIndex = cycle.index(before: nextIndex)

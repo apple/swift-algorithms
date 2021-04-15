@@ -20,9 +20,8 @@ final class SortedPrefixTests: XCTestCase {
     XCTAssertEqualSequences(min, 0..<5)
 
     // Stability with all equal values
-    let maxZeroes = Array(repeating: 0, count: 100)
-      .enumerated()
-      .max(count: 5, sortedBy: { $0.element < $1.element })
+    let maxZeroes = Array(repeating: 0, count: 100).enumerated().max(
+      count: 5, sortedBy: { $0.element < $1.element })
     XCTAssertEqualSequences(maxZeroes.map { $0.offset }, 95..<100)
   }
 
@@ -33,9 +32,8 @@ final class SortedPrefixTests: XCTestCase {
     XCTAssertEqualSequences(max, 10..<15)
 
     // Stability with all equal values
-    let maxZeroes = Array(repeating: 0, count: 100)
-      .enumerated()
-      .max(count: 5, sortedBy: { $0.element < $1.element })
+    let maxZeroes = Array(repeating: 0, count: 100).enumerated().max(
+      count: 5, sortedBy: { $0.element < $1.element })
     XCTAssertEqualSequences(maxZeroes.map { $0.offset }, 95..<100)
   }
 
@@ -84,21 +82,13 @@ final class SortedPrefixTests: XCTestCase {
     XCTAssertEqual(input.min(count: 1, sortedBy: >), [range.upperBound])
 
     XCTAssertEqualSequences(input.min(count: 5, sortedBy: <), range.prefix(5))
-    XCTAssertEqualSequences(
-      input.min(count: 5, sortedBy: >),
-      range.suffix(5).reversed())
+    XCTAssertEqualSequences(input.min(count: 5, sortedBy: >), range.suffix(5).reversed())
 
-    XCTAssertEqualSequences(
-      input.min(count: 500, sortedBy: <),
-      range.prefix(500))
-    XCTAssertEqualSequences(
-      input.min(count: 500, sortedBy: >),
-      range.suffix(500).reversed())
+    XCTAssertEqualSequences(input.min(count: 500, sortedBy: <), range.prefix(500))
+    XCTAssertEqualSequences(input.min(count: 500, sortedBy: >), range.suffix(500).reversed())
 
     XCTAssertEqualSequences(input.min(count: 1000, sortedBy: <), range)
-    XCTAssertEqualSequences(
-      input.min(count: 1000, sortedBy: >),
-      range.reversed())
+    XCTAssertEqualSequences(input.min(count: 1000, sortedBy: >), range.reversed())
   }
 
   func testMaxCountWithHugeInput() {
@@ -112,21 +102,13 @@ final class SortedPrefixTests: XCTestCase {
     XCTAssertEqual(input.max(count: 1, sortedBy: >), [range.lowerBound])
 
     XCTAssertEqualSequences(input.max(count: 5, sortedBy: <), range.suffix(5))
-    XCTAssertEqualSequences(
-      input.max(count: 5, sortedBy: >),
-      range.prefix(5).reversed())
+    XCTAssertEqualSequences(input.max(count: 5, sortedBy: >), range.prefix(5).reversed())
 
-    XCTAssertEqualSequences(
-      input.max(count: 500, sortedBy: <),
-      range.suffix(500))
-    XCTAssertEqualSequences(
-      input.max(count: 500, sortedBy: >),
-      range.prefix(500).reversed())
+    XCTAssertEqualSequences(input.max(count: 500, sortedBy: <), range.suffix(500))
+    XCTAssertEqualSequences(input.max(count: 500, sortedBy: >), range.prefix(500).reversed())
 
     XCTAssertEqualSequences(input.max(count: 1000, sortedBy: <), range)
-    XCTAssertEqualSequences(
-      input.max(count: 1000, sortedBy: >),
-      range.reversed())
+    XCTAssertEqualSequences(input.max(count: 1000, sortedBy: >), range.reversed())
   }
 
   func testStability() {
@@ -159,28 +141,18 @@ final class SortedPrefixTests: XCTestCase {
     assertStability([1, 1, 1, 0, 0, 0], withCount: 5)
   }
 
-  func assertStability(
-    _ actual: [Int],
-    withCount count: Int
-  ) {
-    func stableOrder(
-      a: (offset: Int, element: Int),
-      b: (offset: Int, element: Int)
-    ) -> Bool {
-      a.element == b.element
-        ? a.offset < b.offset
-        : a.element < b.element
+  func assertStability(_ actual: [Int], withCount count: Int) {
+    func stableOrder(a: (offset: Int, element: Int), b: (offset: Int, element: Int)) -> Bool {
+      a.element == b.element ? a.offset < b.offset : a.element < b.element
     }
 
     do {
-      let sorted = actual.enumerated()
-        .min(count: count) { $0.element < $1.element }
+      let sorted = actual.enumerated().min(count: count) { $0.element < $1.element }
       XCTAssert(sorted.isSorted(by: stableOrder))
     }
 
     do {
-      let sorted = actual.enumerated()
-        .max(count: count) { $0.element < $1.element }
+      let sorted = actual.enumerated().max(count: count) { $0.element < $1.element }
       XCTAssert(sorted.isSorted(by: stableOrder))
     }
   }

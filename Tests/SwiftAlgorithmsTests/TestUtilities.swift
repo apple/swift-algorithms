@@ -17,11 +17,7 @@ extension Sequence {
   }
 }
 
-extension Sequence where Element: Comparable {
-  func isSorted() -> Bool {
-    isSorted(by: <)
-  }
-}
+extension Sequence where Element: Comparable { func isSorted() -> Bool { isSorted(by: <) } }
 
 extension Numeric {
   func factorial() -> Self {
@@ -33,9 +29,7 @@ extension Numeric {
 struct SplitMix64: RandomNumberGenerator {
   private var state: UInt64
 
-  init(seed: UInt64) {
-    self.state = seed
-  }
+  init(seed: UInt64) { self.state = seed }
 
   mutating func next() -> UInt64 {
     self.state &+= 0x9e37_79b9_7f4a_7c15
@@ -47,9 +41,7 @@ struct SplitMix64: RandomNumberGenerator {
 }
 
 // An eraser helper to any mutable collection
-struct AnyMutableCollection<Base> where Base: MutableCollection {
-  var base: Base
-}
+struct AnyMutableCollection<Base> where Base: MutableCollection { var base: Base }
 
 extension AnyMutableCollection: MutableCollection {
   typealias Index = Base.Index
@@ -58,9 +50,7 @@ extension AnyMutableCollection: MutableCollection {
   var startIndex: Base.Index { base.startIndex }
   var endIndex: Base.Index { base.endIndex }
 
-  func index(after i: Index) -> Index {
-    return base.index(after: i)
-  }
+  func index(after i: Index) -> Index { return base.index(after: i) }
 
   subscript(position: Base.Index) -> Base.Element {
     _read { yield base[position] }
@@ -75,20 +65,16 @@ extension MutableCollection {
 }
 
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
-  _ expression1: @autoclosure () throws -> S1,
-  _ expression2: @autoclosure () throws -> S2,
-  _ message: @autoclosure () -> String = "",
-  file: StaticString = #file, line: UInt = #line
+  _ expression1: @autoclosure () throws -> S1, _ expression2: @autoclosure () throws -> S2,
+  _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
   try XCTAssertEqualSequences(
-    expression1(), expression2(), by: ==,
-    message(), file: file, line: line)
+    expression1(), expression2(), by: ==, message(), file: file, line: line)
 }
 
 // Two sequences contains exactly the same element but not necessarily in the same order.
 func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
-  _ expression1: @autoclosure () throws -> S1,
-  _ expression2: @autoclosure () throws -> S2,
+  _ expression1: @autoclosure () throws -> S1, _ expression2: @autoclosure () throws -> S2,
   file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
   var s1 = Array(try expression1())
@@ -103,28 +89,22 @@ func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
 
   XCTAssertTrue(
     missing.isEmpty, "first sequence missing '\(missing)' elements from second sequence",
-    file: file, line: line
-  )
+    file: file, line: line)
 
   XCTAssertTrue(
-    s1.isEmpty, "first sequence contains \(s1) missing from second sequence",
-    file: file, line: line
+    s1.isEmpty, "first sequence contains \(s1) missing from second sequence", file: file, line: line
   )
 }
 
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
-  _ expression1: @autoclosure () throws -> S1,
-  _ expression2: @autoclosure () throws -> S2,
-  by areEquivalent: (S1.Element, S1.Element) -> Bool,
-  _ message: @autoclosure () -> String = "",
+  _ expression1: @autoclosure () throws -> S1, _ expression2: @autoclosure () throws -> S2,
+  by areEquivalent: (S1.Element, S1.Element) -> Bool, _ message: @autoclosure () -> String = "",
   file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element == S2.Element {
 
   func fail(_ reason: String) {
     let message = message()
-    XCTFail(
-      message.isEmpty ? reason : "\(message) - \(reason)",
-      file: file, line: line)
+    XCTFail(message.isEmpty ? reason : "\(message) - \(reason)", file: file, line: line)
   }
 
   var iter1 = try expression1().makeIterator()
@@ -139,10 +119,8 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
       fail(
         "element \(e1) on first sequence does not match element \(e2) on second sequence at position \(idx)"
       )
-    case (_?, nil):
-      fail("second sequence shorter than first")
-    case (nil, _?):
-      fail("first sequence shorter than second")
+    case (_?, nil): fail("second sequence shorter than first")
+    case (nil, _?): fail("first sequence shorter than second")
     case (nil, nil): break
     }
     return
@@ -154,10 +132,8 @@ func XCTAssertLazyCollection<S: LazyCollectionProtocol>(_: S) {}
 
 /// Asserts two collections are equal by using their indices to access elements.
 func XCTAssertEqualCollections<C1: Collection, C2: Collection>(
-  _ expression1: @autoclosure () throws -> C1,
-  _ expression2: @autoclosure () throws -> C2,
-  _ message: @autoclosure () -> String = "",
-  file: StaticString = #file, line: UInt = #line
+  _ expression1: @autoclosure () throws -> C1, _ expression2: @autoclosure () throws -> C2,
+  _ message: @autoclosure () -> String = "", file: StaticString = #file, line: UInt = #line
 ) rethrows where C1.Element: Equatable, C1.Element == C2.Element {
   let c1 = try expression1()
   let c2 = try expression2()
@@ -187,30 +163,21 @@ func XCTAssertEqualCollections<C1: Collection, C2: Collection>(
 /// - Complexity: O(*n*^3) for each collection, where *n* is the length of the
 ///   collection.
 func validateIndexTraversals<C>(
-  _ collections: C...,
-  indices: ((C) -> [C.Index])? = nil,
-  file: StaticString = #file, line: UInt = #line
+  _ collections: C..., indices: ((C) -> [C.Index])? = nil, file: StaticString = #file,
+  line: UInt = #line
 ) where C: BidirectionalCollection {
   for c in collections {
     let indicesIncludingEnd = indices?(c) ?? (c.indices + [c.endIndex])
     let count = indicesIncludingEnd.count - 1
 
+    XCTAssertEqual(c.count, count, "Count mismatch", file: file, line: line)
+    XCTAssertEqual(c.isEmpty, count == 0, "Emptiness mismatch", file: file, line: line)
     XCTAssertEqual(
-      c.count, count,
-      "Count mismatch",
+      c.startIndex, indicesIncludingEnd.first, "`startIndex` does not equal the first index",
       file: file, line: line)
     XCTAssertEqual(
-      c.isEmpty, count == 0,
-      "Emptiness mismatch",
-      file: file, line: line)
-    XCTAssertEqual(
-      c.startIndex, indicesIncludingEnd.first,
-      "`startIndex` does not equal the first index",
-      file: file, line: line)
-    XCTAssertEqual(
-      c.endIndex, indicesIncludingEnd.last,
-      "`endIndex` does not equal the last index",
-      file: file, line: line)
+      c.endIndex, indicesIncludingEnd.last, "`endIndex` does not equal the last index", file: file,
+      line: line)
 
     // `index(after:)`
     do {
@@ -223,8 +190,7 @@ func validateIndexTraversals<C>(
           """
           `startIndex` incremented \(offset) times does not equal index at \
           offset \(offset)
-          """,
-          file: file, line: line)
+          """, file: file, line: line)
       }
     }
 
@@ -239,8 +205,7 @@ func validateIndexTraversals<C>(
           """
           `endIndex` decremented \(count - offset) times does not equal index \
           at offset \(offset)
-          """,
-          file: file, line: line)
+          """, file: file, line: line)
       }
     }
 
@@ -248,33 +213,26 @@ func validateIndexTraversals<C>(
     XCTAssertEqual(c.indices.count, count)
     for (offset, index) in c.indices.enumerated() {
       XCTAssertEqual(
-        index, indicesIncludingEnd[offset],
-        "Index mismatch at offset \(offset) in `indices`",
+        index, indicesIncludingEnd[offset], "Index mismatch at offset \(offset) in `indices`",
         file: file, line: line)
     }
 
     // index comparison
     for (offsetA, a) in indicesIncludingEnd.enumerated() {
       XCTAssertEqual(
-        a, a,
-        "Index at offset \(offsetA) does not equal itself",
-        file: file, line: line)
+        a, a, "Index at offset \(offsetA) does not equal itself", file: file, line: line)
       XCTAssertFalse(
-        a < a,
-        "Index at offset \(offsetA) is less than itself",
-        file: file, line: line)
+        a < a, "Index at offset \(offsetA) is less than itself", file: file, line: line)
 
       for (offsetB, b) in indicesIncludingEnd[..<offsetA].enumerated() {
         XCTAssertNotEqual(
-          a, b,
-          "Index at offset \(offsetA) equals index at offset \(offsetB)",
-          file: file, line: line)
+          a, b, "Index at offset \(offsetA) equals index at offset \(offsetB)", file: file,
+          line: line)
         XCTAssertLessThan(
           b, a,
           """
           Index at offset \(offsetB) is not less than index at offset \(offsetA)
-          """,
-          file: file, line: line)
+          """, file: file, line: line)
       }
     }
 
@@ -288,15 +246,13 @@ func validateIndexTraversals<C>(
           """
           Index at offset \(startOffset) offset by \(distance) does not equal \
           index at offset \(endOffset)
-          """,
-          file: file, line: line)
+          """, file: file, line: line)
         XCTAssertEqual(
           c.distance(from: start, to: end), distance,
           """
           Distance from index at offset \(startOffset) to index at offset \
           \(endOffset) does not equal \(distance)
-          """,
-          file: file, line: line)
+          """, file: file, line: line)
       }
     }
 
@@ -318,8 +274,7 @@ func validateIndexTraversals<C>(
                 """
                 Index at offset \(startOffset) offset by \(distance) limited \
                 by index at offset \(limitOffset) does not equal `nil`
-                """,
-                file: file, line: line)
+                """, file: file, line: line)
             } else {
               XCTAssertEqual(
                 end, indicesIncludingEnd[targetOffset],
@@ -327,8 +282,7 @@ func validateIndexTraversals<C>(
                 Index at offset \(startOffset) offset by \(distance) limited \
                 by index at offset \(limitOffset) does not equal index at \
                 offset \(targetOffset)
-                """,
-                file: file, line: line)
+                """, file: file, line: line)
             }
           }
         }

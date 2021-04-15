@@ -24,30 +24,22 @@ final class UniquePermutationsTests: XCTestCase {
     [[1, 1], [1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 2]],
     // 3
     [
-      [1, 1, 1], [1, 1, 2], [1, 1, 3],
-      [1, 2, 1], [1, 2, 3], [1, 3, 1], [1, 3, 2],
-      [2, 1, 1], [2, 1, 3], [2, 3, 1],
-      [3, 1, 1], [3, 1, 2], [3, 2, 1],
+      [1, 1, 1], [1, 1, 2], [1, 1, 3], [1, 2, 1], [1, 2, 3], [1, 3, 1], [1, 3, 2], [2, 1, 1],
+      [2, 1, 3], [2, 3, 1], [3, 1, 1], [3, 1, 2], [3, 2, 1],
     ],
     // 4
     [
-      [1, 1, 1, 2], [1, 1, 1, 3],
-      [1, 1, 2, 1], [1, 1, 2, 3],
-      [1, 1, 3, 1], [1, 1, 3, 2],
-      [1, 2, 1, 1], [1, 2, 1, 3], [1, 2, 3, 1],
-      [1, 3, 1, 1], [1, 3, 1, 2], [1, 3, 2, 1],
-      [2, 1, 1, 1], [2, 1, 1, 3], [2, 1, 3, 1], [2, 3, 1, 1],
-      [3, 1, 1, 1], [3, 1, 1, 2], [3, 1, 2, 1], [3, 2, 1, 1],
+      [1, 1, 1, 2], [1, 1, 1, 3], [1, 1, 2, 1], [1, 1, 2, 3], [1, 1, 3, 1], [1, 1, 3, 2],
+      [1, 2, 1, 1], [1, 2, 1, 3], [1, 2, 3, 1], [1, 3, 1, 1], [1, 3, 1, 2], [1, 3, 2, 1],
+      [2, 1, 1, 1], [2, 1, 1, 3], [2, 1, 3, 1], [2, 3, 1, 1], [3, 1, 1, 1], [3, 1, 1, 2],
+      [3, 1, 2, 1], [3, 2, 1, 1],
     ],
     // 5
     [
-      [1, 1, 1, 2, 3], [1, 1, 1, 3, 2],
-      [1, 1, 2, 1, 3], [1, 1, 2, 3, 1],
-      [1, 1, 3, 1, 2], [1, 1, 3, 2, 1],
-      [1, 2, 1, 1, 3], [1, 2, 1, 3, 1], [1, 2, 3, 1, 1],
-      [1, 3, 1, 1, 2], [1, 3, 1, 2, 1], [1, 3, 2, 1, 1],
-      [2, 1, 1, 1, 3], [2, 1, 1, 3, 1], [2, 1, 3, 1, 1], [2, 3, 1, 1, 1],
-      [3, 1, 1, 1, 2], [3, 1, 1, 2, 1], [3, 1, 2, 1, 1], [3, 2, 1, 1, 1],
+      [1, 1, 1, 2, 3], [1, 1, 1, 3, 2], [1, 1, 2, 1, 3], [1, 1, 2, 3, 1], [1, 1, 3, 1, 2],
+      [1, 1, 3, 2, 1], [1, 2, 1, 1, 3], [1, 2, 1, 3, 1], [1, 2, 3, 1, 1], [1, 3, 1, 1, 2],
+      [1, 3, 1, 2, 1], [1, 3, 2, 1, 1], [2, 1, 1, 1, 3], [2, 1, 1, 3, 1], [2, 1, 3, 1, 1],
+      [2, 3, 1, 1, 1], [3, 1, 1, 1, 2], [3, 1, 1, 2, 1], [3, 1, 2, 1, 1], [3, 2, 1, 1, 1],
     ],
   ]
 }
@@ -57,20 +49,15 @@ extension UniquePermutationsTests {
     XCTAssertEqualSequences(([] as [Int]).uniquePermutations(), [[]])
     XCTAssertEqualSequences(([] as [Int]).uniquePermutations(ofCount: 0), [[]])
     XCTAssertEqualSequences(([] as [Int]).uniquePermutations(ofCount: 1), [])
-    XCTAssertEqualSequences(
-      ([] as [Int]).uniquePermutations(ofCount: 1...3), [])
+    XCTAssertEqualSequences(([] as [Int]).uniquePermutations(ofCount: 1...3), [])
   }
 
   func testSingleCounts() {
     for (k, expectation) in Self.numbersPermutations.enumerated() {
-      XCTAssertEqualSequences(
-        expectation,
-        Self.numbers.uniquePermutations(ofCount: k))
+      XCTAssertEqualSequences(expectation, Self.numbers.uniquePermutations(ofCount: k))
     }
 
-    XCTAssertEqualSequences(
-      Self.numbersPermutations[5],
-      Self.numbers.uniquePermutations())
+    XCTAssertEqualSequences(Self.numbersPermutations[5], Self.numbers.uniquePermutations())
   }
 
   func testRanges() {
@@ -98,17 +85,11 @@ extension UniquePermutationsTests {
   private final class IntBox: Hashable {
     var value: Int
 
-    init(_ value: Int) {
-      self.value = value
-    }
+    init(_ value: Int) { self.value = value }
 
-    static func == (lhs: IntBox, rhs: IntBox) -> Bool {
-      lhs.value == rhs.value
-    }
+    static func == (lhs: IntBox, rhs: IntBox) -> Bool { lhs.value == rhs.value }
 
-    func hash(into hasher: inout Hasher) {
-      hasher.combine(value)
-    }
+    func hash(into hasher: inout Hasher) { hasher.combine(value) }
   }
 
   func testFirstUnique() {
@@ -122,7 +103,5 @@ extension UniquePermutationsTests {
     }
   }
 
-  func testLaziness() {
-    XCTAssertLazySequence("ABCD".lazy.uniquePermutations())
-  }
+  func testLaziness() { XCTAssertLazySequence("ABCD".lazy.uniquePermutations()) }
 }
