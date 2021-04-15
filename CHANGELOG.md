@@ -16,6 +16,12 @@ package updates, you can specify your package dependency using
 
 ---
 
+## [0.1.1] - 2021-04-14
+
+### Fixes
+
+- `Product2` associated type inference error in release build ([#130])
+
 ## [0.1.0] - 2021-04-13
 
 ### Additions
@@ -149,7 +155,8 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for releases -->
 
-[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.1.0...HEAD
+[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.1.1...HEAD
+[0.1.1]: https://github.com/apple/swift-algorithms/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/apple/swift-algorithms/compare/0.0.4...0.1.0
 [0.0.4]: https://github.com/apple/swift-algorithms/compare/0.0.3...0.0.4
 [0.0.3]: https://github.com/apple/swift-algorithms/compare/0.0.2...0.0.3
@@ -178,6 +185,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#112]: https://github.com/apple/swift-algorithms/pull/112
 [#124]: https://github.com/apple/swift-algorithms/pull/124
 [#125]: https://github.com/apple/swift-algorithms/pull/125
+[#130]: https://github.com/apple/swift-algorithms/pull/130
 
 <!-- Link references for contributors -->
 
