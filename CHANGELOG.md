@@ -12,7 +12,18 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
-*No changes yet.*
+### Additions
+
+- The `overwrite(prefixWith:)` method has been added to element-mutable
+  collections. It takes a sequence with the same element type as the receiver;
+  copies the leading elements from that source on top of the leading elements
+  of the receiver, in order, until at least one sequence runs out; and returns
+  the index after the last element of the receiver that was overwritten. The
+  similar `overwrite(suffixWith:)` method is restricted to bidirectional
+  element-mutable collections, uses the trailing elements of the receiver as
+  the destination, and returns the index to the first element of the receiver
+  that was overwritten instead. There are variants of these methods for when
+  the source is an iterator, collection, or subsequence.
 
 ---
 
