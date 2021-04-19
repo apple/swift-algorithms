@@ -3,7 +3,6 @@
 
     If this pull request adds new API, please add '?template=new.md'
     to the URL to switch to the appropriate template.
-    
     Before you submit your request, please replace the paragraph
     below with the relevant details, and complete the steps in the
     checklist by placing an 'x' in each box:
