@@ -40,6 +40,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 #### Other useful operations
 
 - [`chunked(by:)`, `chunked(on:)`, `chunks(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chunked.md): Eager and lazy operations that break a collection into chunks based on either a binary predicate or when the result of a projection changes or chunks of a given count.
+- [`count(where:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Count.md): Counts the elements in a sequence that pass a predicate.
 - [`firstNonNil(_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/FirstNonNil.md): Returns the first non-`nil` result from transforming a sequence's elements.
 - [`indexed()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Indexed.md): Iterate over tuples of a collection's indices and elements. 
 - [`interspersed(with:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Intersperse.md): Place a value between every two elements of a sequence.
