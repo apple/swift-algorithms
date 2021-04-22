@@ -234,7 +234,7 @@ extension EvenChunks {
 }
 
 extension EvenChunks: Collection {
-  public struct _Index: Comparable {
+  public struct Index: Comparable {
     /// The range corresponding to the chunk at this position.
     @usableFromInline
     internal var baseRange: Range<Base.Index>
@@ -263,8 +263,6 @@ extension EvenChunks: Collection {
   }
   
   public typealias Element = Base.SubSequence
-  public typealias Index = SubSequence._Index
-  public typealias SubSequence = EvenChunks<Base.SubSequence>
 
   @inlinable
   public var startIndex: Index {
@@ -287,22 +285,6 @@ extension EvenChunks: Collection {
   public subscript(position: Index) -> Element {
     precondition(position != endIndex)
     return base[position.baseRange]
-  }
-  
-  @inlinable
-  public subscript(bounds: Range<Index>) -> SubSequence {
-    func baseCount(before index: Index) -> Int {
-      let smallChunkSize = self.baseCount / numberOfChunks
-      let numberOfLargeChunks = Swift.min(index.offset, self.numberOfLargeChunks)
-      return index.offset * smallChunkSize + numberOfLargeChunks
-    }
-    
-    return .init(
-      base: base[bounds.lowerBound.baseRange.lowerBound..<bounds.upperBound.baseRange.lowerBound],
-      numberOfChunks: bounds.upperBound.offset - bounds.lowerBound.offset,
-      baseCount: baseCount(before: bounds.upperBound) - baseCount(before: bounds.lowerBound),
-      firstUpperBound: bounds.lowerBound.baseRange.upperBound
-    )
   }
   
   @inlinable
@@ -355,7 +337,7 @@ extension EvenChunks: Collection {
   }
 }
 
-extension EvenChunks._Index: Hashable where Base.Index: Hashable {}
+extension EvenChunks.Index: Hashable where Base.Index: Hashable {}
 
 extension EvenChunks: BidirectionalCollection
   where Base: BidirectionalCollection
@@ -369,6 +351,12 @@ extension EvenChunks: BidirectionalCollection
 
 extension EvenChunks: RandomAccessCollection
   where Base: RandomAccessCollection {}
+
+extension EvenChunks: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
+
+extension EvenChunks: LazyCollectionProtocol
+  where Base: LazyCollectionProtocol {}
 
 //===----------------------------------------------------------------------===//
 // lazy.chunked(by:)
