@@ -43,13 +43,10 @@ Read more about the package, and the intent behind it, in the [announcement on s
 - [`firstNonNil(_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/FirstNonNil.md): Returns the first non-`nil` result from transforming a sequence's elements.
 - [`indexed()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Indexed.md): Iterate over tuples of a collection's indices and elements. 
 - [`interspersed(with:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Intersperse.md): Place a value between every two elements of a sequence.
+- [`partitioningIndex(where:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Partition.md)`: Splits a collection into two partitions according to a predicate and returns the index of the partition.
 - [`reductions(_:)`, `reductions(_:_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Reductions.md): Returns all the intermediate states of reducing the elements of a sequence or collection.
 - [`split(maxSplits:omittingEmptySubsequences:whereSeparator)`, `split(separator:maxSplits:omittingEmptySubsequences)`](https://github.com/apple/swift-algorithms/blob/main/Guides/LazySplit.md): Lazy versions of the Standard Library's eager operations that split sequences and collections into subsequences separated by the specified separator element.
 - [`windows(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Windows.md): Breaks a collection into overlapping subsequences where elements are slices from the original collection.
-
-#### Binary Search Partitions
-
-- [`partitioningIndex(where:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Partition.md)`: Splits a collection into two partitions according to a predicate and returns the index of the partition.
 
 ## Adding Swift Algorithms as a Dependency
 
