@@ -764,7 +764,22 @@ extension Collection {
   /// Returns a collection of `count` evenly divided subsequences of this
   /// collection.
   ///
-  /// - Complexity: TODO
+  /// This method divides the collection into a given number of equally sized
+  /// chunks. If the length of the collection is not divisible by `count`, the
+  /// chunks at the start will be longer than the chunks at the end, like in
+  /// this example:
+  ///
+  ///     for chunk in "Hello, world!".evenlyChunked(into: 5) {
+  ///         print(chunk)
+  ///     }
+  ///     // "Hel"
+  ///     // "lo,"
+  ///     // " wo"
+  ///     // "rl"
+  ///     // "d!"
+  ///
+  /// - Complexity: O(1) if the collection conforms to `RandomAccessCollection`,
+  ///   otherwise O(*n*), where *n* is the length of the collection.
   @inlinable
   public func evenlyChunked(into count: Int) -> EvenChunks<Self> {
     precondition(count >= 0, "Can't divide into a negative number of chunks")
