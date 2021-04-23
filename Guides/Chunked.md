@@ -8,7 +8,7 @@ Break a collection into nonoverlapping subsequences:
 * `chunked(by:)` forms chunks of consecutive elements that pass a binary predicate,
 * `chunked(on:)` forms chunks of consecutive elements that project to equal values,
 * `chunks(ofCount:)` forms chunks of a given size, and
-* `evenlyChunked(into:)` forms a given number of equally-sized chunks.
+* `evenlyChunked(in:)` forms a given number of equally-sized chunks.
 
 `chunked(by:)` uses a binary predicate to test consecutive elements, separating
 chunks where the predicate returns `false`. For example, you can chunk a
@@ -46,16 +46,16 @@ let remaining = names.chunks(ofCount: 3)
 The `chunks(ofCount:)` method was previously [proposed](proposal) for inclusion
 in the standard library.
 
-The `evenlyChunked(into:)` method takes a `count` parameter and divides the
+The `evenlyChunked(in:)` method takes a `count` parameter and divides the
 collection into `count` number of equally-sized chunks. If the length of the
 collection is not a multiple of the `count` parameter, the chunks at the start
 will be longer than the chunks at the end.
 
 ```swift
-let evenChunks = (0..<15).evenlyChunked(into: 3)
+let evenChunks = (0..<15).evenlyChunked(in: 3)
 // equivalent to [0..<5, 5..<10, 10..<15]
 
-let nearlyEvenChunks = (0..<15).evenlyChunked(into: 4)
+let nearlyEvenChunks = (0..<15).evenlyChunked(in: 4)
 // equivalent to [0..<4, 4..<8, 8..<12, 12..<15]
 ```
 
@@ -87,7 +87,7 @@ extension Collection {
     
     public func chunks(ofCount count: Int) -> ChunkedByCount<Self>
     
-    public func evenlyChunked(into count: Int) -> EvenChunks<Self>
+    public func evenlyChunked(in count: Int) -> EvenChunks<Self>
   }
 }
 

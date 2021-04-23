@@ -726,7 +726,7 @@ extension ChunkedByCount: LazyCollectionProtocol
   where Base: LazyCollectionProtocol {}
 
 //===----------------------------------------------------------------------===//
-// evenlyChunked(into:)
+// evenlyChunked(in:)
 //===----------------------------------------------------------------------===//
 
 extension Collection {
@@ -738,7 +738,7 @@ extension Collection {
   /// chunks at the start will be longer than the chunks at the end, like in
   /// this example:
   ///
-  ///     for chunk in "Hello, world!".evenlyChunked(into: 5) {
+  ///     for chunk in "Hello, world!".evenlyChunked(in: 5) {
   ///         print(chunk)
   ///     }
   ///     // "Hel"
@@ -750,7 +750,7 @@ extension Collection {
   /// - Complexity: O(1) if the collection conforms to `RandomAccessCollection`,
   ///   otherwise O(*n*), where *n* is the length of the collection.
   @inlinable
-  public func evenlyChunked(into count: Int) -> EvenChunks<Self> {
+  public func evenlyChunked(in count: Int) -> EvenChunks<Self> {
     precondition(count >= 0, "Can't divide into a negative number of chunks")
     precondition(count > 0 || isEmpty, "Can't divide a non-empty collection into 0 chunks")
     return EvenChunks(base: self, numberOfChunks: count)

@@ -148,31 +148,31 @@ final class ChunkedTests: XCTestCase {
   
   func testEvenChunks() {
     XCTAssertEqualSequences(
-      (0..<10).evenlyChunked(into: 4),
+      (0..<10).evenlyChunked(in: 4),
       [0..<3, 3..<6, 6..<8, 8..<10])
     
     XCTAssertEqualSequences(
-      (0..<3).evenlyChunked(into: 5),
+      (0..<3).evenlyChunked(in: 5),
       [0..<1, 1..<2, 2..<3, 3..<3, 3..<3])
     
     XCTAssertEqualSequences(
-      "".evenlyChunked(into: 0),
+      "".evenlyChunked(in: 0),
       [])
     
     XCTAssertEqualSequences(
-      "".evenlyChunked(into: 1),
+      "".evenlyChunked(in: 1),
       [""])
   }
   
   func testEvenChunksIndexTraversals() {
     validateIndexTraversals(
-      (0..<10).evenlyChunked(into: 1),
-      (0..<10).evenlyChunked(into: 2),
-      (0..<10).evenlyChunked(into: 3),
-      (0..<10).evenlyChunked(into: 10),
-      (0..<10).evenlyChunked(into: 20),
-      (0..<0).evenlyChunked(into: 0),
-      (0..<0).evenlyChunked(into: 1),
-      (0..<0).evenlyChunked(into: 10))
+      (0..<10).evenlyChunked(in: 1),
+      (0..<10).evenlyChunked(in: 2),
+      (0..<10).evenlyChunked(in: 3),
+      (0..<10).evenlyChunked(in: 10),
+      (0..<10).evenlyChunked(in: 20),
+      (0..<0).evenlyChunked(in: 0),
+      (0..<0).evenlyChunked(in: 1),
+      (0..<0).evenlyChunked(in: 10))
   }
 }
