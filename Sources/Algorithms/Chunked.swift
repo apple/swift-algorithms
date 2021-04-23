@@ -155,19 +155,6 @@ public struct EvenChunks<Base: Collection> {
   internal var firstUpperBound: Base.Index
   
   @inlinable
-  internal init(
-    base: Base,
-    numberOfChunks: Int,
-    baseCount: Int,
-    firstUpperBound: Base.Index
-  ) {
-    self.base = base
-    self.numberOfChunks = numberOfChunks
-    self.baseCount = base.count
-    self.firstUpperBound = firstUpperBound
-  }
-  
-  @inlinable
   internal init(base: Base, numberOfChunks: Int) {
     self.base = base
     self.numberOfChunks = numberOfChunks
@@ -186,12 +173,6 @@ extension EvenChunks {
   @inlinable
   internal var numberOfLargeChunks: Int {
     baseCount % numberOfChunks
-  }
-  
-  /// Returns the size of the small chunks at the end of this collection.
-  @inlinable
-  internal var smallChunkSize: Int {
-    baseCount / numberOfChunks
   }
   
   /// Returns the size of a chunk at a given offset.
