@@ -9,6 +9,10 @@
 //
 //===----------------------------------------------------------------------===//
 
+//===----------------------------------------------------------------------===//
+// Intersperse
+//===----------------------------------------------------------------------===//
+
 /// A sequence that presents the elements of a base sequence of elements
 /// with a separator between each of those elements.
 public struct Intersperse<Base: Sequence> {
@@ -199,6 +203,195 @@ extension Intersperse: LazySequenceProtocol
 extension Intersperse: LazyCollectionProtocol
   where Base: LazyCollectionProtocol {}
 
+//===----------------------------------------------------------------------===//
+// InterspersedMap
+//===----------------------------------------------------------------------===//
+
+@usableFromInline
+internal struct InterspersedMap<Base: Sequence, Result> {
+  @usableFromInline
+  internal let base: Base
+  
+  @usableFromInline
+  internal let transform: (Base.Element) -> Result
+  
+  @usableFromInline
+  internal let separator: (Base.Element, Base.Element) -> Result
+}
+
+extension InterspersedMap: Sequence {
+  public struct Iterator: IteratorProtocol {
+    @usableFromInline
+    internal var base: Base.Iterator
+    
+    @usableFromInline
+    internal let transform: (Base.Element) -> Result
+    
+    @usableFromInline
+    internal let separator: (Base.Element, Base.Element) -> Result
+    
+    @usableFromInline
+    internal var state = State.start
+    
+    @inlinable
+    internal init(
+      base: Base.Iterator,
+      transform: @escaping (Base.Element) -> Result,
+      separator: @escaping (Base.Element, Base.Element) -> Result
+    ) {
+      self.base = base
+      self.transform = transform
+      self.separator = separator
+    }
+    
+    @usableFromInline
+    enum State {
+      case start
+      case element(Base.Element)
+      case separator(previous: Base.Element)
+    }
+
+    @inlinable
+    public mutating func next() -> Result? {
+      switch state {
+      case .start:
+        guard let first = base.next() else { return nil }
+        state = .separator(previous: first)
+        return transform(first)
+      case .separator(let previous):
+        guard let next = base.next() else { return nil }
+        state = .element(next)
+        return separator(previous, next)
+      case .element(let element):
+        state = .separator(previous: element)
+        return transform(element)
+      }
+    }
+  }
+
+  @inlinable
+  public func makeIterator() -> Iterator {
+    Iterator(
+      base: base.makeIterator(),
+      transform: transform,
+      separator: separator)
+  }
+}
+
+extension InterspersedMap: Collection where Base: Collection {
+  @usableFromInline
+  internal struct Index: Comparable {
+    @usableFromInline
+    internal enum Representation {
+      case element(Base.Index)
+      case separator(previous: Base.Index, next: Base.Index)
+    }
+    
+    @usableFromInline
+    internal let representation: Representation
+    
+    @inlinable
+    internal init(_ representation: Representation) {
+      self.representation = representation
+    }
+    
+    @inlinable
+    internal static func == (lhs: Self, rhs: Self) -> Bool {
+      switch (lhs.representation, rhs.representation) {
+      case let (.element(lhs), .element(rhs)),
+           let (.separator(_, lhs), .separator(_, rhs)):
+        return lhs == rhs
+      case (.element, .separator), (.separator, .element):
+        return false
+      }
+    }
+    
+    @inlinable
+    internal static func < (lhs: Self, rhs: Self) -> Bool {
+      switch (lhs.representation, rhs.representation) {
+      case let (.element(lhs), .element(rhs)),
+           let (.separator(_, lhs), .separator(_, rhs)),
+           let (.element(lhs), .separator(_, rhs)),
+           let (.separator(lhs, _), .element(rhs)):
+        return lhs < rhs
+      }
+    }
+  }
+  
+  @inlinable
+  internal var startIndex: Index {
+    base.isEmpty ? endIndex : Index(.element(base.startIndex))
+  }
+  
+  @inlinable
+  internal var endIndex: Index {
+    Index(.separator(previous: base.endIndex, next: base.endIndex))
+  }
+  
+  @inlinable
+  internal func index(after index: Index) -> Index {
+    switch index.representation {
+    case .element(let index):
+      let next = base.index(after: index)
+      return Index(.separator(previous: index, next: next))
+    case .separator(_, let next):
+      return Index(.element(next))
+    }
+  }
+  
+  @inlinable
+  internal subscript(position: Index) -> Result {
+    switch position.representation {
+    case .element(let index):
+      return transform(base[index])
+    case let .separator(previous, next):
+      return separator(base[previous], base[next])
+    }
+  }
+  
+  @inlinable
+  internal func index(_ index: Index, offsetBy distance: Int) -> Index {
+    // TODO
+    fatalError()
+  }
+  
+  @inlinable
+  internal func index(
+    _ index: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    // TODO
+    fatalError()
+  }
+  
+  @inlinable
+  internal func distance(from start: Index, to end: Index) -> Int {
+    // TODO
+    fatalError()
+  }
+}
+
+extension InterspersedMap: BidirectionalCollection
+  where Base: BidirectionalCollection
+{
+  @inlinable
+  internal func index(before index: Index) -> Index {
+    switch index.representation {
+    case .element(let index):
+      let previous = base.index(before: index)
+      return Index(.separator(previous: previous, next: index))
+    case let .separator(previous, next):
+      let index = next == base.endIndex ? base.index(before: next) : previous
+      return Index(.element(index))
+    }
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// interspersed(with:)
+//===----------------------------------------------------------------------===//
+
 extension Sequence {
 
   /// Returns a sequence containing elements of this sequence with the given
@@ -232,5 +425,19 @@ extension Sequence {
   @inlinable
   public func interspersed(with separator: Element) -> Intersperse<Self> {
     Intersperse(base: self, separator: separator)
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// lazy.interspersed(_:with:)
+//===----------------------------------------------------------------------===//
+  
+extension LazySequenceProtocol {
+  @usableFromInline
+  internal func interspersedMap<Result>(
+    _ transform: @escaping (Element) -> Result,
+    by separator: @escaping (Element, Element) -> Result
+  ) -> InterspersedMap<Self, Result> {
+    InterspersedMap(base: self, transform: transform, separator: separator)
   }
 }
