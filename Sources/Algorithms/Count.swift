@@ -18,14 +18,14 @@ extension Sequence {
   /// five characters long:
   ///
   ///     let names = ["Jacqueline", "Ian", "Amy", "Juan", "Soroush", "Tiffany"]
-  ///     let shortNameCount = names.count(where: { $0.count < 5 })
+  ///     let shortNameCount = names.countAll(where: { $0.count < 5 })
   ///     // shortNameCount == 3
   ///
   /// To find the number of times a specific element appears in the sequence,
-  /// use the equal-to operator (`==`) in the closure to test for a match.
+  /// use the `countAll(_:)` method.
   ///
   ///     let birds = ["duck", "duck", "duck", "duck", "goose"]
-  ///     let duckCount = birds.count(where: { $0 == "duck" })
+  ///     let duckCount = birds.countAll("duck")
   ///     // duckCount == 4
   ///
   /// The sequence must be finite.
@@ -33,10 +33,32 @@ extension Sequence {
   /// - Parameter predicate: A closure that takes each element of the sequence
   ///   as its argument and returns a Boolean value indicating whether
   ///   the element should be included in the count.
-  /// - Returns: The number of elements in the sequence that satisfy the given
-  ///   predicate.
+  /// - Returns: The number of elements in the sequence that satisfy
+  ///   `predicate`.
   @inlinable
-  public func count(where predicate: (Element) throws -> Bool) rethrows -> Int {
+  public func countAll(where predicate: (Element) throws -> Bool) rethrows -> Int {
     try reduce(0) { try $0 + (predicate($1) ? 1 : 0) }
+  }
+}
+
+extension Sequence where Element: Equatable {
+  /// Returns the number of elements in the sequence that are equal to the given
+  /// value.
+  ///
+  /// This example finds the number of times that the string `"duck"` appears
+  /// in an array:
+  ///
+  ///     let birds = ["duck", "duck", "duck", "duck", "goose"]
+  ///     let duckCount = birds.countAll("duck")
+  ///     // duckCount == 4
+  ///
+  /// The sequence must be finite.
+  ///
+  /// - Parameter element: The element to count instances of in this sequence.
+  /// - Returns: The number of elements in the sequence that are equal to
+  ///   `element`.
+  @inlinable
+  public func countAll(_ element: Element) -> Int {
+    reduce(0) { $0 + ((element == $1) ? 1 : 0) }
   }
 }
