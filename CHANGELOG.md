@@ -12,7 +12,7 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
-*No changes yet.*
+-`adjacentPairs()` lazily iterates over tuples of adjacent elements of a sequence.
 
 ---
 
