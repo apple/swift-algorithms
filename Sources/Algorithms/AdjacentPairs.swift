@@ -268,7 +268,7 @@ extension AdjacentPairsCollection: Collection {
       limitedBy: limit.second)
     else { return nil }
     let newFirst = base.index(newSecond, offsetBy: -1)
-    precondition(newSecond >= base.startIndex, "Can't move before startIndex")
+    precondition(newFirst >= base.startIndex, "Can't move before startIndex")
     return Index(first: newFirst, second: newSecond)
   }
 

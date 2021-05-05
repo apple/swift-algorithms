@@ -70,7 +70,11 @@ final class AdjacentPairsTests: XCTestCase {
   }
 
   func testIndexTraversals() {
-    validateIndexTraversals((1...5).adjacentPairs())
+    validateIndexTraversals(
+      (0..<0).adjacentPairs(),
+      (0..<1).adjacentPairs(),
+      (0..<2).adjacentPairs(),
+      (0..<5).adjacentPairs())
   }
   
   func testLaziness() {
