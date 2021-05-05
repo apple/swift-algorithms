@@ -72,4 +72,9 @@ final class AdjacentPairsTests: XCTestCase {
   func testIndexTraversals() {
     validateIndexTraversals((1...5).adjacentPairs())
   }
+  
+  func testLaziness() {
+    XCTAssertLazySequence((0...).lazy.adjacentPairs())
+    XCTAssertLazyCollection((0..<100).lazy.adjacentPairs())
+  }
 }

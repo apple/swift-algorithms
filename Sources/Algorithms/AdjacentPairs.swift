@@ -69,6 +69,7 @@ public struct AdjacentPairsSequence<Base: Sequence> {
 }
 
 extension AdjacentPairsSequence {
+  /// The iterator for an `AdjacentPairsSequence` or `AdjacentPairsCollection`.
   public struct Iterator {
     @usableFromInline
     internal var base: Base.Iterator
@@ -112,6 +113,9 @@ extension AdjacentPairsSequence: Sequence {
     Swift.max(0, base.underestimatedCount - 1)
   }
 }
+
+extension AdjacentPairsSequence: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
 
 /// A collection of adjacent pairs of elements built from an underlying
 /// collection.
@@ -159,6 +163,7 @@ extension AdjacentPairsCollection {
 }
 
 extension AdjacentPairsCollection {
+  /// A position in an `AdjacentPairsCollection`.
   public struct Index: Comparable {
     @usableFromInline
     internal var first: Base.Index
@@ -298,6 +303,9 @@ extension AdjacentPairsCollection: BidirectionalCollection
 
 extension AdjacentPairsCollection: RandomAccessCollection
   where Base: RandomAccessCollection {}
+
+extension AdjacentPairsCollection: LazySequenceProtocol, LazyCollectionProtocol
+  where Base: LazyCollectionProtocol {}
 
 extension AdjacentPairsCollection.Index: Hashable where Base.Index: Hashable {
   @inlinable
