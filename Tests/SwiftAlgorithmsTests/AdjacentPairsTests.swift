@@ -13,86 +13,72 @@ import XCTest
 import Algorithms
 
 final class AdjacentPairsTests: XCTestCase {
+  func testEmptySequence() {
+    let pairs = (0...).prefix(0).adjacentPairs()
+    XCTAssertEqualSequences(pairs, [], by: ==)
+  }
+  
+  func testOneElementSequence() {
+    let pairs = (0...).prefix(1).adjacentPairs()
+    XCTAssertEqualSequences(pairs, [], by: ==)
+  }
+  
+  func testTwoElementSequence() {
+    let pairs = (0...).prefix(2).adjacentPairs()
+    XCTAssertEqualSequences(pairs, [(0, 1)], by: ==)
+  }
+  
+  func testThreeElementSequence() {
+    let pairs = (0...).prefix(3).adjacentPairs()
+    XCTAssertEqualSequences(pairs, [(0, 1), (1, 2)], by: ==)
+  }
+  
+  func testManySequences() {
+    for n in 4...100 {
+      let pairs = (0...).prefix(n).adjacentPairs()
+      XCTAssertEqualSequences(pairs, zip(0..., 1...).prefix(n - 1), by: ==)
+    }
+  }
+  
   func testZeroElements() {
     let pairs = (0..<0).adjacentPairs()
     XCTAssertEqual(pairs.startIndex, pairs.endIndex)
-    XCTAssert(Array(pairs) == [])
+    XCTAssertEqualSequences(pairs, [], by: ==)
   }
 
   func testOneElement() {
     let pairs = (0..<1).adjacentPairs()
     XCTAssertEqual(pairs.startIndex, pairs.endIndex)
-    XCTAssert(Array(pairs) == [])
+    XCTAssertEqualSequences(pairs, [], by: ==)
   }
 
   func testTwoElements() {
     let pairs = (0..<2).adjacentPairs()
-    XCTAssert(Array(pairs) == [(0, 1)])
+    XCTAssertEqualSequences(pairs, [(0, 1)], by: ==)
   }
 
   func testThreeElements() {
     let pairs = (0..<3).adjacentPairs()
-    XCTAssert(Array(pairs) == [(0, 1), (1, 2)])
+    XCTAssertEqualSequences(pairs, [(0, 1), (1, 2)], by: ==)
   }
 
-  func testFourElements() {
-    let pairs = (0..<4).adjacentPairs()
-    XCTAssert(Array(pairs) == [(0, 1), (1, 2), (2, 3)])
-  }
-
-  func testForwardIndexing() {
-    let pairs = (1...5).adjacentPairs()
-    let expected = [(1, 2), (2, 3), (3, 4), (4, 5)]
-    var index = pairs.startIndex
-    for iteration in expected.indices {
-      XCTAssert(pairs[index] == expected[iteration])
-      pairs.formIndex(after: &index)
-    }
-    XCTAssertEqual(index, pairs.endIndex)
-  }
-
-  func testBackwardIndexing() {
-    let pairs = (1...5).adjacentPairs()
-    let expected = [(4, 5), (3, 4), (2, 3), (1, 2)]
-    var index = pairs.endIndex
-    for iteration in expected.indices {
-      pairs.formIndex(before: &index)
-      XCTAssert(pairs[index] == expected[iteration])
-    }
-    XCTAssertEqual(index, pairs.startIndex)
-  }
-
-  func testIndexDistance() {
-    let pairSequences = (0...4).map { (0..<$0).adjacentPairs() }
-
-    for pairs in pairSequences {
-      for index in pairs.indices.dropLast() {
-        let next = pairs.index(after: index)
-        XCTAssertEqual(pairs.distance(from: index, to: next), 1)
-      }
-
-      XCTAssertEqual(pairs.distance(from: pairs.startIndex, to: pairs.endIndex), pairs.count)
-      XCTAssertEqual(pairs.distance(from: pairs.endIndex, to: pairs.startIndex), -pairs.count)
+  func testManyElements() {
+    for n in 4...100 {
+      let pairs = (0..<n).adjacentPairs()
+      XCTAssertEqualSequences(pairs, zip(0..., 1...).prefix(n - 1), by: ==)
     }
   }
 
-  func testIndexOffsetBy() {
-    let pairSequences = (0...4).map { (0..<$0).adjacentPairs() }
-
-    for pairs in pairSequences {
-      for index in pairs.indices.dropLast() {
-        let next = pairs.index(after: index)
-        XCTAssertEqual(pairs.index(index, offsetBy: 1), next)
-      }
-
-      XCTAssertEqual(pairs.index(pairs.startIndex, offsetBy: pairs.count), pairs.endIndex)
-      XCTAssertEqual(pairs.index(pairs.endIndex, offsetBy: -pairs.count), pairs.startIndex)
-    }
+  func testIndexTraversals() {
+    validateIndexTraversals(
+      (0..<0).adjacentPairs(),
+      (0..<1).adjacentPairs(),
+      (0..<2).adjacentPairs(),
+      (0..<5).adjacentPairs())
   }
-}
-
-extension Collection {
-  fileprivate static func == <L: Equatable, R: Equatable> (lhs: Self, rhs: Self) -> Bool where Element == (L, R) {
-    lhs.count == rhs.count && zip(lhs, rhs).allSatisfy(==)
+  
+  func testLaziness() {
+    XCTAssertLazySequence((0...).lazy.adjacentPairs())
+    XCTAssertLazyCollection((0..<100).lazy.adjacentPairs())
   }
 }
