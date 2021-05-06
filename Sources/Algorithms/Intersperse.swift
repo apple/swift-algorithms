@@ -220,7 +220,8 @@ internal struct InterspersedMap<Base: Sequence, Result> {
 }
 
 extension InterspersedMap: Sequence {
-  public struct Iterator: IteratorProtocol {
+  @usableFromInline
+  internal struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var base: Base.Iterator
     
@@ -245,14 +246,14 @@ extension InterspersedMap: Sequence {
     }
     
     @usableFromInline
-    enum State {
+    internal enum State {
       case start
       case element(Base.Element)
       case separator(previous: Base.Element)
     }
 
     @inlinable
-    public mutating func next() -> Result? {
+    internal mutating func next() -> Result? {
       switch state {
       case .start:
         guard let first = base.next() else { return nil }
@@ -270,7 +271,7 @@ extension InterspersedMap: Sequence {
   }
 
   @inlinable
-  public func makeIterator() -> Iterator {
+  internal func makeIterator() -> Iterator {
     Iterator(
       base: base.makeIterator(),
       transform: transform,

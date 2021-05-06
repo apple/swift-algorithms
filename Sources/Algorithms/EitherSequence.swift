@@ -62,17 +62,22 @@ internal enum EitherSequence<Left: Sequence, Right: Sequence>
 }
 
 extension EitherSequence: Sequence {
-  public struct Iterator: IteratorProtocol {
-    var left: Left.Iterator?
-    var right: Right.Iterator?
+  @usableFromInline
+  internal struct Iterator: IteratorProtocol {
+    @usableFromInline
+    internal var left: Left.Iterator?
     
-    public mutating func next() -> Left.Element? {
+    @usableFromInline
+    internal var right: Right.Iterator?
+    
+    @inlinable
+    internal mutating func next() -> Left.Element? {
       left?.next() ?? right?.next()
     }
   }
   
   @usableFromInline
-  func makeIterator() -> Iterator {
+  internal func makeIterator() -> Iterator {
     switch self {
     case .left(let left):
       return Iterator(left: left.makeIterator(), right: nil)
