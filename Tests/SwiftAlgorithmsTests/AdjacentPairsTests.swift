@@ -18,9 +18,19 @@ final class AdjacentPairsTests: XCTestCase {
     XCTAssertEqualSequences(pairs, [], by: ==)
   }
   
+  func testEmptySequenceWrapped() {
+    let pairs = (0...).prefix(0).adjacentPairs(wrapping: true)
+    XCTAssertEqualSequences(pairs, [], by: ==)
+  }
+  
   func testOneElementSequence() {
     let pairs = (0...).prefix(1).adjacentPairs()
     XCTAssertEqualSequences(pairs, [], by: ==)
+  }
+  
+  func testOneElementSequenceWrapping() {
+    let pairs = (0...).prefix(1).adjacentPairs(wrapping: true)
+    XCTAssertEqualSequences(pairs, [(0, 0)], by: ==)
   }
   
   func testTwoElementSequence() {
@@ -28,15 +38,32 @@ final class AdjacentPairsTests: XCTestCase {
     XCTAssertEqualSequences(pairs, [(0, 1)], by: ==)
   }
   
+  func testTwoElementSequenceWrapping() {
+    let pairs = (0...).prefix(2).adjacentPairs(wrapping: true)
+    XCTAssertEqualSequences(pairs, [(0, 1), (1, 0)], by: ==)
+  }
+  
   func testThreeElementSequence() {
     let pairs = (0...).prefix(3).adjacentPairs()
     XCTAssertEqualSequences(pairs, [(0, 1), (1, 2)], by: ==)
+  }
+  
+  func testThreeElementSequenceWrapping() {
+    let pairs = (0...).prefix(3).adjacentPairs(wrapping: true)
+    XCTAssertEqualSequences(pairs, [(0, 1), (1, 2), (2, 0)], by: ==)
   }
   
   func testManySequences() {
     for n in 4...100 {
       let pairs = (0...).prefix(n).adjacentPairs()
       XCTAssertEqualSequences(pairs, zip(0..., 1...).prefix(n - 1), by: ==)
+    }
+  }
+  
+  func testManySequencesWrapping() {
+    for n in 4...100 {
+      let pairs = (0...).prefix(n).adjacentPairs(wrapping: true)
+      XCTAssertEqualSequences(pairs, chain(zip(0..., 1...).prefix(n - 1), [((n - 1), 0)]), by: ==)
     }
   }
   
