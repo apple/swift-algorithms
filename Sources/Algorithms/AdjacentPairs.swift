@@ -64,9 +64,13 @@ extension Collection {
   ///     // Prints "(2, 3)"
   ///     // Prints "(3, 4)"
   ///     // Prints "(4, 5)"
+  ///
+  /// - Parameter wrapping: If `true`, include the pair of the last and first
+  /// elements of the collection as the last element of the returned
+  /// collection. Defaults to `false`.
   @inlinable
-  public func adjacentPairs() -> AdjacentPairsCollection<Self> {
-    AdjacentPairsCollection(base: self)
+  public func adjacentPairs(wrapping: Bool = false) -> AdjacentPairsCollection<Self> {
+    AdjacentPairsCollection(base: self, wrapping: wrapping)
   }
 }
 
@@ -168,11 +172,16 @@ public struct AdjacentPairsCollection<Base: Collection> {
   @usableFromInline
   internal let base: Base
   
+  @usableFromInline
+  internal let wrapping: Bool
+  
   public let startIndex: Index
   
   @inlinable
-  internal init(base: Base) {
+  internal init(base: Base, wrapping: Bool) {
     self.base = base
+    
+    self.wrapping = wrapping
     
     // Lazily build the end index, since we can't use the instance
     // property pre-initialization
@@ -186,11 +195,11 @@ public struct AdjacentPairsCollection<Base: Collection> {
       return
     }
     
-    // If there's only one element (i.e., the second index of base == endIndex),
+    // If there's only one element (i.e., the second index of base == endIndex)
     // then this collection should be empty.
     let secondIndex = base.index(after: base.startIndex)
     self.startIndex = secondIndex == base.endIndex
-      ? endIndex
+      ? (wrapping ? Index(first: base.startIndex, second: base.startIndex) : endIndex)
       : Index(first: base.startIndex, second: secondIndex)
   }
 }
@@ -200,7 +209,7 @@ extension AdjacentPairsCollection {
   
   @inlinable
   public func makeIterator() -> Iterator {
-    Iterator(base: base.makeIterator(), wrapping: false)
+    Iterator(base: base.makeIterator(), wrapping: wrapping)
   }
 }
 
@@ -245,6 +254,17 @@ extension AdjacentPairsCollection: Collection {
   @inlinable
   public func index(after i: Index) -> Index {
     precondition(i != endIndex, "Can't advance beyond endIndex")
+    
+    if wrapping {
+      guard i.second != base.startIndex
+      else { return endIndex }
+      let newFirst = i.second
+      let newSecond = newFirst < base.endIndex
+        ? base.index(after: newFirst)
+        : base.startIndex
+      return Index(first: newFirst, second: newSecond)
+    }
+    
     let next = base.index(after: i.second)
     return next == base.endIndex
       ? endIndex
@@ -285,6 +305,17 @@ extension AdjacentPairsCollection: Collection {
     assert(distance > 0)
     assert(limit > i)
     
+    if wrapping {
+      guard let newFirst = base.index(i.first, offsetBy: distance, limitedBy: limit.first)
+      else { return nil }
+      guard newFirst != base.endIndex
+      else { return endIndex }
+      let newSecond = base.index(after: newFirst)
+      return newSecond == base.endIndex
+        ? Index(first: newFirst, second: base.startIndex)
+        : Index(first: newFirst, second: newSecond)
+    }
+    
     guard let newFirst = base.index(i.second, offsetBy: distance - 1, limitedBy: limit.first),
           newFirst != base.endIndex
     else { return nil }
@@ -303,6 +334,13 @@ extension AdjacentPairsCollection: Collection {
     assert(distance > 0)
     assert(limit < i)
     
+    if wrapping {
+      guard let newFirst = base.index(i.first, offsetBy: -distance, limitedBy: limit.first)
+      else { return nil }
+      let newSecond = base.index(after: newFirst)
+      return Index(first: newFirst, second: newSecond)
+    }
+    
     let offset = i == endIndex ? 0 : 1
     guard let newSecond = base.index(
       i.first,
@@ -320,12 +358,20 @@ extension AdjacentPairsCollection: Collection {
     // `endIndex` and the penultimate index of this collection, the `second`
     // base index values are consistently one step apart throughout the
     // entire collection.
-    base.distance(from: start.second, to: end.second)
+    if wrapping {
+      return base.distance(from: start.first, to: end.first)
+    } else {
+      return base.distance(from: start.second, to: end.second)
+    }
   }
   
   @inlinable
   public var count: Int {
-    Swift.max(0, base.count - 1)
+    if wrapping {
+      return base.count
+    } else {
+      return Swift.max(0, base.count - 1)
+    }
   }
 }
 
@@ -335,6 +381,10 @@ extension AdjacentPairsCollection: BidirectionalCollection
   @inlinable
   public func index(before i: Index) -> Index {
     precondition(i != startIndex, "Can't offset before startIndex")
+    if wrapping {
+      return Index(first: base.index(before: i.first), second: i.first)
+    }
+    
     let second = i == endIndex
       ? base.index(before: base.endIndex)
       : i.first
