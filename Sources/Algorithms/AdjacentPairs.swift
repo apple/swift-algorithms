@@ -60,7 +60,7 @@ extension Collection {
 public struct AdjacentPairsSequence<Base: Sequence> {
   @usableFromInline
   internal let base: Base
-
+  
   /// Creates an instance that makes pairs of adjacent elements from `base`.
   @inlinable
   internal init(base: Base) {
@@ -86,7 +86,7 @@ extension AdjacentPairsSequence {
 
 extension AdjacentPairsSequence.Iterator: IteratorProtocol {
   public typealias Element = (Base.Element, Base.Element)
-
+  
   @inlinable
   public mutating func next() -> Element? {
     if previousElement == nil {
@@ -107,7 +107,7 @@ extension AdjacentPairsSequence: Sequence {
   public func makeIterator() -> Iterator {
     Iterator(base: base.makeIterator())
   }
-
+  
   @inlinable
   public var underestimatedCount: Int {
     Swift.max(0, base.underestimatedCount - 1)
@@ -125,9 +125,9 @@ extension AdjacentPairsSequence: LazySequenceProtocol
 public struct AdjacentPairsCollection<Base: Collection> {
   @usableFromInline
   internal let base: Base
-
+  
   public let startIndex: Index
-
+  
   @inlinable
   internal init(base: Base) {
     self.base = base
@@ -137,7 +137,7 @@ public struct AdjacentPairsCollection<Base: Collection> {
     var endIndex: Index {
       Index(first: base.endIndex, second: base.endIndex)
     }
-
+    
     // Precompute `startIndex` to ensure O(1) behavior.
     guard !base.isEmpty else {
       self.startIndex = endIndex
@@ -155,7 +155,7 @@ public struct AdjacentPairsCollection<Base: Collection> {
 
 extension AdjacentPairsCollection {
   public typealias Iterator = AdjacentPairsSequence<Base>.Iterator
-
+  
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(base: base.makeIterator())
@@ -170,13 +170,13 @@ extension AdjacentPairsCollection {
     
     @usableFromInline
     internal var second: Base.Index
-
+    
     @inlinable
     internal init(first: Base.Index, second: Base.Index) {
       self.first = first
       self.second = second
     }
-
+    
     @inlinable
     public static func ==(lhs: Index, rhs: Index) -> Bool {
       lhs.first == rhs.first
@@ -194,12 +194,12 @@ extension AdjacentPairsCollection: Collection {
   public var endIndex: Index {
     Index(first: base.endIndex, second: base.endIndex)
   }
-
+  
   @inlinable
   public subscript(position: Index) -> (Base.Element, Base.Element) {
     (base[position.first], base[position.second])
   }
-
+  
   @inlinable
   public func index(after i: Index) -> Index {
     precondition(i != endIndex, "Can't advance beyond endIndex")
@@ -208,18 +208,18 @@ extension AdjacentPairsCollection: Collection {
       ? endIndex
       : Index(first: i.second, second: next)
   }
-
+  
   @inlinable
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     guard distance != 0 else { return i }
-
+    
     guard let result = distance > 0
       ? offsetForward(i, by: distance, limitedBy: endIndex)
       : offsetBackward(i, by: -distance, limitedBy: startIndex)
     else { fatalError("Index out of bounds") }
     return result
   }
-
+  
   @inlinable
   public func index(
     _ i: Index, offsetBy distance: Int, limitedBy limit: Index
@@ -260,7 +260,7 @@ extension AdjacentPairsCollection: Collection {
   ) -> Index? {
     assert(distance > 0)
     assert(limit < i)
-        
+    
     let offset = i == endIndex ? 0 : 1
     guard let newSecond = base.index(
       i.first,
@@ -271,7 +271,7 @@ extension AdjacentPairsCollection: Collection {
     precondition(newFirst >= base.startIndex, "Can't move before startIndex")
     return Index(first: newFirst, second: newSecond)
   }
-
+  
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     // While there's a 2-step gap between the `first` base index values in
@@ -280,7 +280,7 @@ extension AdjacentPairsCollection: Collection {
     // entire collection.
     base.distance(from: start.second, to: end.second)
   }
-
+  
   @inlinable
   public var count: Int {
     Swift.max(0, base.count - 1)
