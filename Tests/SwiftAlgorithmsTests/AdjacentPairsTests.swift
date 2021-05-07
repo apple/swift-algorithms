@@ -45,30 +45,30 @@ final class AdjacentPairsTests: XCTestCase {
     XCTAssertEqual(pairs.startIndex, pairs.endIndex)
     XCTAssertEqualSequences(pairs, [], by: ==)
   }
-
+  
   func testOneElement() {
     let pairs = (0..<1).adjacentPairs()
     XCTAssertEqual(pairs.startIndex, pairs.endIndex)
     XCTAssertEqualSequences(pairs, [], by: ==)
   }
-
+  
   func testTwoElements() {
     let pairs = (0..<2).adjacentPairs()
     XCTAssertEqualSequences(pairs, [(0, 1)], by: ==)
   }
-
+  
   func testThreeElements() {
     let pairs = (0..<3).adjacentPairs()
     XCTAssertEqualSequences(pairs, [(0, 1), (1, 2)], by: ==)
   }
-
+  
   func testManyElements() {
     for n in 4...100 {
       let pairs = (0..<n).adjacentPairs()
       XCTAssertEqualSequences(pairs, zip(0..., 1...).prefix(n - 1), by: ==)
     }
   }
-
+  
   func testIndexTraversals() {
     validateIndexTraversals(
       (0..<0).adjacentPairs(),
