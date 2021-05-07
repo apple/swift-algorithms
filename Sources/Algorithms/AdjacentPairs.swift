@@ -15,6 +15,7 @@ extension Sequence {
   /// In the `AdjacentPairsSequence` returned by this method, the elements of
   /// the *i*th pair are the *i*th and *(i+1)*th elements of the underlying
   /// sequence.
+  ///
   /// The following example uses the `adjacentPairs()` method to iterate over
   /// adjacent pairs of integers:
   ///
@@ -25,9 +26,25 @@ extension Sequence {
   ///     // Prints "(2, 3)"
   ///     // Prints "(3, 4)"
   ///     // Prints "(4, 5)"
+  ///
+  /// The following example uses `adjacentPairs(wrapping: true)` to iterate over
+  /// adjacent pairs of integers, including the last and first:
+  ///
+  ///     for pair in (1...).prefix(5).adjacentPairs(wrapping: true) {
+  ///         print(pair)
+  ///     }
+  ///     // Prints "(1, 2)"
+  ///     // Prints "(2, 3)"
+  ///     // Prints "(3, 4)"
+  ///     // Prints "(4, 5)"
+  ///     // Prints "(5, 1)"
+  ///
+  /// - Parameter wrapping: If `true`, include the pair of the last and first
+  /// elements of the sequence as the last elements of the returned sequence.
+  /// Defaults to `false`.
   @inlinable
-  public func adjacentPairs() -> AdjacentPairsSequence<Self> {
-    AdjacentPairsSequence(base: self)
+  public func adjacentPairs(wrapping: Bool = false) -> AdjacentPairsSequence<Self> {
+    AdjacentPairsSequence(base: self, wrapping: wrapping)
   }
 }
 
@@ -61,10 +78,14 @@ public struct AdjacentPairsSequence<Base: Sequence> {
   @usableFromInline
   internal let base: Base
   
+  @usableFromInline
+  internal let wrapping: Bool
+  
   /// Creates an instance that makes pairs of adjacent elements from `base`.
   @inlinable
-  internal init(base: Base) {
+  internal init(base: Base, wrapping: Bool) {
     self.base = base
+    self.wrapping = wrapping
   }
 }
 
@@ -73,13 +94,20 @@ extension AdjacentPairsSequence {
   public struct Iterator {
     @usableFromInline
     internal var base: Base.Iterator
-
+    
+    @usableFromInline
+    internal let wrapping: Bool
+    
     @usableFromInline
     internal var previousElement: Base.Element?
-
+    
+    @usableFromInline
+    internal var firstElement: Base.Element?
+    
     @inlinable
-    internal init(base: Base.Iterator) {
+    internal init(base: Base.Iterator, wrapping: Bool) {
       self.base = base
+      self.wrapping = wrapping
     }
   }
 }
@@ -91,26 +119,40 @@ extension AdjacentPairsSequence.Iterator: IteratorProtocol {
   public mutating func next() -> Element? {
     if previousElement == nil {
       previousElement = base.next()
+      if wrapping {
+        firstElement = previousElement
+      }
     }
-
-    guard let previous = previousElement, let next = base.next() else {
+    
+    guard let previous = previousElement else {
       return nil
     }
-
-    previousElement = next
-    return (previous, next)
+    
+    if let next = base.next() {
+      previousElement = next
+      return (previous, next)
+    } else if let first = firstElement {
+      firstElement = nil
+      return (previous, first)
+    } else {
+      return nil
+    }
   }
 }
 
 extension AdjacentPairsSequence: Sequence {
   @inlinable
   public func makeIterator() -> Iterator {
-    Iterator(base: base.makeIterator())
+    Iterator(base: base.makeIterator(), wrapping: wrapping)
   }
   
   @inlinable
   public var underestimatedCount: Int {
-    Swift.max(0, base.underestimatedCount - 1)
+    if wrapping {
+      return base.underestimatedCount
+    } else {
+      return Swift.max(0, base.underestimatedCount - 1)
+    }
   }
 }
 
@@ -158,7 +200,7 @@ extension AdjacentPairsCollection {
   
   @inlinable
   public func makeIterator() -> Iterator {
-    Iterator(base: base.makeIterator())
+    Iterator(base: base.makeIterator(), wrapping: false)
   }
 }
 
