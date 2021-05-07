@@ -144,7 +144,7 @@ public struct AdjacentPairsCollection<Base: Collection> {
       return
     }
     
-    // If there's only one element (i.e. the second index of base == endIndex)
+    // If there's only one element (i.e., the second index of base == endIndex),
     // then this collection should be empty.
     let secondIndex = base.index(after: base.startIndex)
     self.startIndex = secondIndex == base.endIndex
