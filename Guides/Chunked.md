@@ -22,18 +22,20 @@ let chunks = numbers.chunked(by: { $0 <= $1 })
 
 The `chunk(on:)` method, by contrast, takes a projection of each element and
 separates chunks where the projection of two consecutive elements is not equal.
+The result includes both the projected value and the subsequence 
+that groups elements with that projected value:
 
 ```swift
 let names = ["David", "Kyle", "Karoy", "Nate"]
 let chunks = names.chunked(on: \.first!)
-// [["David"], ["Kyle", "Karoy"], ["Nate"]] 
+// [("D", ["David"]), ("K", ["Kyle", "Karoy"]), ("N", ["Nate"])] 
 ```
 
-The `chunks(ofCount:)` takes a `count` parameter (required to be > 0) and separates 
-the collection into `n` chunks of this given count. If the `count` parameter is 
-evenly divided by the count of the base `Collection` all the chunks will have 
-the count equals to the parameter. Otherwise, the last chunk will contain the 
-remaining elements.
+The `chunks(ofCount:)` method takes a `count` parameter (greater than zero) 
+and separates the collection into chunks of this given count.
+If the `count` parameter is evenly divided by the count of the base `Collection`,
+all the chunks will have a count equal to the parameter. 
+Otherwise, the last chunk will contain the remaining elements.
  
 ```swift
 let names = ["David", "Kyle", "Karoy", "Nate"]
@@ -44,16 +46,16 @@ let remaining = names.chunks(ofCount: 3)
 // equivalent to [["David", "Kyle", "Karoy"], ["Nate"]]
 ```
 
-The `chunks(ofCount:)` is the method of the [existing SE proposal][proposal]. 
-Unlike the `split` family of methods, the entire collection is included in the
-chunked result — joining the resulting chunks recreates the original collection. 
+The  `chunks(ofCount:)` is the subject of an [existing SE proposal][proposal].
+
+When "chunking" a collection, the entire collection is included in the result, 
+unlike the `split` family of methods, where separators are dropped.
+Joining the result of a chunking method call recreates the original collection. 
 
 ```swift
 c.elementsEqual(c.chunked(...).joined())
 // true
 ```
-
-Check the [proposal][proposal] detailed design section for more info. 
 
 [proposal]: https://github.com/apple/swift-evolution/pull/935
 
@@ -70,21 +72,21 @@ extension Collection {
 
     public func chunked<Subject: Equatable>(
         on projection: (Element) -> Subject
-    ) -> [SubSequence]
+    ) -> [(Subject, SubSequence)]
   }
 
   extension LazyCollectionProtocol {
     public func chunked(
         by belongInSameGroup: @escaping (Element, Element) -> Bool
-    ) -> Chunked<Elements>
+    ) -> ChunkedBy<Elements, Element>
 
     public func chunked<Subject: Equatable>(
         on projection: @escaping (Element) -> Subject
-    ) -> Chunked<Elements>
+    ) -> ChunkedOn<Elements, Subject>
 }
 ```
 
-The `Chunked` type is bidirectional when the wrapped collection is
+The `ChunkedBy` and `ChunkedOn` types are bidirectional when the wrapped collection is
 bidirectional.
 
 ### Complexity
