@@ -79,7 +79,7 @@ public struct JoinedByClosureSequence<Base: Sequence, Separator: Sequence>
     self.inner = base.lazy
       .interspersedMap(
         EitherSequence.left,
-        by: { EitherSequence.right(separator($0, $1)) })
+        with: { EitherSequence.right(separator($0, $1)) })
       .joined()
   }
 }
@@ -227,7 +227,7 @@ public struct JoinedByClosureCollection<Base: Collection, Separator: Collection>
     self.inner = base.lazy
       .interspersedMap(
         EitherSequence.left,
-        by: { EitherSequence.right(separator($0, $1)) })
+        with: { EitherSequence.right(separator($0, $1)) })
       .joined()
   }
 }

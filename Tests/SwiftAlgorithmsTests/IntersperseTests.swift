@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
-import Algorithms
+@testable import Algorithms
 
 final class IntersperseTests: XCTestCase {
   func testSequence() {
@@ -61,5 +61,17 @@ final class IntersperseTests: XCTestCase {
   func testIntersperseLazy() {
     XCTAssertLazySequence((1...).prefix(0).lazy.interspersed(with: 0))
     XCTAssertLazyCollection("ABCDE".lazy.interspersed(with: "-"))
+  }
+  
+  func testInterspersedMap() {
+    validateIndexTraversals(
+      (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
+      (0..<1).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
+      (0..<2).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
+      (0..<5).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
+    
+    print(Array((1...5).lazy.interspersedMap(String.init, with: { left, right in
+      fatalError()
+    }).striding(by: 2)))
   }
 }

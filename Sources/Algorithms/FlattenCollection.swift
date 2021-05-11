@@ -58,42 +58,34 @@ extension FlattenCollection: Collection {
     Index(outer: base.endIndex, inner: nil)
   }
   
+  /// Forms an index from a pair of base indices, normalizing
+  /// `(i, base2.endIndex)` to `(base1.index(after: i), base2.startIndex)` if
+  /// necessary.
+  @inlinable
+  internal func normalizeIndex(
+    outer: Base.Index,
+    inner: Base.Element.Index
+  ) -> Index {
+    if inner == base[outer].endIndex {
+      let outer = base[base.index(after: outer)...]
+        .endOfPrefix(while: { $0.isEmpty })
+      let inner = outer == base.endIndex ? nil : base[outer].startIndex
+      return Index(outer: outer, inner: inner)
+    } else {
+      return Index(outer: outer, inner: inner)
+    }
+  }
+  
   @inlinable
   internal func index(after index: Index) -> Index {
     let element = base[index.outer]
     let nextInner = element.index(after: index.inner!)
-    
-    if nextInner == element.endIndex {
-      let nextOuter = base[base.index(after: index.outer)...]
-        .endOfPrefix(while: { $0.isEmpty })
-      let nextInner = nextOuter == base.endIndex
-        ? nil
-        : base[nextOuter].startIndex
-      return Index(outer: nextOuter, inner: nextInner)
-    } else {
-      return Index(outer: index.outer, inner: nextInner)
-    }
+    return normalizeIndex(outer: index.outer, inner: nextInner)
   }
   
   @inlinable
   internal subscript(position: Index) -> Base.Element.Element {
     base[position.outer][position.inner!]
-  }
-  
-  @inlinable
-  internal func index(_ index: Index, offsetBy distance: Int) -> Index {
-    // TODO
-    fatalError()
-  }
-  
-  @inlinable
-  internal func index(
-    _ index: Index,
-    offsetBy distance: Int,
-    limitedBy limit: Index
-  ) -> Index? {
-    // TODO
-    fatalError()
   }
   
   @inlinable
@@ -110,6 +102,153 @@ extension FlattenCollection: Collection {
     let lastPart = end.inner.map { base[end.outer][..<$0].count } ?? 0
     
     return firstPart + middlePart + lastPart
+  }
+  
+  @inlinable
+  internal func index(_ index: Index, offsetBy distance: Int) -> Index {
+    guard distance != 0 else { return index }
+    
+    return distance > 0
+      ? offsetForward(index, by: distance)
+      : offsetBackward(index, by: -distance)
+  }
+  
+  @inlinable
+  internal func index(
+    _ index: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    guard distance != 0 else { return index }
+    
+    if distance > 0 {
+      return limit >= index
+        ? offsetForward(index, by: distance, limitedBy: limit)
+        : offsetForward(index, by: distance)
+    } else {
+      return limit <= index
+        ? offsetBackward(index, by: -distance, limitedBy: limit)
+        : offsetBackward(index, by: -distance)
+    }
+  }
+  
+  @inlinable
+  internal func offsetForward(_ i: Index, by distance: Int) -> Index {
+    guard let index = offsetForward(i, by: distance, limitedBy: endIndex)
+      else { fatalError("Index is out of bounds") }
+    return index
+  }
+  
+  @inlinable
+  internal func offsetBackward(_ i: Index, by distance: Int) -> Index {
+    guard let index = offsetBackward(i, by: distance, limitedBy: startIndex)
+      else { fatalError("Index is out of bounds") }
+    return index
+  }
+  
+  @inlinable
+  internal func offsetForward(
+    _ index: Index, by distance: Int, limitedBy limit: Index
+  ) -> Index? {
+    assert(distance > 0)
+    assert(limit >= index)
+    
+    if index.outer == limit.outer {
+      if let indexInner = index.inner, let limitInner = limit.inner {
+        return base[index.outer]
+          .index(indexInner, offsetBy: distance, limitedBy: limitInner)
+          .map { inner in Index(outer: index.outer, inner: inner) }
+      } else {
+        // `index` and `limit` are both `endIndex`
+        return nil
+      }
+    }
+    
+    // `index <= limit` and `index.outer != limit.outer`, so `index != endIndex`
+    let indexInner = index.inner!
+    let element = base[index.outer]
+    
+    if let inner = element.index(
+        indexInner,
+        offsetBy: distance,
+        limitedBy: element.endIndex
+    ) {
+      return normalizeIndex(outer: index.outer, inner: inner)
+    }
+    
+    var remainder = distance - element[indexInner...].count
+    var outer = base.index(after: index.outer)
+    
+    while outer != limit.outer {
+      let element = base[outer]
+      
+      if let inner = element.index(
+          element.startIndex,
+          offsetBy: remainder,
+          limitedBy: element.endIndex
+      ) {
+        return normalizeIndex(outer: outer, inner: inner)
+      }
+      
+      remainder -= element.count
+      base.formIndex(after: &outer)
+    }
+    
+    if let limitInner = limit.inner {
+      let element = base[outer]
+      return element.index(element.startIndex, offsetBy: remainder, limitedBy: limitInner)
+        .map { inner in Index(outer: outer, inner: inner) }
+    } else {
+      return nil
+    }
+  }
+  
+  @inlinable
+  internal func offsetBackward(
+    _ index: Index, by distance: Int, limitedBy limit: Index
+  ) -> Index? {
+    assert(distance > 0)
+    assert(limit <= index)
+    
+    if index.outer == limit.outer {
+      if let indexInner = index.inner, let limitInner = limit.inner {
+        return base[index.outer]
+          .index(indexInner, offsetBy: -distance, limitedBy: limitInner)
+          .map { inner in Index(outer: index.outer, inner: inner) }
+      } else {
+        // `index` and `limit` are both `endIndex`
+        return nil
+      }
+    }
+    
+    var remainder = distance
+    
+    if let indexInner = index.inner {
+      let element = base[index.outer]
+      
+      if let inner = element.index(indexInner, offsetBy: -remainder, limitedBy: element.startIndex) {
+        return Index(outer: index.outer, inner: inner)
+      }
+      
+      remainder -= element[..<indexInner].count
+    }
+    
+    var outer = base.index(index.outer, offsetBy: -1)
+    
+    while outer != limit.outer {
+      let element = base[outer]
+      
+      if let inner = element.index(element.endIndex, offsetBy: -remainder, limitedBy: element.startIndex) {
+        return Index(outer: outer, inner: inner)
+      }
+      
+      remainder -= element.count
+      base.formIndex(&outer, offsetBy: -1)
+    }
+    
+    let element = base[outer]
+    return element.index(element.endIndex, offsetBy: -remainder, limitedBy: limit.inner!)
+      .map { inner in Index(outer: outer, inner: inner) }
   }
 }
 
@@ -133,6 +272,10 @@ extension FlattenCollection: BidirectionalCollection
     return Index(outer: previousOuter, inner: previousInner)
   }
 }
+
+//===----------------------------------------------------------------------===//
+// joined()
+//===----------------------------------------------------------------------===//
 
 extension Collection where Element: Collection {
   @inlinable

@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
-import Algorithms
+@testable import Algorithms
 
 final class JoinedTests: XCTestCase {
   func testSequence() {
@@ -19,21 +19,29 @@ final class JoinedTests: XCTestCase {
     }
   }
   
-  func testIndexTraversals() {
+  func testJoinedIndexTraversals() {
     validateIndexTraversals(
-      [0..<3, 3..<6].joined(by: 100),
-      [0..<0, 0..<5, 3..<6].joined(by: 100),
-      [0..<3, 3..<6, 6..<6].joined(by: 100),
-      [0..<0, 0..<0, 0..<3, 3..<6, 6..<6, 6..<6].joined(by: 100))
-    
+      [].joined(),
+      [[]].joined(),
+      [[], []].joined(),
+      [[0]].joined(),
+      [[], [0], [1, 2], [3], []].joined(),
+      [[], [], [0], [1], [], [], [2, 3], [], []].joined())
+  }
+  
+  func testJoinedByIndexTraversals() {
     let elements: [[Range<Int>]] = [
       [],
       [0..<0],
       [0..<3],
       [0..<3, 3..<6],
-      [0..<0, 0..<5, 3..<6, 6..<6],
-      [0..<0, 0..<0, 0..<3, 3..<6, 6..<6, 6..<6]
+      [0..<0, 0..<3, 3..<6, 6..<6],
+      [0..<0, 0..<0, 0..<3, 3..<3, 3..<6, 6..<6, 6..<6]
     ]
+    
+    for collection in elements {
+      validateIndexTraversals(collection.joined(by: 100))
+    }
     
     let separators: [[Int]] = [[], [100], [100, 101]]
     

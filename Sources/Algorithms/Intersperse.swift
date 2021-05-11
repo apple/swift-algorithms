@@ -85,7 +85,7 @@ extension Intersperse: Collection where Base: Collection {
   /// A position in an `Intersperse` collection.
   public struct Index: Comparable {
     @usableFromInline
-    enum Representation: Equatable {
+    internal enum Representation: Equatable {
       case element(Base.Index)
       case separator(next: Base.Index)
     }
@@ -94,7 +94,7 @@ extension Intersperse: Collection where Base: Collection {
     internal let representation: Representation
 
     @inlinable
-    init(representation: Representation) {
+    internal init(representation: Representation) {
       self.representation = representation
     }
 
@@ -111,12 +111,12 @@ extension Intersperse: Collection where Base: Collection {
     }
     
     @inlinable
-    static func element(_ index: Base.Index) -> Self {
+    internal static func element(_ index: Base.Index) -> Self {
       Self(representation: .element(index))
     }
 
     @inlinable
-    static func separator(next: Base.Index) -> Self {
+    internal static func separator(next: Base.Index) -> Self {
       Self(representation: .separator(next: next))
     }
   }
@@ -151,21 +151,6 @@ extension Intersperse: Collection where Base: Collection {
   }
   
   @inlinable
-  public func index(_ i: Index, offsetBy distance: Int) -> Index {
-    switch (i.representation, distance.isMultiple(of: 2)) {
-    case (let .element(index), true):
-      return .element(base.index(index, offsetBy: distance / 2))
-    case (let .element(index), false):
-      return .separator(next: base.index(index, offsetBy: (distance + 1) / 2))
-    case (let .separator(next: index), true):
-      return .separator(next: base.index(index, offsetBy: distance / 2))
-    case (let .separator(next: index), false):
-      return .element(base.index(index, offsetBy: (distance - 1) / 2))
-    }
-  }
-
-  // TODO: Implement index(_:offsetBy:limitedBy:)
-  @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     switch (start.representation, end.representation) {
     case let (.element(element), .separator(next: separator)):
@@ -175,6 +160,98 @@ extension Intersperse: Collection where Base: Collection {
     case let (.element(start), .element(end)),
          let (.separator(start), .separator(end)):
       return 2 * base.distance(from: start, to: end)
+    }
+  }
+  
+  @inlinable
+  public func index(_ index: Index, offsetBy distance: Int) -> Index {
+    distance >= 0
+      ? offsetForward(index, by: distance)
+      : offsetBackward(index, by: -distance)
+  }
+
+  @inlinable
+  public func index(
+      _ index: Index,
+      offsetBy distance: Int,
+      limitedBy limit: Index
+    ) -> Index? {
+      if distance >= 0 {
+        return limit >= index
+          ? offsetForward(index, by: distance, limitedBy: limit)
+          : offsetForward(index, by: distance)
+      } else {
+        return limit <= index
+          ? offsetBackward(index, by: -distance, limitedBy: limit)
+          : offsetBackward(index, by: -distance)
+      }
+    }
+  
+  @inlinable
+  internal func offsetForward(_ i: Index, by distance: Int) -> Index {
+    guard let index = offsetForward(i, by: distance, limitedBy: endIndex)
+      else { fatalError("Index is out of bounds") }
+    return index
+  }
+  
+  @inlinable
+  internal func offsetBackward(_ i: Index, by distance: Int) -> Index {
+    guard let index = offsetBackward(i, by: distance, limitedBy: startIndex)
+      else { fatalError("Index is out of bounds") }
+    return index
+  }
+    
+  @inlinable
+  internal func offsetForward(
+    _ index: Index, by distance: Int, limitedBy limit: Index
+  ) -> Index? {
+    assert(distance >= 0)
+    assert(limit >= index)
+    
+    switch (index.representation, limit.representation, distance.isMultiple(of: 2)) {
+    case let (.element(index), .element(limit), true),
+         let (.separator(next: index), .element(limit), false):
+      return base.index(index, offsetBy: distance / 2, limitedBy: limit)
+        .map { .element($0) }
+      
+    case let (.element(index), .element(limit), false),
+         let (.element(index), .separator(next: limit), false),
+         let (.separator(next: index), .element(limit), true),
+         let (.separator(next: index), .separator(next: limit), true):
+      return base.index(index, offsetBy: (distance + 1) / 2, limitedBy: limit)
+        .map { .separator(next: $0) }
+      
+    case let (.element(index), .separator(next: limit), true),
+         let (.separator(next: index), .separator(next: limit), false):
+      return base.index(index, offsetBy: distance / 2, limitedBy: limit)
+        .flatMap { $0 == limit ? nil : .element($0) }
+    }
+  }
+  
+  @inlinable
+  internal func offsetBackward(
+    _ index: Index, by distance: Int, limitedBy limit: Index
+  ) -> Index? {
+    assert(distance >= 0)
+    assert(limit <= index)
+    
+    switch (index.representation, limit.representation, distance.isMultiple(of: 2)) {
+    case let (.element(index), .element(limit), true),
+         let (.element(index), .separator(next: limit), true),
+         let (.separator(next: index), .element(limit), false),
+         let (.separator(next: index), .separator(next: limit), false):
+      return base.index(index, offsetBy: -((distance + 1) / 2), limitedBy: limit)
+        .map { .element($0) }
+      
+    case let (.element(index), .separator(next: limit), false),
+         let (.separator(next: index), .separator(next: limit), true):
+      return base.index(index, offsetBy: -(distance / 2), limitedBy: limit)
+        .map { .separator(next: $0) }
+      
+    case let (.element(index), .element(limit), false),
+         let (.separator(next: index), .element(limit), true):
+      return base.index(index, offsetBy: -(distance / 2), limitedBy: limit)
+        .flatMap { $0 == limit ? nil : .separator(next: $0) }
     }
   }
 }
@@ -292,15 +369,25 @@ extension InterspersedMap: Collection where Base: Collection {
     internal let representation: Representation
     
     @inlinable
-    internal init(_ representation: Representation) {
+    internal init(representation: Representation) {
       self.representation = representation
+    }
+    
+    @inlinable
+    internal static func element(_ index: Base.Index) -> Self {
+      Self(representation: .element(index))
+    }
+
+    @inlinable
+    internal static func separator(previous: Base.Index, next: Base.Index) -> Self {
+      Self(representation: .separator(previous: previous, next: next))
     }
     
     @inlinable
     internal static func == (lhs: Self, rhs: Self) -> Bool {
       switch (lhs.representation, rhs.representation) {
       case let (.element(lhs), .element(rhs)),
-           let (.separator(_, lhs), .separator(_, rhs)):
+           let (.separator(_, next: lhs), .separator(_, next: rhs)):
         return lhs == rhs
       case (.element, .separator), (.separator, .element):
         return false
@@ -311,9 +398,9 @@ extension InterspersedMap: Collection where Base: Collection {
     internal static func < (lhs: Self, rhs: Self) -> Bool {
       switch (lhs.representation, rhs.representation) {
       case let (.element(lhs), .element(rhs)),
-           let (.separator(_, lhs), .separator(_, rhs)),
-           let (.element(lhs), .separator(_, rhs)),
-           let (.separator(lhs, _), .element(rhs)):
+           let (.separator(_, next: lhs), .separator(_, next: rhs)),
+           let (.element(lhs), .separator(_, next: rhs)),
+           let (.separator(previous: lhs, _), .element(rhs)):
         return lhs < rhs
       }
     }
@@ -321,12 +408,12 @@ extension InterspersedMap: Collection where Base: Collection {
   
   @inlinable
   internal var startIndex: Index {
-    base.isEmpty ? endIndex : Index(.element(base.startIndex))
+    base.isEmpty ? endIndex : .element(base.startIndex)
   }
   
   @inlinable
   internal var endIndex: Index {
-    Index(.separator(previous: base.endIndex, next: base.endIndex))
+    .separator(previous: base.endIndex, next: base.endIndex)
   }
   
   @inlinable
@@ -334,9 +421,9 @@ extension InterspersedMap: Collection where Base: Collection {
     switch index.representation {
     case .element(let index):
       let next = base.index(after: index)
-      return Index(.separator(previous: index, next: next))
+      return .separator(previous: index, next: next)
     case .separator(_, let next):
-      return Index(.element(next))
+      return .element(next)
     }
   }
   
@@ -351,9 +438,25 @@ extension InterspersedMap: Collection where Base: Collection {
   }
   
   @inlinable
+  internal func distance(from start: Index, to end: Index) -> Int {
+    switch (start.representation, end.representation) {
+    case let (.element(lhs), .element(rhs)),
+         let (.separator(_, next: lhs), .separator(_, next: rhs)):
+      return 2 * base.distance(from: lhs, to: rhs)
+    case let (.element(lhs), .separator(_, next: rhs)):
+      return 2 * base.distance(from: lhs, to: rhs) - 1
+    case let (.separator(_, next: lhs), .element(rhs)):
+      return 2 * base.distance(from: lhs, to: rhs) + 1
+    }
+  }
+  
+  @inlinable
   internal func index(_ index: Index, offsetBy distance: Int) -> Index {
-    // TODO
-    fatalError()
+    guard distance != 0 else { return index }
+    
+    return distance > 0
+      ? offsetForward(index, by: distance)
+      : offsetBackward(index, by: -distance)
   }
   
   @inlinable
@@ -362,14 +465,95 @@ extension InterspersedMap: Collection where Base: Collection {
     offsetBy distance: Int,
     limitedBy limit: Index
   ) -> Index? {
-    // TODO
-    fatalError()
+    guard distance != 0 else { return index }
+    
+    if distance > 0 {
+      return limit >= index
+        ? offsetForward(index, by: distance, limitedBy: limit)
+        : offsetForward(index, by: distance)
+    } else {
+      return limit <= index
+        ? offsetBackward(index, by: -distance, limitedBy: limit)
+        : offsetBackward(index, by: -distance)
+    }
   }
   
   @inlinable
-  internal func distance(from start: Index, to end: Index) -> Int {
-    // TODO
-    fatalError()
+  internal func offsetForward(_ i: Index, by distance: Int) -> Index {
+    guard let index = offsetForward(i, by: distance, limitedBy: endIndex)
+    else { fatalError("Index is out of bounds") }
+    return index
+  }
+  
+  @inlinable
+  internal func offsetBackward(_ i: Index, by distance: Int) -> Index {
+    guard let index = offsetBackward(i, by: distance, limitedBy: startIndex)
+    else { fatalError("Index is out of bounds") }
+    return index
+  }
+  
+  @inlinable
+  internal func offsetForward(
+    _ index: Index, by distance: Int, limitedBy limit: Index
+  ) -> Index? {
+    assert(distance > 0)
+    assert(limit >= index)
+    
+    switch (index.representation, limit.representation, distance.isMultiple(of: 2)) {
+    case let (.element(index), .element(limit), true),
+         let (.separator(_, next: index), .element(limit), false):
+      return base.index(index, offsetBy: distance / 2, limitedBy: limit)
+        .map { .element($0) }
+      
+    case let (.element(index), .element(limit), false),
+         let (.element(index), .separator(_, next: limit), false),
+         let (.separator(_, next: index), .element(limit), true),
+         let (.separator(_, next: index), .separator(_, next: limit), true):
+      return base.index(index, offsetBy: (distance - 1) / 2, limitedBy: limit)
+        .flatMap {
+          guard $0 != limit else { return nil }
+          let next = base.index(after: $0)
+          return next == base.endIndex
+            ? endIndex
+            : .separator(previous: $0, next: next)
+        }
+      
+    case let (.element(index), .separator(_, next: limit), true),
+         let (.separator(_, next: index), .separator(_, next: limit), false):
+      return base.index(index, offsetBy: distance / 2, limitedBy: limit)
+        .flatMap { $0 == limit ? nil : .element($0) }
+    }
+  }
+  
+  @inlinable
+  internal func offsetBackward(
+    _ index: Index, by distance: Int, limitedBy limit: Index
+  ) -> Index? {
+    assert(distance > 0)
+    assert(limit <= index)
+    
+    switch (index.representation, limit.representation, distance.isMultiple(of: 2)) {
+    case let (.element(index), .element(limit), true),
+         let (.element(index), .separator(_, next: limit), true),
+         let (.separator(_, next: index), .element(limit), false),
+         let (.separator(_, next: index), .separator(_, next: limit), false):
+      return base.index(index, offsetBy: -((distance + 1) / 2), limitedBy: limit)
+        .map { .element($0) }
+      
+    case let (.element(index), .separator(_, next: limit), false),
+         let (.separator(_, next: index), .separator(_, next: limit), true):
+      return base.index(index, offsetBy: -(distance / 2), limitedBy: limit)
+        .map { .separator(previous: base.index($0, offsetBy: -1), next: $0) }
+      
+    case let (.element(index), .element(limit), false),
+         let (.separator(_, next: index), .element(limit), true):
+      return base.index(index, offsetBy: -(distance / 2), limitedBy: limit)
+        .flatMap {
+          $0 == limit
+            ? nil
+            : .separator(previous: base.index($0, offsetBy: -1), next: $0)
+        }
+    }
   }
 }
 
@@ -381,10 +565,10 @@ extension InterspersedMap: BidirectionalCollection
     switch index.representation {
     case .element(let index):
       let previous = base.index(before: index)
-      return Index(.separator(previous: previous, next: index))
+      return .separator(previous: previous, next: index)
     case let .separator(previous, next):
       let index = next == base.endIndex ? base.index(before: next) : previous
-      return Index(.element(index))
+      return .element(index)
     }
   }
 }
@@ -437,7 +621,7 @@ extension LazySequenceProtocol {
   @usableFromInline
   internal func interspersedMap<Result>(
     _ transform: @escaping (Element) -> Result,
-    by separator: @escaping (Element, Element) -> Result
+    with separator: @escaping (Element, Element) -> Result
   ) -> InterspersedMap<Self, Result> {
     InterspersedMap(base: self, transform: transform, separator: separator)
   }
