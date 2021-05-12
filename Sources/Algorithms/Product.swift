@@ -12,11 +12,14 @@
 /// A sequence that represents the product of two sequences' elements.
 public struct Product2<Base1: Sequence, Base2: Collection> {
   /// The outer sequence in the product.
-  public let base1: Base1
-  /// The inner sequence in the product.
-  public let base2: Base2
-  
   @usableFromInline
+  internal let base1: Base1
+  
+  /// The inner sequence in the product.
+  @usableFromInline
+  internal let base2: Base2
+  
+  @inlinable
   internal init(_ base1: Base1, _ base2: Base2) {
     self.base1 = base1
     self.base2 = base2
@@ -24,6 +27,8 @@ public struct Product2<Base1: Sequence, Base2: Collection> {
 }
 
 extension Product2: Sequence {
+  public typealias Element = (Base1.Element, Base2.Element)
+  
   /// The iterator for a `Product2` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -35,7 +40,7 @@ extension Product2: Sequence {
     @usableFromInline
     internal let base2: Base2
 
-    @usableFromInline
+    @inlinable
     internal init(_ c: Product2) {
       self.base2 = c.base2
       self.i1 = c.base1.makeIterator()
@@ -44,7 +49,8 @@ extension Product2: Sequence {
     }
     
     @inlinable
-    public mutating func next() -> (Base1.Element, Base2.Element)? {
+    public mutating func next() -> (Base1.Element,
+                                    Base2.Element)? {
       // This is the initial state, where i1.next() has never
       // been called, or the final state, where i1.next() has
       // already returned nil.
@@ -90,7 +96,7 @@ extension Product2: Collection where Base1: Collection {
     @usableFromInline
     internal var i2: Base2.Index
     
-    @usableFromInline
+    @inlinable
     internal init(i1: Base1.Index, i2: Base2.Index) {
       self.i1 = i1
       self.i2 = i2
@@ -121,14 +127,15 @@ extension Product2: Collection where Base1: Collection {
   }
   
   @inlinable
-  public subscript(position: Index) -> (Base1.Element, Base2.Element) {
+  public subscript(position: Index) -> (Base1.Element,
+                                        Base2.Element) {
     (base1[position.i1], base2[position.i2])
   }
   
   /// Forms an index from a pair of base indices, normalizing
   /// `(i, base2.endIndex)` to `(base1.index(after: i), base2.startIndex)` if
   /// necessary.
-  @usableFromInline
+  @inlinable
   internal func normalizeIndex(_ i1: Base1.Index, _ i2: Base2.Index) -> Index {
     i2 == base2.endIndex
       ? Index(i1: base1.index(after: i1), i2: base2.startIndex)
@@ -195,6 +202,7 @@ extension Product2: Collection where Base1: Collection {
     }
   }
   
+  @inlinable
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     guard distance != 0 else { return i }
     
@@ -203,6 +211,7 @@ extension Product2: Collection where Base1: Collection {
       : offsetBackward(i, by: -distance)
   }
   
+  @inlinable
   public func index(
     _ i: Index,
     offsetBy distance: Int,
@@ -219,21 +228,21 @@ extension Product2: Collection where Base1: Collection {
     }
   }
 
-  @usableFromInline
+  @inlinable
   internal func offsetForward(_ i: Index, by distance: Int) -> Index {
     guard let index = offsetForward(i, by: distance, limitedBy: endIndex)
       else { fatalError("Index is out of bounds") }
     return index
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(_ i: Index, by distance: Int) -> Index {
     guard let index = offsetBackward(i, by: distance, limitedBy: startIndex)
       else { fatalError("Index is out of bounds") }
     return index
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetForward(
     _ i: Index, by distance: Int, limitedBy limit: Index
   ) -> Index? {
@@ -311,7 +320,7 @@ extension Product2: Collection where Base1: Collection {
       .map { i2 in Index(i1: i1, i2: i2) }
   }
 
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(
     _ i: Index, by distance: Int, limitedBy limit: Index
   ) -> Index? {
@@ -431,8 +440,6 @@ extension Product2: RandomAccessCollection
   where Base1: RandomAccessCollection, Base2: RandomAccessCollection {}
 
 extension Product2.Index: Hashable where Base1.Index: Hashable, Base2.Index: Hashable {}
-extension Product2: Equatable where Base1: Equatable, Base2: Equatable {}
-extension Product2: Hashable where Base1: Hashable, Base2: Hashable {}
 
 //===----------------------------------------------------------------------===//
 // product(_:_:)

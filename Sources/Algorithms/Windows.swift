@@ -47,13 +47,16 @@ extension Collection {
 /// A collection wrapper that presents a sliding window over the elements of
 /// a collection.
 public struct Windows<Base: Collection> {
-  public let base: Base
-  public let size: Int
+  @usableFromInline
+  internal let base: Base
+  
+  @usableFromInline
+  internal let size: Int
   
   @usableFromInline
   internal var firstUpperBound: Base.Index?
 
-  @usableFromInline
+  @inlinable
   internal init(base: Base, size: Int) {
     precondition(size > 0, "Windows size must be greater than zero")
     self.base = base
@@ -72,7 +75,7 @@ extension Windows: Collection {
     @usableFromInline
     internal var upperBound: Base.Index
     
-    @usableFromInline
+    @inlinable
     internal init(lowerBound: Base.Index, upperBound: Base.Index) {
       self.lowerBound = lowerBound
       self.upperBound = upperBound
@@ -150,21 +153,21 @@ extension Windows: Collection {
     }
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetForward(_ i: Index, by distance: Int) -> Index {
     guard let index = offsetForward(i, by: distance, limitedBy: endIndex)
       else { fatalError("Index is out of bounds") }
     return index
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(_ i: Index, by distance: Int) -> Index {
     guard let index = offsetBackward(i, by: distance, limitedBy: startIndex)
       else { fatalError("Index is out of bounds") }
     return index
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetForward(
     _ i: Index, by distance: Int, limitedBy limit: Index
   ) -> Index? {
@@ -235,7 +238,7 @@ extension Windows: Collection {
     }
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(
       _ i: Index, by distance: Int, limitedBy limit: Index
     ) -> Index? {
@@ -347,6 +350,4 @@ extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
 extension Windows: LazySequenceProtocol where Base: LazySequenceProtocol {}
 extension Windows: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
 extension Windows: RandomAccessCollection where Base: RandomAccessCollection {}
-extension Windows: Equatable where Base: Equatable {}
-extension Windows: Hashable where Base: Hashable, Base.Index: Hashable {}
 extension Windows.Index: Hashable where Base.Index: Hashable {}

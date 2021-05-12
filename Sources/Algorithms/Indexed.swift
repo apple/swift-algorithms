@@ -16,9 +16,10 @@ public struct Indexed<Base: Collection> {
   public typealias Element = (index: Base.Index, element: Base.Element)
   
   /// The base collection.
-  public let base: Base
-  
   @usableFromInline
+  internal let base: Base
+  
+  @inlinable
   internal init(base: Base) {
     self.base = base
   }
@@ -71,8 +72,6 @@ extension Indexed: BidirectionalCollection where Base: BidirectionalCollection {
 extension Indexed: RandomAccessCollection where Base: RandomAccessCollection {}
 extension Indexed: LazySequenceProtocol where Base: LazySequenceProtocol {}
 extension Indexed: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
-extension Indexed: Equatable where Base: Equatable {}
-extension Indexed: Hashable where Base: Hashable {}
 
 //===----------------------------------------------------------------------===//
 // indexed()

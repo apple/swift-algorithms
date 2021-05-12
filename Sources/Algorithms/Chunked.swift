@@ -11,9 +11,10 @@
 
 /// A collection wrapper that breaks a collection into chunks based on a
 /// predicate or projection.
-public struct LazyChunked<Base: Collection, Subject> {
+public struct Chunked<Base: Collection, Subject> {
   /// The collection that this instance provides a view onto.
-  public let base: Base
+  @usableFromInline
+  internal let base: Base
   
   /// The projection function.
   @usableFromInline
@@ -27,7 +28,7 @@ public struct LazyChunked<Base: Collection, Subject> {
   @usableFromInline
   internal var firstUpperBound: Base.Index
   
-  @usableFromInline
+  @inlinable
   internal init(
     base: Base,
     projection: @escaping (Base.Element) -> Subject,
@@ -44,14 +45,14 @@ public struct LazyChunked<Base: Collection, Subject> {
   }
 }
 
-extension LazyChunked: LazyCollectionProtocol {
+extension Chunked: LazyCollectionProtocol {
   /// A position in a chunked collection.
   public struct Index: Comparable {
     /// The range corresponding to the chunk at this position.
     @usableFromInline
     internal var baseRange: Range<Base.Index>
     
-    @usableFromInline
+    @inlinable
     internal init(_ baseRange: Range<Base.Index>) {
       self.baseRange = baseRange
     }
@@ -72,12 +73,11 @@ extension LazyChunked: LazyCollectionProtocol {
 
   /// Returns the index in the base collection of the end of the chunk starting
   /// at the given index.
-  @usableFromInline
+  @inlinable
   internal func endOfChunk(startingAt start: Base.Index) -> Base.Index {
     let subject = projection(base[start])
     return base[base.index(after: start)...]
-      .firstIndex(where: { !belongInSameGroup(subject, projection($0)) })
-      ?? base.endIndex
+      .endOfPrefix(while: { belongInSameGroup(subject, projection($0)) })
   }
   
   @inlinable
@@ -106,33 +106,21 @@ extension LazyChunked: LazyCollectionProtocol {
   }
 }
 
-extension LazyChunked.Index: Hashable where Base.Index: Hashable {}
+extension Chunked.Index: Hashable where Base.Index: Hashable {}
 
-extension LazyChunked: BidirectionalCollection
+extension Chunked: BidirectionalCollection
   where Base: BidirectionalCollection
 {
   /// Returns the index in the base collection of the start of the chunk ending
   /// at the given index.
-  @usableFromInline
+  @inlinable
   internal func startOfChunk(endingAt end: Base.Index) -> Base.Index {
     let indexBeforeEnd = base.index(before: end)
     
     // Get the projected value of the last element in the range ending at `end`.
     let subject = projection(base[indexBeforeEnd])
-    
-    // Search backward from `end` for the first element whose projection isn't
-    // equal to `subject`.
-    if let firstMismatch = base[..<indexBeforeEnd]
-      .lastIndex(where: { !belongInSameGroup(projection($0), subject) })
-    {
-      // If we found one, that's the last element of the _next_ previous chunk,
-      // and therefore one position _before_ the start of this chunk.
-      return base.index(after: firstMismatch)
-    } else {
-      // If we didn't find such an element, this chunk extends back to the start
-      // of the collection.
-      return base.startIndex
-    }
+    return base[..<indexBeforeEnd]
+      .startOfSuffix(while: { belongInSameGroup(projection($0), subject) })
   }
 
   @inlinable
@@ -142,6 +130,9 @@ extension LazyChunked: BidirectionalCollection
     return Index(start..<i.baseRange.lowerBound)
   }
 }
+
+@available(*, deprecated, renamed: "Chunked")
+public typealias LazyChunked<Base: Collection, Subject> = Chunked<Base, Subject>
 
 //===----------------------------------------------------------------------===//
 // lazy.chunked(by:)
@@ -155,8 +146,8 @@ extension LazyCollectionProtocol {
   @inlinable
   public func chunked(
     by belongInSameGroup: @escaping (Element, Element) -> Bool
-  ) -> LazyChunked<Elements, Element> {
-    LazyChunked(
+  ) -> Chunked<Elements, Element> {
+    Chunked(
       base: elements,
       projection: { $0 },
       belongInSameGroup: belongInSameGroup)
@@ -169,8 +160,8 @@ extension LazyCollectionProtocol {
   @inlinable
   public func chunked<Subject: Equatable>(
     on projection: @escaping (Element) -> Subject
-  ) -> LazyChunked<Elements, Subject> {
-    LazyChunked(
+  ) -> Chunked<Elements, Subject> {
+    Chunked(
       base: elements,
       projection: projection,
       belongInSameGroup: ==)
@@ -187,7 +178,7 @@ extension Collection {
   /// predicate.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  @usableFromInline
+  @inlinable
   internal func chunked<Subject>(
     on projection: (Element) throws -> Subject,
     by belongInSameGroup: (Subject, Subject) throws -> Bool
@@ -286,7 +277,7 @@ extension ChunkedByCount: Collection {
     @usableFromInline
     internal let baseRange: Range<Base.Index>
     
-    @usableFromInline
+    @inlinable
     internal init(_baseRange: Range<Base.Index>) {
       self.baseRange = _baseRange
     }
@@ -303,6 +294,7 @@ extension ChunkedByCount: Collection {
   }
   
   /// - Complexity: O(1)
+  @inlinable
   public subscript(i: Index) -> Element {
     precondition(i < endIndex, "Index out of range")
     return base[i.baseRange]
@@ -405,7 +397,7 @@ extension ChunkedByCount {
     return index
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetForward(
     _ i: Index, offsetBy distance: Int, limit: Index? = nil
   ) -> Index? {
@@ -419,8 +411,8 @@ extension ChunkedByCount {
   }
   
   // Convenience to compute offset backward base distance.
-  @inline(__always)
-  private func computeOffsetBackwardBaseDistance(
+  @inlinable
+  internal func computeOffsetBackwardBaseDistance(
     _ i: Index, _ distance: Int
   ) -> Int {
     if i == endIndex {
@@ -436,7 +428,7 @@ extension ChunkedByCount {
     return distance * chunkCount
   }
   
-  @usableFromInline
+  @inlinable
   internal func offsetBackward(
     _ i: Index, offsetBy distance: Int, limit: Index? = nil
   ) -> Index? {
@@ -451,8 +443,8 @@ extension ChunkedByCount {
   }
   
   // Helper to compute index(offsetBy:) index.
-  @inline(__always)
-  private func makeOffsetIndex(
+  @inlinable
+  internal func makeOffsetIndex(
     from i: Index, baseBound: Base.Index, distance: Int, baseDistance: Int,
     limit: Index?, by limitFn: (Base.Index, Base.Index) -> Bool
   ) -> Index? {
@@ -520,20 +512,6 @@ extension Collection {
   }
 }
 
-// Conditional conformances.
-extension ChunkedByCount: Equatable where Base: Equatable {}
-
-// Since we have another stored property of type `Index` on the
-// collection, synthesis of `Hashble` conformace would require
-// a `Base.Index: Hashable` constraint, so we implement the hasher
-// only in terms of `base`. Since the computed index is based on it,
-// it should not make a difference here.
-extension ChunkedByCount: Hashable where Base: Hashable {
-  @inlinable
-  public func hash(into hasher: inout Hasher) {
-    hasher.combine(base)
-  }
-}
 extension ChunkedByCount.Index: Hashable where Base.Index: Hashable {}
 
 // Lazy conditional conformance.

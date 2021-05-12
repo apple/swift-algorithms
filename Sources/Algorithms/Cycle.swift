@@ -12,9 +12,10 @@
 /// A collection wrapper that repeats the elements of a base collection.
 public struct Cycle<Base: Collection> {
   /// The collection to repeat.
-  public let base: Base
-  
   @usableFromInline
+  internal let base: Base
+  
+  @inlinable
   internal init(base: Base) {
     self.base = base
   }
@@ -24,12 +25,12 @@ extension Cycle: Sequence {
   /// The iterator for a `Cycle` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
-    let base: Base
+    internal let base: Base
     
     @usableFromInline
-    var current: Base.Index
+    internal var current: Base.Index
     
-    @usableFromInline
+    @inlinable
     internal init(base: Base) {
       self.base = base
       self.current = base.startIndex
@@ -55,6 +56,112 @@ extension Cycle: Sequence {
 }
 
 extension Cycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
+
+
+/// A collection wrapper that repeats the elements of a base collection for a
+/// finite number of times.
+public struct FiniteCycle<Base: Collection> {
+  /// A Product2 instance for iterating the Base collection.
+  @usableFromInline
+  internal let product: Product2<Range<Int>, Base>
+
+  @inlinable
+  internal init(base: Base, times: Int) {
+    self.product = Product2(0..<times, base)
+  }
+}
+
+extension FiniteCycle: LazySequenceProtocol, LazyCollectionProtocol
+  where Base: LazyCollectionProtocol { }
+
+extension FiniteCycle: Collection {
+
+  public typealias Element = Base.Element
+
+  public struct Index: Comparable {
+    /// The index corresponding to the Product2 index at this position.
+    @usableFromInline
+    internal let productIndex: Product2<Range<Int>, Base>.Index
+
+    @inlinable
+    internal init(_ productIndex: Product2<Range<Int>, Base>.Index) {
+      self.productIndex = productIndex
+    }
+
+    @inlinable
+    public static func == (lhs: Index, rhs: Index) -> Bool {
+      lhs.productIndex == rhs.productIndex
+    }
+
+    @inlinable
+    public static func < (lhs: Index, rhs: Index) -> Bool {
+      lhs.productIndex < rhs.productIndex
+    }
+  }
+
+  @inlinable
+  public var startIndex: Index {
+    Index(product.startIndex)
+  }
+
+  @inlinable
+  public var endIndex: Index {
+    Index(product.endIndex)
+  }
+
+  @inlinable
+  public subscript(_ index: Index) -> Element {
+    product[index.productIndex].1
+  }
+
+  @inlinable
+  public func index(after i: Index) -> Index {
+    let productIndex = product.index(after: i.productIndex)
+    return Index(productIndex)
+  }
+
+  @inlinable
+  public func distance(from start: Index, to end: Index) -> Int {
+    product.distance(from: start.productIndex, to: end.productIndex)
+  }
+
+  @inlinable
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    let productIndex = product.index(i.productIndex, offsetBy: distance)
+    return Index(productIndex)
+  }
+
+  @inlinable
+  public func index(
+    _ i: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    guard let productIndex = product.index(i.productIndex,
+                                           offsetBy: distance,
+                                           limitedBy: limit.productIndex) else {
+      return nil
+    }
+    return Index(productIndex)
+  }
+
+  @inlinable
+  public var count: Int {
+    product.count
+  }
+}
+
+extension FiniteCycle: BidirectionalCollection
+  where Base: BidirectionalCollection {
+  @inlinable
+  public func index(before i: Index) -> Index {
+    let productIndex = product.index(before: i.productIndex)
+    return Index(productIndex)
+  }
+}
+
+extension FiniteCycle: RandomAccessCollection
+  where Base: RandomAccessCollection {}
 
 //===----------------------------------------------------------------------===//
 // cycled()
@@ -109,7 +216,7 @@ extension Collection {
   ///
   /// - Complexity: O(1)
   @inlinable
-  public func cycled(times: Int) -> FlattenSequence<Repeated<Self>> {
-    repeatElement(self, count: times).joined()
+  public func cycled(times: Int) -> FiniteCycle<Self> {
+    FiniteCycle(base: self, times: times)
   }
 }

@@ -101,7 +101,7 @@ let result = myString.drop(while: \.isWhitespace)
 ```
 
 With a lazy filter that drops _all_ whitespace characters regardless of where they are in the string.
-Besides that, the root `trim` leads to clearer, more conscise code, which is more aligned with other programming
+Besides that, the root `trim` leads to clearer, more concise code, which is more aligned with other programming
 languages:
 
 ```swift

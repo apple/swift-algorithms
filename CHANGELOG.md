@@ -8,14 +8,73 @@ This project follows semantic versioning. While still in major version `0`,
 source-stability is only guaranteed within minor versions (e.g. between
 `0.0.3` and `0.0.4`). If you want to guard against potentially source-breaking
 package updates, you can specify your package dependency using
-`.upToNextMinor(from: "0.0.1")` as the requirement.
+`.upToNextMinor(from: "0.1.0")` as the requirement.
 
 ## [Unreleased]
 
-- `minAndMax()` finds both the smallest and largest elements of a sequence in a
-  single pass.
+- `adjacentPairs()` lazily iterates over tuples of adjacent elements of a sequence.
+- `minAndMax()` finds both the smallest and largest elements of a sequence in a single pass.
 
 ---
+
+## [0.1.1] - 2021-04-14
+
+### Fixes
+
+- `Product2` associated type inference error in release build ([#130])
+
+## [0.1.0] - 2021-04-13
+
+### Additions
+
+- The `compacted()` method lazily finds the non-`nil` elements of a sequence or
+  collection ([#112]).
+
+### Changes
+
+- The `uniqued()` method now lazily computes the unique elements of a sequence
+  or a collection ([#71]). Pass this resulting sequence to an `Array`
+  initializer to recover the behavior of the previous release.
+- Calling `cycled(times:)` now returns a new `FiniteCycle` type, which has the
+  same conformances as its underlying collection ([#106]). 
+- The base collections of the sequence and collection wrapper types are no
+  longer public ([#85], [#125]), and the wrapper types no longer conform to the
+  `Equatable` or `Hashable` protocols ([#124]). If you need those conformances,
+  convert the wrapper type to an `Array` or other collection currrency type
+  before storing. Please file an issue if these changes pose a problem for your
+  use case.
+
+The 0.1.0 release includes contributions from [LemonSpike], [LucianoPAlmeida], 
+[natecook1000], and [timvermeulen]. Thank you!
+
+---
+
+## [0.0.4] - 2021-03-29
+
+### Additions
+
+More new algorithms to join the party:
+
+- A lazy version of the standard library's two `split` methods. ([#78])
+- `firstNonNil(_:)` returns the first non-`nil` element from an
+  optional-generating transform. ([#31])
+- `uniquePermutations()` skips duplicates when generating permutations of a
+  collection. ([#91])
+- The `reductions` methods return all the in-between states of reducing a
+  sequence or collection. ([#46])
+
+### Fixes
+
+- Methods and computed properties are more consistently marked as inlinable, 
+  resolving a performance regression. 
+- The `Stride` type now efficiently calculates distances between positions,
+  supported by the underlying collection.
+- Better test coverage and improved diagnostics for comparing sequences.
+- Fixed links and improved documentation.
+
+The 0.0.4 release includes contributions from [bjhomer], [danielctull],
+[hashemi], [karwa], [kylemacomber], [LucianoPAlmeida], [mdznr], [natecook1000],
+[ollieatkinson], [Qata], [timvermeulen], and [toddthomas]. Thank you!
 
 ## [0.0.3] - 2021-02-26
 
@@ -97,7 +156,10 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for releases -->
 
-[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.0.3...HEAD
+[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.1.1...HEAD
+[0.1.1]: https://github.com/apple/swift-algorithms/compare/0.1.0...0.1.1
+[0.1.0]: https://github.com/apple/swift-algorithms/compare/0.0.4...0.1.0
+[0.0.4]: https://github.com/apple/swift-algorithms/compare/0.0.3...0.0.4
 [0.0.3]: https://github.com/apple/swift-algorithms/compare/0.0.2...0.0.3
 [0.0.2]: https://github.com/apple/swift-algorithms/compare/0.0.1...0.0.2
 [0.0.1]: https://github.com/apple/swift-algorithms/releases/tag/0.0.1
@@ -108,24 +170,38 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#9]: https://github.com/apple/swift-algorithms/pull/9
 [#20]: https://github.com/apple/swift-algorithms/pull/20
 [#24]: https://github.com/apple/swift-algorithms/pull/24
+[#31]: https://github.com/apple/swift-algorithms/pull/31
 [#35]: https://github.com/apple/swift-algorithms/pull/35
+[#46]: https://github.com/apple/swift-algorithms/pull/46
 [#51]: https://github.com/apple/swift-algorithms/pull/51
 [#54]: https://github.com/apple/swift-algorithms/pull/54
 [#56]: https://github.com/apple/swift-algorithms/pull/56
 [#65]: https://github.com/apple/swift-algorithms/pull/65
+[#71]: https://github.com/apple/swift-algorithms/pull/71
 [#77]: https://github.com/apple/swift-algorithms/pull/77
+[#78]: https://github.com/apple/swift-algorithms/pull/78
+[#85]: https://github.com/apple/swift-algorithms/pull/85
+[#91]: https://github.com/apple/swift-algorithms/pull/91
+[#106]: https://github.com/apple/swift-algorithms/pull/106
+[#112]: https://github.com/apple/swift-algorithms/pull/112
+[#124]: https://github.com/apple/swift-algorithms/pull/124
+[#125]: https://github.com/apple/swift-algorithms/pull/125
+[#130]: https://github.com/apple/swift-algorithms/pull/130
 
 <!-- Link references for contributors -->
 
 [AustinConlon]: https://github.com/apple/swift-algorithms/commits?author=AustinConlon
 [benrimmington]: https://github.com/apple/swift-algorithms/commits?author=benrimmington
+[bjhomer]: https://github.com/apple/swift-algorithms/commits?author=bjhomer
 [danielctull]: https://github.com/apple/swift-algorithms/commits?author=danielctull
 [dhruvshah8]: https://github.com/apple/swift-algorithms/commits?author=dhruvshah8
 [egorzhdan]: https://github.com/apple/swift-algorithms/commits?author=egorzhdan
+[hashemi]: https://github.com/apple/swift-algorithms/commits?author=hashemi
 [IanKeen]: https://github.com/apple/swift-algorithms/commits?author=IanKeen
 [iSame7]: https://github.com/apple/swift-algorithms/commits?author=iSame7
 [karwa]: https://github.com/apple/swift-algorithms/commits?author=karwa
 [kylemacomber]: https://github.com/apple/swift-algorithms/commits?author=kylemacomber
+[LemonSpike]: https://github.com/apple/swift-algorithms/commits?author=LemonSpike
 [LucianoPAlmeida]: https://github.com/apple/swift-algorithms/commits?author=LucianoPAlmeida
 [markuswntr]: https://github.com/apple/swift-algorithms/commits?author=markuswntr
 [mdznr]: https://github.com/apple/swift-algorithms/commits?author=mdznr
@@ -134,6 +210,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [nordicio]: https://github.com/apple/swift-algorithms/commits?author=nordicio
 [ollieatkinson]: https://github.com/apple/swift-algorithms/commits?author=ollieatkinson
 [pmtao]: https://github.com/apple/swift-algorithms/commits?author=pmtao
+[Qata]: https://github.com/apple/swift-algorithms/commits?author=Qata
 [rakaramos]: https://github.com/apple/swift-algorithms/commits?author=rakaramos
 [rockbruno]: https://github.com/apple/swift-algorithms/commits?author=rockbruno
 [Roshankumar350]: https://github.com/apple/swift-algorithms/commits?author=Roshankumar350
@@ -141,3 +218,4 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [sidepelican]: https://github.com/apple/swift-algorithms/commits?author=sidepelican
 [stephentyrone]: https://github.com/apple/swift-algorithms/commits?author=stephentyrone
 [timvermeulen]: https://github.com/apple/swift-algorithms/commits?author=timvermeulen
+[toddthomas]: https://github.com/apple/swift-algorithms/commits?author=toddthomas

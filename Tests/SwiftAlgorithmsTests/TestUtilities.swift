@@ -46,13 +46,69 @@ struct SplitMix64: RandomNumberGenerator {
   }
 }
 
+// An eraser helper to any mutable collection
+struct AnyMutableCollection<Base> where Base: MutableCollection {
+  var base: Base
+}
+
+extension AnyMutableCollection: MutableCollection {
+  typealias Index = Base.Index
+  typealias Element = Base.Element
+  
+  var startIndex: Base.Index { base.startIndex }
+  var endIndex: Base.Index { base.endIndex }
+
+  func index(after i: Index) -> Index {
+    return base.index(after: i)
+  }
+
+  subscript(position: Base.Index) -> Base.Element {
+    _read { yield base[position] }
+    set { base[position] = newValue }
+  }
+}
+
+extension MutableCollection {
+  func eraseToAnyMutableCollection() -> AnyMutableCollection<Self> {
+    AnyMutableCollection(base: self)
+  }
+}
+
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
   _ message: @autoclosure () -> String = "",
   file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
-  try XCTAssert(expression1().elementsEqual(expression2()), message(), file: file, line: line)
+  try XCTAssertEqualSequences(expression1(), expression2(), by: ==,
+    message(), file: file, line: line)
+}
+
+// Two sequences contains exactly the same element but not necessarily in the same order.
+func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
+  _ expression1: @autoclosure () throws -> S1,
+  _ expression2: @autoclosure () throws -> S2,
+  file: StaticString = #file, line: UInt = #line
+) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
+  var s1 = Array(try expression1())
+  var missing: [S1.Element] = []
+  for elt in try expression2() {
+    guard let idx = s1.firstIndex(of: elt) else {
+      missing.append(elt)
+      continue
+    }
+    s1.remove(at: idx)
+  }
+  
+  XCTAssertTrue(
+    missing.isEmpty, "first sequence missing '\(missing)' elements from second sequence",
+    file: file, line: line
+  )
+
+  XCTAssertTrue(
+    s1.isEmpty, "first sequence contains \(s1) missing from second sequence",
+    file: file, line: line
+  )
 }
 
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
@@ -62,11 +118,50 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   _ message: @autoclosure () -> String = "",
   file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element == S2.Element {
-  try XCTAssert(expression1().elementsEqual(expression2(), by: areEquivalent), message(), file: file, line: line)
+
+  func fail(_ reason: String) {
+    let message = message()
+    XCTFail(message.isEmpty ? reason : "\(message) - \(reason)",
+            file: file, line: line)
+  }
+
+  var iter1 = try expression1().makeIterator()
+  var iter2 = try expression2().makeIterator()
+  var idx = 0
+  while true {
+    switch (iter1.next(), iter2.next()) {
+    case let (e1?, e2?) where areEquivalent(e1, e2):
+      idx += 1
+      continue
+    case let (e1?, e2?):
+      fail("element \(e1) on first sequence does not match element \(e2) on second sequence at position \(idx)")
+    case (_?, nil):
+      fail("second sequence shorter than first")
+    case (nil, _?):
+      fail("first sequence shorter than second")
+    case (nil, nil): break
+    }
+    return
+  }
 }
 
 func XCTAssertLazySequence<S: LazySequenceProtocol>(_: S) {}
 func XCTAssertLazyCollection<S: LazyCollectionProtocol>(_: S) {}
+
+/// Asserts two collections are equal by using their indices to access elements.
+func XCTAssertEqualCollections<C1: Collection, C2: Collection>(
+  _ expression1: @autoclosure () throws -> C1,
+  _ expression2: @autoclosure () throws -> C2,
+  _ message: @autoclosure () -> String = "",
+  file: StaticString = #file, line: UInt = #line
+) rethrows where C1.Element: Equatable, C1.Element == C2.Element {
+  let c1 = try expression1()
+  let c2 = try expression2()
+  XCTAssertEqual(c1.indices.count, c2.indices.count, message(), file: file, line: line)
+  for index in zip(c1.indices, c2.indices) {
+    XCTAssertEqual(c1[index.0], c2[index.1], message(), file: file, line: line)
+  }
+}
 
 /// Tests that all index traversal methods behave as expected.
 ///

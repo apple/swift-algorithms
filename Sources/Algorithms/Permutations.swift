@@ -9,10 +9,77 @@
 //
 //===----------------------------------------------------------------------===//
 
+//===----------------------------------------------------------------------===//
+// nextPermutation()
+//===----------------------------------------------------------------------===//
+
+extension MutableCollection
+  where Self: BidirectionalCollection, Element: Comparable
+{
+  /// Permutes this collection's elements through all the lexical orderings.
+  ///
+  /// Call `nextPermutation()` repeatedly starting with the collection in
+  /// sorted order. When the full cycle of all permutations has been completed,
+  /// the collection will be back in sorted order and this method will return
+  /// `false`.
+  ///
+  /// - Returns: A Boolean value indicating whether the collection still has
+  ///   remaining permutations. When this method returns `false`, the collection
+  ///   is in ascending order according to `areInIncreasingOrder`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the collection.
+  @inlinable
+  internal mutating func nextPermutation(upperBound: Index? = nil) -> Bool {
+    // Ensure we have > 1 element in the collection.
+    guard !isEmpty else { return false }
+    var i = index(before: endIndex)
+    if i == startIndex { return false }
+    
+    let upperBound = upperBound ?? endIndex
+    
+    while true {
+      let ip1 = i
+      formIndex(before: &i)
+      
+      // Find the last ascending pair (ie. ..., a, b, ... where a < b)
+      if self[i] < self[ip1] {
+        // Find the last element greater than self[i]
+        // This is _always_ at most `ip1` due to if statement above
+        let j = lastIndex(where: { self[i] < $0 })!
+        
+        // At this point we have something like this:
+        //    0, 1, 4, 3, 2
+        //       ^        ^
+        //       i        j
+        swapAt(i, j)
+        self.reverse(subrange: ip1 ..< endIndex)
+        
+        // Only return if we've made a change within ..<upperBound region
+        if i < upperBound {
+          return true
+        } else {
+          i = index(before: endIndex)
+          continue
+        }
+      }
+      
+      if i == startIndex {
+        self.reverse()
+        return false
+      }
+    }
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// struct Permutations<Base>
+//===----------------------------------------------------------------------===//
+
 /// A sequence of all the permutations of a collection's elements.
 public struct Permutations<Base: Collection> {
   /// The base collection to iterate over for permutations.
-  public let base: Base
+  @usableFromInline
+  internal let base: Base
   
   @usableFromInline
   internal let baseCount: Int
@@ -28,7 +95,7 @@ public struct Permutations<Base: Collection> {
   ///   - base: The collection to iterate over for permutations
   ///   - k: The expected size of each permutation, or `nil` (default) to
   ///   iterate over all permutations of the same size as the base collection.
-  @usableFromInline
+  @inlinable
   internal init(_ base: Base, k: Int? = nil) {
     let kRange: ClosedRange<Int>?
     if let countToChoose = k {
@@ -45,7 +112,7 @@ public struct Permutations<Base: Collection> {
   ///   - base: The collection to iterate over for permutations.
   ///   - kRange: The range of accepted sizes of permutations, or `nil` to
   ///   iterate over all permutations of the same size as the base collection.
-  @usableFromInline
+  @inlinable
   internal init<R: RangeExpression>(
     _ base: Base, kRange: R?
   ) where R.Bound == Int {
@@ -71,7 +138,7 @@ extension Permutations: Sequence {
   /// The iterator for a `Permutations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
-    internal var base: Base
+    internal let base: Base
     
     @usableFromInline
     internal let baseCount: Int
@@ -84,7 +151,7 @@ extension Permutations: Sequence {
     internal var kRange: Range<Int>
     
     /// Whether or not iteration is finished (`kRange` is empty)
-    @usableFromInline
+    @inlinable
     internal var isFinished: Bool {
       return kRange.isEmpty
     }
@@ -92,7 +159,7 @@ extension Permutations: Sequence {
     @usableFromInline
     internal var indexes: [Base.Index]
     
-    @usableFromInline
+    @inlinable
     internal init(_ permutations: Permutations) {
       self.base = permutations.base
       self.baseCount = permutations.baseCount
@@ -111,7 +178,7 @@ extension Permutations: Sequence {
     ///   is in ascending order.
     ///
     /// - Complexity: O(*n*), where *n* is the length of the collection.
-    @usableFromInline
+    @inlinable
     internal mutating func nextState() -> Bool {
       let countToChoose = self.kRange.lowerBound
       let edge = countToChoose - 1
@@ -195,54 +262,6 @@ extension Permutations: Sequence {
 extension Permutations: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
-// nextPermutation()
-//===----------------------------------------------------------------------===//
-
-extension MutableCollection
-where Self: BidirectionalCollection, Element: Comparable
-{
-  /// Permutes this collection's elements through all the lexical orderings.
-  ///
-  /// Call `nextPermutation()` repeatedly starting with the collection in
-  /// sorted order. When the full cycle of all permutations has been completed,
-  /// the collection will be back in sorted order and this method will return
-  /// `false`.
-  ///
-  /// - Returns: A Boolean value indicating whether the collection still has
-  ///   remaining permutations. When this method returns `false`, the collection
-  ///   is in ascending order according to `areInIncreasingOrder`.
-  ///
-  /// - Complexity: O(*n*), where *n* is the length of the collection.
-  @usableFromInline
-  internal mutating func nextPermutation() -> Bool {
-    // Ensure we have > 1 element in the collection.
-    guard !isEmpty else { return false }
-    var i = index(before: endIndex)
-    if i == startIndex { return false }
-    
-    while true {
-      let ip1 = i
-      formIndex(before: &i)
-      
-      if self[i] < self[ip1] {
-        var j = index(before: endIndex)
-        while self[i] >= self[j] {
-          formIndex(before: &j)
-        }
-        swapAt(i, j)
-        self.reverse(subrange: ip1 ..< endIndex)
-        return true
-      }
-      
-      if i == startIndex {
-        self.reverse()
-        return false
-      }
-    }
-  }
-}
-
-//===----------------------------------------------------------------------===//
 // permutations(ofCount:)
 //===----------------------------------------------------------------------===//
 
@@ -268,34 +287,41 @@ extension Collection {
   ///     // Davide, Celeste
   ///
   /// This example prints _all_ the permutations (including an empty array) from
-  /// the an array of numbers:
+  /// an array of numbers:
   ///
   ///     let numbers = [10, 20, 30]
-  ///    for perm in numbers.permutations(ofCount: 0...) {
-  ///        print(perm)
-  ///    }
-  ///    // []
-  ///    // [10]
-  ///    // [20]
-  ///    // [30]
-  ///    // [10, 20]
-  ///    // [10, 30]
-  ///    // [20, 10]
-  ///    // [20, 30]
-  ///    // [30, 10]
-  ///    // [30, 20]
-  ///    // [10, 20, 30]
-  ///    // [10, 30, 20]
-  ///    // [20, 10, 30]
-  ///    // [20, 30, 10]
-  ///    // [30, 10, 20]
-  ///    // [30, 20, 10]
+  ///     for perm in numbers.permutations(ofCount: 0...) {
+  ///         print(perm)
+  ///     }
+  ///     // []
+  ///     // [10]
+  ///     // [20]
+  ///     // [30]
+  ///     // [10, 20]
+  ///     // [10, 30]
+  ///     // [20, 10]
+  ///     // [20, 30]
+  ///     // [30, 10]
+  ///     // [30, 20]
+  ///     // [10, 20, 30]
+  ///     // [10, 30, 20]
+  ///     // [20, 10, 30]
+  ///     // [20, 30, 10]
+  ///     // [30, 10, 20]
+  ///     // [30, 20, 10]
   ///
-  /// - Parameter kRange: The number of elements to include in each permutation.
+  /// The returned permutations are in ascending order by length, and then
+  /// lexicographically within each group of the same length.
+  ///
+  /// - Parameter kRange: A range of the number of elements to include in each
+  ///   permutation. `kRange` can be any integer range expression, and is
+  ///   clamped to the number of elements in this collection. Passing a range
+  ///   covering sizes greater than the number of elements in this collection
+  ///   results in an empty sequence.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
-  /// is the number of elements in the base collection, since `Permutations`
-  /// accesses the `count` of the base collection.
+  ///   is the number of elements in the base collection, since `Permutations`
+  ///   accesses the `count` of the base collection.
   @inlinable
   public func permutations<R: RangeExpression>(
     ofCount kRange: R
@@ -346,16 +372,211 @@ extension Collection {
   ///
   /// - Parameter k: The number of elements to include in each permutation.
   ///   If `k` is `nil`, the resulting sequence represents permutations of this
-  ///   entire collection.
+  ///   entire collection. If `k` is greater than the number of elements in
+  ///   this collection, the resulting sequence is empty.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
-  /// is the number of elements in the base collection, since `Permutations`
-  /// accesses the `count` of the base collection.
+  ///   is the number of elements in the base collection, since `Permutations`
+  ///   accesses the `count` of the base collection.
   @inlinable
   public func permutations(ofCount k: Int? = nil) -> Permutations<Self> {
     precondition(
       k ?? 0 >= 0,
       "Can't have permutations with a negative number of elements.")
     return Permutations(self, k: k)
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// uniquePermutations()
+//===----------------------------------------------------------------------===//
+
+/// A sequence of the unique permutations of the elements of a sequence or
+/// collection.
+///
+/// To create a `UniquePermutations` instance, call one of the
+/// `uniquePermutations` methods on your collection.
+public struct UniquePermutations<Base: Collection> {
+  /// The base collection to iterate over for permutations.
+  @usableFromInline
+  internal let base: Base
+  
+  @usableFromInline
+  internal var indexes: [Base.Index]
+  
+  @usableFromInline
+  internal let kRange: Range<Int>
+}
+
+extension UniquePermutations where Base.Element: Hashable {
+  @inlinable
+  internal static func _indexes(_ base: Base) -> [Base.Index] {
+    let firstIndexesAndCountsByElement = Dictionary(
+      base.indices.lazy.map { (base[$0], ($0, 1)) },
+      uniquingKeysWith: { indexAndCount, _ in (indexAndCount.0, indexAndCount.1 + 1) })
+    
+    return firstIndexesAndCountsByElement
+      .values.sorted(by: { $0.0 < $1.0 })
+      .flatMap { index, count in repeatElement(index, count: count) }
+  }
+  
+  @inlinable
+  internal init(_ elements: Base) {
+    self.indexes = Self._indexes(elements)
+    self.base = elements
+    self.kRange = self.indexes.count ..< (self.indexes.count + 1)
+  }
+
+  @inlinable
+  internal init<R: RangeExpression>(_ base: Base, _ range: R)
+    where R.Bound == Int
+  {
+    self.indexes = Self._indexes(base)
+    self.base = base
+    
+    let upperBound = self.indexes.count + 1
+    self.kRange = range.relative(to: 0 ..< .max)
+      .clamped(to: 0 ..< upperBound)
+  }
+}
+
+extension UniquePermutations: Sequence {
+  /// The iterator for a `UniquePermutations` instance.
+  public struct Iterator: IteratorProtocol {
+    @usableFromInline
+    internal let base: Base
+    
+    @usableFromInline
+    internal var indexes: [Base.Index]
+    
+    @usableFromInline
+    internal var lengths: Range<Int>
+
+    @usableFromInline
+    internal var initial = true
+
+    @inlinable
+    internal init(_ elements: Base, indexes: [Base.Index], lengths: Range<Int>) {
+      self.base = elements
+      self.indexes = indexes
+      self.lengths = lengths
+    }
+    
+    @inlinable
+    public mutating func next() -> [Base.Element]? {
+      // In the end case, `lengths` is an empty range.
+      if lengths.isEmpty {
+        return nil
+      }
+      
+      // The first iteration must produce the original sorted array, before any
+      // permutations. We skip the permutation the first time so that we can
+      // always mutate the array _before_ returning a slice, which avoids
+      // copying when possible.
+      if initial {
+        initial = false
+        return indexes[..<lengths.lowerBound].map { base[$0] }
+      }
+
+      if !indexes.nextPermutation(upperBound: lengths.lowerBound) {
+        lengths.removeFirst()
+
+        if lengths.isEmpty {
+          return nil
+        }
+      }
+      
+      return indexes[..<lengths.lowerBound].map { base[$0] }
+    }
+  }
+  
+  @inlinable
+  public func makeIterator() -> Iterator {
+    Iterator(base, indexes: indexes, lengths: kRange)
+  }
+}
+
+extension UniquePermutations: LazySequenceProtocol where Base: LazySequenceProtocol {}
+
+extension Collection where Element: Hashable {
+  /// Returns a sequence of the unique permutations of this sequence of the
+  /// specified length.
+  ///
+  /// Use this method to iterate over the unique permutations of a sequence
+  /// with repeating elements. This example prints every unique two-element
+  /// permutation of an array of numbers:
+  ///
+  ///     let numbers = [1, 1, 2]
+  ///     for perm in numbers.uniquePermutations(ofCount: 2) {
+  ///         print(perm)
+  ///     }
+  ///     // [1, 1]
+  ///     // [1, 2]
+  ///     // [2, 1]
+  ///
+  /// By contrast, the `permutations(ofCount:)` method permutes a collection's
+  /// elements by position, and can include permutations with equal elements
+  /// in each permutation:
+  ///
+  ///     for perm in numbers.permutations(ofCount: 2)
+  ///         print(perm)
+  ///     }
+  ///     // [1, 1]
+  ///     // [1, 1]
+  ///     // [1, 2]
+  ///     // [1, 2]
+  ///     // [2, 1]
+  ///     // [2, 1]
+  ///
+  /// The returned permutations are in lexicographically sorted order.
+  ///
+  /// - Parameter k: The number of elements to include in each permutation.
+  ///   If `k` is `nil`, the resulting sequence represents permutations of this
+  ///   entire collection. If `k` is greater than the number of elements in
+  ///   this collection, the resulting sequence is empty.
+  ///
+  /// - Complexity: O(*n*), where *n* is the number of elements in this
+  ///   collection.
+  public func uniquePermutations(ofCount k: Int? = nil) -> UniquePermutations<Self> {
+    if let k = k {
+      return UniquePermutations(self, k ..< (k + 1))
+    } else {
+      return UniquePermutations(self)
+    }
+  }
+
+  /// Returns a collection of the unique permutations of this sequence with
+  /// lengths in the specified range.
+  ///
+  /// Use this method to iterate over the unique permutations of a sequence
+  /// with repeating elements. This example prints every unique permutation
+  /// of an array of numbers with lengths through 2 elements:
+  ///
+  ///     let numbers = [1, 1, 2]
+  ///     for perm in numbers.uniquePermutations(ofCount: ...2) {
+  ///         print(perm)
+  ///     }
+  ///     // []
+  ///     // [1]
+  ///     // [2]
+  ///     // [1, 1]
+  ///     // [1, 2]
+  ///     // [2, 1]
+  ///
+  /// The returned permutations are in ascending order by length, and then
+  /// lexicographically within each group of the same length.
+  ///
+  /// - Parameter kRange: A range of the number of elements to include in each
+  ///   permutation. `kRange` can be any integer range expression, and is
+  ///   clamped to the number of elements in this collection. Passing a range
+  ///   covering sizes greater than the number of elements in this collection
+  ///   results in an empty sequence.
+  ///
+  /// - Complexity: O(*n*), where *n* is the number of elements in this
+  ///   collection.
+  public func uniquePermutations<R: RangeExpression>(ofCount kRange: R) -> UniquePermutations<Self>
+    where R.Bound == Int
+  {
+    UniquePermutations(self, kRange)
   }
 }
