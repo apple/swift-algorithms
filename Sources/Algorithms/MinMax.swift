@@ -423,10 +423,10 @@ extension Sequence {
   ///   if its first argument should be ordered before its second
   ///   argument; otherwise, `false`.
   /// - Returns: A tuple with the sequence's minimum element, followed by its
-  ///   maximum element. For either member, if the sequence provides multiple
-  ///   qualifying elements, the one chosen is unspecified. The same element may
-  ///   be used for both members if all the elements are equivalent. If the
-  ///   sequence has no elements, returns `nil`.
+  ///   maximum element. If the sequence provides multiple qualifying minimum
+  ///   elements, the first equivalent element is returned; of multiple maximum
+  ///   elements, the last is returned. If the sequence has no elements, the
+  ///   method returns `nil`.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   public func minAndMax(
@@ -471,10 +471,10 @@ extension Sequence where Element: Comparable {
   /// - Precondition: The sequence is finite.
   ///
   /// - Returns: A tuple with the sequence's minimum element, followed by its
-  ///   maximum element. For either member, if there is a tie for the extreme
-  ///   value, the element chosen is unspecified. The same element may be used
-  ///   for both members if all the elements are equal. If the sequence has no
-  ///   elements, returns `nil`.
+  ///   maximum element. If the sequence provides multiple qualifying minimum
+  ///   elements, the first equivalent element is returned; of multiple maximum
+  ///   elements, the last is returned. If the sequence has no elements, the
+  ///   method returns `nil`.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   @inlinable
