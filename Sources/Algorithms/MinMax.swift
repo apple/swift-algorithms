@@ -383,3 +383,141 @@ extension Collection where Element: Comparable {
     return max(count: count, sortedBy: <)
   }
 }
+
+//===----------------------------------------------------------------------===//
+// Simultaneous minimum and maximum evaluation
+//===----------------------------------------------------------------------===//
+
+extension Sequence {
+  /// Returns both the minimum and maximum elements in the sequence, using the
+  /// given predicate as the comparison between elements.
+  ///
+  /// The predicate must be a *strict weak ordering* over the elements. That
+  /// is, for any elements `a`, `b`, and `c`, the following conditions must
+  /// hold:
+  ///
+  /// - `areInIncreasingOrder(a, a)` is always `false`. (Irreflexivity)
+  /// - If `areInIncreasingOrder(a, b)` and `areInIncreasingOrder(b, c)` are
+  ///   both `true`, then `areInIncreasingOrder(a, c)` is also
+  ///   `true`. (Transitive comparability)
+  /// - Two elements are *incomparable* if neither is ordered before the other
+  ///   according to the predicate. If `a` and `b` are incomparable, and `b`
+  ///   and `c` are incomparable, then `a` and `c` are also incomparable.
+  ///   (Transitive incomparability)
+  ///
+  /// This example shows how to use the `minAndMax(by:)` method on a
+  /// dictionary to find the key-value pair with the lowest value and the pair
+  /// with the highest value.
+  ///
+  ///     let hues = ["Heliotrope": 296, "Coral": 16, "Aquamarine": 156]
+  ///     if let extremeHues = hues.minAndMax(by: {$0.value < $1.value}) {
+  ///         print(extremeHues.min, extremeHues.max)
+  ///     } else {
+  ///         print("There are no hues")
+  ///     }
+  ///     // Prints: "(key: "Coral", value: 16) (key: "Heliotrope", value: 296)"
+  ///
+  /// - Precondition: The sequence is finite.
+  ///
+  /// - Parameter areInIncreasingOrder: A predicate that returns `true`
+  ///   if its first argument should be ordered before its second
+  ///   argument; otherwise, `false`.
+  /// - Returns: A tuple with the sequence's minimum element, followed by its
+  ///   maximum element. For either member, if the sequence provides multiple
+  ///   qualifying elements, the one chosen is unspecified. The same element may
+  ///   be used for both members if all the elements are equivalent. If the
+  ///   sequence has no elements, returns `nil`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  public func minAndMax(
+    by areInIncreasingOrder: (Element, Element) throws -> Bool
+  ) rethrows -> (min: Element, max: Element)? {
+    // Check short sequences.
+    var iterator = makeIterator()
+    guard var lowest = iterator.next() else { return nil }
+    guard var highest = iterator.next() else { return (lowest, lowest) }
+
+    // Confirm the initial bounds.
+    if try areInIncreasingOrder(highest, lowest) { swap(&lowest, &highest) }
+
+    #if true
+    // Read the elements in pairwise.  Structuring the comparisons around this
+    // is actually faster than loops based on extracting and testing elements
+    // one-at-a-time.
+    while var low = iterator.next() {
+      if var high = iterator.next() {
+        // Update the upper bound with the larger new element.
+        if try areInIncreasingOrder(high, low) { swap(&low, &high) }
+        if try !areInIncreasingOrder(high, highest) { highest = high }
+      } else {
+        // Update the upper bound by reusing the last element.  The next element
+        // iteration will also fail, ending the loop.
+        if try !areInIncreasingOrder(low, highest) { highest = low }
+      }
+
+      // Update the lower bound with the smaller new element, which may need a
+      // swap first to determine.
+      if try areInIncreasingOrder(low, lowest) { lowest = low }
+    }
+    #else
+    /// Ensure the second argument has a value that is ranked at least as much as
+    /// the first argument.
+    func sort(_ a: inout Element, _ b: inout Element) throws {
+      if try areInIncreasingOrder(b, a) { swap(&a, &b) }
+    }
+
+    /// Find the smallest and largest values out of a group of four arguments.
+    func minAndMaxOf4(
+      _ a: Element, _ b: Element, _ c: Element, _ d: Element
+    ) throws -> (min: Element, max: Element) {
+      var (a, b, c, d) = (a, b, c, d)
+      try sort(&a, &b)
+      try sort(&c, &d)
+      try sort(&a, &c)
+      try sort(&b, &d)
+      return (a, d)
+    }
+
+    // Read the elements in four-at-a-time.  Some say this is more effective
+    // than a two-at-a-time loop.
+    while let a = iterator.next() {
+      let b = iterator.next() ?? a
+      let c = iterator.next() ?? b
+      let d = iterator.next() ?? c
+      let (low, high) = try minAndMaxOf4(a, b, c, d)
+      if try areInIncreasingOrder(low, lowest) { lowest = low }
+      if try !areInIncreasingOrder(high, highest) { highest = high }
+    }
+    #endif
+    return (lowest, highest)
+  }
+}
+
+extension Sequence where Element: Comparable {
+  /// Returns both the minimum and maximum elements in the sequence.
+  ///
+  /// This example finds the smallest and largest values in an array of height
+  /// measurements.
+  ///
+  ///     let heights = [67.5, 65.7, 64.3, 61.1, 58.5, 60.3, 64.9]
+  ///     if let (lowestHeight, greatestHeight) = heights.minAndMax() {
+  ///         print(lowestHeight, greatestHeight)
+  ///     } else {
+  ///         print("The list of heights is empty")
+  ///     }
+  ///     // Prints: "58.5 67.5"
+  ///
+  /// - Precondition: The sequence is finite.
+  ///
+  /// - Returns: A tuple with the sequence's minimum element, followed by its
+  ///   maximum element. For either member, if there is a tie for the extreme
+  ///   value, the element chosen is unspecified. The same element may be used
+  ///   for both members if all the elements are equal. If the sequence has no
+  ///   elements, returns `nil`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  @inlinable
+  public func minAndMax() -> (min: Element, max: Element)? {
+    return minAndMax(by: <)
+  }
+}

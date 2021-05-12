@@ -12,7 +12,8 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
--`adjacentPairs()` lazily iterates over tuples of adjacent elements of a sequence.
+- `adjacentPairs()` lazily iterates over tuples of adjacent elements of a sequence.
+- `minAndMax()` finds both the smallest and largest elements of a sequence in a single pass.
 
 ---
 
