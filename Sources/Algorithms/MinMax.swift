@@ -440,55 +440,16 @@ extension Sequence {
     // Confirm the initial bounds.
     if try areInIncreasingOrder(highest, lowest) { swap(&lowest, &highest) }
 
-    #if true
     // Read the elements in pairwise.  Structuring the comparisons around this
     // is actually faster than loops based on extracting and testing elements
     // one-at-a-time.
     while var low = iterator.next() {
-      if var high = iterator.next() {
-        // Update the upper bound with the larger new element.
-        if try areInIncreasingOrder(high, low) { swap(&low, &high) }
-        if try !areInIncreasingOrder(high, highest) { highest = high }
-      } else {
-        // Update the upper bound by reusing the last element.  The next element
-        // iteration will also fail, ending the loop.
-        if try !areInIncreasingOrder(low, highest) { highest = low }
-      }
-
-      // Update the lower bound with the smaller new element, which may need a
-      // swap first to determine.
-      if try areInIncreasingOrder(low, lowest) { lowest = low }
-    }
-    #else
-    /// Ensure the second argument has a value that is ranked at least as much as
-    /// the first argument.
-    func sort(_ a: inout Element, _ b: inout Element) throws {
-      if try areInIncreasingOrder(b, a) { swap(&a, &b) }
-    }
-
-    /// Find the smallest and largest values out of a group of four arguments.
-    func minAndMaxOf4(
-      _ a: Element, _ b: Element, _ c: Element, _ d: Element
-    ) throws -> (min: Element, max: Element) {
-      var (a, b, c, d) = (a, b, c, d)
-      try sort(&a, &b)
-      try sort(&c, &d)
-      try sort(&a, &c)
-      try sort(&b, &d)
-      return (a, d)
-    }
-
-    // Read the elements in four-at-a-time.  Some say this is more effective
-    // than a two-at-a-time loop.
-    while let a = iterator.next() {
-      let b = iterator.next() ?? a
-      let c = iterator.next() ?? b
-      let d = iterator.next() ?? c
-      let (low, high) = try minAndMaxOf4(a, b, c, d)
+      var high = iterator.next() ?? low
+      if try areInIncreasingOrder(high, low) { swap(&low, &high) }
       if try areInIncreasingOrder(low, lowest) { lowest = low }
       if try !areInIncreasingOrder(high, highest) { highest = high }
     }
-    #endif
+
     return (lowest, highest)
   }
 }
