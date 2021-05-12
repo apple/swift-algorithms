@@ -248,4 +248,27 @@ final class MinAndMaxTests: XCTestCase {
     XCTAssertEqual(result2?.min, "a")
     XCTAssertEqual(result2?.max, "g")
   }
+
+  /// Confirms that the given predicate is used to find the min/max.
+  func testPredicate() {
+    let result = (1...5).minAndMax(by: >)
+    XCTAssertEqual(result?.min, 5)
+    XCTAssertEqual(result?.max, 1)
+
+    // Odd count
+    let result2 = "gfabdec".minAndMax(by: >)
+    XCTAssertEqual(result2?.min, "g")
+    XCTAssertEqual(result2?.max, "a")
+  }
+
+  /// Confirms that the min and max are "stable" as defined for minAndMax.
+  func testStability() {
+    for n in 1...10 {
+      let result = repeatElement(0, count: n)
+        .enumerated()
+        .minAndMax(by: { $0.element < $1.element })
+      XCTAssertEqual(result?.min.offset, 0)
+      XCTAssertEqual(result?.max.offset, n - 1)
+    }
+  }
 }
