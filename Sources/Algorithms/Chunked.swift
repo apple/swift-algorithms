@@ -10,8 +10,10 @@
 //===----------------------------------------------------------------------===//
 
 /// A collection wrapper that breaks a collection into chunks based on a
-/// predicate or projection.
-public struct Chunked<Base: Collection, Subject> {
+/// predicate.
+///
+/// Call `lazy.chunked(by:)` on a collection to create an instance of this type.
+public struct ChunkedBy<Base: Collection, Subject> {
   /// The collection that this instance provides a view onto.
   @usableFromInline
   internal let base: Base
@@ -45,7 +47,7 @@ public struct Chunked<Base: Collection, Subject> {
   }
 }
 
-extension Chunked: LazyCollectionProtocol {
+extension ChunkedBy: LazyCollectionProtocol {
   /// A position in a chunked collection.
   public struct Index: Comparable {
     /// The range corresponding to the chunk at this position.
@@ -106,9 +108,9 @@ extension Chunked: LazyCollectionProtocol {
   }
 }
 
-extension Chunked.Index: Hashable where Base.Index: Hashable {}
+extension ChunkedBy.Index: Hashable where Base.Index: Hashable {}
 
-extension Chunked: BidirectionalCollection
+extension ChunkedBy: BidirectionalCollection
   where Base: BidirectionalCollection
 {
   /// Returns the index in the base collection of the start of the chunk ending
@@ -131,11 +133,64 @@ extension Chunked: BidirectionalCollection
   }
 }
 
-@available(*, deprecated, renamed: "Chunked")
-public typealias LazyChunked<Base: Collection, Subject> = Chunked<Base, Subject>
+@available(*, deprecated, renamed: "ChunkedBy")
+public typealias LazyChunked<Base: Collection, Subject> = ChunkedBy<Base, Subject>
+
+@available(*, deprecated, renamed: "ChunkedBy")
+public typealias Chunked<Base: Collection, Subject> = ChunkedBy<Base, Subject>
+
+/// A collection wrapper that breaks a collection into chunks based on a
+/// predicate.
+///
+/// Call `lazy.chunked(on:)` on a collection to create an instance of this type.
+public struct ChunkedOn<Base: Collection, Subject> {
+  @usableFromInline
+  internal var chunked: ChunkedBy<Base, Subject>
+  
+  @inlinable
+  internal init(
+    base: Base,
+    projection: @escaping (Base.Element) -> Subject,
+    belongInSameGroup: @escaping (Subject, Subject) -> Bool
+  ) {
+    self.chunked = ChunkedBy(base: base, projection: projection, belongInSameGroup: belongInSameGroup)
+  }
+}
+
+extension ChunkedOn: LazyCollectionProtocol {
+  public typealias Index = ChunkedBy<Base, Subject>.Index
+  
+  @inlinable
+  public var startIndex: Index {
+    chunked.startIndex
+  }
+  
+  @inlinable
+  public var endIndex: Index {
+    chunked.endIndex
+  }
+  
+  @inlinable
+  public subscript(position: Index) -> (Subject, Base.SubSequence) {
+    let subsequence = chunked[position]
+    let subject = chunked.projection(subsequence.first!)
+    return (subject, subsequence)
+  }
+  
+  @inlinable
+  public func index(after i: Index) -> Index {
+    chunked.index(after: i)
+  }
+}
+
+extension ChunkedOn: BidirectionalCollection where Base: BidirectionalCollection {
+  public func index(before i: Index) -> Index {
+    chunked.index(before: i)
+  }
+}
 
 //===----------------------------------------------------------------------===//
-// lazy.chunked(by:)
+// lazy.chunked(by:) / lazy.chunked(on:)
 //===----------------------------------------------------------------------===//
 
 extension LazyCollectionProtocol {
@@ -146,8 +201,8 @@ extension LazyCollectionProtocol {
   @inlinable
   public func chunked(
     by belongInSameGroup: @escaping (Element, Element) -> Bool
-  ) -> Chunked<Elements, Element> {
-    Chunked(
+  ) -> ChunkedBy<Elements, Element> {
+    ChunkedBy(
       base: elements,
       projection: { $0 },
       belongInSameGroup: belongInSameGroup)
@@ -160,8 +215,8 @@ extension LazyCollectionProtocol {
   @inlinable
   public func chunked<Subject: Equatable>(
     on projection: @escaping (Element) -> Subject
-  ) -> Chunked<Elements, Subject> {
-    Chunked(
+  ) -> ChunkedOn<Elements, Subject> {
+    ChunkedOn(
       base: elements,
       projection: projection,
       belongInSameGroup: ==)
@@ -169,32 +224,29 @@ extension LazyCollectionProtocol {
 }
 
 //===----------------------------------------------------------------------===//
-// chunked(by:)
+// chunked(by:) / chunked(on:)
 //===----------------------------------------------------------------------===//
 
 extension Collection {
   /// Returns a collection of subsequences of this collection, chunked by
-  /// grouping elements that project to the same value according to the given
-  /// predicate.
+  /// the given predicate.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
   @inlinable
-  internal func chunked<Subject>(
-    on projection: (Element) throws -> Subject,
-    by belongInSameGroup: (Subject, Subject) throws -> Bool
+  public func chunked(
+    by belongInSameGroup: (Element, Element) throws -> Bool
   ) rethrows -> [SubSequence] {
     guard !isEmpty else { return [] }
     var result: [SubSequence] = []
     
     var start = startIndex
-    var subject = try projection(self[start])
+    var current = self[start]
     
     for (index, element) in indexed().dropFirst() {
-      let nextSubject = try projection(element)
-      if try !belongInSameGroup(subject, nextSubject) {
+      if try !belongInSameGroup(current, element) {
         result.append(self[start..<index])
         start = index
-        subject = nextSubject
+        current = element
       }
     }
     
@@ -204,17 +256,6 @@ extension Collection {
     
     return result
   }
-  
-  /// Returns a collection of subsequences of this collection, chunked by
-  /// the given predicate.
-  ///
-  /// - Complexity: O(*n*), where *n* is the length of this collection.
-  @inlinable
-  public func chunked(
-    by belongInSameGroup: (Element, Element) throws -> Bool
-  ) rethrows -> [SubSequence] {
-    try chunked(on: { $0 }, by: belongInSameGroup)
-  }
 
   /// Returns a collection of subsequences of this collection, chunked by
   /// grouping elements that project to the same value.
@@ -223,8 +264,27 @@ extension Collection {
   @inlinable
   public func chunked<Subject: Equatable>(
     on projection: (Element) throws -> Subject
-  ) rethrows -> [SubSequence] {
-    try chunked(on: projection, by: ==)
+  ) rethrows -> [(Subject, SubSequence)] {
+    guard !isEmpty else { return [] }
+    var result: [(Subject, SubSequence)] = []
+    
+    var start = startIndex
+    var subject = try projection(self[start])
+    
+    for (index, element) in indexed().dropFirst() {
+      let nextSubject = try projection(element)
+      if subject != nextSubject {
+        result.append((subject, self[start..<index]))
+        start = index
+        subject = nextSubject
+      }
+    }
+    
+    if start != endIndex {
+      result.append((subject, self[start..<endIndex]))
+    }
+    
+    return result
   }
 }
 
