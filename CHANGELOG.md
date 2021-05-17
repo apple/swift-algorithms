@@ -12,8 +12,43 @@ package updates, you can specify your package dependency using
 
 ## [Unreleased]
 
-- `adjacentPairs()` lazily iterates over tuples of adjacent elements of a sequence.
-- `minAndMax()` finds both the smallest and largest elements of a sequence in a single pass.
+*No new changes.*
+
+---
+
+## [0.2.0] - 2021-05-17
+
+### Additions
+
+Two new additions to the list of algorithms:
+
+- `adjacentPairs()` lazily iterates over tuples of adjacent elements of a
+  sequence. ([#119])
+- `minAndMax()` finds both the smallest and largest elements of a sequence in 
+  a single pass. ([#90])
+
+### Changes
+
+- When calling `chunked(on:)`, the resulting collection has an element type of
+  `(Subject, SubSequence)` instead of just `SubSequence`, making the subject
+  value available when iterating.
+
+    ```swift
+    let numbers = [5, 6, -3, -9, -11, 2, 7, 6]
+    for (signum, values) in numbers.chunked(on: { $0.signum() }) {
+        print(signum, values)
+    }
+    // 1 [5, 6]
+    // -1 [-3, -9, -11]
+    // 1 [2, 7, 6]
+    ```
+
+### Fixes
+
+- Improvements to the documentation and PR templates.
+
+The 0.2.0 release includes contributions from [CTMacUser], [LemonSpike],
+[mpangburn], and [natecook1000]. Thank you!
 
 ---
 
@@ -156,7 +191,8 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for releases -->
 
-[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.1.1...HEAD
+[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/apple/swift-algorithms/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/apple/swift-algorithms/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/apple/swift-algorithms/compare/0.0.4...0.1.0
 [0.0.4]: https://github.com/apple/swift-algorithms/compare/0.0.3...0.0.4
@@ -181,9 +217,11 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#77]: https://github.com/apple/swift-algorithms/pull/77
 [#78]: https://github.com/apple/swift-algorithms/pull/78
 [#85]: https://github.com/apple/swift-algorithms/pull/85
+[#90]: https://github.com/apple/swift-algorithms/pull/90
 [#91]: https://github.com/apple/swift-algorithms/pull/91
 [#106]: https://github.com/apple/swift-algorithms/pull/106
 [#112]: https://github.com/apple/swift-algorithms/pull/112
+[#119]: https://github.com/apple/swift-algorithms/pull/119
 [#124]: https://github.com/apple/swift-algorithms/pull/124
 [#125]: https://github.com/apple/swift-algorithms/pull/125
 [#130]: https://github.com/apple/swift-algorithms/pull/130
@@ -193,6 +231,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [AustinConlon]: https://github.com/apple/swift-algorithms/commits?author=AustinConlon
 [benrimmington]: https://github.com/apple/swift-algorithms/commits?author=benrimmington
 [bjhomer]: https://github.com/apple/swift-algorithms/commits?author=bjhomer
+[CTMacUser]: https://github.com/apple/swift-algorithms/commits?author=CTMacUser
 [danielctull]: https://github.com/apple/swift-algorithms/commits?author=danielctull
 [dhruvshah8]: https://github.com/apple/swift-algorithms/commits?author=dhruvshah8
 [egorzhdan]: https://github.com/apple/swift-algorithms/commits?author=egorzhdan
@@ -206,6 +245,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [markuswntr]: https://github.com/apple/swift-algorithms/commits?author=markuswntr
 [mdznr]: https://github.com/apple/swift-algorithms/commits?author=mdznr
 [michiboo]: https://github.com/apple/swift-algorithms/commits?author=michiboo
+[mpangburn]: https://github.com/apple/swift-algorithms/commits?author=mpangburn
 [natecook1000]: https://github.com/apple/swift-algorithms/commits?author=natecook1000
 [nordicio]: https://github.com/apple/swift-algorithms/commits?author=nordicio
 [ollieatkinson]: https://github.com/apple/swift-algorithms/commits?author=ollieatkinson
