@@ -48,6 +48,25 @@ func myAlgorithm2<Input>(input: Input) where Input: BidirectionalCollection {
 Swift provides the `BidirectionalCollection` protocol for marking types which support reverse traversal,
 and generic types and algorithms which want to make use of that should add it to their constraints.
 
+### >= 0.3.0
+
+In `v0.3.0` new methods are added to allow discarding all the elements matching the predicate at the beginning (prefix) or at the ending (suffix) of the collection.
+- `trimmingSuffix(while:)` can only be run on collections conforming to the `BidirectionalCollection` protocol.  
+- `trimmingPrefix(while:)` can be run also on collections conforming to the `Collection` protocol.
+
+```swift
+let myString = "   hello, world  "
+print(myString.trimmingPrefix(while: \.isWhitespace)) // "hello, world   "
+
+print(myString.trimmingSuffix(while: \.isWhitespace)) // "   hello, world"
+```
+Also mutating variants for all the methods already existing and the new ones are added.
+```swift
+var myString = "   hello, world  "
+myString.trim(while: \.isWhitespace)
+print(myString) // "hello, world"
+```
+
 ### Complexity
 
 Calling this method is O(_n_).
