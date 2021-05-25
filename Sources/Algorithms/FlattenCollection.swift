@@ -9,6 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// A collection consisting of all the elements contained in a collection of
+/// collections.
 @usableFromInline
 internal struct FlattenCollection<Base: Collection> where Base.Element: Collection {
   @usableFromInline
@@ -98,7 +100,8 @@ extension FlattenCollection: Collection {
       else { return base[start.outer].distance(from: startInner, to: end.inner!) }
     
     let firstPart = base[start.outer][startInner...].count
-    let middlePart = base[start.outer..<end.outer].dropFirst().reduce(0, { $0 + $1.count })
+    let middlePart = base[start.outer..<end.outer].dropFirst()
+      .reduce(0, { $0 + $1.count })
     let lastPart = end.inner.map { base[end.outer][..<$0].count } ?? 0
     
     return firstPart + middlePart + lastPart
@@ -226,7 +229,11 @@ extension FlattenCollection: Collection {
     if let indexInner = index.inner {
       let element = base[index.outer]
       
-      if let inner = element.index(indexInner, offsetBy: -remainder, limitedBy: element.startIndex) {
+      if let inner = element.index(
+          indexInner,
+          offsetBy: -remainder,
+          limitedBy: element.startIndex
+      ) {
         return Index(outer: index.outer, inner: inner)
       }
       
@@ -238,7 +245,11 @@ extension FlattenCollection: Collection {
     while outer != limit.outer {
       let element = base[outer]
       
-      if let inner = element.index(element.endIndex, offsetBy: -remainder, limitedBy: element.startIndex) {
+      if let inner = element.index(
+          element.endIndex,
+          offsetBy: -remainder,
+          limitedBy: element.startIndex
+      ) {
         return Index(outer: outer, inner: inner)
       }
       
@@ -247,8 +258,11 @@ extension FlattenCollection: Collection {
     }
     
     let element = base[outer]
-    return element.index(element.endIndex, offsetBy: -remainder, limitedBy: limit.inner!)
-      .map { inner in Index(outer: outer, inner: inner) }
+    return element.index(
+      element.endIndex,
+      offsetBy: -remainder,
+      limitedBy: limit.inner!
+    ).map { inner in Index(outer: outer, inner: inner) }
   }
 }
 
@@ -273,11 +287,18 @@ extension FlattenCollection: BidirectionalCollection
   }
 }
 
+extension FlattenCollection: LazySequenceProtocol
+  where Base: LazySequenceProtocol, Base.Element: LazySequenceProtocol {}
+extension FlattenCollection: LazyCollectionProtocol
+  where Base: LazyCollectionProtocol, Base.Element: LazyCollectionProtocol {}
+
 //===----------------------------------------------------------------------===//
 // joined()
 //===----------------------------------------------------------------------===//
 
 extension Collection where Element: Collection {
+  /// Returns the concatenation of the elements in this collection of
+  /// collections.
   @inlinable
   internal func joined() -> FlattenCollection<Self> {
     FlattenCollection(base: self)

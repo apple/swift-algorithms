@@ -13,6 +13,8 @@
 // JoinedBySequence
 //===----------------------------------------------------------------------===//
 
+/// A sequence that presents the elements of a base sequence of sequences
+/// concatenated using a given separator.
 public struct JoinedBySequence<Base: Sequence, Separator: Sequence>
   where Base.Element: Sequence, Base.Element.Element == Separator.Element
 {
@@ -61,6 +63,9 @@ extension JoinedBySequence: LazySequenceProtocol
 // JoinedByClosureSequence
 //===----------------------------------------------------------------------===//
 
+/// A sequence that presents the elements of a base sequence of sequences
+/// concatenated using a given separator that depends on the sequences right
+/// before and after it.
 public struct JoinedByClosureSequence<Base: Sequence, Separator: Sequence>
   where Base.Element: Sequence, Base.Element.Element == Separator.Element
 {
@@ -113,6 +118,8 @@ extension JoinedByClosureSequence: LazySequenceProtocol
 // JoinedByCollection
 //===----------------------------------------------------------------------===//
 
+/// A collection that presents the elements of a base collection of collections
+/// concatenated using a given separator.
 public struct JoinedByCollection<Base: Collection, Separator: Collection>
   where Base.Element: Collection, Base.Element.Element == Separator.Element
 {
@@ -205,10 +212,18 @@ extension JoinedByCollection: BidirectionalCollection
   }
 }
 
+extension JoinedByCollection: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
+extension JoinedByCollection: LazyCollectionProtocol
+  where Base: LazyCollectionProtocol {}
+
 //===----------------------------------------------------------------------===//
 // JoinedByClosureCollection
 //===----------------------------------------------------------------------===//
 
+/// A collection that presents the elements of a base collection of collections
+/// concatenated using a given separator that depends on the collections right
+/// before and after it.
 public struct JoinedByClosureCollection<Base: Collection, Separator: Collection>
   where Base.Element: Collection, Base.Element.Element == Separator.Element
 {
@@ -305,11 +320,23 @@ extension JoinedByClosureCollection: BidirectionalCollection
   }
 }
 
+extension JoinedByClosureCollection: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
+extension JoinedByClosureCollection: LazyCollectionProtocol
+  where Base: LazyCollectionProtocol {}
+
 //===----------------------------------------------------------------------===//
 // Sequence.joined(by:)
 //===----------------------------------------------------------------------===//
 
 extension Sequence where Element: Sequence {
+  /// Returns the concatenation of the elements in this sequence of sequences,
+  /// inserting the given separator between each sequence.
+  ///
+  ///     for x in [[1, 2], [3, 4], [5, 6]].joined(by: 100) {
+  ///         print(x)
+  ///     }
+  ///     // 1, 2, 100, 3, 4, 100, 5, 6
   @inlinable
   public func joined(by separator: Element.Element)
     -> JoinedBySequence<Self, CollectionOfOne<Element.Element>>
@@ -317,6 +344,13 @@ extension Sequence where Element: Sequence {
     joined(by: CollectionOfOne(separator))
   }
   
+  /// Returns the concatenation of the elements in this sequence of sequences,
+  /// inserting the given separator between each sequence.
+  ///
+  ///     for x in [[1, 2], [3, 4], [5, 6]].joined(by: [100, 200]) {
+  ///         print(x)
+  ///     }
+  ///     // 1, 2, 100, 200, 3, 4, 100, 200, 5, 6
   @inlinable
   public func joined<Separator>(
     by separator: Separator
@@ -345,6 +379,13 @@ extension Sequence where Element: Sequence {
     return result
   }
   
+  /// Returns the concatenation of the elements in this sequence of sequences,
+  /// inserting the separator produced by the closure between each sequence.
+  ///
+  ///     for x in [[1, 2], [3, 4], [5, 6]].joined(by: { $0.last! * $1.first! }) {
+  ///         print(x)
+  ///     }
+  ///     // 1, 2, 6, 3, 4, 20, 5, 6
   @inlinable
   public func joined(
     by separator: (Element, Element) throws -> Element.Element
@@ -352,6 +393,13 @@ extension Sequence where Element: Sequence {
     try _joined(by: { $0.append(try separator($1, $2)) })
   }
   
+  /// Returns the concatenation of the elements in this sequence of sequences,
+  /// inserting the separator produced by the closure between each sequence.
+  ///
+  ///     for x in [[1, 2], [3, 4], [5, 6]].joined(by: { [100 * $0.last!, 100 * $1.first!] }) {
+  ///         print(x)
+  ///     }
+  ///     // 1, 2, 200, 300, 3, 4, 400, 500, 5, 6
   @inlinable
   public func joined<Separator>(
     by separator: (Element, Element) throws -> Separator
@@ -367,6 +415,8 @@ extension Sequence where Element: Sequence {
 //===----------------------------------------------------------------------===//
 
 extension LazySequenceProtocol where Element: Sequence {
+  /// Returns the concatenation of the elements in this sequence of sequences,
+  /// inserting the separator produced by the closure between each sequence.
   @inlinable
   public func joined(
     by separator: @escaping (Element, Element) -> Element.Element
@@ -374,6 +424,8 @@ extension LazySequenceProtocol where Element: Sequence {
     joined(by: { CollectionOfOne(separator($0, $1)) })
   }
   
+  /// Returns the concatenation of the elements in this sequence of sequences,
+  /// inserting the separator produced by the closure between each sequence.
   @inlinable
   public func joined<Separator>(
     by separator: @escaping (Element, Element) -> Separator
@@ -387,6 +439,13 @@ extension LazySequenceProtocol where Element: Sequence {
 //===----------------------------------------------------------------------===//
 
 extension Collection where Element: Collection {
+  /// Returns the concatenation of the elements in this collection of
+  /// collections, inserting the given separator between each collection.
+  ///
+  ///     for x in [[1, 2], [3, 4], [5, 6]].joined(by: 100) {
+  ///         print(x)
+  ///     }
+  ///     // 1, 2, 100, 3, 4, 100, 5, 6
   @inlinable
   public func joined(by separator: Element.Element)
     -> JoinedByCollection<Self, CollectionOfOne<Element.Element>>
@@ -394,6 +453,13 @@ extension Collection where Element: Collection {
     joined(by: CollectionOfOne(separator))
   }
   
+  /// Returns the concatenation of the elements in this collection of
+  /// collections, inserting the given separator between each collection.
+  ///
+  ///     for x in [[1, 2], [3, 4], [5, 6]].joined(by: [100, 200]) {
+  ///         print(x)
+  ///     }
+  ///     // 1, 2, 100, 200, 3, 4, 100, 200, 5, 6
   @inlinable
   public func joined<Separator>(by separator: Separator)
     -> JoinedByCollection<Self, Separator>
@@ -407,6 +473,9 @@ extension Collection where Element: Collection {
 //===----------------------------------------------------------------------===//
 
 extension LazyCollectionProtocol where Element: Collection {
+  /// Returns the concatenation of the elements in this collection of
+  /// collections, inserting the separator produced by the closure between each
+  /// sequence.
   @inlinable
   public func joined(
     by separator: @escaping (Element, Element) -> Element.Element
@@ -414,6 +483,9 @@ extension LazyCollectionProtocol where Element: Collection {
     joined(by: { CollectionOfOne(separator($0, $1)) })
   }
   
+  /// Returns the concatenation of the elements in this collection of
+  /// collections, inserting the separator produced by the closure between each
+  /// sequence.
   @inlinable
   public func joined<Separator>(
     by separator: @escaping (Element, Element) -> Separator

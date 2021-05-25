@@ -284,6 +284,10 @@ extension Intersperse: LazyCollectionProtocol
 // InterspersedMap
 //===----------------------------------------------------------------------===//
 
+
+/// A sequence over the results of applying a closure to the sequence's
+/// elements, with a separator that separates each pair of adjacent transformed
+/// values.
 @usableFromInline
 internal struct InterspersedMap<Base: Sequence, Result> {
   @usableFromInline
@@ -360,7 +364,7 @@ extension InterspersedMap: Collection where Base: Collection {
   @usableFromInline
   internal struct Index: Comparable {
     @usableFromInline
-    internal enum Representation {
+    internal enum Representation: Equatable {
       case element(Base.Index)
       case separator(previous: Base.Index, next: Base.Index)
     }
@@ -573,6 +577,14 @@ extension InterspersedMap: BidirectionalCollection
   }
 }
 
+extension InterspersedMap.Index.Representation: Hashable
+  where Base.Index: Hashable {}
+
+extension InterspersedMap: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
+extension InterspersedMap: LazyCollectionProtocol
+  where Base: LazyCollectionProtocol {}
+
 //===----------------------------------------------------------------------===//
 // interspersed(with:)
 //===----------------------------------------------------------------------===//
@@ -616,8 +628,21 @@ extension Sequence {
 //===----------------------------------------------------------------------===//
 // lazy.interspersed(_:with:)
 //===----------------------------------------------------------------------===//
-  
+
 extension LazySequenceProtocol {
+  /// Returns a sequence over the results of applying a closure to the
+  /// sequence's elements, with a separator that separates each pair of adjacent
+  /// transformed values.
+  ///
+  /// The transformation closure lets you intersperse a sequence using a
+  /// separator of a different type than the original's sequence's elements.
+  /// Each separator is produced by a closure that is given access to the
+  /// two elements in the original sequence right before and after it.
+  ///
+  ///     let strings = [1, 2, 2].interspersedMap(String.init,
+  ///         with: { $0 == $1 ? " == " : " != " })
+  ///     print(strings.joined()) // "1 != 2 == 2"
+  ///
   @usableFromInline
   internal func interspersedMap<Result>(
     _ transform: @escaping (Element) -> Result,

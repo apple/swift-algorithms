@@ -13,6 +13,7 @@
 // Either
 //===----------------------------------------------------------------------===//
 
+/// A general-purpose sum type.
 @usableFromInline
 internal enum Either<Left, Right> {
   case left(Left)
@@ -53,6 +54,7 @@ extension Either: Comparable where Left: Comparable, Right: Comparable {
 // EitherSequence
 //===----------------------------------------------------------------------===//
 
+/// A sequence that has one of the two specified types.
 @usableFromInline
 internal enum EitherSequence<Left: Sequence, Right: Sequence>
   where Left.Element == Right.Element

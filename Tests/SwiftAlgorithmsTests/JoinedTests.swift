@@ -13,40 +13,113 @@ import XCTest
 @testable import Algorithms
 
 final class JoinedTests: XCTestCase {
-  func testSequence() {
-    for x in [0..<0, 0..<0, 0..<5, 5..<10, 10..<15, 15..<15].joined(by: [100, 101]) {
-      print(x)
+  let stringArrays = [
+    [],
+    [""],
+    ["", ""],
+    ["foo"],
+    ["foo", "bar"],
+    ["", "", "foo", "", "bar", "baz", ""],
+  ]
+  
+  func testJoined() {
+    let expected = ["", "", "", "foo", "foobar", "foobarbaz"]
+    
+    for (strings, expected) in zip(stringArrays, expected) {
+      // regular sequence
+      XCTAssertEqualSequences(AnySequence(strings).joined(), expected)
+      
+      // lazy sequence
+      XCTAssertEqualSequences(AnySequence(strings).lazy.joined(), expected)
+      
+      // regular collection
+      XCTAssertEqualSequences(strings.joined(), expected)
+      
+      // lazy collection
+      XCTAssertEqualSequences(strings.lazy.joined() as FlattenCollection, expected)
     }
+  }
+  
+  func testJoinedByElement() {
+    let separator: Character = " "
+    let expected = ["", "", " ", "foo", "foo bar", "  foo  bar baz "]
+    
+    for (strings, expected) in zip(stringArrays, expected) {
+      XCTAssertEqualSequences(AnySequence(strings).joined(by: separator), expected)
+      XCTAssertEqualSequences(AnySequence(strings).lazy.joined(by: separator), expected)
+      XCTAssertEqualSequences(strings.joined(by: separator), expected)
+      XCTAssertEqualSequences(strings.lazy.joined(by: separator), expected)
+    }
+  }
+  
+  func testJoinedBySequence() {
+    let separator = ", "
+    let expected = ["", "", ", ", "foo", "foo, bar", ", , foo, , bar, baz, "]
+    
+    for (strings, expected) in zip(stringArrays, expected) {
+      XCTAssertEqualSequences(AnySequence(strings).joined(by: separator), expected)
+      XCTAssertEqualSequences(AnySequence(strings).lazy.joined(by: separator), expected)
+      XCTAssertEqualSequences(strings.joined(by: separator), expected)
+      XCTAssertEqualSequences(strings.lazy.joined(by: separator), expected)
+    }
+  }
+  
+  func testJoinedByElementClosure() {
+    let separator = { (left: String, right: String) -> Character in
+      left.isEmpty || right.isEmpty ? " " : "-"
+    }
+    
+    let expected = ["", "", " ", "foo", "foo-bar", "  foo  bar-baz "]
+    
+    for (strings, expected) in zip(stringArrays, expected) {
+      XCTAssertEqualSequences(AnySequence(strings).joined(by: separator), expected)
+      XCTAssertEqualSequences(AnySequence(strings).lazy.joined(by: separator), expected)
+      XCTAssertEqualSequences(strings.joined(by: separator), expected)
+      XCTAssertEqualSequences(strings.lazy.joined(by: separator), expected)
+    }
+  }
+  
+  func testJoinedBySequenceClosure() {
+    let separator = { (left: String, right: String) in
+      "(\(left.count), \(right.count))"
+    }
+    
+    let expected = [
+      "",
+      "",
+      "(0, 0)",
+      "foo",
+      "foo(3, 3)bar",
+      "(0, 0)(0, 3)foo(3, 0)(0, 3)bar(3, 3)baz(3, 0)"
+    ]
+    
+    for (strings, expected) in zip(stringArrays, expected) {
+      XCTAssertEqualSequences(AnySequence(strings).joined(by: separator), expected)
+      XCTAssertEqualSequences(AnySequence(strings).lazy.joined(by: separator), expected)
+      XCTAssertEqualSequences(strings.joined(by: separator), expected)
+      XCTAssertEqualSequences(strings.lazy.joined(by: separator), expected)
+    }
+  }
+  
+  func testJoinedLazy() {
+    XCTAssertLazySequence(AnySequence([[1], [2]]).lazy.joined())
+    XCTAssertLazySequence(AnySequence([[1], [2]]).lazy.joined(by: 1))
+    XCTAssertLazySequence(AnySequence([[1], [2]]).lazy.joined(by: { _, _ in 1 }))
+    XCTAssertLazyCollection([[1], [2]].lazy.joined())
+    XCTAssertLazyCollection([[1], [2]].lazy.joined(by: 1))
+    XCTAssertLazyCollection([[1], [2]].lazy.joined(by: { _, _ in 1 }))
   }
   
   func testJoinedIndexTraversals() {
-    validateIndexTraversals(
-      [].joined(),
-      [[]].joined(),
-      [[], []].joined(),
-      [[0]].joined(),
-      [[], [0], [1, 2], [3], []].joined(),
-      [[], [], [0], [1], [], [], [2, 3], [], []].joined())
-  }
-  
-  func testJoinedByIndexTraversals() {
-    let elements: [[Range<Int>]] = [
-      [],
-      [0..<0],
-      [0..<3],
-      [0..<3, 3..<6],
-      [0..<0, 0..<3, 3..<6, 6..<6],
-      [0..<0, 0..<0, 0..<3, 3..<3, 3..<6, 6..<6, 6..<6]
-    ]
-    
-    for collection in elements {
-      validateIndexTraversals(collection.joined(by: 100))
+    // the last test case takes too long to run
+    for strings in stringArrays.dropLast() {
+      validateIndexTraversals(strings.joined() as FlattenCollection)
+      validateIndexTraversals(strings.joined(by: ", "))
     }
     
-    let separators: [[Int]] = [[], [100], [100, 101]]
-    
-    for (collection, separator) in product(elements, separators) {
-      validateIndexTraversals(collection.joined(by: separator))
+    for (strings, separator) in product(stringArrays.dropLast(), ["", " ", ", "]) {
+      validateIndexTraversals(strings.joined(by: separator))
+      validateIndexTraversals(strings.lazy.joined(by: { _, _ in separator }))
     }
   }
 }

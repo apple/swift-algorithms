@@ -64,14 +64,29 @@ final class IntersperseTests: XCTestCase {
   }
   
   func testInterspersedMap() {
+    XCTAssertEqualSequences(
+      (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
+      [])
+    
+    XCTAssertEqualSequences(
+      (0..<1).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
+      [0])
+    
+    XCTAssertEqualSequences(
+      (0..<5).lazy.interspersedMap({ $0 }, with: { $0 + $1 + 100 }),
+      [0, 101, 1, 103, 2, 105, 3, 107, 4])
+  }
+  
+  func testInterspersedMapLazy() {
+    XCTAssertLazySequence(AnySequence([]).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
+    XCTAssertLazyCollection((0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
+  }
+    
+  func testInterspersedMapIndexTraversals() {
     validateIndexTraversals(
       (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       (0..<1).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       (0..<2).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       (0..<5).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
-    
-    print(Array((1...5).lazy.interspersedMap(String.init, with: { left, right in
-      fatalError()
-    }).striding(by: 2)))
   }
 }
