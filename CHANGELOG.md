@@ -16,6 +16,21 @@ package updates, you can specify your package dependency using
 
 ---
 
+## [0.2.1] - 2021-06-01
+
+### Additions
+
+Expanded versatility for two existing operations:
+
+- A series of `joined(by:)` overloads concatenate a sequence of sequences using
+  an element or a collection, either passed in or generated from consecutive
+  elements via a closure. ([#138])
+- Additional `trimming(while:)` methods for trimming only the start or end of a
+  collection, as well as mutating versions of all three variants. ([#104])
+
+The 0.2.1 release includes contributions from [fedeci] and [timvermeulen]. 
+Thank you!
+
 ## [0.2.0] - 2021-05-17
 
 ### Additions
@@ -191,7 +206,8 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for releases -->
 
-[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.2.1...HEAD
+[0.2.1]: https://github.com/apple/swift-algorithms/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/apple/swift-algorithms/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/apple/swift-algorithms/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/apple/swift-algorithms/compare/0.0.4...0.1.0
@@ -219,12 +235,14 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#85]: https://github.com/apple/swift-algorithms/pull/85
 [#90]: https://github.com/apple/swift-algorithms/pull/90
 [#91]: https://github.com/apple/swift-algorithms/pull/91
+[#104]: https://github.com/apple/swift-algorithms/pull/104
 [#106]: https://github.com/apple/swift-algorithms/pull/106
 [#112]: https://github.com/apple/swift-algorithms/pull/112
 [#119]: https://github.com/apple/swift-algorithms/pull/119
 [#124]: https://github.com/apple/swift-algorithms/pull/124
 [#125]: https://github.com/apple/swift-algorithms/pull/125
 [#130]: https://github.com/apple/swift-algorithms/pull/130
+[#138]: https://github.com/apple/swift-algorithms/pull/138
 
 <!-- Link references for contributors -->
 
@@ -235,6 +253,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [danielctull]: https://github.com/apple/swift-algorithms/commits?author=danielctull
 [dhruvshah8]: https://github.com/apple/swift-algorithms/commits?author=dhruvshah8
 [egorzhdan]: https://github.com/apple/swift-algorithms/commits?author=egorzhdan
+[fedeci]: https://github.com/apple/swift-algorithms/commits?author=fedeci
 [hashemi]: https://github.com/apple/swift-algorithms/commits?author=hashemi
 [IanKeen]: https://github.com/apple/swift-algorithms/commits?author=IanKeen
 [iSame7]: https://github.com/apple/swift-algorithms/commits?author=iSame7
