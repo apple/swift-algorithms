@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
-import Algorithms
+@testable import Algorithms
 
 final class IntersperseTests: XCTestCase {
   func testSequence() {
@@ -61,5 +61,32 @@ final class IntersperseTests: XCTestCase {
   func testIntersperseLazy() {
     XCTAssertLazySequence((1...).prefix(0).lazy.interspersed(with: 0))
     XCTAssertLazyCollection("ABCDE".lazy.interspersed(with: "-"))
+  }
+  
+  func testInterspersedMap() {
+    XCTAssertEqualSequences(
+      (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
+      [])
+    
+    XCTAssertEqualSequences(
+      (0..<1).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
+      [0])
+    
+    XCTAssertEqualSequences(
+      (0..<5).lazy.interspersedMap({ $0 }, with: { $0 + $1 + 100 }),
+      [0, 101, 1, 103, 2, 105, 3, 107, 4])
+  }
+  
+  func testInterspersedMapLazy() {
+    XCTAssertLazySequence(AnySequence([]).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
+    XCTAssertLazyCollection((0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
+  }
+    
+  func testInterspersedMapIndexTraversals() {
+    validateIndexTraversals(
+      (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
+      (0..<1).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
+      (0..<2).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
+      (0..<5).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
   }
 }
