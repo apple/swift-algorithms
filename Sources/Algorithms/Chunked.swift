@@ -704,8 +704,8 @@ extension LazyCollectionProtocol {
   /// Lazily returns a collection of subsequences of this collection, chunked by
   /// the given reducing predicate.
   ///
-  ///
-  /// This example shows how to lazily chunk a list of integers into subsequences that sum to no more than 16.
+  /// This example shows how to lazily chunk a list of integers into
+  /// subsequences that sum to no more than 16.
   ///
   ///     let chunks = [16, 8, 8, 19, 12, 5].lazy.chunkedByReduction(into: 0) { sum, n in
   ///       sum += n
@@ -745,7 +745,8 @@ extension Collection {
   /// Eagerly returns a collection of subsequences of this collection, chunked by
   /// the given reducing predicate.
   ///
-  /// For example, to chunk a list of integers into subsequences that sum to no more than 16:
+  /// This example shows how to lazily chunk a list of integers into
+  /// subsequences that sum to no more than 16.
   ///
   ///     let chunks = [16, 8, 8, 19, 12, 5].chunkedByReduction(into: 0) { sum, n in
   ///       sum += n
