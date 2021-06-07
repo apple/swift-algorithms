@@ -152,3 +152,106 @@ final class ChunkedTests: XCTestCase {
     }
   }
 }
+
+//===----------------------------------------------------------------------===//
+// Tests for eager and lazy `chunkedByReduction(into:_)`
+//===----------------------------------------------------------------------===//
+
+class ChunkedByReductionTests: XCTestCase {
+  fileprivate struct Thing: Equatable {
+    let width: Int
+  }
+
+  fileprivate let thingPredicate: (inout Int, Thing) -> Bool = { sum, elem in
+    sum += elem.width
+    return sum <= 16
+  }
+
+  fileprivate let intPredicate: (inout Int, Int) -> Bool = { sum, elem in
+    sum += elem
+    return sum <= 16
+  }
+
+  func testSumObjectProperty() throws {
+    let things = [16, 8, 8, 5, 5, 5, 19, 4, 4, 4, 4, 4].map { Thing(width: $0) }
+    let expectedChunks: [[Thing]] = [
+      [16].map { Thing(width: $0) },
+      [8, 8].map { Thing(width: $0) },
+      [5, 5, 5].map { Thing(width: $0) },
+      [19].map { Thing(width: $0) },
+      [4, 4, 4, 4].map { Thing(width: $0) },
+      [4].map { Thing(width: $0) }
+    ]
+
+    validateChunkedByReduction(
+      base: things,
+      predicate: thingPredicate,
+      initialValue: 0,
+      expectedResult: expectedChunks
+    )
+  }
+
+  func testAveragingPredicate() throws {
+    let samples = [2.5, 16.2, 1.5, 3.14, 5.0, 5.75, 7.9, 10.2, 18.6]
+    let expectedChunks = [
+      [2.5],
+      [16.2],
+      [1.5, 3.14, 5.0, 5.75, 7.9],
+      [10.2],
+      [18.6]
+    ]
+
+    validateChunkedByReduction(
+      base: samples,
+      predicate: { result, elem in
+        result.0 += elem
+        result.1 += 1
+        return result.0/Double(result.1) <= 5.0
+      },
+      initialValue: (0.0, 0),
+      expectedResult: expectedChunks
+    )
+  }
+
+  func testEmpty() throws {
+    let things: [Thing] = []
+    validateChunkedByReduction(
+      base: things,
+      predicate: thingPredicate,
+      initialValue: 0,
+      expectedResult: []
+    )
+  }
+
+  func testAllFailPredicate() throws {
+    validateChunkedByReduction(
+      base: [19, 19, 19, 19],
+      predicate: intPredicate,
+      initialValue: 0,
+      expectedResult: [[19], [19], [19], [19]]
+    )
+  }
+
+  func testNoneFailPredicate() throws {
+    validateChunkedByReduction(
+      base: [1, 1, 1, 1],
+      predicate: intPredicate,
+      initialValue: 0,
+      expectedResult: [[1, 1, 1, 1]]
+    )
+  }
+}
+
+fileprivate func validateChunkedByReduction<Base: Collection, Accumulator>(
+  base: Base,
+  predicate: @escaping (inout Accumulator, Base.Element) -> Bool,
+  initialValue: Accumulator,
+  expectedResult: [[Base.Element]]
+)
+where Base.Element: Equatable {
+  let eagerChunks = base.chunkedByReduction(into: initialValue, predicate)
+  XCTAssertEqual(eagerChunks.map { Array($0) }, expectedResult)
+
+  let lazyChunks = base.lazy.chunkedByReduction(into: initialValue, predicate)
+  XCTAssertEqual(lazyChunks.map { Array($0) }, expectedResult)
+}
