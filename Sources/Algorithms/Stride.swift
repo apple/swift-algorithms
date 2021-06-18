@@ -226,8 +226,8 @@ extension StrideCollection: Collection {
     offsetBy n: Int,
     limitedBy limit: Index
   ) -> Index? {
-    // We typically use the ternary operator but this significantly increases compile
-    // times when using Swift 5.3.2
+    // We typically use the ternary operator but this significantly increases
+    // compile times when using Swift 5.3.2
     // https://github.com/apple/swift-algorithms/issues/146
     let distance: Int
     if i == endIndex {
