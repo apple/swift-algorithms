@@ -226,9 +226,15 @@ extension StrideCollection: Collection {
     offsetBy n: Int,
     limitedBy limit: Index
   ) -> Index? {
-    let distance = i == endIndex
-      ? -((base.count - 1) % stride + 1) + (n - 1) * -stride
-      : n * -stride
+    // We typically use the ternary operator but this significantly increases
+    // compile times when using Swift 5.3.2
+    // https://github.com/apple/swift-algorithms/issues/146
+    let distance: Int
+    if i == endIndex {
+      distance = -((base.count - 1) % stride + 1) + (n - 1) * -stride
+    } else {
+      distance = n * -stride
+    }
     return base.index(
         i.base,
         offsetBy: distance,
