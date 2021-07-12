@@ -26,6 +26,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 #### Subsetting operations
 
+- [`bifurcate(_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Bifurcate.md): Separates elements in a sequence or collection into two groups based on whether each elements matches a given predicate.
 - [`compacted()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Compacted.md): Drops the `nil`s from a sequence or collection, unwrapping the remaining elements.
 - [`randomSample(count:)`, `randomSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection.
 - [`randomStableSample(count:)`, `randomStableSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection, preserving their original relative order.
