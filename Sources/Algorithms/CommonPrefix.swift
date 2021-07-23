@@ -261,7 +261,7 @@ extension BidirectionalCollection {
     with other: Other,
     by areEquivalent: (Element, Other.Element) throws -> Bool
   ) rethrows -> SubSequence {
-    let (index, _) = try startsOfCommonSuffix(with: other, by: areEquivalent)
+    let (index, _) = try startOfCommonSuffix(with: other, by: areEquivalent)
     return self[index...]
   }
 }
@@ -276,12 +276,12 @@ extension BidirectionalCollection where Element: Equatable {
 }
 
 //===----------------------------------------------------------------------===//
-// Collection.endsOfCommonPrefix(with:)
+// Collection.endOfCommonPrefix(with:)
 //===----------------------------------------------------------------------===//
 
 extension Collection {
   @inlinable
-  public func endsOfCommonPrefix<Other: Collection>(
+  public func endOfCommonPrefix<Other: Collection>(
     with other: Other,
     by areEquivalent: (Element, Other.Element) throws -> Bool
   ) rethrows -> (Index, Other.Index) {
@@ -301,20 +301,20 @@ extension Collection {
 
 extension Collection where Element: Equatable {
   @inlinable
-  public func endsOfCommonPrefix<Other: Collection>(
+  public func endOfCommonPrefix<Other: Collection>(
     with other: Other
   ) -> (Index, Other.Index) where Other.Element == Element {
-    endsOfCommonPrefix(with: other, by: ==)
+    endOfCommonPrefix(with: other, by: ==)
   }
 }
 
 //===----------------------------------------------------------------------===//
-// BidirectionalCollection.startsOfCommonPrefix(with:)
+// BidirectionalCollection.startOfCommonPrefix(with:)
 //===----------------------------------------------------------------------===//
 
 extension BidirectionalCollection {
   @inlinable
-  public func startsOfCommonSuffix<Other: BidirectionalCollection>(
+  public func startOfCommonSuffix<Other: BidirectionalCollection>(
     with other: Other,
     by areEquivalent: (Element, Other.Element) throws -> Bool
   ) rethrows -> (Index, Other.Index) {
@@ -342,9 +342,9 @@ extension BidirectionalCollection {
 
 extension BidirectionalCollection where Element: Equatable {
   @inlinable
-  public func startsOfCommonSuffix<Other: BidirectionalCollection>(
+  public func startOfCommonSuffix<Other: BidirectionalCollection>(
     with other: Other
   ) -> (Index, Other.Index) where Other.Element == Element {
-    startsOfCommonSuffix(with: other, by: ==)
+    startOfCommonSuffix(with: other, by: ==)
   }
 }
