@@ -241,6 +241,13 @@ extension Sequence {
   public func partitioned(
     _ belongsInSecondCollection: (Element) throws -> Bool
   ) rethrows -> ([Element], [Element]) {
+    return try _partitioned(belongsInSecondCollection)
+  }
+  
+  @inlinable
+  public func _partitioned(
+    _ belongsInSecondCollection: (Element) throws -> Bool
+  ) rethrows -> ([Element], [Element]) {
     var lhs = ContiguousArray<Element>()
     var rhs = ContiguousArray<Element>()
     
@@ -275,6 +282,14 @@ extension Collection {
     // them back to the original order at the end.
     
     let count = self.count
+    
+    // The overhead of this implementation isn’t worth it for collections fewer
+    // than 8 elements. Use the simple `Sequence`-based implementation instead.
+    // This constant was determined using benchmarking. More information:
+    // https://github.com/apple/swift-algorithms/pull/152#issuecomment-887130149
+    if count < 8 {
+      return try _partitioned(belongsInSecondCollection)
+    }
     
     // Inside of the `initializer` closure, we set what the actual mid-point is.
     // We will use this to partitioned the single array into two in constant time.
