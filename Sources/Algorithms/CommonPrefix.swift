@@ -9,6 +9,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+/// A sequence that produces the longest common prefix of two sequences.
 public struct CommonPrefix<Base: Sequence, Other: Sequence> {
   @usableFromInline
   internal let base: Base
@@ -32,6 +33,7 @@ public struct CommonPrefix<Base: Sequence, Other: Sequence> {
 }
 
 extension CommonPrefix: Sequence {
+  /// The iterator for a `CommonPrefix` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var base: Base.Iterator
@@ -74,6 +76,7 @@ extension CommonPrefix: Sequence {
 }
 
 extension CommonPrefix: Collection where Base: Collection, Other: Collection {
+  /// The index for a `CommonPrefix` collection.
   public struct Index {
     @usableFromInline
     internal let base: Base.Index
@@ -150,6 +153,21 @@ extension CommonPrefix: LazyCollectionProtocol
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
+  /// Returns an array of the longest common prefix of this sequence and the
+  /// other sequence, according to the given equivalence function.
+  ///
+  ///     let characters = AnySequence("abcde")
+  ///     characters.commonPrefix(with: "abce", by: ==) // ["a", "b", "c"]
+  ///     characters.commonPrefix(with: "bcde", by: ==) // []
+  ///
+  /// - Parameters:
+  ///   - other: The other sequence.
+  ///   - areEquivalent: The equivalence function.
+  /// - Returns: An array containing the elements in the longest common prefix
+  ///   of `self` and `other`, according to `areEquivalent`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the longest common
+  ///   prefix.
   @inlinable
   public func commonPrefix<Other: Sequence>(
     with other: Other,
@@ -171,6 +189,18 @@ extension Sequence {
 }
 
 extension Sequence where Element: Equatable {
+  /// Returns an array of the longest common prefix of this sequence and the
+  /// other sequence.
+  ///
+  ///     let characters = AnySequence("abcde")
+  ///     characters.commonPrefix(with: "abce") // ["a", "b", "c"]
+  ///     characters.commonPrefix(with: "bcde") // []
+  ///
+  /// - Parameter other: The other sequence.
+  /// - Returns: An array containing the elements in the longest common prefix
+  ///   of `self` and `other`.
+  ///
+  /// - Complexity: O(1)
   @inlinable
   public func commonPrefix<Other: Sequence>(
     with other: Other
@@ -184,6 +214,8 @@ extension Sequence where Element: Equatable {
 //===----------------------------------------------------------------------===//
 
 extension LazySequenceProtocol {
+  /// Returns a lazy sequence of the longest common prefix of this sequence and
+  /// another sequence, according to the given equivalence function.
   @inlinable
   public func commonPrefix<Other: Sequence>(
     with other: Other,
@@ -198,6 +230,20 @@ extension LazySequenceProtocol {
 //===----------------------------------------------------------------------===//
 
 extension Collection {
+  /// Returns the longest prefix of this collection that it has in common with
+  /// another sequence, according to the given equivalence function.
+  ///
+  ///     let string = "abcde"
+  ///     string.commonPrefix(with: "abce", by: ==) // "abc"
+  ///     string.commonPrefix(with: "bcde", by: ==) // ""
+  ///
+  /// - Parameters:
+  ///   - other: The other sequence.
+  ///   - areEquivalent: The equivalence function.
+  /// - Returns: The longest prefix of `self` that it has in common with
+  ///   `other`, according to `areEquivalent`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the common prefix.
   @inlinable
   public func commonPrefix<Other: Sequence>(
     with other: Other,
@@ -220,6 +266,19 @@ extension Collection {
 }
 
 extension Collection where Element: Equatable {
+  /// Returns the longest prefix of this collection that it has in common with
+  /// another sequence.
+  ///
+  ///     let string = "abcde"
+  ///     string.commonPrefix(with: "abce") // "abc"
+  ///     string.commonPrefix(with: "bcde") // ""
+  ///
+  /// - Parameter other: The other sequence.
+  /// - Returns: The longest prefix of `self` that it has in common with
+  ///   `other`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the longest common
+  ///   prefix.
   @inlinable
   public func commonPrefix<Other: Sequence>(
     with other: Other
@@ -229,33 +288,25 @@ extension Collection where Element: Equatable {
 }
 
 //===----------------------------------------------------------------------===//
-// LazyCollectionProtocol.commonPrefix(with:)
-//===----------------------------------------------------------------------===//
-
-extension LazyCollectionProtocol {
-  @inlinable
-  public func commonPrefix<Other: Sequence>(
-    with other: Other,
-    by areEquivalent: @escaping (Element, Other.Element) -> Bool
-  ) -> CommonPrefix<Self, Other> {
-    CommonPrefix(base: self, other: other, areEquivalent: areEquivalent)
-  }
-}
-
-extension LazyCollectionProtocol where Element: Equatable {
-  @inlinable
-  public func commonPrefix<Other: Sequence>(
-    with other: Other
-  ) -> CommonPrefix<Self, Other> where Other.Element == Element {
-    commonPrefix(with: other, by: ==)
-  }
-}
-
-//===----------------------------------------------------------------------===//
 // BidirectionalCollection.commonSuffix(with:)
 //===----------------------------------------------------------------------===//
 
 extension BidirectionalCollection {
+  /// Returns the longest suffix of this collection that it has in common with
+  /// another collection, according to the given equivalence function.
+  ///
+  ///     let string = "abcde"
+  ///     string.commonSuffix(with: "acde", by: ==) // "acde"
+  ///     string.commonSuffix(with: "abcd", by: ==) // ""
+  ///
+  /// - Parameters:
+  ///   - other: The other collection.
+  ///   - areEquivalent: The equivalence function.
+  /// - Returns: The longest suffix of `self` that it has in common with
+  ///   `other`, according to `areEquivalent`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the longest common
+  ///   suffix.
   @inlinable
   public func commonSuffix<Other: BidirectionalCollection>(
     with other: Other,
@@ -267,6 +318,19 @@ extension BidirectionalCollection {
 }
 
 extension BidirectionalCollection where Element: Equatable {
+  /// Returns the longest suffix of this collection that it has in common with
+  /// another collection.
+  ///
+  ///     let string = "abcde"
+  ///     string.commonSuffix(with: "acde") // "cde"
+  ///     string.commonSuffix(with: "abcd") // ""
+  ///
+  /// - Parameter other: The other collection.
+  /// - Returns: The longest suffix of `self` that it has in common with
+  ///   `other`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the longest common
+  ///   suffix.
   @inlinable
   public func commonSuffix<Other: BidirectionalCollection>(
     with other: Other
@@ -280,6 +344,24 @@ extension BidirectionalCollection where Element: Equatable {
 //===----------------------------------------------------------------------===//
 
 extension Collection {
+  /// Finds the longest common prefix of this collection and another collection,
+  /// according to the given equivalence function, and returns the index from
+  /// each collection that marks the end of this prefix.
+  ///
+  ///     let string1 = "abcde"
+  ///     let string2 = "abce"
+  ///     let (i1, i2) = string1.endOfCommonPrefix(with: string2, by: ==)
+  ///     print(string1[..<i1], string1[i1...]) // "abc", "de"
+  ///     print(string2[..<i2], string2[i2...]) // "abc", "e"
+  ///
+  /// - Parameters:
+  ///   - other: The other collection.
+  ///   - areEquivalent: The equivalence function.
+  /// - Returns: A pair of indices from `self` and `other` that mark the end of
+  ///   their longest common prefix according to `areEquivalent`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the longest common
+  ///   prefix.
   @inlinable
   public func endOfCommonPrefix<Other: Collection>(
     with other: Other,
@@ -300,6 +382,22 @@ extension Collection {
 }
 
 extension Collection where Element: Equatable {
+  /// Finds the longest common prefix of this collection and another collection,
+  /// and returns the index from each collection that marks the end of this
+  /// prefix.
+  ///
+  ///     let string1 = "abcde"
+  ///     let string2 = "abce"
+  ///     let (i1, i2) = string1.endOfCommonPrefix(with: string2)
+  ///     print(string1[..<i1], string1[i1...]) // "abc", "de"
+  ///     print(string2[..<i2], string2[i2...]) // "abc", "e"
+  ///
+  /// - Parameter other: The other collection.
+  /// - Returns: A pair of indices from `self` and `other` that mark the end of
+  ///   their longest common prefix.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the longest common
+  ///   prefix.
   @inlinable
   public func endOfCommonPrefix<Other: Collection>(
     with other: Other
@@ -309,10 +407,28 @@ extension Collection where Element: Equatable {
 }
 
 //===----------------------------------------------------------------------===//
-// BidirectionalCollection.startOfCommonPrefix(with:)
+// BidirectionalCollection.startOfCommonSuffix(with:)
 //===----------------------------------------------------------------------===//
 
 extension BidirectionalCollection {
+  /// Finds the longest common suffix of this collection and another collection,
+  /// according to the given equivalence function, and returns the index from
+  /// each collection that marks the start of this suffix.
+  ///
+  ///     let string1 = "abcde"
+  ///     let string2 = "acde"
+  ///     let (i1, i2) = string1.startOfCommonSuffix(with: string2, by: ==)
+  ///     print(string1[..<i1], string1[i1...]) // "ab", "cde"
+  ///     print(string2[..<i2], string2[i2...]) // "a", "cde"
+  ///
+  /// - Parameters:
+  ///   - other: The other collection.
+  ///   - areEquivalent: The equivalence function.
+  /// - Returns: A pair of indices from `self` and `other` that mark the start
+  ///   of their longest common suffix according to `areEquivalent`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the longest common
+  ///   suffix.
   @inlinable
   public func startOfCommonSuffix<Other: BidirectionalCollection>(
     with other: Other,
@@ -341,6 +457,22 @@ extension BidirectionalCollection {
 }
 
 extension BidirectionalCollection where Element: Equatable {
+  /// Finds the longest common suffix of this collection and another collection,
+  /// and returns the index from each collection that marks the start of this
+  /// suffix.
+  ///
+  ///     let string1 = "abcde"
+  ///     let string2 = "acde"
+  ///     let (i1, i2) = string1.startOfCommonSuffix(with: string2)
+  ///     print(string1[..<i1], string1[i1...]) // "ab", "cde"
+  ///     print(string2[..<i2], string2[i2...]) // "a", "cde"
+  ///
+  /// - Parameter other: The other collection.
+  /// - Returns: A pair of indices from `self` and `other` that mark the start
+  ///   of their longest common suffix.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the longest common
+  ///   suffix.
   @inlinable
   public func startOfCommonSuffix<Other: BidirectionalCollection>(
     with other: Other
