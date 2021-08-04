@@ -43,6 +43,15 @@ final class CommonPrefixTests: XCTestCase {
     XCTAssertLazyCollection([1, 2, 3].lazy.commonPrefix(with: [4, 5, 6]))
   }
   
+  func testCommonPrefixIteratorKeepsReturningNil() {
+    var iter = AnySequence("12A34").commonPrefix(with: "12B34").makeIterator()
+    XCTAssertEqual(iter.next(), "1")
+    XCTAssertEqual(iter.next(), "2")
+    XCTAssertEqual(iter.next(), nil)
+    XCTAssertEqual(iter.next(), nil)
+    XCTAssertEqual(iter.next(), nil)
+  }
+  
   func testCommonSuffix() {
     func testCommonSuffix(of a: String, and b: String, equals c: String) {
       XCTAssertEqualSequences(a.commonSuffix(with: b, by: ==), c)

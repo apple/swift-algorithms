@@ -44,6 +44,9 @@ extension CommonPrefix: Sequence {
     @usableFromInline
     internal let areEquivalent: (Base.Element, Other.Element) -> Bool
     
+    @usableFromInline
+    internal var isDone = false
+    
     @inlinable
     internal init(
       base: Base.Iterator,
@@ -56,11 +59,13 @@ extension CommonPrefix: Sequence {
     }
     
     public mutating func next() -> Base.Element? {
-      if let next = base.next(),
+      if !isDone,
+         let next = base.next(),
          let otherNext = other.next(),
          areEquivalent(next, otherNext) {
         return next
       } else {
+        isDone = true
         return nil
       }
     }
