@@ -16,6 +16,16 @@ final class ContainsTests: XCTestCase {
   func test() {
     let array = [0, 1, 2, 1, 2, 1, 2, 3]
     
+    XCTAssertTrue(array.contains([0, 1, 2]))
+    XCTAssertTrue(array.contains([1, 2]))
+    XCTAssertTrue(array.contains([1, 2, 3]))
+    XCTAssertTrue(array.contains([1, 2, 1, 2, 3]))
+    XCTAssertTrue(array.contains([0, 1, 2, 1, 2]))
+    
+    XCTAssertFalse(array.contains([2, 2]))
+    XCTAssertFalse(array.contains([0, 1, 2, 3]))
+    XCTAssertFalse(array.contains([1, 2, 3, 2]))
+    
     XCTAssertEqual(array.firstRange(of: [0, 1, 2]),       0..<3)
     XCTAssertEqual(array.firstRange(of: [1, 2]),          1..<3)
     XCTAssertEqual(array.firstRange(of: [1, 2, 3]),       5..<8)
@@ -31,6 +41,10 @@ final class ContainsTests: XCTestCase {
   func testEmpty() {
     let array = [0, 1, 2, 1, 2, 1, 2, 3]
     let empty: [Int] = []
+    
+    XCTAssertTrue(array.contains(empty))
+    XCTAssertTrue(empty.contains(empty))
+    XCTAssertFalse(empty.contains(array))
     
     XCTAssertEqual(array.firstRange(of: empty), 0..<0)
     XCTAssertEqual(empty.firstRange(of: empty), 0..<0)
