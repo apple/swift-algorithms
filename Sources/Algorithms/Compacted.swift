@@ -159,7 +159,7 @@ extension Collection {
   ///   element and iterates over every non-nil element from the original
   ///   `Collection`.
   ///
-  /// Complexity: O(*n*) where *n*  is the number of elements in the
+  /// Complexity: O(*n*) where *n* is the number of elements in the
   /// original `Collection`.
   @inlinable
   public func compacted<Unwrapped>() -> CompactedCollection<Self, Unwrapped>
