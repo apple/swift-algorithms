@@ -158,8 +158,8 @@ extension CommonPrefix: LazyCollectionProtocol
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
-  /// Returns an array of the longest common prefix of this sequence and the
-  /// other sequence, according to the given equivalence function.
+  /// Returns an array of the longest common prefix of this sequence and another
+  /// sequence, according to the given equivalence function.
   ///
   ///     let characters = AnySequence("abcde")
   ///     characters.commonPrefix(with: "abce", by: ==) // ["a", "b", "c"]
@@ -167,7 +167,8 @@ extension Sequence {
   ///
   /// - Parameters:
   ///   - other: The other sequence.
-  ///   - areEquivalent: The equivalence function.
+  ///   - areEquivalent: A predicate that returns true if its two arguments are
+  ///     equivalent; otherwise, false.
   /// - Returns: An array containing the elements in the longest common prefix
   ///   of `self` and `other`, according to `areEquivalent`.
   ///
@@ -194,8 +195,8 @@ extension Sequence {
 }
 
 extension Sequence where Element: Equatable {
-  /// Returns an array of the longest common prefix of this sequence and the
-  /// other sequence.
+  /// Returns an array of the longest common prefix of this sequence and another
+  /// sequence.
   ///
   ///     let characters = AnySequence("abcde")
   ///     characters.commonPrefix(with: "abce") // ["a", "b", "c"]
@@ -244,7 +245,8 @@ extension Collection {
   ///
   /// - Parameters:
   ///   - other: The other sequence.
-  ///   - areEquivalent: The equivalence function.
+  ///   - areEquivalent: A predicate that returns true if its two arguments are
+  ///     equivalent; otherwise, false.
   /// - Returns: The longest prefix of `self` that it has in common with
   ///   `other`, according to `areEquivalent`.
   ///
@@ -324,7 +326,8 @@ extension BidirectionalCollection {
   ///
   /// - Parameters:
   ///   - other: The other collection.
-  ///   - areEquivalent: The equivalence function.
+  ///   - areEquivalent: A predicate that returns true if its two arguments are
+  ///     equivalent; otherwise, false.
   /// - Returns: The longest suffix of `self` that it has in common with
   ///   `other`, according to `areEquivalent`.
   ///
@@ -379,7 +382,8 @@ extension Collection {
   ///
   /// - Parameters:
   ///   - other: The other collection.
-  ///   - areEquivalent: The equivalence function.
+  ///   - areEquivalent: A predicate that returns true if its two arguments are
+  ///     equivalent; otherwise, false.
   /// - Returns: A pair of indices from `self` and `other` that mark the end of
   ///   their longest common prefix according to `areEquivalent`.
   ///
@@ -446,7 +450,8 @@ extension BidirectionalCollection {
   ///
   /// - Parameters:
   ///   - other: The other collection.
-  ///   - areEquivalent: The equivalence function.
+  ///   - areEquivalent: A predicate that returns true if its two arguments are
+  ///     equivalent; otherwise, false.
   /// - Returns: A pair of indices from `self` and `other` that mark the start
   ///   of their longest common suffix according to `areEquivalent`.
   ///

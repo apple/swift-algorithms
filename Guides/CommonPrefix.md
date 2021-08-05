@@ -47,11 +47,11 @@ function is provided and a `CommonPrefix` otherwise.
 both base sequences conform. It also conforms to `LazySequenceProtocol` and
 `LazyCollectionProtocol` when the first base sequence conforms.
 
-|                            | `commonPrefix(with:)`            | `commonPrefix(with:by:)`
-|----------------------------|----------------------------------|------------------------------|
-| **`LazySequenceProtocol`** | `CommonPrefix<Self, Other>`      | `CommonPrefix<Self, Other>`       |
-| **`Collection`**           | `Self.SubSequence`               | `Self.SubSequence`                |
-| **`Sequence`**             | `CommonPrefix<Self, Other>`      | `[Self.Element]`                  |
+|                              | `commonPrefix(with:)`        | `commonPrefix(with:by:)`
+|------------------------------|------------------------------|------------------------------|
+| **`LazySequenceProtocol`**   | `CommonPrefix<Self, Other>`  | `CommonPrefix<Self, Other>`  |
+| **`Collection`**             | `Self.SubSequence`           | `Self.SubSequence`           |
+| **`Sequence`**               | `CommonPrefix<Self, Other>`  | `[Self.Element]`             |
 
 ```swift
 extension Sequence {
