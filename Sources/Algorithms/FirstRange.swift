@@ -75,6 +75,9 @@ extension BidirectionalCollection {
     }
     
     let needleLast = other[otherLastIndex]
+    
+    let startIndex = startIndex
+    let otherStartIndex = other.startIndex
 
     while let matchEnd = try self[..<searchEnd]
             .lastIndex(where: { try areEquivalent($0, needleLast) })
@@ -83,7 +86,7 @@ extension BidirectionalCollection {
       var otherIndex = otherLastIndex
 
       repeat {
-        if otherIndex == other.startIndex {
+        if otherIndex == otherStartIndex {
           return index..<self.index(after: matchEnd)
         } else if index == startIndex {
           return nil
