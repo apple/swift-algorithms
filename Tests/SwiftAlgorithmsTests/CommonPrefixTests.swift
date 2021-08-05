@@ -16,16 +16,16 @@ final class CommonPrefixTests: XCTestCase {
   func testCommonPrefix() {
     func testCommonPrefix(of a: String, and b: String, equals c: String) {
       // eager sequence
-      XCTAssertEqualSequences(AnySequence(a).commonPrefix(with: AnySequence(b), by: ==), c)
+      XCTAssertEqualSequences(AnySequence(a).commonPrefix(with: AnySequence(b)), c)
       
       // lazy sequence
-      XCTAssertEqualSequences(AnySequence(a).lazy.commonPrefix(with: AnySequence(b), by: ==), c)
+      XCTAssertEqualSequences(AnySequence(a).lazy.commonPrefix(with: AnySequence(b)), c)
       
       // eager collection
-      XCTAssertEqualSequences(a.commonPrefix(with: b, by: ==), c)
+      XCTAssertEqualSequences(a.commonPrefix(with: b), c)
       
       // lazy collection
-      XCTAssertEqualSequences(a.lazy.commonPrefix(with: b, by: ==), c)
+      XCTAssertEqualSequences(a.lazy.commonPrefix(with: b), c)
     }
     
     testCommonPrefix(of: "abcdef", and: "abcxyz", equals: "abc")
@@ -68,5 +68,21 @@ final class CommonPrefixTests: XCTestCase {
     testCommonSuffix(of: "",    and: "",    equals: "")
     
     XCTAssertLazySequence([1, 2, 3].lazy.commonSuffix(with: [4, 5, 6]))
+  }
+  
+  func testEndOfCommonPrefix() {
+    XCTAssert([1, 2, 3].endOfCommonPrefix(with: [1, 2, 3]) == (3, 3))
+    XCTAssert([1, 2, 3].endOfCommonPrefix(with: [4, 5]) == (0, 0))
+    XCTAssert([1, 2, 3].endOfCommonPrefix(with: [1, 2]) == (2, 2))
+    XCTAssert([1, 2, 3].endOfCommonPrefix(with: [1, 2, 4]) == (2, 2))
+    XCTAssert([1, 2].endOfCommonPrefix(with: [1, 2, 3]) == (2, 2))
+  }
+  
+  func testStartOfCommonSuffix() {
+    XCTAssert([1, 2, 3].startOfCommonSuffix(with: [1, 2, 3]) == (0, 0))
+    XCTAssert([1, 2, 3].startOfCommonSuffix(with: [4, 5]) == (3, 2))
+    XCTAssert([1, 2, 3].startOfCommonSuffix(with: [2, 3]) == (1, 0))
+    XCTAssert([0, 1, 2, 3].startOfCommonSuffix(with: [0, 2, 3]) == (2, 1))
+    XCTAssert([2, 3].startOfCommonSuffix(with: [1, 2, 3]) == (0, 1))
   }
 }
