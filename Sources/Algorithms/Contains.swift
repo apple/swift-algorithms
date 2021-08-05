@@ -29,7 +29,7 @@ extension Collection {
   /// - Returns: `true` if there exists an index range `r` such that `self[r]`
   ///   equals `other` according to `areEquivalent`.
   ///
-  /// - Complexity: O(*n* \* *m*), where *n* is the length of this collection
+  /// - Complexity: O(*n \* m*), where *n* is the length of this collection
   ///   and *m* is the length of the collection being searched for.
   @inlinable
   public func contains<Other: Collection>(
@@ -52,7 +52,7 @@ extension Collection where Element: Equatable {
   /// - Returns: `true` if there exists an index range `r` such that `self[r]`
   ///   equals `other`.
   ///
-  /// - Complexity: O(*n* \* *m*), where *n* is the length of this collection
+  /// - Complexity: O(*n \* m*), where *n* is the length of this collection
   ///   and *m* is the length of the collection being searched for.
   @inlinable
   public func contains<Other: Collection>(
@@ -85,7 +85,7 @@ extension Collection {
   /// - Returns: The first index range `r` such that `self[r]` equals `other`
   ///   according to `areEquivalent`.
   ///
-  /// - Complexity: O(*n* \* *m*), where *n* is the length of this collection
+  /// - Complexity: O(*n \* m*), where *n* is the length of this collection
   ///   and *m* is the length of the collection being searched for.
   @inlinable
   public func firstRange<Other: Collection>(
@@ -136,7 +136,7 @@ extension Collection where Element: Equatable {
   /// - Parameter other: The collection to search for.
   /// - Returns: The first index range `r` such that `self[r]` equals `other`.
   ///
-  /// - Complexity: O(*n* \* *m*), where *n* is the length of this collection
+  /// - Complexity: O(*n \* m*), where *n* is the length of this collection
   ///   and *m* is the length of the collection being searched for.
   @inlinable
   public func firstRange<Other: Collection>(of other: Other) -> Range<Index>?
@@ -169,7 +169,7 @@ extension BidirectionalCollection {
   /// - Returns: The last index range `r` such that `self[r]` equals `other`
   ///   according to `areEquivalent`.
   ///
-  /// - Complexity: O(*n* \* *m*), where *n* is the length of this collection
+  /// - Complexity: O(*n \* m*), where *n* is the length of this collection
   ///   and *m* is the length of the collection being searched for.
   @inlinable
   public func lastRange<Other: BidirectionalCollection>(
@@ -226,7 +226,7 @@ extension BidirectionalCollection where Element: Equatable {
   /// - Returns: The last index range `r` such that `self[r]` equals `other`
   ///   according to `areEquivalent`.
   ///
-  /// - Complexity: O(*n* \* *m*), where *n* is the length of this collection
+  /// - Complexity: O(*n \* m*), where *n* is the length of this collection
   ///   and *m* is the length of the collection being searched for.
   @inlinable
   public func lastRange<Other: BidirectionalCollection>(
