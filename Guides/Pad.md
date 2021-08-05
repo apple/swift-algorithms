@@ -37,6 +37,7 @@ extension RangeReplaceableCollection {
 Each of the two operations also have a mutating varient.
 
 ```swift
+extension RangeReplaceableCollection {
     public mutating func padStart(
         with element: Element,
         toCount paddedCount: Int
