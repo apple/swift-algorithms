@@ -293,6 +293,24 @@ extension Collection where Element: Equatable {
 }
 
 //===----------------------------------------------------------------------===//
+// LazyCollectionProtocol.commonPrefix(with:)
+//===----------------------------------------------------------------------===//
+
+// This overload exists in the same form on `Sequence` but is necessary to
+// ensure a `CommonPrefix` is returned and not a `SubSequence`.
+
+extension LazyCollectionProtocol where Element: Equatable {
+  /// Returns a lazy collection of the longest common prefix of this collection
+  /// and another sequence.
+  @inlinable
+  public func commonPrefix<Other: Sequence>(
+    with other: Other
+  ) -> CommonPrefix<Self, Other> where Other.Element == Element {
+    commonPrefix(with: other, by: ==)
+  }
+}
+
+//===----------------------------------------------------------------------===//
 // BidirectionalCollection.commonSuffix(with:)
 //===----------------------------------------------------------------------===//
 
