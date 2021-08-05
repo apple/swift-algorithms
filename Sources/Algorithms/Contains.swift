@@ -10,6 +10,59 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
+// contains(_:)
+//===----------------------------------------------------------------------===//
+
+extension Collection {
+  /// Returns a Boolean value indicating whether this collection at any position
+  /// contains the same elements as another collection in the same order,
+  /// according to the given equivalence function.
+  ///
+  ///     let string = "foo, bar"
+  ///     print(string.contains("foo, ", by: ==)) // true
+  ///     print(string.contains("bar, ", by: ==)) // false
+  ///
+  /// - Parameters:
+  ///   - other: The collection to search for.
+  ///   - areEquivalent: A predicate that returns true if its two arguments are
+  ///     equivalent; otherwise, false.
+  /// - Returns: `true` if there exists an index range `r` such that `self[r]`
+  ///   equals `other` according to `areEquivalent`.
+  ///
+  /// - Complexity: O(*n* \* *m*), where *n* is the length of this collection
+  ///   and *m* is the length of the collection being searched for.
+  @inlinable
+  public func contains<Other: Collection>(
+    _ other: Other,
+    by areEquivalent: (Element, Other.Element) throws -> Bool
+  ) rethrows -> Bool {
+    try firstRange(of: other, by: areEquivalent) != nil
+  }
+}
+
+extension Collection where Element: Equatable {
+  /// Returns a Boolean value indicating whether this collection at any position
+  /// contains the same elements as another collection in the same order.
+  ///
+  ///     let string = "foo, bar"
+  ///     print(string.contains("foo, ")) // true
+  ///     print(string.contains("bar, ")) // false
+  ///
+  /// - Parameter other: The collection to search for.
+  /// - Returns: `true` if there exists an index range `r` such that `self[r]`
+  ///   equals `other`.
+  ///
+  /// - Complexity: O(*n* \* *m*), where *n* is the length of this collection
+  ///   and *m* is the length of the collection being searched for.
+  @inlinable
+  public func contains<Other: Collection>(
+    _ other: Other
+  ) -> Bool where Other.Element == Element {
+    contains(other, by: ==)
+  }
+}
+
+//===----------------------------------------------------------------------===//
 // firstRange(of:)
 //===----------------------------------------------------------------------===//
 
@@ -180,58 +233,5 @@ extension BidirectionalCollection where Element: Equatable {
     of other: Other
   ) -> Range<Index>? where Other.Element == Element {
     lastRange(of: other, by: ==)
-  }
-}
-
-//===----------------------------------------------------------------------===//
-// contains(_:)
-//===----------------------------------------------------------------------===//
-
-extension Collection {
-  /// Returns a Boolean value indicating whether this collection at any position
-  /// contains the same elements as another collection in the same order,
-  /// according to the given equivalence function.
-  ///
-  ///     let string = "foo, bar"
-  ///     print(string.contains("foo, ", by: ==)) // true
-  ///     print(string.contains("bar, ", by: ==)) // false
-  ///
-  /// - Parameters:
-  ///   - other: The collection to search for.
-  ///   - areEquivalent: A predicate that returns true if its two arguments are
-  ///     equivalent; otherwise, false.
-  /// - Returns: `true` if there exists an index range `r` such that `self[r]`
-  ///   equals `other` according to `areEquivalent`.
-  ///
-  /// - Complexity: O(*n* \* *m*), where *n* is the length of this collection
-  ///   and *m* is the length of the collection being searched for.
-  @inlinable
-  public func contains<Other: Collection>(
-    _ other: Other,
-    by areEquivalent: (Element, Other.Element) throws -> Bool
-  ) rethrows -> Bool {
-    try firstRange(of: other, by: areEquivalent) != nil
-  }
-}
-
-extension Collection where Element: Equatable {
-  /// Returns a Boolean value indicating whether this collection at any position
-  /// contains the same elements as another collection in the same order.
-  ///
-  ///     let string = "foo, bar"
-  ///     print(string.contains("foo, ")) // true
-  ///     print(string.contains("bar, ")) // false
-  ///
-  /// - Parameter other: The collection to search for.
-  /// - Returns: `true` if there exists an index range `r` such that `self[r]`
-  ///   equals `other`.
-  ///
-  /// - Complexity: O(*n* \* *m*), where *n* is the length of this collection
-  ///   and *m* is the length of the collection being searched for.
-  @inlinable
-  public func contains<Other: Collection>(
-    _ other: Other
-  ) -> Bool where Other.Element == Element {
-    contains(other, by: ==)
   }
 }

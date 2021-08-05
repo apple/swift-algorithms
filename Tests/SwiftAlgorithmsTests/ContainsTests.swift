@@ -12,7 +12,7 @@
 import XCTest
 import Algorithms
 
-final class FirstRangeTests: XCTestCase {
+final class ContainsTests: XCTestCase {
   func test() {
     let array = [0, 1, 2, 1, 2, 1, 2, 3]
     
