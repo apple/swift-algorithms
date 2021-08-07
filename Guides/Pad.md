@@ -3,8 +3,8 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Pad.swift) | 
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/PadTests.swift)]
 
-Returns a `RangeReplaceableCollection` whose length is expanded to `paddedCount`
-by repeating the padding `element` at the start or the end of the base collection.
+Pad a collection by repeatedly adding a padding element to the start or end until 
+it reaches a given length.
 
 ```swift
 let paddedNumber = "96".paddingStart(with: "0", toCount: 4)
@@ -34,19 +34,17 @@ extension RangeReplaceableCollection {
 }
 ```
 
-Each of the two operations also have a mutating varient.
+Each of the two operations also has a mutating variant.
 
 ```swift
 extension RangeReplaceableCollection {
     public mutating func padStart(
         with element: Element,
-        toCount paddedCount: Int
-    )
+        toCount paddedCount: Int)
       
     public mutating func padEnd(
         with element: Element,
-        toCount paddedCount: Int
-    )
+        toCount paddedCount: Int)
 }
 ```
 
@@ -56,10 +54,10 @@ greater than the `paddedCount`, the collection is preserved.
 
 ### Complexity
 
-O(_m_), when collection's count is less than the `paddedCount`, where _m_ is the 
-`paddedCount`. O(_n_) when the collection's count is greater than or equal to the 
-`paddedCount`, where _n_ is the `count` of the collection. For a `RandomAccessCollection`
-when the collection's count is greater than or equal to the `paddedCount`, the 
+O(_m_), when the collection's length is less than the `paddedCount`, where _m_ is the 
+`paddedCount`. O(_n_) when the collection's length is greater than or equal to the 
+`paddedCount`, where _n_ is the length of the collection. For a `RandomAccessCollection`
+when the collection's length is greater than or equal to the `paddedCount`, the 
 complexity is reduced to O(_1_).
 
 ### Naming
@@ -73,4 +71,5 @@ fit in with Swift's naming convention.
 **Python:** Python’s built-in `str`, `bytes` and `bytearray` have `ljust` and 
 `rjust` methods.
 **Ruby:** Ruby defines `ljust` and `rjust` on strings.
-**JavaScript:** `String.prototype.padStart` and `String.prototype.padEnd` are part of the ECMAScript standard and supported on all prominent web browsers.
+**JavaScript:** `String.prototype.padStart` and `String.prototype.padEnd` are part
+of the ECMAScript standard and supported on all prominent web browsers.
