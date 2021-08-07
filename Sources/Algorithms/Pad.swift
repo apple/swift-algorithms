@@ -54,8 +54,8 @@ extension RangeReplaceableCollection {
   /// Mutates a `RangeReplaceableCollection` by expanding its length
   /// to `paddedCount` repeating the padding `element` at the start.
   ///
-  /// The collection not mutated in the case where the length of the collection is
-  /// longer than or equal to the `paddedCount`.
+  /// The collection is not mutated in the case where the length of the collection
+  /// is greater than or equal to the `paddedCount`.
   ///
   /// This example uses `padStart(with:toCount:)` to get a `String`
   /// justified to the desired `paddedCount`.
@@ -126,8 +126,8 @@ extension RangeReplaceableCollection {
   /// Mutates a `RangeReplaceableCollection` by expanding its length
   /// to `paddedCount` repeating the padding `element` at the end.
   ///
-  /// The collection not mutated in the case where the length of the collection is
-  /// longer than or equal to the `paddedCount`.
+  /// The collection is not mutated in the case where the length of the collection
+  /// is greater than or equal to the `paddedCount`.
   ///
   /// This example uses `padEnd(with:toCount:)` to get a `String`
   /// justified to the desired `paddedCount`.
