@@ -79,7 +79,7 @@ extension RangeReplaceableCollection {
     with element: Element,
     toCount paddedCount: Int
   ) {
-    self = self.paddingStart(with: element, toCount: paddedCount)
+    self = paddingStart(with: element, toCount: paddedCount)
   }
 
   /// Returns a new collection of the same type whose length is expanded
@@ -151,6 +151,6 @@ extension RangeReplaceableCollection {
     with element: Element,
     toCount paddedCount: Int
   ) {
-    self = self.paddingEnd(with: element, toCount: paddedCount)
+    self = paddingEnd(with: element, toCount: paddedCount)
   }
 }
