@@ -50,7 +50,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 - [`reductions(_:)`, `reductions(_:_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Reductions.md): Returns all the intermediate states of reducing the elements of a sequence or collection.
 - [`split(maxSplits:omittingEmptySubsequences:whereSeparator)`, `split(separator:maxSplits:omittingEmptySubsequences)`](https://github.com/apple/swift-algorithms/blob/main/Guides/LazySplit.md): Lazy versions of the Standard Library's eager operations that split sequences and collections into subsequences separated by the specified separator element.
 - [`windows(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Windows.md): Breaks a collection into overlapping subsequences where elements are slices from the original collection.
-- [`paddingStart(with:toCount:)`, `paddingEnd(with:toCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Pad.md): Expands a collection to the specified length by repeating the provided padding element at the start or the end. The mutating `pad...` methods pad a collection in place.
+- [`paddingStart(with:toCount:)`, `paddingEnd(with:toCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Pad.md): Pads a collection by repeatedly adding a padding element to the start or end until it reaches a given length. The mutating `pad...` methods pad a collection in place.
 
 ## Adding Swift Algorithms as a Dependency
 

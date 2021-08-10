@@ -3,7 +3,7 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Pad.swift) | 
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/PadTests.swift)]
 
-Pad a collection by repeatedly adding a padding element to the start or end until 
+Pads a collection by repeatedly adding a padding element to the start or end until 
 it reaches a given length.
 
 ```swift
