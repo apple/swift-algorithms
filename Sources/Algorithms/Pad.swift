@@ -27,12 +27,11 @@ extension RangeReplaceableCollection {
   ///   - element: The element which is repeated to expand the collection.
   ///   - paddedCount: The length of the padded collection.
   ///
-  /// - Complexity: O(_m_), when the collection's length is less than the
-  /// `paddedCount`, where _m_ is the `paddedCount`. O(_n_) when the
-  /// collection's length is greater than or equal to the `paddedCount`, where
-  /// _n_ is the length of the collection. For a `RandomAccessCollection`
-  /// when the collection's length is greater than or equal to the `paddedCount`,
-  /// the complexity is reduced to O(_1_).
+  /// - Complexity: O(_m_) when the collection's length is less than the
+  /// `paddedCount`, where _m_ is equal to the `paddedCount`. O(_1_) for
+  /// a `RandomAccessCollection`; otherwise O(_n_) when the collection's length
+  /// is greater than or equal to the `paddedCount`, where _n_ is the length of
+  /// the collection.
   @inlinable
   public func paddingStart(
     with element: Element,
@@ -68,18 +67,22 @@ extension RangeReplaceableCollection {
   ///   - element: The element which is repeated to expand the `Collection`.
   ///   - paddedCount: The length of the padded `Collection`.
   ///
-  /// - Complexity: O(_m_), when the collection's length is less than the
-  /// `paddedCount`, where _m_ is the `paddedCount`. O(_n_) when the
-  /// collection's length is greater than or equal to the `paddedCount`, where
-  /// _n_ is the length of the collection. For a `RandomAccessCollection`
-  /// when the collection's length is greater than or equal to the `paddedCount`,
-  /// the complexity is reduced to O(_1_).
+  /// - Complexity: O(_m_) when the collection's length is less than the
+  /// `paddedCount`, where _m_ is equal to the `paddedCount`. O(_1_) for
+  /// a `RandomAccessCollection`; otherwise O(_n_) when the collection's length
+  /// is greater than or equal to the `paddedCount`, where _n_ is the length of
+  /// the collection.
   @inlinable
   public mutating func padStart(
     with element: Element,
     toCount paddedCount: Int
   ) {
-    self = paddingStart(with: element, toCount: paddedCount)
+    let padElementCount = paddedCount - count
+
+    // Early exit if no padding is required.
+    guard padElementCount > 0 else { return }
+
+    insert(contentsOf: repeatElement(element, count: padElementCount), at: startIndex)
   }
 
   /// Returns a new collection of the same type whose length is expanded
@@ -99,12 +102,11 @@ extension RangeReplaceableCollection {
   ///   - element: The element which is repeated to expand the collection.
   ///   - paddedCount: The length of the padded collection.
   ///
-  /// - Complexity: O(_m_), when the collection's length is less than the
-  /// `paddedCount`, where _m_ is the `paddedCount`. O(_n_) when the
-  /// collection's length is greater than or equal to the `paddedCount`, where
-  /// _n_ is the length of the collection. For a `RandomAccessCollection`
-  /// when the collection's length is greater than or equal to the `paddedCount`,
-  /// the complexity is reduced to O(_1_).
+  /// - Complexity: O(_m_) when the collection's length is less than the
+  /// `paddedCount`, where _m_ is equal to the `paddedCount`. O(_1_) for
+  /// a `RandomAccessCollection`; otherwise O(_n_) when the collection's length
+  /// is greater than or equal to the `paddedCount`, where _n_ is the length of
+  /// the collection.
   @inlinable
   public func paddingEnd(
     with element: Element,
@@ -140,17 +142,22 @@ extension RangeReplaceableCollection {
   ///   - element: The element which is repeated to expand the `Collection`.
   ///   - paddedCount: The length of the padded `Collection`.
   ///
-  /// - Complexity: O(_m_), when the collection's length is less than the
-  /// `paddedCount`, where _m_ is the `paddedCount`. O(_n_) when the
-  /// collection's length is greater than or equal to the `paddedCount`, where
-  /// _n_ is the length of the collection. For a `RandomAccessCollection`
-  /// when the collection's length is greater than or equal to the `paddedCount`,
-  /// the complexity is reduced to O(_1_).
+  /// - Complexity: O(_m-n_) for a `RandomAccessCollection`; otherwise
+  /// O(_m_) when the collection's length is less than the `paddedCount`, where
+  /// _m_ is equal to the `paddedCount` and _n_ is equal to the length of the
+  /// collection. O(_1_) for  a `RandomAccessCollection`; otherwise O(_n_) when
+  /// the collection's length is greater than or equal to the `paddedCount`, where
+  /// _n_ is equal to the length of the collection.
   @inlinable
   public mutating func padEnd(
     with element: Element,
     toCount paddedCount: Int
   ) {
-    self = paddingEnd(with: element, toCount: paddedCount)
+    let padElementCount = paddedCount - count
+
+    // Early exit if no padding is required.
+    guard padElementCount > 0 else { return }
+
+    self.append(contentsOf: repeatElement(element, count: padElementCount))
   }
 }

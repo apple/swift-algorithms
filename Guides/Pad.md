@@ -54,11 +54,19 @@ greater than the `paddedCount`, the collection is preserved.
 
 ### Complexity
 
-O(_m_), when the collection's length is less than the `paddedCount`, where _m_ is the 
-`paddedCount`. O(_n_) when the collection's length is greater than or equal to the 
-`paddedCount`, where _n_ is the length of the collection. For a `RandomAccessCollection`
-when the collection's length is greater than or equal to the `paddedCount`, the 
-complexity is reduced to O(_1_).
+O(_m_) when the collection's length is less than the `paddedCount`, where _m_ is 
+equal to the `paddedCount`. O(_1_) for a `RandomAccessCollection`; otherwise O(_n_) 
+when the collection's length is greater than or equal to the `paddedCount`, where _n_ 
+is the length of the collection.
+
+*Note:* Padding the end of a collection in place using `padEnd(with:toCount:)` can be 
+further optimized and therefore has a better complexity:
+
+O(_m-n_) for a `RandomAccessCollection`; otherwise O(_m_) when the collection's length 
+is less than the `paddedCount`, where _m_ is equal to the `paddedCount` and _n_ is 
+equal to the length of the collection. O(_1_) for  a `RandomAccessCollection`; 
+otherwise O(_n_) when the collection's length is greater than or equal to the 
+`paddedCount`, where _n_ is equal to the length of the collection.
 
 ### Naming
 
@@ -70,6 +78,8 @@ fit in with Swift's naming convention.
 
 **Python:** Python’s built-in `str`, `bytes` and `bytearray` have `ljust` and 
 `rjust` methods.
+
 **Ruby:** Ruby defines `ljust` and `rjust` on strings.
+
 **JavaScript:** `String.prototype.padStart` and `String.prototype.padEnd` are part
 of the ECMAScript standard and supported on all prominent web browsers.
