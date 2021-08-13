@@ -12,9 +12,7 @@ code](https://swift.org/contributing/#contributing-code).
 ---
 
 For benchmarking of particular algorithms, please use the 
-
 `algorithms-benchmark` executable target. For convenience, this target 
-
 already imports `Algorithms`.
 
 Example usage:
