@@ -78,6 +78,25 @@ final class ChunkedTests: XCTestCase {
     validateIndexTraversals(lazyChunks)
   }
   
+  func testChunkedByComparesConsecutiveElements() {
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 6, 7, 8, 9].chunked(by: { $1 - $0 == 1 }),
+      [[1, 2, 3, 4], [6, 7, 8, 9]])
+    
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 6, 7, 8, 9].lazy.chunked(by: { $1 - $0 == 1 }),
+      [[1, 2, 3, 4], [6, 7, 8, 9]])
+    
+    print(Array([1, 2, 3].lazy.chunked(by: { $1 - $0 == 1 })))
+    print(Array([1, 2, 3].lazy.chunked(by: { $1 - $0 == 1 }).reversed()))
+    
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 6, 7, 8, 9].lazy.chunked(by: { $1 - $0 == 1 }).reversed(),
+      [[6, 7, 8, 9], [1, 2, 3, 4]])
+    
+    validateIndexTraversals([1, 2, 3].lazy.chunked(by: { $1 - $0 == 1 }))
+  }
+  
   func testChunkedLazy() {
     XCTAssertLazySequence(fruits.lazy.chunked(by: { $0.first == $1.first }))
     XCTAssertLazySequence(fruits.lazy.chunked(on: { $0.first }))

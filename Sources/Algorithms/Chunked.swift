@@ -77,9 +77,13 @@ extension ChunkedBy: LazyCollectionProtocol {
   /// at the given index.
   @inlinable
   internal func endOfChunk(startingAt start: Base.Index) -> Base.Index {
-    let subject = projection(base[start])
-    return base[base.index(after: start)...]
-      .endOfPrefix(while: { belongInSameGroup(subject, projection($0)) })
+    var subject = projection(base[start])
+    
+    return base[base.index(after: start)...].endOfPrefix(while: { element in
+      let nextSubject = projection(element)
+      defer { subject = nextSubject }
+      return belongInSameGroup(subject, nextSubject)
+    })
   }
   
   @inlinable
@@ -118,11 +122,13 @@ extension ChunkedBy: BidirectionalCollection
   @inlinable
   internal func startOfChunk(endingAt end: Base.Index) -> Base.Index {
     let indexBeforeEnd = base.index(before: end)
+    var subject = projection(base[indexBeforeEnd])
     
-    // Get the projected value of the last element in the range ending at `end`.
-    let subject = projection(base[indexBeforeEnd])
-    return base[..<indexBeforeEnd]
-      .startOfSuffix(while: { belongInSameGroup(projection($0), subject) })
+    return base[..<indexBeforeEnd].startOfSuffix(while: { element in
+      let nextSubject = projection(element)
+      defer { subject = nextSubject }
+      return belongInSameGroup(nextSubject, subject)
+    })
   }
 
   @inlinable
@@ -246,8 +252,8 @@ extension Collection {
       if try !belongInSameGroup(current, element) {
         result.append(self[start..<index])
         start = index
-        current = element
       }
+      current = element
     }
     
     if start != endIndex {
