@@ -19,25 +19,25 @@ The stride amount must be a positive value.
 ## Detailed Design
 
 The `striding(by:)` method is declared as a `Sequence` extension, and returns a 
-`Stride` type:
+`StridingSequence` type:
 
 ```swift
 extension Sequence {
-  public func striding(by step: Int) -> Stride<Self>
+  public func striding(by step: Int) -> StridingSequence<Self>
 }
 ```
 
-A custom `Index` type is defined so that it's not possible to get confused when trying 
-to access an index of the stride collection.
+A custom `Index` type is defined so that it's not possible to get confused when 
+trying to access an index of the stride collection.
 
 ```swift
 [0, 1, 2, 3, 4].striding(by: 2)[1] // == 1
 [0, 1, 2, 3, 4].striding(by: 2).map { $0 }[1] // == 2
 ```
 
-A careful thought was given to the composition of these strides by giving a custom 
-implementation to `index(_:offsetBy:limitedBy)` which multiplies the offset by the 
-stride amount. 
+A careful thought was given to the composition of these strides by giving a 
+custom implementation to `index(_:offsetBy:limitedBy)` which multiplies the 
+offset by the stride amount. 
 
 ```swift
 base.index(i.base, offsetBy: distance * stride, limitedBy: base.endIndex)
@@ -52,8 +52,9 @@ The following two lines of code are equivalent, including performance:
 
 ### Complexity
 
-The call to `striding(by: k)` is always O(_1_) and access to the next value in the stride 
-is O(_1_) if the collection conforms to `RandomAccessCollection`, otherwise O(_k_).
+The call to `striding(by: k)` is always O(_1_) and access to the next value in
+the stride is O(_1_) if the collection conforms to `RandomAccessCollection`, 
+otherwise O(_k_).
 
 ### Comparison with other languages
 

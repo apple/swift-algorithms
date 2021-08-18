@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 /// A sequence that represents the product of two sequences' elements.
-public struct Product2<Base1: Sequence, Base2: Collection> {
+public struct Product2Sequence<Base1: Sequence, Base2: Collection> {
   /// The outer sequence in the product.
   @usableFromInline
   internal let base1: Base1
@@ -26,7 +26,7 @@ public struct Product2<Base1: Sequence, Base2: Collection> {
   }
 }
 
-extension Product2: Sequence {
+extension Product2Sequence: Sequence {
   public typealias Element = (Base1.Element, Base2.Element)
   
   /// The iterator for a `Product2` sequence.
@@ -41,7 +41,7 @@ extension Product2: Sequence {
     internal let base2: Base2
 
     @inlinable
-    internal init(_ c: Product2) {
+    internal init(_ c: Product2Sequence) {
       self.base2 = c.base2
       self.i1 = c.base1.makeIterator()
       self.i2 = c.base2.makeIterator()
@@ -88,7 +88,7 @@ extension Product2: Sequence {
   }
 }
 
-extension Product2: Collection where Base1: Collection {
+extension Product2Sequence: Collection where Base1: Collection {
   /// The index type for a `Product2` collection.
   public struct Index: Comparable {
     @usableFromInline
@@ -419,7 +419,7 @@ extension Product2: Collection where Base1: Collection {
   }
 }
 
-extension Product2: BidirectionalCollection
+extension Product2Sequence: BidirectionalCollection
   where Base1: BidirectionalCollection, Base2: BidirectionalCollection
 {
   @inlinable
@@ -436,10 +436,10 @@ extension Product2: BidirectionalCollection
   }
 }
 
-extension Product2: RandomAccessCollection
+extension Product2Sequence: RandomAccessCollection
   where Base1: RandomAccessCollection, Base2: RandomAccessCollection {}
 
-extension Product2.Index: Hashable where Base1.Index: Hashable, Base2.Index: Hashable {}
+extension Product2Sequence.Index: Hashable where Base1.Index: Hashable, Base2.Index: Hashable {}
 
 //===----------------------------------------------------------------------===//
 // product(_:_:)
@@ -481,6 +481,6 @@ extension Product2.Index: Hashable where Base1.Index: Hashable, Base2.Index: Has
 @inlinable
 public func product<Base1: Sequence, Base2: Collection>(
   _ s1: Base1, _ s2: Base2
-) -> Product2<Base1, Base2> {
-  return Product2(s1, s2)
+) -> Product2Sequence<Base1, Base2> {
+  return Product2Sequence(s1, s2)
 }

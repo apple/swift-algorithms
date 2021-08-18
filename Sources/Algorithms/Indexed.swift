@@ -11,7 +11,7 @@
 
 /// A collection wrapper that iterates over the indices and elements of a
 /// collection together.
-public struct Indexed<Base: Collection> {
+public struct IndexedCollection<Base: Collection> {
   /// The element type for an `Indexed` collection.
   public typealias Element = (index: Base.Index, element: Base.Element)
   
@@ -25,7 +25,7 @@ public struct Indexed<Base: Collection> {
   }
 }
 
-extension Indexed: Collection {
+extension IndexedCollection: Collection {
   @inlinable
   public var startIndex: Base.Index {
     base.startIndex
@@ -62,16 +62,16 @@ extension Indexed: Collection {
   }
 }
 
-extension Indexed: BidirectionalCollection where Base: BidirectionalCollection {
+extension IndexedCollection: BidirectionalCollection where Base: BidirectionalCollection {
   @inlinable
   public func index(before i: Base.Index) -> Base.Index {
     base.index(before: i)
   }
 }
 
-extension Indexed: RandomAccessCollection where Base: RandomAccessCollection {}
-extension Indexed: LazySequenceProtocol where Base: LazySequenceProtocol {}
-extension Indexed: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
+extension IndexedCollection: RandomAccessCollection where Base: RandomAccessCollection {}
+extension IndexedCollection: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension IndexedCollection: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
 
 //===----------------------------------------------------------------------===//
 // indexed()
@@ -94,7 +94,7 @@ extension Collection {
   ///
   /// Returns: A collection of paired indices and elements of this collection.
   @inlinable
-  public func indexed() -> Indexed<Self> {
-    Indexed(base: self)
+  public func indexed() -> IndexedCollection<Self> {
+    IndexedCollection(base: self)
   }
 }

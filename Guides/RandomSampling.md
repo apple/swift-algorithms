@@ -17,7 +17,7 @@ source.randomSample(count: 4)
 // e.g. [30, 10, 70, 50]
 source.randomStableSample(count: 4)
 // e.g. [20, 30, 80, 100]
-//
+
 var rng = SplitMix64(seed: 0)
 source.randomSample(count: 4, using: &rng)
 ```

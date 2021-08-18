@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 /// A sequence wrapper that leaves out duplicate elements of a base sequence.
-public struct Uniqued<Base: Sequence, Subject: Hashable> {
+public struct UniquedSequence<Base: Sequence, Subject: Hashable> {
   /// The base collection.
   @usableFromInline
   internal let base: Base
@@ -26,7 +26,7 @@ public struct Uniqued<Base: Sequence, Subject: Hashable> {
   }
 }
 
-extension Uniqued: Sequence {
+extension UniquedSequence: Sequence {
   /// The iterator for a `Uniqued` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -64,7 +64,8 @@ extension Uniqued: Sequence {
   }
 }
 
-extension Uniqued: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension UniquedSequence: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // uniqued()
@@ -83,8 +84,8 @@ extension Sequence where Element: Hashable {
   ///  .
   /// - Complexity: O(1).
   @inlinable
-  public func uniqued() -> Uniqued<Self, Element> {
-    Uniqued(base: self, projection: { $0 })
+  public func uniqued() -> UniquedSequence<Self, Element> {
+    UniquedSequence(base: self, projection: { $0 })
   }
 }
 
@@ -138,7 +139,7 @@ extension LazySequenceProtocol {
   @inlinable
   public func uniqued<Subject: Hashable>(
     on projection: @escaping (Element) -> Subject
-  ) -> Uniqued<Self, Subject> {
-    Uniqued(base: self, projection: projection)
+  ) -> UniquedSequence<Self, Subject> {
+    UniquedSequence(base: self, projection: projection)
   }
 }

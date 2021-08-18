@@ -15,9 +15,9 @@ collection without allocating additional storage on the heap.
 // Splitting a lazy sequence.
 let numbers = stride(from: 1, through: 16, by: 1)
 for subsequence in numbers.lazy.split(
-  whereSeparator: { $0 % 3 == 0 || $0 % 5 == 0 }
+    whereSeparator: { $0 % 3 == 0 || $0 % 5 == 0 }
 ) {
-  print(subsequence)
+    print(subsequence)
 }
 /* Prints:
 [1, 2]
@@ -31,7 +31,7 @@ for subsequence in numbers.lazy.split(
 // Splitting a lazy collection.
 let line = "BLANCHE:   I don't want realism. I want magic!"
 for subsequence in line.lazy.split(separator: " ") {
-  print(subsequence)
+    print(subsequence)
 }
 /* Prints
 BLANCHE:
@@ -52,29 +52,28 @@ magic!
 `split(separator:maxSplits:omittingEmptySubsequences:)`.
 
 The `LazySequence` versions of those methods return an instance of
-`LazySplitSequence`. The `LazyCollection` versions return an instance of
-`LazySplitCollection`.
+`SplitSequence`. The `LazyCollection` versions return an instance of
+`SplitCollection`.
 
-`LazySplitSequence` wraps the sequence to be split, and provides an
-iterator whose `next` method returns a newly-allocated array containing
-the elements of each subsequence in the split sequence in turn.
+`SplitSequence` wraps the sequence to be split, and provides an iterator whose
+`next` method returns a newly-allocated array containing the elements of each
+subsequence in the split sequence in turn.
 
-`LazySplitCollection` wraps the collection to be split. Its `Index`
-wraps a range of base collection indices. `startIndex` is computed at
-initialization. Subscripting a `LazySplitCollection` instance returns
-the slice of the original collection which is the subsequence of the
-split collection at the given index's position.
+`SplitCollection` wraps the collection to be split. Its `Index` wraps a range of 
+base collection indices. `startIndex` is computed at initialization.
+Subscripting a `SplitCollection` instance returns the slice of the original 
+collection which is the subsequence of the split collection at the given index's 
+position.
 
 ### Complexity
 
-Iterating a `LazySplitSequence` instance is O(_n_) in time and space,
-since each subsequence returned is a newly-allocated array.
+Iterating a `SplitSequence` instance is O(_n_) in time and space, since each 
+subsequence returned is a newly-allocated array.
 
-Iterating a `LazySplitCollection` instance is O(_n_) in time and O(1) in
-space, since each subsequence returned is a slice of the base
-collection. Since `startIndex` is computed at initialization, some or
-all of the time cost may be paid at initialization. For example, if the
-base collection contains no elements determined to be separators, it
-will be iterated entirely on initialization of the split collection, and
-all subsequent operations on the split collection, such as
-`index(after:)`, will have complexity O(1).
+Iterating a `SplitCollection` instance is O(_n_) in time and O(1) in space, 
+since each subsequence returned is a slice of the base collection. Since 
+`startIndex` is computed at initialization, some or all of the time cost may be 
+paid at initialization. For example, if the base collection contains no elements 
+determined to be separators, it will be iterated entirely on initialization of 
+the split collection, and all subsequent operations on the split collection, 
+such as `index(after:)`, will have complexity O(1).

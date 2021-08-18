@@ -13,7 +13,7 @@
 /// predicate.
 ///
 /// Call `lazy.chunked(by:)` on a collection to create an instance of this type.
-public struct ChunkedBy<Base: Collection, Subject> {
+public struct ChunkedByCollection<Base: Collection, Subject> {
   /// The collection that this instance provides a view onto.
   @usableFromInline
   internal let base: Base
@@ -47,7 +47,7 @@ public struct ChunkedBy<Base: Collection, Subject> {
   }
 }
 
-extension ChunkedBy: LazyCollectionProtocol {
+extension ChunkedByCollection: LazyCollectionProtocol {
   /// A position in a chunked collection.
   public struct Index: Comparable {
     /// The range corresponding to the chunk at this position.
@@ -112,9 +112,9 @@ extension ChunkedBy: LazyCollectionProtocol {
   }
 }
 
-extension ChunkedBy.Index: Hashable where Base.Index: Hashable {}
+extension ChunkedByCollection.Index: Hashable where Base.Index: Hashable {}
 
-extension ChunkedBy: BidirectionalCollection
+extension ChunkedByCollection: BidirectionalCollection
   where Base: BidirectionalCollection
 {
   /// Returns the index in the base collection of the start of the chunk ending
@@ -139,19 +139,22 @@ extension ChunkedBy: BidirectionalCollection
   }
 }
 
-@available(*, deprecated, renamed: "ChunkedBy")
-public typealias LazyChunked<Base: Collection, Subject> = ChunkedBy<Base, Subject>
+@available(*, deprecated, renamed: "ChunkedByCollection")
+public typealias LazyChunked<Base: Collection, Subject> = ChunkedByCollection<Base, Subject>
 
-@available(*, deprecated, renamed: "ChunkedBy")
-public typealias Chunked<Base: Collection, Subject> = ChunkedBy<Base, Subject>
+@available(*, deprecated, renamed: "ChunkedByCollection")
+public typealias Chunked<Base: Collection, Subject> = ChunkedByCollection<Base, Subject>
+
+@available(*, deprecated, renamed: "ChunkedByCollection")
+public typealias ChunkedBy<Base: Collection, Subject> = ChunkedByCollection<Base, Subject>
 
 /// A collection wrapper that breaks a collection into chunks based on a
 /// predicate.
 ///
 /// Call `lazy.chunked(on:)` on a collection to create an instance of this type.
-public struct ChunkedOn<Base: Collection, Subject> {
+public struct ChunkedOnCollection<Base: Collection, Subject> {
   @usableFromInline
-  internal var chunked: ChunkedBy<Base, Subject>
+  internal var chunked: ChunkedByCollection<Base, Subject>
   
   @inlinable
   internal init(
@@ -159,12 +162,12 @@ public struct ChunkedOn<Base: Collection, Subject> {
     projection: @escaping (Base.Element) -> Subject,
     belongInSameGroup: @escaping (Subject, Subject) -> Bool
   ) {
-    self.chunked = ChunkedBy(base: base, projection: projection, belongInSameGroup: belongInSameGroup)
+    self.chunked = ChunkedByCollection(base: base, projection: projection, belongInSameGroup: belongInSameGroup)
   }
 }
 
-extension ChunkedOn: LazyCollectionProtocol {
-  public typealias Index = ChunkedBy<Base, Subject>.Index
+extension ChunkedOnCollection: LazyCollectionProtocol {
+  public typealias Index = ChunkedByCollection<Base, Subject>.Index
   
   @inlinable
   public var startIndex: Index {
@@ -189,7 +192,7 @@ extension ChunkedOn: LazyCollectionProtocol {
   }
 }
 
-extension ChunkedOn: BidirectionalCollection where Base: BidirectionalCollection {
+extension ChunkedOnCollection: BidirectionalCollection where Base: BidirectionalCollection {
   public func index(before i: Index) -> Index {
     chunked.index(before: i)
   }
@@ -207,8 +210,8 @@ extension LazyCollectionProtocol {
   @inlinable
   public func chunked(
     by belongInSameGroup: @escaping (Element, Element) -> Bool
-  ) -> ChunkedBy<Elements, Element> {
-    ChunkedBy(
+  ) -> ChunkedByCollection<Elements, Element> {
+    ChunkedByCollection(
       base: elements,
       projection: { $0 },
       belongInSameGroup: belongInSameGroup)
@@ -221,8 +224,8 @@ extension LazyCollectionProtocol {
   @inlinable
   public func chunked<Subject: Equatable>(
     on projection: @escaping (Element) -> Subject
-  ) -> ChunkedOn<Elements, Subject> {
-    ChunkedOn(
+  ) -> ChunkedOnCollection<Elements, Subject> {
+    ChunkedOnCollection(
       base: elements,
       projection: projection,
       belongInSameGroup: ==)
@@ -307,7 +310,7 @@ extension Collection {
 /// * `c.chunks(ofCount: 3)` does not create new storage
 /// * `c.chunks(ofCount: 3).map(f)` maps eagerly and returns a new array
 /// * `c.lazy.chunks(ofCount: 3).map(f)` maps lazily and returns a `LazyMapCollection`
-public struct ChunkedByCount<Base: Collection> {
+public struct ChunksOfCountCollection<Base: Collection> {
   
   public typealias Element = Base.SubSequence
   
@@ -338,7 +341,7 @@ public struct ChunkedByCount<Base: Collection> {
   }
 }
 
-extension ChunkedByCount: Collection {
+extension ChunksOfCountCollection: Collection {
   public struct Index {
     @usableFromInline
     internal let baseRange: Range<Base.Index>
@@ -377,21 +380,21 @@ extension ChunkedByCount: Collection {
   }
 }
 
-extension ChunkedByCount.Index: Comparable {
+extension ChunksOfCountCollection.Index: Comparable {
   @inlinable
-  public static func == (lhs: ChunkedByCount.Index,
-                         rhs: ChunkedByCount.Index) -> Bool {
+  public static func == (lhs: ChunksOfCountCollection.Index,
+                         rhs: ChunksOfCountCollection.Index) -> Bool {
     lhs.baseRange.lowerBound == rhs.baseRange.lowerBound
   }
   
   @inlinable
-  public static func < (lhs: ChunkedByCount.Index,
-                        rhs: ChunkedByCount.Index) -> Bool {
+  public static func < (lhs: ChunksOfCountCollection.Index,
+                        rhs: ChunksOfCountCollection.Index) -> Bool {
     lhs.baseRange.lowerBound < rhs.baseRange.lowerBound
   }
 }
 
-extension ChunkedByCount:
+extension ChunksOfCountCollection:
   BidirectionalCollection, RandomAccessCollection
 where Base: RandomAccessCollection {
   @inlinable
@@ -414,7 +417,7 @@ where Base: RandomAccessCollection {
   }
 }
 
-extension ChunkedByCount {
+extension ChunksOfCountCollection {
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     let distance =
@@ -572,16 +575,16 @@ extension Collection {
   ///
   /// - Complexity: O(*n*), because the start index is pre-computed.
   @inlinable
-  public func chunks(ofCount count: Int) -> ChunkedByCount<Self> {
+  public func chunks(ofCount count: Int) -> ChunksOfCountCollection<Self> {
     precondition(count > 0, "Cannot chunk with count <= 0!")
-    return ChunkedByCount(_base: self, _chunkCount: count)
+    return ChunksOfCountCollection(_base: self, _chunkCount: count)
   }
 }
 
-extension ChunkedByCount.Index: Hashable where Base.Index: Hashable {}
+extension ChunksOfCountCollection.Index: Hashable where Base.Index: Hashable {}
 
 // Lazy conditional conformance.
-extension ChunkedByCount: LazySequenceProtocol
+extension ChunksOfCountCollection: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
-extension ChunkedByCount: LazyCollectionProtocol
+extension ChunksOfCountCollection: LazyCollectionProtocol
   where Base: LazyCollectionProtocol {}

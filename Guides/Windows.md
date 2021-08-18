@@ -6,7 +6,9 @@
 Break a collection into overlapping subsequences where
 elements are slices from the original collection.
 
-The `windows(ofCount:)` method takes a size as a parameter and returns a collection of subsequences. Each element of the returned collection is a successive overlapping slice of the given size.
+The `windows(ofCount:)` method takes a size as a parameter and returns a
+collection of subsequences. Each element of the returned collection is a
+successive overlapping slice of the given size.
 
 ```swift
 let swift = "swift"
@@ -21,24 +23,26 @@ The `windows(ofCount:)` method is added as an extension `Collection` method:
 
 ```swift
 extension Collection {
-    public func windows(ofCount count: Int) -> Windows<Self>
+    public func windows(ofCount count: Int) -> WindowsCollection<Self>
 }
 ```
 
-If a size larger than the collection's length is specified, the returned collection is empty. 
+If a size larger than the collection's length is specified, the returned
+collection is empty. 
 
 ```swift
 [1, 2, 3].windows(ofCount: 5).isEmpty // true
 ```
 
-The resulting `Windows` type is a collection, with conditional conformance to the 
-`BidirectionalCollection`, `RandomAccessCollection`, and
+The resulting `WindowsCollection` type is a collection, with conditional
+conformance to the `BidirectionalCollection`, `RandomAccessCollection`, and
 `LazyCollectionProtocol` protocols when the base collection conforms.
 
 ### Complexity
 
 The call to `windows(ofCount: k)` is O(1) if the collection conforms to 
-`RandomAccessCollection`, otherwise O(_k_). Access to each successive window is O(1).
+`RandomAccessCollection`, otherwise O(_k_). Access to each successive window is 
+O(1).
 
 ### Naming
 
@@ -51,5 +55,5 @@ and  `permutations(ofCount:)`.
 ### Comparison with other languages
 
 [rust](https://doc.rust-lang.org/std/slice/struct.Windows.html) has 
-`std::slice::Windows`  which is a method available on slices. It has the same 
+`std::slice::Windows` which is a method available on slices. It has the same 
 semantics as described here.

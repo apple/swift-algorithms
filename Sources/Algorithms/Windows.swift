@@ -39,14 +39,14 @@ extension Collection {
   ///   `RandomAccessCollection`, otherwise O(*k*) where `k` is `count`.
   ///   Access to successive windows is O(1).
   @inlinable
-  public func windows(ofCount count: Int) -> Windows<Self> {
-    Windows(base: self, size: count)
+  public func windows(ofCount count: Int) -> WindowsCollection<Self> {
+    WindowsCollection(base: self, size: count)
   }
 }
 
 /// A collection wrapper that presents a sliding window over the elements of
 /// a collection.
-public struct Windows<Base: Collection> {
+public struct WindowsCollection<Base: Collection> {
   @usableFromInline
   internal let base: Base
   
@@ -66,7 +66,7 @@ public struct Windows<Base: Collection> {
   }
 }
 
-extension Windows: Collection {
+extension WindowsCollection: Collection {
   /// A position in a `Windows` collection.
   public struct Index: Comparable {
     @usableFromInline
@@ -329,7 +329,7 @@ extension Windows: Collection {
   }
 }
 
-extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
+extension WindowsCollection: BidirectionalCollection where Base: BidirectionalCollection {
   @inlinable
   public func index(before index: Index) -> Index {
     precondition(index > startIndex, "Incrementing past start index")
@@ -347,7 +347,7 @@ extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
   }
 }
 
-extension Windows: LazySequenceProtocol where Base: LazySequenceProtocol {}
-extension Windows: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
-extension Windows: RandomAccessCollection where Base: RandomAccessCollection {}
-extension Windows.Index: Hashable where Base.Index: Hashable {}
+extension WindowsCollection: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension WindowsCollection: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
+extension WindowsCollection: RandomAccessCollection where Base: RandomAccessCollection {}
+extension WindowsCollection.Index: Hashable where Base.Index: Hashable {}

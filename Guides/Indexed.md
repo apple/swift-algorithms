@@ -25,11 +25,11 @@ The `indexed` method returns an `Indexed` type:
 
 ```swift
 extension Collection {
-    func indexed() -> Indexed<Self>
+    func indexed() -> IndexedCollection<Self>
 }
 ```
 
-`Indexed` scales from a collection up to a random-access collection, depending on 
-its base type. `Indexed` also conforms to `LazySequenceProtocol` and 
-`LazyCollectionProtocol` when the base type conforms.
+`IndexedCollection` scales from a collection up to a random-access collection, 
+depending on its base type. `Indexed` also conforms to `LazySequenceProtocol` 
+and `LazyCollectionProtocol` when the base type conforms.
 
