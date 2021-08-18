@@ -259,7 +259,10 @@ extension Sequence {
       }
     }
     
-    return _tupleMap((lhs, rhs), { Array($0) })
+    return (
+      Array(lhs),
+      Array(rhs)
+    )
   }
 }
 
@@ -351,26 +354,4 @@ extension Collection {
       Array(rhs)
     )
   }
-}
-
-//===----------------------------------------------------------------------===//
-// _tupleMap(_:_:)
-//===----------------------------------------------------------------------===//
-
-/// Returns a tuple containing the results of mapping the given closure over
-/// each of the tuple’s elements.
-/// - Parameters:
-///   - x: The tuple to transform
-///   - transform: A mapping closure. `transform` accepts an element of this
-///   sequence as its parameter and returns a transformed
-/// - Returns: A tuple containing the transformed elements of this tuple.
-@usableFromInline
-internal func _tupleMap<T, U>(
-  _ x: (T, T),
-  _ transform: (T) throws -> U
-) rethrows -> (U, U) {
-  return (
-    try transform(x.0),
-    try transform(x.1)
-  )
 }
