@@ -245,7 +245,7 @@ extension Sequence {
   }
   
   @inlinable
-  public func _partitioned(
+  internal func _partitioned(
     _ belongsInSecondCollection: (Element) throws -> Bool
   ) rethrows -> ([Element], [Element]) {
     var lhs = ContiguousArray<Element>()
