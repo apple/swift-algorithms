@@ -248,8 +248,8 @@ extension Sequence {
   internal func _partitioned(
     _ belongsInSecondCollection: (Element) throws -> Bool
   ) rethrows -> ([Element], [Element]) {
-    var lhs = ContiguousArray<Element>()
-    var rhs = ContiguousArray<Element>()
+    var lhs = Array<Element>()
+    var rhs = Array<Element>()
     
     for element in self {
       if try belongsInSecondCollection(element) {
