@@ -56,18 +56,6 @@ print(shortNames)
 // Prints "["Kim", "Karl"]"
 ```
 
-There’s also a function to partition a collection into a prefix and a suffix, up
-to but not including a given index:
-
-```swift
-let cast = ["Vivien", "Marlon", "Kim", "Karl"]
-let (callbacks, alternates) = cast.partitioned(upTo: 2)
-print(callbacks)
-// Prints "["Vivien", "Marlon"]"
-print(alternates)
-// Prints "["Kim", "Karl"]"
-```
-
 ## Detailed Design
 
 All mutating methods are declared as extensions to `MutableCollection`.

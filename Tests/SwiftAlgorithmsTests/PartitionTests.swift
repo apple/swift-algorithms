@@ -169,27 +169,4 @@ final class PartitionTests: XCTestCase {
     XCTAssertEqual(s3.0, ["B"])
     XCTAssertEqual(s3.1, ["a", "c", "d"])
   }
-  
-  func testPartitionedUpToIndex() throws {
-    let s0 = ["A", "B", "C", "D"].partitioned(upTo: 0)
-    let s1 = ["A", "B", "C", "D"].partitioned(upTo: 1)
-    let s2 = ["A", "B", "C", "D"].partitioned(upTo: 2)
-    let s3 = ["A", "B", "C", "D"].partitioned(upTo: 3)
-    let s4 = ["A", "B", "C", "D"].partitioned(upTo: 4)
-    
-    XCTAssertEqual(s0.0, [])
-    XCTAssertEqual(s0.1, ["A", "B", "C", "D"])
-    
-    XCTAssertEqual(s1.0, ["A"])
-    XCTAssertEqual(s1.1, ["B", "C", "D"])
-    
-    XCTAssertEqual(s2.0, ["A", "B"])
-    XCTAssertEqual(s2.1, ["C", "D"])
-    
-    XCTAssertEqual(s3.0, ["A", "B", "C"])
-    XCTAssertEqual(s3.1, ["D"])
-    
-    XCTAssertEqual(s4.0, ["A", "B", "C", "D"])
-    XCTAssertEqual(s4.1, [])
-  }
 }

@@ -344,28 +344,11 @@ extension Collection {
         }
       })
     
-    let collections = elements.partitioned(upTo: midPoint)
-    return _tupleMap(collections, { Array($0) })
-  }
-}
-
-//===----------------------------------------------------------------------===//
-// partitioned(upTo:)
-//===----------------------------------------------------------------------===//
-
-extension Collection {
-  /// Splits the receiving collection into two at the specified index
-  /// - Parameter index: The index within the receiver to split the collection
-  /// - Returns: A tuple with the first and second parts of the receiving
-  /// collection after splitting it
-  /// - Note: The first subsequence in the returned tuple does *not* include
-  /// the element at `index`. That element is in the second subsequence.
-  /// - Complexity: O(*1*)
-  @inlinable
-  public func partitioned(upTo index: Index) -> (SubSequence, SubSequence) {
+    let lhs = elements[..<midPoint]
+    let rhs = elements[midPoint...]
     return (
-      self[self.startIndex..<index],
-      self[index..<self.endIndex]
+      Array(lhs),
+      Array(rhs)
     )
   }
 }
