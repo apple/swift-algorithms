@@ -264,8 +264,35 @@ extension Sequence {
 }
 
 extension Collection {
-  // This is a specialized version of the same algorithm on `Sequence` that
-  // avoids reallocation of arrays since `count` is known ahead of time.
+  /// Returns two arrays containing, in order, the elements of the collection
+  /// that do and don’t satisfy the given predicate, respectively.
+  ///
+  /// In this example, `partitioned(_:)` is used to separate the input based on
+  /// names that aren’t and are shorter than five characters, respectively:
+  ///
+  ///     let cast = ["Vivien", "Marlon", "Kim", "Karl"]
+  ///     let (longNames, shortNames) = cast.partitioned({ $0.count < 5 })
+  ///     print(longNames)
+  ///     // Prints "["Vivien", "Marlon"]"
+  ///     print(shortNames)
+  ///     // Prints "["Kim", "Karl"]"
+  ///
+  /// - Parameter belongsInSecondCollection: A closure that takes an element of
+  /// the collection as its argument and returns a Boolean value indicating
+  /// whether the element should be included in the second returned array.
+  /// Otherwise, the element will appear in the first returned array.
+  ///
+  /// - Returns: Two arrays with with all of the elements of the receiver. The
+  /// first array contains all the elements that `belongsInSecondCollection`
+  /// didn’t allow, and the second array contains all the elements that
+  /// `belongsInSecondCollection` allowed.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the collection.
+  ///
+  /// - Note: This function on `Collection` performs a bit faster than the
+  /// `Sequence` implementation. Since the size of the collection, and therefore
+  /// the total size of the two returned arrays, is known ahead of time, it can
+  /// avoid array resizing.
   @inlinable
   public func partitioned(
     _ belongsInSecondCollection: (Element) throws -> Bool
