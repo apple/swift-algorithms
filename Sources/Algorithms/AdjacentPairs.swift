@@ -14,9 +14,8 @@ extension Sequence {
   ///
   /// In the `AdjacentPairsSequence` returned by this method, the elements of
   /// the *i*th pair are the *i*th and *(i+1)*th elements of the underlying
-  /// sequence.
-  /// The following example uses the `adjacentPairs()` method to iterate over
-  /// adjacent pairs of integers:
+  /// sequence. The following example uses the `adjacentPairs()` method to
+  /// iterate over adjacent pairs of integers:
   ///
   ///     for pair in (1...).prefix(5).adjacentPairs() {
   ///         print(pair)
@@ -69,7 +68,8 @@ public struct AdjacentPairsSequence<Base: Sequence> {
 }
 
 extension AdjacentPairsSequence {
-  /// The iterator for an `AdjacentPairsSequence` or `AdjacentPairsCollection`.
+  /// The iterator for an `AdjacentPairsSequence` or `AdjacentPairsCollection`
+  /// instance.
   public struct Iterator {
     @usableFromInline
     internal var base: Base.Iterator
@@ -126,44 +126,20 @@ public struct AdjacentPairsCollection<Base: Collection> {
   @usableFromInline
   internal let base: Base
 
-  public let startIndex: Index
+  @usableFromInline
+  internal let secondBaseIndex: Base.Index
 
   @inlinable
   internal init(base: Base) {
     self.base = base
-    
-    // Lazily build the end index, since we can't use the instance
-    // property pre-initialization
-    var endIndex: Index {
-      Index(first: base.endIndex, second: base.endIndex)
-    }
-
-    // Precompute `startIndex` to ensure O(1) behavior.
-    guard !base.isEmpty else {
-      self.startIndex = endIndex
-      return
-    }
-    
-    // If there's only one element (i.e. the second index of base == endIndex)
-    // then this collection should be empty.
-    let secondIndex = base.index(after: base.startIndex)
-    self.startIndex = secondIndex == base.endIndex
-      ? endIndex
-      : Index(first: base.startIndex, second: secondIndex)
+    self.secondBaseIndex = base.isEmpty
+      ? base.endIndex
+      : base.index(after: base.startIndex)
   }
 }
 
 extension AdjacentPairsCollection {
-  public typealias Iterator = AdjacentPairsSequence<Base>.Iterator
-
-  @inlinable
-  public func makeIterator() -> Iterator {
-    Iterator(base: base.makeIterator())
-  }
-}
-
-extension AdjacentPairsCollection {
-  /// A position in an `AdjacentPairsCollection`.
+  /// A position in an `AdjacentPairsCollection` instance.
   public struct Index: Comparable {
     @usableFromInline
     internal var first: Base.Index
@@ -178,7 +154,7 @@ extension AdjacentPairsCollection {
     }
 
     @inlinable
-    public static func ==(lhs: Index, rhs: Index) -> Bool {
+    public static func == (lhs: Index, rhs: Index) -> Bool {
       lhs.first == rhs.first
     }
     
@@ -190,6 +166,13 @@ extension AdjacentPairsCollection {
 }
 
 extension AdjacentPairsCollection: Collection {
+  @inlinable
+  public var startIndex: Index {
+    Index(
+      first: secondBaseIndex == base.endIndex ? base.endIndex : base.startIndex,
+      second: secondBaseIndex)
+  }
+  
   @inlinable
   public var endIndex: Index {
     Index(first: base.endIndex, second: base.endIndex)
@@ -305,7 +288,7 @@ extension AdjacentPairsCollection: RandomAccessCollection
   where Base: RandomAccessCollection {}
 
 extension AdjacentPairsCollection: LazySequenceProtocol, LazyCollectionProtocol
-  where Base: LazyCollectionProtocol {}
+  where Base: LazySequenceProtocol {}
 
 extension AdjacentPairsCollection.Index: Hashable where Base.Index: Hashable {
   @inlinable

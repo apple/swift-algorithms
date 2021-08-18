@@ -1,7 +1,7 @@
-# LazySplit
+# Split
 
-[[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/LazySplit.swift) | 
- [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/LazySplitTests.swift)]
+[[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Split.swift) | 
+ [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/SplitTests.swift)]
 
 Lazily-evaluating versions of
 [`split(maxSplits:omittingEmptySubsequences:whereSeparator:)`](https://developer.apple.com/documentation/swift/sequence/3128814-split)

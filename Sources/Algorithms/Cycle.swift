@@ -22,7 +22,7 @@ public struct CycledSequence<Base: Collection> {
 }
 
 extension CycledSequence: Sequence {
-  /// The iterator for a `Cycle` sequence.
+  /// The iterator for a `CycledSequence` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal let base: Base
@@ -58,7 +58,6 @@ extension CycledSequence: Sequence {
 extension CycledSequence: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
 
-
 /// A collection wrapper that repeats the elements of a base collection for a
 /// finite number of times.
 public struct CycledTimesCollection<Base: Collection> {
@@ -76,7 +75,8 @@ extension CycledTimesCollection: Collection {
   public typealias Element = Base.Element
 
   public struct Index: Comparable {
-    /// The index corresponding to the Product2 index at this position.
+    /// The index corresponding to the `Product2Sequence` index at this
+    /// position.
     @usableFromInline
     internal let productIndex: Product2Sequence<Range<Int>, Base>.Index
 
@@ -134,11 +134,11 @@ extension CycledTimesCollection: Collection {
     offsetBy distance: Int,
     limitedBy limit: Index
   ) -> Index? {
-    guard let productIndex = product.index(i.productIndex,
-                                           offsetBy: distance,
-                                           limitedBy: limit.productIndex) else {
-      return nil
-    }
+    guard let productIndex = product.index(
+      i.productIndex,
+      offsetBy: distance,
+      limitedBy: limit.productIndex)
+    else { return nil }
     return Index(productIndex)
   }
 

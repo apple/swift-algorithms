@@ -70,8 +70,7 @@ Note that the sequence separator of the closure-less version defined on
 general be iterated over multiple times.
 
 The closure-based versions also have lazy variants that are defined on both
-`LazySequenceProtocol` and `LazyCollectionProtocol` for the same reason as
-explained above:
+lazy sequences and collections for the same reason as explained above:
 
 ```swift
 extension LazySequenceProtocol where Element: Sequence {
@@ -84,7 +83,7 @@ extension LazySequenceProtocol where Element: Sequence {
     ) -> JoinedByClosureSequence<Self, Separator>
 }
 
-extension LazyCollectionProtocol where Element: Collection {
+extension LazySequenceProtocol where Self: Collection, Element: Collection {
     public func joined(
         by separator: @escaping (Element, Element) -> Element.Element
     ) -> JoinedByClosureCollection<Self, CollectionOfOne<Element.Element>>
@@ -98,5 +97,4 @@ extension LazyCollectionProtocol where Element: Collection {
 `JoinedBySequence`, `JoinedByClosureSequence`, `JoinedByCollection`, and
 `JoinedByClosureCollection` conform to `LazySequenceProtocol` when the base
 sequence conforms. `JoinedByCollection` and `JoinedByClosureCollection` also
-conform to `LazyCollectionProtocol` and `BidirectionalCollection` when the base
-collection conforms.
+conform to `BidirectionalCollection` when the base collection conforms.

@@ -61,8 +61,9 @@ c.elementsEqual(c.chunked(...).joined())
 
 ## Detailed Design
 
-The two methods are added as extension to `Collection`, with two matching
-versions that return a lazy wrapper added to `LazyCollectionProtocol`.
+The three methods are added as extension to `Collection`. `chunked(by:)` and
+`chunked(on:)` are eager by default, both with a matching version that return a
+lazy wrapper added to `LazySequenceProtocol`.
 
 ```swift
 extension Collection {
@@ -73,9 +74,11 @@ extension Collection {
   public func chunked<Subject: Equatable>(
       on projection: (Element) -> Subject
   ) -> [(Subject, SubSequence)]
+  
+  public func chunks(ofCount count: Int) -> ChunksOfCountCollection<Self>
 }
 
-extension LazyCollectionProtocol {
+extension LazySequenceProtocol where Self: Collection, Elements: Collection {
   public func chunked(
       by belongInSameGroup: @escaping (Element, Element) -> Bool
   ) -> ChunkedByCollection<Elements, Element>
@@ -86,8 +89,10 @@ extension LazyCollectionProtocol {
 }
 ```
 
-The `ChunkedByCollection` and `ChunkedOnCollection` types are bidirectional when 
-the wrapped collection is bidirectional.
+The `ChunkedByCollection`, `ChunkedOnCollection`, and `ChunksOfCountCollection`
+types are bidirectional when the wrapped collection is bidirectional.
+`ChunksOfCountCollection` also conforms to `LazySequenceProtocol` when the base
+collection conforms.
 
 ### Complexity
 

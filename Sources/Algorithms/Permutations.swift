@@ -18,9 +18,9 @@ extension MutableCollection
 {
   /// Permutes this collection's elements through all the lexical orderings.
   ///
-  /// Call `nextPermutation()` repeatedly starting with the collection in
-  /// sorted order. When the full cycle of all permutations has been completed,
-  /// the collection will be back in sorted order and this method will return
+  /// Call `nextPermutation()` repeatedly starting with the collection in sorted
+  /// order. When the full cycle of all permutations has been completed, the
+  /// collection will be back in sorted order and this method will return
   /// `false`.
   ///
   /// - Returns: A Boolean value indicating whether the collection still has
@@ -85,12 +85,15 @@ public struct PermutationsSequence<Base: Collection> {
   internal let baseCount: Int
   
   /// The range of accepted sizes of permutations.
+  ///
   /// - Note: This may be empty if the attempted range entirely exceeds the
   /// bounds of the size of the `base` collection.
   @usableFromInline
   internal let kRange: Range<Int>
   
-  /// Initializes a `Permutations` for all permutations of `base` of size `k`.
+  /// Initializes a `PermutationsSequence` for all permutations of `base` of
+  /// size `k`.
+  ///
   /// - Parameters:
   ///   - base: The collection to iterate over for permutations
   ///   - k: The expected size of each permutation, or `nil` (default) to
@@ -106,8 +109,9 @@ public struct PermutationsSequence<Base: Collection> {
     self.init(base, kRange: kRange)
   }
   
-  /// Initializes a `Permutations` for all combinations of `base` of sizes
-  /// within a given range.
+  /// Initializes a `PermutationsSequence` for all combinations of `base` of
+  /// sizes within a given range.
+  ///
   /// - Parameters:
   ///   - base: The collection to iterate over for permutations.
   ///   - kRange: The range of accepted sizes of permutations, or `nil` to
@@ -128,14 +132,14 @@ public struct PermutationsSequence<Base: Collection> {
   /// The total number of permutations.
   @inlinable
   public var count: Int {
-    return kRange.map {
+    kRange.map {
       stride(from: baseCount, to: baseCount - $0, by: -1).reduce(1, *)
     }.reduce(0, +)
   }
 }
 
 extension PermutationsSequence: Sequence {
-  /// The iterator for a `Permutations` instance.
+  /// The iterator for a `PermutationsSequence` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal let base: Base
@@ -259,7 +263,8 @@ extension PermutationsSequence: Sequence {
   }
 }
 
-extension PermutationsSequence: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension PermutationsSequence: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // permutations(ofCount:)
@@ -320,13 +325,13 @@ extension Collection {
   ///   results in an empty sequence.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
-  ///   is the number of elements in the base collection, since `Permutations`
-  ///   accesses the `count` of the base collection.
+  ///   is the number of elements in the base collection, since
+  ///   `PermutationsSequence` accesses the `count` of the base collection.
   @inlinable
   public func permutations<R: RangeExpression>(
     ofCount kRange: R
   ) -> PermutationsSequence<Self> where R.Bound == Int {
-    return PermutationsSequence(self, kRange: kRange)
+    PermutationsSequence(self, kRange: kRange)
   }
   
   /// Returns a collection of the permutations of this collection of the
@@ -376,8 +381,8 @@ extension Collection {
   ///   this collection, the resulting sequence is empty.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
-  ///   is the number of elements in the base collection, since `Permutations`
-  ///   accesses the `count` of the base collection.
+  ///   is the number of elements in the base collection, since
+  ///   `PermutationsSequence` accesses the `count` of the base collection.
   @inlinable
   public func permutations(ofCount k: Int? = nil) -> PermutationsSequence<Self> {
     precondition(
@@ -394,7 +399,7 @@ extension Collection {
 /// A sequence of the unique permutations of the elements of a sequence or
 /// collection.
 ///
-/// To create a `UniquePermutations` instance, call one of the
+/// To create a `UniquePermutationsSequence` instance, call one of the
 /// `uniquePermutations` methods on your collection.
 public struct UniquePermutationsSequence<Base: Collection> {
   /// The base collection to iterate over for permutations.
@@ -441,7 +446,7 @@ extension UniquePermutationsSequence where Base.Element: Hashable {
 }
 
 extension UniquePermutationsSequence: Sequence {
-  /// The iterator for a `UniquePermutations` instance.
+  /// The iterator for a `UniquePermutationsSequence` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal let base: Base
@@ -496,7 +501,8 @@ extension UniquePermutationsSequence: Sequence {
   }
 }
 
-extension UniquePermutationsSequence: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension UniquePermutationsSequence: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
 
 extension Collection where Element: Hashable {
   /// Returns a sequence of the unique permutations of this sequence of the
@@ -537,7 +543,10 @@ extension Collection where Element: Hashable {
   ///
   /// - Complexity: O(*n*), where *n* is the number of elements in this
   ///   collection.
-  public func uniquePermutations(ofCount k: Int? = nil) -> UniquePermutationsSequence<Self> {
+  @inlinable
+  public func uniquePermutations(ofCount k: Int? = nil)
+    -> UniquePermutationsSequence<Self>
+  {
     if let k = k {
       return UniquePermutationsSequence(self, k ..< (k + 1))
     } else {
@@ -574,9 +583,10 @@ extension Collection where Element: Hashable {
   ///
   /// - Complexity: O(*n*), where *n* is the number of elements in this
   ///   collection.
-  public func uniquePermutations<R: RangeExpression>(ofCount kRange: R) -> UniquePermutationsSequence<Self>
-    where R.Bound == Int
-  {
+  @inlinable
+  public func uniquePermutations<R: RangeExpression>(
+    ofCount kRange: R
+  ) -> UniquePermutationsSequence<Self> where R.Bound == Int {
     UniquePermutationsSequence(self, kRange)
   }
 }

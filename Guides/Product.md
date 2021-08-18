@@ -43,8 +43,8 @@ collection, and a random-access collection when both base collections have those
 conformances.
 
 We don't provide higher arities (like `Product3Sequence`, `Product4Sequence`,
-etc.) at this time to match the standard library's `Zip2` type. Users can
-compose multiple calls to `product` if they would like higher arities.
+etc.) at this time to match the standard library's `Zip2Sequence` type. Users
+can compose multiple calls to `product` if they would like higher arities.
 
 ### Complexity
 

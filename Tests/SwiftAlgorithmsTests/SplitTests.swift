@@ -13,10 +13,10 @@ import Algorithms
 import XCTest
 
 //===----------------------------------------------------------------------===//
-// Tests for `LazySplitSequence` and `LazySplitCollection`
+// Tests for `SplitSequence` and `SplitCollection`
 //===----------------------------------------------------------------------===//
 
-final class LazySplitTests: XCTestCase {
+final class SplitTests: XCTestCase {
   func testEmpty() {
     Validator(
       subject: [],

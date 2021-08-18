@@ -29,7 +29,7 @@ public struct Product2Sequence<Base1: Sequence, Base2: Collection> {
 extension Product2Sequence: Sequence {
   public typealias Element = (Base1.Element, Base2.Element)
   
-  /// The iterator for a `Product2` sequence.
+  /// The iterator for a `Product2Sequence` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var i1: Base1.Iterator
@@ -83,13 +83,14 @@ extension Product2Sequence: Sequence {
     }
   }
 
+  @inlinable
   public func makeIterator() -> Iterator {
-    return Iterator(self)
+    Iterator(self)
   }
 }
 
 extension Product2Sequence: Collection where Base1: Collection {
-  /// The index type for a `Product2` collection.
+  /// The index type for a `Product2Sequence` collection.
   public struct Index: Comparable {
     @usableFromInline
     internal var i1: Base1.Index
@@ -439,7 +440,8 @@ extension Product2Sequence: BidirectionalCollection
 extension Product2Sequence: RandomAccessCollection
   where Base1: RandomAccessCollection, Base2: RandomAccessCollection {}
 
-extension Product2Sequence.Index: Hashable where Base1.Index: Hashable, Base2.Index: Hashable {}
+extension Product2Sequence.Index: Hashable
+  where Base1.Index: Hashable, Base2.Index: Hashable {}
 
 //===----------------------------------------------------------------------===//
 // product(_:_:)
@@ -482,5 +484,5 @@ extension Product2Sequence.Index: Hashable where Base1.Index: Hashable, Base2.In
 public func product<Base1: Sequence, Base2: Collection>(
   _ s1: Base1, _ s2: Base2
 ) -> Product2Sequence<Base1, Base2> {
-  return Product2Sequence(s1, s2)
+  Product2Sequence(s1, s2)
 }

@@ -27,7 +27,7 @@ public struct UniquedSequence<Base: Sequence, Subject: Hashable> {
 }
 
 extension UniquedSequence: Sequence {
-  /// The iterator for a `Uniqued` sequence.
+  /// The iterator for a `UniquedSequence` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var base: Base.Iterator
@@ -103,9 +103,9 @@ extension Sequence {
   ///     // Prints '["dog", "pig", "cat", "ox"]'
   ///
   /// - Parameter projection: A closure that transforms an element into the
-  ///   value to use for uniqueness. If `projection` returns the same value
-  ///   for two different elements, the second element will be excluded
-  ///   from the resulting array.
+  ///   value to use for uniqueness. If `projection` returns the same value for
+  ///   two different elements, the second element will be excluded from the
+  ///   resulting array.
   ///
   /// - Returns: An array with only the unique elements of this sequence, as
   ///   determined by the result of `projection` for each element.

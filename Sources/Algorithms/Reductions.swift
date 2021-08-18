@@ -12,7 +12,6 @@
 // MARK: - Exclusive Reductions
 
 extension LazySequenceProtocol {
-
   /// Returns a sequence containing the accumulated results of combining the
   /// elements of the sequence using the given closure.
   ///
@@ -29,17 +28,17 @@ extension LazySequenceProtocol {
   /// - Parameters:
   ///   - initial: The value to use as the initial value.
   ///   - transform: A closure that combines the previously reduced result and
-  ///   the next element in the receiving sequence.
+  ///     the next element in the receiving sequence.
   /// - Returns: A sequence of the initial value followed by the reduced
-  /// elements.
+  ///   elements.
   ///
   /// - Complexity: O(1)
   @inlinable
   public func reductions<Result>(
     _ initial: Result,
     _ transform: @escaping (Result, Element) -> Result
-  ) -> ExclusiveReductionsSequence<Result, Self> {
-    return reductions(into: initial) { result, element in
+  ) -> ExclusiveReductionsSequence<Elements, Result> {
+    reductions(into: initial) { result, element in
       result = transform(result, element)
     }
   }
@@ -60,7 +59,7 @@ extension LazySequenceProtocol {
   /// - Parameters:
   ///   - initial: The value to use as the initial value.
   ///   - transform: A closure that combines the previously reduced result and
-  ///   the next element in the receiving sequence.
+  ///     the next element in the receiving sequence.
   /// - Returns: A sequence of the initial value followed by the reduced
   /// elements.
   ///
@@ -69,13 +68,15 @@ extension LazySequenceProtocol {
   public func reductions<Result>(
     into initial: Result,
     _ transform: @escaping (inout Result, Element) -> Void
-  ) -> ExclusiveReductionsSequence<Result, Self> {
-    ExclusiveReductionsSequence(base: self, initial: initial, transform: transform)
+  ) -> ExclusiveReductionsSequence<Elements, Result> {
+    ExclusiveReductionsSequence(
+      base: elements,
+      initial: initial,
+      transform: transform)
   }
 }
 
 extension Sequence {
-
   /// Returns an array containing the accumulated results of combining the
   /// elements of the sequence using the given closure.
   ///
@@ -106,7 +107,7 @@ extension Sequence {
   /// - Parameters:
   ///   - initial: The value to use as the initial value.
   ///   - transform: A closure that combines the previously reduced result and
-  ///   the next element in the receiving sequence.
+  ///     the next element in the receiving sequence.
   /// - Returns: An array of the initial value followed by the reduced elements.
   ///
   /// - Complexity: O(_n_), where _n_ is the length of the sequence.
@@ -115,7 +116,7 @@ extension Sequence {
     _ initial: Result,
     _ transform: (Result, Element) throws -> Result
   ) rethrows -> [Result] {
-    return try reductions(into: initial) { result, element in
+    try reductions(into: initial) { result, element in
       result = try transform(result, element)
     }
   }
@@ -150,7 +151,7 @@ extension Sequence {
   /// - Parameters:
   ///   - initial: The value to use as the initial value.
   ///   - transform: A closure that combines the previously reduced result and
-  ///   the next element in the receiving sequence.
+  ///     the next element in the receiving sequence.
   /// - Returns: An array of the initial value followed by the reduced elements.
   ///
   /// - Complexity: O(_n_), where _n_ is the length of the sequence.
@@ -176,7 +177,7 @@ extension Sequence {
 
 /// A sequence of applying a transform to the element of a sequence and the
 /// previously transformed result.
-public struct ExclusiveReductionsSequence<Result, Base: Sequence> {
+public struct ExclusiveReductionsSequence<Base: Sequence, Result> {
   @usableFromInline
   internal let base: Base
 
@@ -234,58 +235,82 @@ extension ExclusiveReductionsSequence: Sequence {
 
   @inlinable
   public func makeIterator() -> Iterator {
-    Iterator(iterator: base.makeIterator(),
-             current: initial,
-             transform: transform)
+    Iterator(
+      iterator: base.makeIterator(),
+      current: initial,
+      transform: transform)
   }
 }
 
 extension ExclusiveReductionsSequence: Collection where Base: Collection {
   public struct Index: Comparable {
     @usableFromInline
-    internal let representation: ReductionsIndexRepresentation<Base.Index, Result>
+    internal enum Representation {
+      case base(Base.Index, Result)
+      case end
+    }
+    
+    @usableFromInline
+    internal let representation: Representation
 
     @inlinable
-    internal init(
-      _ representation: ReductionsIndexRepresentation<Base.Index, Result>
-    ) {
+    internal init(_ representation: Representation) {
       self.representation = representation
     }
-
+    
+    @inlinable
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+      switch (lhs.representation, rhs.representation) {
+      case (.base(let lhs, _), .base(let rhs, _)):
+        return lhs == rhs
+      case (.end, .end):
+        return true
+      case (.base, .end), (.end, .base):
+        return false
+      }
+    }
+    
     @inlinable
     public static func < (lhs: Self, rhs: Self) -> Bool {
-      lhs.representation < rhs.representation
+      switch (lhs.representation, rhs.representation) {
+      case (.end, _):
+        return false
+      case (_, .end):
+        return true
+      case (.base(let lhs, _), .base(let rhs, _)):
+        return lhs < rhs
+      }
     }
   }
 
   @inlinable
-  public var startIndex: Index { Index(.start) }
+  public var startIndex: Index {
+    Index(.base(base.startIndex, initial))
+  }
 
   @inlinable
-  public var endIndex: Index { Index(.end) }
+  public var endIndex: Index {
+    Index(.end)
+  }
 
   @inlinable
   public subscript(position: Index) -> Result {
     switch position.representation {
-    case .start: return initial
-    case .base(_, let result): return result
-    case .end: fatalError("Cannot get element of end index.")
+    case .base(_, let result):
+      return result
+    case .end:
+      fatalError("Cannot get element of end index.")
     }
   }
 
   @inlinable
-  public func index(after i: Index) -> Index {
-    func index(base index: Base.Index, previous: Result) -> Index {
-      guard index != base.endIndex else { return endIndex }
-      var previous = previous
-      transform(&previous, base[index])
-      return Index(.base(index: index, result: previous))
-    }
-    switch i.representation {
-    case .start:
-      return index(base: base.startIndex, previous: initial)
-    case let .base(i, result):
-      return index(base: base.index(after: i), previous: result)
+  public func index(after index: Index) -> Index {
+    switch index.representation {
+    case .base(base.endIndex, _):
+      return Index(.end)
+    case .base(let index, var result):
+      transform(&result, base[index])
+      return Index(.base(base.index(after: index), result))
     case .end:
       fatalError("Cannot get index after end index.")
     }
@@ -294,38 +319,40 @@ extension ExclusiveReductionsSequence: Collection where Base: Collection {
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     switch (start.representation, end.representation) {
-    case (.start, .start):
-      return 0
-    case let (.start, .base(index, _)):
-      return base.distance(from: base.startIndex, to: index) + 1
-    case (.start, .end):
-      return base.distance(from: base.startIndex, to: base.endIndex) + 1
-    case let (.base(index, _), .start):
-      return base.distance(from: index, to: base.startIndex) - 1
     case let (.base(start, _), .base(end, _)):
       return base.distance(from: start, to: end)
     case let (.base(index, _), .end):
-      return base.distance(from: index, to: base.endIndex)
-    case (.end, .start):
-      return base.distance(from: base.endIndex, to: base.startIndex) - 1
+      return base.distance(from: index, to: base.endIndex) + 1
     case let (.end, .base(index, _)):
-      return base.distance(from: base.endIndex, to: index)
+      return base.distance(from: base.endIndex, to: index) - 1
     case (.end, .end):
       return 0
     }
   }
 }
 
-extension ExclusiveReductionsSequence: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+extension ExclusiveReductionsSequence: LazySequenceProtocol {}
 
 extension ExclusiveReductionsSequence: LazyCollectionProtocol
-  where Base: LazyCollectionProtocol {}
+  where Base: Collection {}
+
+extension ExclusiveReductionsSequence.Index: Hashable
+  where Base.Index: Hashable
+{
+  @inlinable
+  public func hash(into hasher: inout Hasher) {
+    switch representation {
+    case .base(let base, _):
+      hasher.combine(base)
+    case .end:
+      break
+    }
+  }
+}
 
 // MARK: - Inclusive Reductions
 
 extension LazySequenceProtocol {
-
   /// Returns a sequence containing the accumulated results of combining the
   /// elements of the sequence using the given closure.
   ///
@@ -339,22 +366,20 @@ extension LazySequenceProtocol {
   /// // prints [1, 3, 6, 10]
   /// ```
   ///
-  /// - Parameters:
-  ///   - transform: A closure that combines the previously reduced result and
-  ///   the next element in the receiving sequence.
+  /// - Parameter transform: A closure that combines the previously reduced
+  ///   result and the next element in the receiving sequence.
   /// - Returns: A sequence of the reduced elements.
   ///
   /// - Complexity: O(1)
   @inlinable
   public func reductions(
     _ transform: @escaping (Element, Element) -> Element
-  ) -> InclusiveReductionsSequence<Self> {
-    InclusiveReductionsSequence(base: self, transform: transform)
+  ) -> InclusiveReductionsSequence<Elements> {
+    InclusiveReductionsSequence(base: elements, transform: transform)
   }
 }
 
 extension Sequence {
-
   /// Returns an array containing the accumulated results of combining the
   /// elements of the sequence using the given closure.
   ///
@@ -384,9 +409,8 @@ extension Sequence {
   ///   If the sequence has one element, `transform` is never executed and
   ///   an array containing only that first element is returned.
   ///
-  /// - Parameters:
-  ///   - transform: A closure that combines the previously reduced result and
-  ///   the next element in the receiving sequence.
+  /// - Parameter transform: A closure that combines the previously reduced
+  ///   result and the next element in the receiving sequence.
   /// - Returns: An array of the reduced elements.
   ///
   /// - Complexity: O(_n_), where _n_ is the length of the sequence.
@@ -431,11 +455,9 @@ extension InclusiveReductionsSequence: Sequence {
     @inlinable
     internal init(
       iterator: Base.Iterator,
-      element: Base.Element? = nil,
       transform: @escaping (Base.Element, Base.Element) -> Base.Element
     ) {
       self.iterator = iterator
-      self.element = element
       self.transform = transform
     }
 
@@ -453,139 +475,97 @@ extension InclusiveReductionsSequence: Sequence {
 
   @inlinable
   public func makeIterator() -> Iterator {
-    Iterator(iterator: base.makeIterator(),
-             transform: transform)
+    Iterator(iterator: base.makeIterator(), transform: transform)
   }
 }
 
 extension InclusiveReductionsSequence: Collection where Base: Collection {
   public struct Index: Comparable {
     @usableFromInline
-    internal let representation: ReductionsIndexRepresentation<Base.Index, Base.Element>
+    internal let base: Base.Index
+    
+    @usableFromInline
+    internal let result: Element?
 
     @inlinable
-    internal init(
-      _ representation: ReductionsIndexRepresentation<Base.Index, Base.Element>
-    ) {
-      self.representation = representation
+    internal init(base: Base.Index, result: Element?) {
+      self.base = base
+      self.result = result
     }
 
     @inlinable
     public static func < (lhs: Self, rhs: Self) -> Bool {
-      lhs.representation < rhs.representation
+      lhs.base < rhs.base
+    }
+    
+    @inlinable
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+      lhs.base == rhs.base
     }
   }
 
   @inlinable
   public var startIndex: Index {
-    guard base.startIndex != base.endIndex else { return endIndex }
-    return Index(.start)
+    Index(base: base.startIndex, result: base.first)
   }
 
   @inlinable
-  public var endIndex: Index { Index(.end) }
-
-  @inlinable
-  public subscript(position: Index) -> Base.Element {
-    switch position.representation {
-    case .start: return base[base.startIndex]
-    case .base(_, let result): return result
-    case .end: fatalError("Cannot get element of end index.")
-    }
+  public var endIndex: Index {
+    Index(base: base.endIndex, result: nil)
   }
 
   @inlinable
-  public func index(after i: Index) -> Index {
-    func index(after i: Base.Index, previous: Base.Element) -> Index {
-      let index = base.index(after: i)
-      guard index != base.endIndex else { return endIndex }
-      return Index(.base(index: index, result: transform(previous, base[index])))
+  public subscript(index: Index) -> Base.Element {
+    guard let result = index.result else {
+      fatalError("Can't subscript using endIndex")
     }
-    switch i.representation {
-    case .start:
-      return index(after: base.startIndex, previous: base[base.startIndex])
-    case let .base(i, element):
-      return index(after: i, previous: element)
-    case .end:
-      fatalError("Cannot get index after end index.")
+    
+    return result
+  }
+
+  @inlinable
+  public func index(after index: Index) -> Index {
+    guard let result = index.result else {
+      fatalError("Can't advance past endIndex")
     }
+    
+    let index = base.index(after: index.base)
+    let nextResult = index == base.endIndex
+      ? nil
+      : transform(result, base[index])
+    
+    return Index(base: index, result: nextResult)
   }
 
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
-    switch (start.representation, end.representation) {
-    case (.start, .start):
-      return 0
-    case let (.start, .base(index, _)):
-      return base.distance(from: base.startIndex, to: index)
-    case (.start, .end):
-      return base.distance(from: base.startIndex, to: base.endIndex)
-    case let (.base(index, _), .start):
-      return base.distance(from: index, to: base.startIndex)
-    case let (.base(start, _), .base(end, _)):
-      return base.distance(from: start, to: end)
-    case let (.base(index, _), .end):
-      return base.distance(from: index, to: base.endIndex)
-    case (.end, .start):
-      return base.distance(from: base.endIndex, to: base.startIndex)
-    case let (.end, .base(index, _)):
-      return base.distance(from: base.endIndex, to: index)
-    case (.end, .end):
-      return 0
-    }
+    base.distance(from: start.base, to: end.base)
   }
 }
 
-extension InclusiveReductionsSequence: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+extension InclusiveReductionsSequence: LazySequenceProtocol {}
 
 extension InclusiveReductionsSequence: LazyCollectionProtocol
-  where Base: LazyCollectionProtocol {}
+  where Base: Collection {}
 
-// MARK: - ReductionsIndexRepresentation
-
-@usableFromInline
-enum ReductionsIndexRepresentation<BaseIndex: Comparable, Result> {
-  case start
-  case base(index: BaseIndex, result: Result)
-  case end
-}
-
-extension ReductionsIndexRepresentation: Equatable {
+extension InclusiveReductionsSequence.Index: Hashable
+  where Base.Index: Hashable
+{
   @inlinable
-  static func == (lhs: Self, rhs: Self) -> Bool {
-    switch (lhs, rhs) {
-    case (.start, .start): return true
-    case (.end, .end): return true
-    case let (.base(lhs, _), .base(rhs, _)): return lhs == rhs
-    default: return false
-    }
-  }
-}
-
-extension ReductionsIndexRepresentation: Comparable {
-  @inlinable
-  static func < (lhs: Self, rhs: Self) -> Bool {
-    switch (lhs, rhs) {
-    case (_, .start): return false
-    case (.start, _): return true
-    case (.end, _): return false
-    case (_, .end): return true
-    case let (.base(lhs, _), .base(rhs, _)): return lhs < rhs
-    }
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(base)
   }
 }
 
 // MARK: - Scan
 
 extension LazySequenceProtocol {
-
   @available(*, deprecated, message: "Use reductions(_:_:) instead.")
   @inlinable
   public func scan<Result>(
     _ initial: Result,
     _ transform: @escaping (Result, Element) -> Result
-  ) -> ExclusiveReductionsSequence<Result, Self> {
+  ) -> ExclusiveReductionsSequence<Elements, Result> {
     reductions(initial, transform)
   }
 
@@ -594,13 +574,12 @@ extension LazySequenceProtocol {
   public func scan<Result>(
     into initial: Result,
     _ transform: @escaping (inout Result, Element) -> Void
-  ) -> ExclusiveReductionsSequence<Result, Self> {
+  ) -> ExclusiveReductionsSequence<Elements, Result> {
     reductions(into: initial, transform)
   }
 }
 
 extension Sequence {
-
   @available(*, deprecated, message: "Use reductions(_:_:) instead.")
   @inlinable
   public func scan<Result>(
@@ -621,18 +600,16 @@ extension Sequence {
 }
 
 extension LazySequenceProtocol {
-
   @available(*, deprecated, message: "Use reductions(_:) instead.")
   @inlinable
   public func scan(
     _ transform: @escaping (Element, Element) -> Element
-  ) -> InclusiveReductionsSequence<Self> {
+  ) -> InclusiveReductionsSequence<Elements> {
     reductions(transform)
   }
 }
 
 extension Sequence {
-
   @available(*, deprecated, message: "Use reductions(_:) instead.")
   @inlinable
   public func scan(

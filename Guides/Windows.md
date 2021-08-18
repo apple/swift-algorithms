@@ -36,7 +36,7 @@ collection is empty.
 
 The resulting `WindowsCollection` type is a collection, with conditional
 conformance to the `BidirectionalCollection`, `RandomAccessCollection`, and
-`LazyCollectionProtocol` protocols when the base collection conforms.
+`LazySequenceProtocol` protocols when the base collection conforms.
 
 ### Complexity
 

@@ -12,7 +12,9 @@
 /// A collection consisting of all the elements contained in a collection of
 /// collections.
 @usableFromInline
-internal struct FlattenCollection<Base: Collection> where Base.Element: Collection {
+internal struct FlattenCollection<Base: Collection>
+  where Base.Element: Collection
+{
   @usableFromInline
   internal let base: Base
   
@@ -97,7 +99,9 @@ extension FlattenCollection: Collection {
     guard let startInner = start.inner
       else { return 0 }
     guard start.outer != end.outer
-      else { return base[start.outer].distance(from: startInner, to: end.inner!) }
+      else {
+        return base[start.outer].distance(from: startInner, to: end.inner!)
+      }
     
     let firstPart = base[start.outer][startInner...].count
     let middlePart = base[start.outer..<end.outer].dropFirst()
@@ -199,7 +203,10 @@ extension FlattenCollection: Collection {
     
     if let limitInner = limit.inner {
       let element = base[outer]
-      return element.index(element.startIndex, offsetBy: remainder, limitedBy: limitInner)
+      return element.index(
+        element.startIndex,
+        offsetBy: remainder,
+        limitedBy: limitInner)
         .map { inner in Index(outer: outer, inner: inner) }
     } else {
       return nil
@@ -287,10 +294,8 @@ extension FlattenCollection: BidirectionalCollection
   }
 }
 
-extension FlattenCollection: LazySequenceProtocol
+extension FlattenCollection: LazySequenceProtocol, LazyCollectionProtocol
   where Base: LazySequenceProtocol, Base.Element: LazySequenceProtocol {}
-extension FlattenCollection: LazyCollectionProtocol
-  where Base: LazyCollectionProtocol, Base.Element: LazyCollectionProtocol {}
 
 //===----------------------------------------------------------------------===//
 // joined()
