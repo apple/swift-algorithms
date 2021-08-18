@@ -241,13 +241,6 @@ extension Sequence {
   public func partitioned(
     _ belongsInSecondCollection: (Element) throws -> Bool
   ) rethrows -> ([Element], [Element]) {
-    return try _partitioned(belongsInSecondCollection)
-  }
-  
-  @inlinable
-  internal func _partitioned(
-    _ belongsInSecondCollection: (Element) throws -> Bool
-  ) rethrows -> ([Element], [Element]) {
     var lhs = Array<Element>()
     var rhs = Array<Element>()
     
