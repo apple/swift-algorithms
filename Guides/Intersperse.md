@@ -25,15 +25,15 @@ A new method is added to sequence:
 
 ```swift
 extension Sequence {
-    func interspersed(with separator: Element) -> Intersperse<Self>
+    func interspersed(with separator: Element) -> InterspersedSequence<Self>
 }
 ```
 
-The new `Intersperse` type represents the sequence when the separator is
-inserted between each element. `Intersperse` conforms to `Collection`,
-`BidirectionalCollection`, `RandomAccessCollection`, `LazySequenceProtocol` and
-`LazyCollectionProtocol` when the base sequence conforms to those respective
-protocols.
+The new `InterspersedSequence` type represents the sequence when the separator
+is inserted between each element. `InterspersedSequence` conforms to
+`Collection`, `BidirectionalCollection`, `RandomAccessCollection`,
+`LazySequenceProtocol` and `LazyCollectionProtocol` when the base sequence
+conforms to those respective protocols.
 
 ### Complexity
 

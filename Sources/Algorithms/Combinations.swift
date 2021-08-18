@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 /// A collection wrapper that generates combinations of a base collection.
-public struct Combinations<Base: Collection> {
+public struct CombinationsSequence<Base: Collection> {
   /// The collection to iterate over for combinations.
   @usableFromInline
   internal let base: Base
@@ -76,7 +76,7 @@ public struct Combinations<Base: Collection> {
   }
 }
 
-extension Combinations: Sequence {
+extension CombinationsSequence: Sequence {
   /// The iterator for a `Combinations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -99,7 +99,7 @@ extension Combinations: Sequence {
     internal var indexes: [Base.Index]
     
     @inlinable
-    internal init(_ combinations: Combinations) {
+    internal init(_ combinations: CombinationsSequence) {
       self.base = combinations.base
       self.kRange = combinations.kRange ?? 0..<0
       self.indexes = Array(combinations.base.indices.prefix(kRange.lowerBound))
@@ -180,7 +180,7 @@ extension Combinations: Sequence {
   }
 }
 
-extension Combinations: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension CombinationsSequence: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // combinations(ofCount:)
@@ -251,8 +251,8 @@ extension Collection {
   @inlinable
   public func combinations<R: RangeExpression>(
     ofCount kRange: R
-  ) -> Combinations<Self> where R.Bound == Int {
-    return Combinations(self, kRange: kRange)
+  ) -> CombinationsSequence<Self> where R.Bound == Int {
+    return CombinationsSequence(self, kRange: kRange)
   }
   
   /// Returns a collection of combinations of this collection's elements, with
@@ -285,8 +285,8 @@ extension Collection {
   /// is the number of elements in the base collection, since `Combinations`
   /// accesses the `count` of the base collection.
   @inlinable
-  public func combinations(ofCount k: Int) -> Combinations<Self> {
+  public func combinations(ofCount k: Int) -> CombinationsSequence<Self> {
     precondition(k >= 0, "Can't have combinations with a negative number of elements.")
-    return Combinations(self, k: k)
+    return CombinationsSequence(self, k: k)
   }
 }

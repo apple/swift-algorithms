@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 /// A collection wrapper that repeats the elements of a base collection.
-public struct Cycle<Base: Collection> {
+public struct CycledSequence<Base: Collection> {
   /// The collection to repeat.
   @usableFromInline
   internal let base: Base
@@ -21,7 +21,7 @@ public struct Cycle<Base: Collection> {
   }
 }
 
-extension Cycle: Sequence {
+extension CycledSequence: Sequence {
   /// The iterator for a `Cycle` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -55,36 +55,33 @@ extension Cycle: Sequence {
   }
 }
 
-extension Cycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension CycledSequence: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
 
 
 /// A collection wrapper that repeats the elements of a base collection for a
 /// finite number of times.
-public struct FiniteCycle<Base: Collection> {
-  /// A Product2 instance for iterating the Base collection.
+public struct CycledTimesCollection<Base: Collection> {
+  /// A `Product2Sequence` instance for iterating the base collection.
   @usableFromInline
-  internal let product: Product2<Range<Int>, Base>
+  internal let product: Product2Sequence<Range<Int>, Base>
 
   @inlinable
   internal init(base: Base, times: Int) {
-    self.product = Product2(0..<times, base)
+    self.product = Product2Sequence(0..<times, base)
   }
 }
 
-extension FiniteCycle: LazySequenceProtocol, LazyCollectionProtocol
-  where Base: LazyCollectionProtocol { }
-
-extension FiniteCycle: Collection {
-
+extension CycledTimesCollection: Collection {
   public typealias Element = Base.Element
 
   public struct Index: Comparable {
     /// The index corresponding to the Product2 index at this position.
     @usableFromInline
-    internal let productIndex: Product2<Range<Int>, Base>.Index
+    internal let productIndex: Product2Sequence<Range<Int>, Base>.Index
 
     @inlinable
-    internal init(_ productIndex: Product2<Range<Int>, Base>.Index) {
+    internal init(_ productIndex: Product2Sequence<Range<Int>, Base>.Index) {
       self.productIndex = productIndex
     }
 
@@ -151,7 +148,7 @@ extension FiniteCycle: Collection {
   }
 }
 
-extension FiniteCycle: BidirectionalCollection
+extension CycledTimesCollection: BidirectionalCollection
   where Base: BidirectionalCollection {
   @inlinable
   public func index(before i: Index) -> Index {
@@ -160,8 +157,11 @@ extension FiniteCycle: BidirectionalCollection
   }
 }
 
-extension FiniteCycle: RandomAccessCollection
+extension CycledTimesCollection: RandomAccessCollection
   where Base: RandomAccessCollection {}
+
+extension CycledTimesCollection: LazySequenceProtocol, LazyCollectionProtocol
+  where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // cycled()
@@ -194,8 +194,8 @@ extension Collection {
   ///
   /// - Complexity: O(1)
   @inlinable
-  public func cycled() -> Cycle<Self> {
-    Cycle(base: self)
+  public func cycled() -> CycledSequence<Self> {
+    CycledSequence(base: self)
   }
   
   /// Returns a sequence that repeats the elements of this collection the
@@ -216,7 +216,7 @@ extension Collection {
   ///
   /// - Complexity: O(1)
   @inlinable
-  public func cycled(times: Int) -> FiniteCycle<Self> {
-    FiniteCycle(base: self, times: times)
+  public func cycled(times: Int) -> CycledTimesCollection<Self> {
+    CycledTimesCollection(base: self, times: times)
   }
 }

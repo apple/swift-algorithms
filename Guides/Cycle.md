@@ -26,20 +26,20 @@ Two new methods are added to collections:
 
 ```swift
 extension Collection {
-    func cycled() -> Cycle<Self>
+    func cycled() -> CycledSequence<Self>
 
-    func cycled(times: Int) -> FiniteCycle<Self>
+    func cycled(times: Int) -> CycledTimesCollection<Self>
 }
 ```
 
-The new `Cycle` type is a sequence only, given that the `Collection` protocol
-design makes infinitely large types impossible/impractical. `Cycle` also
-conforms to `LazySequenceProtocol` when the base type conforms.
+The new `CycledSequence` type is a sequence only, given that the `Collection`
+protocol design makes infinitely large types impossible/impractical.
+`CycledSequence` also conforms to `LazySequenceProtocol` when the base type
+conforms.
 
-The `FiniteCycle` type always has `Collection` conformance, with
-`BidirectionalCollection` conformance
-when called on a bidirectional collection. `FiniteCycle` also
-conforms to `LazyCollectionProtocol` when the base type conforms.
+The `CycledTimesCollection` type always has `Collection` conformance, with
+`BidirectionalCollection`, `RandomAccessCollection`, and `LazySequenceProtocol` 
+conformance when the base type conforms.
 
 ### Complexity
 

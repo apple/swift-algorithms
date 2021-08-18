@@ -76,7 +76,7 @@ extension MutableCollection
 //===----------------------------------------------------------------------===//
 
 /// A sequence of all the permutations of a collection's elements.
-public struct Permutations<Base: Collection> {
+public struct PermutationsSequence<Base: Collection> {
   /// The base collection to iterate over for permutations.
   @usableFromInline
   internal let base: Base
@@ -134,7 +134,7 @@ public struct Permutations<Base: Collection> {
   }
 }
 
-extension Permutations: Sequence {
+extension PermutationsSequence: Sequence {
   /// The iterator for a `Permutations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -160,7 +160,7 @@ extension Permutations: Sequence {
     internal var indexes: [Base.Index]
     
     @inlinable
-    internal init(_ permutations: Permutations) {
+    internal init(_ permutations: PermutationsSequence) {
       self.base = permutations.base
       self.baseCount = permutations.baseCount
       self.kRange = permutations.kRange
@@ -259,7 +259,7 @@ extension Permutations: Sequence {
   }
 }
 
-extension Permutations: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension PermutationsSequence: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // permutations(ofCount:)
@@ -325,8 +325,8 @@ extension Collection {
   @inlinable
   public func permutations<R: RangeExpression>(
     ofCount kRange: R
-  ) -> Permutations<Self> where R.Bound == Int {
-    return Permutations(self, kRange: kRange)
+  ) -> PermutationsSequence<Self> where R.Bound == Int {
+    return PermutationsSequence(self, kRange: kRange)
   }
   
   /// Returns a collection of the permutations of this collection of the
@@ -379,11 +379,11 @@ extension Collection {
   ///   is the number of elements in the base collection, since `Permutations`
   ///   accesses the `count` of the base collection.
   @inlinable
-  public func permutations(ofCount k: Int? = nil) -> Permutations<Self> {
+  public func permutations(ofCount k: Int? = nil) -> PermutationsSequence<Self> {
     precondition(
       k ?? 0 >= 0,
       "Can't have permutations with a negative number of elements.")
-    return Permutations(self, k: k)
+    return PermutationsSequence(self, k: k)
   }
 }
 
@@ -396,7 +396,7 @@ extension Collection {
 ///
 /// To create a `UniquePermutations` instance, call one of the
 /// `uniquePermutations` methods on your collection.
-public struct UniquePermutations<Base: Collection> {
+public struct UniquePermutationsSequence<Base: Collection> {
   /// The base collection to iterate over for permutations.
   @usableFromInline
   internal let base: Base
@@ -408,7 +408,7 @@ public struct UniquePermutations<Base: Collection> {
   internal let kRange: Range<Int>
 }
 
-extension UniquePermutations where Base.Element: Hashable {
+extension UniquePermutationsSequence where Base.Element: Hashable {
   @inlinable
   internal static func _indexes(_ base: Base) -> [Base.Index] {
     let firstIndexesAndCountsByElement = Dictionary(
@@ -440,7 +440,7 @@ extension UniquePermutations where Base.Element: Hashable {
   }
 }
 
-extension UniquePermutations: Sequence {
+extension UniquePermutationsSequence: Sequence {
   /// The iterator for a `UniquePermutations` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -496,7 +496,7 @@ extension UniquePermutations: Sequence {
   }
 }
 
-extension UniquePermutations: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension UniquePermutationsSequence: LazySequenceProtocol where Base: LazySequenceProtocol {}
 
 extension Collection where Element: Hashable {
   /// Returns a sequence of the unique permutations of this sequence of the
@@ -537,11 +537,11 @@ extension Collection where Element: Hashable {
   ///
   /// - Complexity: O(*n*), where *n* is the number of elements in this
   ///   collection.
-  public func uniquePermutations(ofCount k: Int? = nil) -> UniquePermutations<Self> {
+  public func uniquePermutations(ofCount k: Int? = nil) -> UniquePermutationsSequence<Self> {
     if let k = k {
-      return UniquePermutations(self, k ..< (k + 1))
+      return UniquePermutationsSequence(self, k ..< (k + 1))
     } else {
-      return UniquePermutations(self)
+      return UniquePermutationsSequence(self)
     }
   }
 
@@ -574,9 +574,9 @@ extension Collection where Element: Hashable {
   ///
   /// - Complexity: O(*n*), where *n* is the number of elements in this
   ///   collection.
-  public func uniquePermutations<R: RangeExpression>(ofCount kRange: R) -> UniquePermutations<Self>
+  public func uniquePermutations<R: RangeExpression>(ofCount kRange: R) -> UniquePermutationsSequence<Self>
     where R.Bound == Int
   {
-    UniquePermutations(self, kRange)
+    UniquePermutationsSequence(self, kRange)
   }
 }

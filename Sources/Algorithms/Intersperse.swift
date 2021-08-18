@@ -15,7 +15,7 @@
 
 /// A sequence that presents the elements of a base sequence of elements
 /// with a separator between each of those elements.
-public struct Intersperse<Base: Sequence> {
+public struct InterspersedSequence<Base: Sequence> {
   @usableFromInline
   internal let base: Base
   
@@ -29,7 +29,7 @@ public struct Intersperse<Base: Sequence> {
   }
 }
 
-extension Intersperse: Sequence {
+extension InterspersedSequence: Sequence {
   /// The iterator for an `Intersperse` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -76,12 +76,12 @@ extension Intersperse: Sequence {
   }
 
   @inlinable
-  public func makeIterator() -> Intersperse<Base>.Iterator {
+  public func makeIterator() -> InterspersedSequence<Base>.Iterator {
     Iterator(iterator: base.makeIterator(), separator: separator)
   }
 }
 
-extension Intersperse: Collection where Base: Collection {
+extension InterspersedSequence: Collection where Base: Collection {
   /// A position in an `Intersperse` collection.
   public struct Index: Comparable {
     @usableFromInline
@@ -256,7 +256,7 @@ extension Intersperse: Collection where Base: Collection {
   }
 }
 
-extension Intersperse: BidirectionalCollection
+extension InterspersedSequence: BidirectionalCollection
   where Base: BidirectionalCollection
 {
   @inlinable
@@ -271,13 +271,13 @@ extension Intersperse: BidirectionalCollection
   }
 }
 
-extension Intersperse: RandomAccessCollection
+extension InterspersedSequence: RandomAccessCollection
   where Base: RandomAccessCollection {}
 
-extension Intersperse: LazySequenceProtocol
+extension InterspersedSequence: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
 
-extension Intersperse: LazyCollectionProtocol
+extension InterspersedSequence: LazyCollectionProtocol
   where Base: LazyCollectionProtocol {}
 
 //===----------------------------------------------------------------------===//
@@ -289,7 +289,7 @@ extension Intersperse: LazyCollectionProtocol
 /// elements, with a separator that separates each pair of adjacent transformed
 /// values.
 @usableFromInline
-internal struct InterspersedMap<Base: Sequence, Result> {
+internal struct InterspersedMapSequence<Base: Sequence, Result> {
   @usableFromInline
   internal let base: Base
   
@@ -300,7 +300,7 @@ internal struct InterspersedMap<Base: Sequence, Result> {
   internal let separator: (Base.Element, Base.Element) -> Result
 }
 
-extension InterspersedMap: Sequence {
+extension InterspersedMapSequence: Sequence {
   @usableFromInline
   internal struct Iterator: IteratorProtocol {
     @usableFromInline
@@ -360,7 +360,7 @@ extension InterspersedMap: Sequence {
   }
 }
 
-extension InterspersedMap: Collection where Base: Collection {
+extension InterspersedMapSequence: Collection where Base: Collection {
   @usableFromInline
   internal struct Index: Comparable {
     @usableFromInline
@@ -561,7 +561,7 @@ extension InterspersedMap: Collection where Base: Collection {
   }
 }
 
-extension InterspersedMap: BidirectionalCollection
+extension InterspersedMapSequence: BidirectionalCollection
   where Base: BidirectionalCollection
 {
   @inlinable
@@ -577,12 +577,12 @@ extension InterspersedMap: BidirectionalCollection
   }
 }
 
-extension InterspersedMap.Index.Representation: Hashable
+extension InterspersedMapSequence.Index.Representation: Hashable
   where Base.Index: Hashable {}
 
-extension InterspersedMap: LazySequenceProtocol
+extension InterspersedMapSequence: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
-extension InterspersedMap: LazyCollectionProtocol
+extension InterspersedMapSequence: LazyCollectionProtocol
   where Base: LazyCollectionProtocol {}
 
 //===----------------------------------------------------------------------===//
@@ -620,8 +620,8 @@ extension Sequence {
   ///
   /// - Complexity: O(1)
   @inlinable
-  public func interspersed(with separator: Element) -> Intersperse<Self> {
-    Intersperse(base: self, separator: separator)
+  public func interspersed(with separator: Element) -> InterspersedSequence<Self> {
+    InterspersedSequence(base: self, separator: separator)
   }
 }
 
@@ -647,7 +647,7 @@ extension LazySequenceProtocol {
   internal func interspersedMap<Result>(
     _ transform: @escaping (Element) -> Result,
     with separator: @escaping (Element, Element) -> Result
-  ) -> InterspersedMap<Self, Result> {
-    InterspersedMap(base: self, transform: transform, separator: separator)
+  ) -> InterspersedMapSequence<Self, Result> {
+    InterspersedMapSequence(base: self, transform: transform, separator: separator)
   }
 }

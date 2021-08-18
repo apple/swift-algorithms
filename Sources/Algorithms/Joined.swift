@@ -19,8 +19,8 @@ public struct JoinedBySequence<Base: Sequence, Separator: Sequence>
   where Base.Element: Sequence, Base.Element.Element == Separator.Element
 {
   @usableFromInline
-  internal typealias Inner = FlattenSequence<
-    Intersperse<LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>>>
+  internal typealias Inner = FlattenSequence<InterspersedSequence<
+    LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>>>
   
   @usableFromInline
   internal let inner: Inner
@@ -70,8 +70,8 @@ public struct JoinedByClosureSequence<Base: Sequence, Separator: Sequence>
   where Base.Element: Sequence, Base.Element.Element == Separator.Element
 {
   @usableFromInline
-  internal typealias Inner = FlattenSequence<
-    InterspersedMap<LazySequence<Base>, EitherSequence<Base.Element, Separator>>>
+  internal typealias Inner = FlattenSequence<InterspersedMapSequence<
+    LazySequence<Base>, EitherSequence<Base.Element, Separator>>>
   
   @usableFromInline
   internal let inner: Inner
@@ -124,8 +124,8 @@ public struct JoinedByCollection<Base: Collection, Separator: Collection>
   where Base.Element: Collection, Base.Element.Element == Separator.Element
 {
   @usableFromInline
-  internal typealias Inner = FlattenCollection<
-    Intersperse<LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>>>
+  internal typealias Inner = FlattenCollection<InterspersedSequence<
+    LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>>>
   
   @usableFromInline
   internal let inner: Inner
@@ -228,8 +228,8 @@ public struct JoinedByClosureCollection<Base: Collection, Separator: Collection>
   where Base.Element: Collection, Base.Element.Element == Separator.Element
 {
   @usableFromInline
-  internal typealias Inner = FlattenCollection<
-    InterspersedMap<LazySequence<Base>, EitherSequence<Base.Element, Separator>>>
+  internal typealias Inner = FlattenCollection<InterspersedMapSequence<
+    LazySequence<Base>, EitherSequence<Base.Element, Separator>>>
   
   @usableFromInline
   internal let inner: Inner

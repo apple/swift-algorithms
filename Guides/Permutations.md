@@ -98,19 +98,20 @@ for perm in numbers.permutations(ofCount: 0...) {
 
 ## Detailed Design
 
-The `permutations(ofCount:)` and `uniquePermutations(ofCount:)` methods are declared as `Collection` extensions,
-and return `Permutations` and `UniquePermutations` instances, respectively:
+The `permutations(ofCount:)` and `uniquePermutations(ofCount:)` methods are 
+declared as `Collection` extensions, and return `PermutationsSequence` and 
+`UniquePermutationsSequence` instances, respectively:
 
 ```swift
 extension Collection {
-    public func permutations(ofCount k: Int? = nil) -> Permutations<Self>
-    public func permutations<R>(ofCount kRange: R) -> Permutations<Self>
+    public func permutations(ofCount k: Int? = nil) -> PermutationsSequence<Self>
+    public func permutations<R>(ofCount kRange: R) -> PermutationsSequence<Self>
         where R: RangeExpression, R.Bound == Int
 }
 
 extension Collection where Element: Hashable {
-    public func uniquePermutations(ofCount k: Int? = nil) -> UniquePermutations<Self>
-    public func uniquePermutations<R>(ofCount kRange: R) -> UniquePermutations<Self>
+    public func uniquePermutations(ofCount k: Int? = nil) -> UniquePermutationsSequence<Self>
+    public func uniquePermutations<R>(ofCount kRange: R) -> UniquePermutationsSequence<Self>
         where R: RangeExpression, R.Bound == Int
 }
 ```
@@ -119,7 +120,7 @@ Since both result types need to store an array of the collection’s
 indices and mutate the array to generate each permutation, they only
 have `Sequence` conformance. Adding `Collection` conformance would require
 storing the array in the index type, which would in turn lead to copying the
-array at every index advancement. The `Permutations` type
+array at every index advancement. The `PermutationsSequence` type
 conforms to `LazySequenceProtocol` when its base type conforms.
 
 ### Complexity
@@ -128,9 +129,9 @@ Calling `permutations()` is an O(1) operation. Creating the iterator for a
 `Permutations` instance and each call to `Permutations.Iterator.next()` is an
 O(_n_) operation.
 
-Calling `uniquePermutations()` is an O(_n_) operation, because it preprocesses the
-collection to find duplicate elements. Creating the iterator for and each call to 
-`next()` is also an O(_n_) operation.
+Calling `uniquePermutations()` is an O(_n_) operation, because it preprocesses 
+the collection to find duplicate elements. Creating the iterator for and each 
+call to `next()` is also an O(_n_) operation.
 
 ### Naming
 

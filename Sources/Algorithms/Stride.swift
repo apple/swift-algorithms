@@ -27,8 +27,8 @@ extension Sequence {
   /// - Returns: Returns a sequence for stepping through the
   /// elements by the specified amount.
   @inlinable
-  public func striding(by step: Int) -> StrideSequence<Self> {
-    StrideSequence(base: self, stride: step)
+  public func striding(by step: Int) -> StridingSequence<Self> {
+    StridingSequence(base: self, stride: step)
   }
 }
 
@@ -47,13 +47,13 @@ extension Collection {
   /// - Returns: Returns a collection for stepping through the
   /// elements by the specified amount.
   @inlinable
-  public func striding(by step: Int) -> StrideCollection<Self> {
-    StrideCollection(base: self, stride: step)
+  public func striding(by step: Int) -> StridingCollection<Self> {
+    StridingCollection(base: self, stride: step)
   }
 }
 
 /// A wrapper that strides over a base sequence.
-public struct StrideSequence<Base: Sequence>: Sequence {
+public struct StridingSequence<Base: Sequence>: Sequence {
   
   @usableFromInline
   internal let base: Base
@@ -69,7 +69,7 @@ public struct StrideSequence<Base: Sequence>: Sequence {
   }
 }
 
-extension StrideSequence {
+extension StridingSequence {
   
   /// An iterator over a `Stride` sequence.
   public struct Iterator: IteratorProtocol {
@@ -107,7 +107,7 @@ extension StrideSequence {
   }
 }
 
-extension StrideSequence {
+extension StridingSequence {
   @inlinable
   public func striding(by step: Int) -> Self {
     Self(base: base, stride: stride * step)
@@ -115,7 +115,7 @@ extension StrideSequence {
 }
 
 /// A wrapper that strides over a base collection.
-public struct StrideCollection<Base: Collection> {
+public struct StridingCollection<Base: Collection> {
   @usableFromInline
   internal let base: Base
   
@@ -130,14 +130,14 @@ public struct StrideCollection<Base: Collection> {
   }
 }
 
-extension StrideCollection {
+extension StridingCollection {
   @inlinable
   public func striding(by step: Int) -> Self {
     Self(base: base, stride: stride * step)
   }
 }
 
-extension StrideCollection: Collection {
+extension StridingCollection: Collection {
   
   /// A position in a `Stride` collection.
   public struct Index: Comparable {
@@ -264,7 +264,7 @@ extension StrideCollection: Collection {
   }
 }
 
-extension StrideCollection: BidirectionalCollection
+extension StridingCollection: BidirectionalCollection
   where Base: RandomAccessCollection {
   
   @inlinable
@@ -274,5 +274,5 @@ extension StrideCollection: BidirectionalCollection
   }
 }
 
-extension StrideCollection: RandomAccessCollection where Base: RandomAccessCollection {}
-extension StrideCollection.Index: Hashable where Base.Index: Hashable {}
+extension StridingCollection: RandomAccessCollection where Base: RandomAccessCollection {}
+extension StridingCollection.Index: Hashable where Base.Index: Hashable {}

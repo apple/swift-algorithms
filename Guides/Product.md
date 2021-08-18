@@ -25,26 +25,26 @@ When either collection is empty, the resulting wrapper collection is also empty.
 ## Detailed Design
 
 The `product` function takes (at minimum) a sequence and a collection and
-returns a `Product2` type:
+returns a `Product2Sequence` type:
 
 ```swift
 public func product<Base1: Sequence, Base2: Collection>(
     _ s1: Base1, _ s2: Base2
-) -> Product2<Base1, Base2>
+) -> Product2Sequence<Base1, Base2>
 ```
 
 We require `Collection` conformance for `Base2`, since it needs to be iterated
 over multiple times. `Base1`, by contrast, is only iterated over a single time,
 so it can be a sequence.
  
-The `Product2` type wraps the base sequence and collection, and acts as a
-sequence in the base case, upgrading to a collection, a bidirectional
+The `Product2Sequence` type wraps the base sequence and collection, and acts as
+a sequence in the base case, upgrading to a collection, a bidirectional
 collection, and a random-access collection when both base collections have those
 conformances.
 
-We don't provide higher arities (like `Product3`, `Product4`, etc.) at this 
-time to match the standard library's `Zip2` type. Users can compose multiple
-calls to `product` if they would like higher arities.
+We don't provide higher arities (like `Product3Sequence`, `Product4Sequence`,
+etc.) at this time to match the standard library's `Zip2` type. Users can
+compose multiple calls to `product` if they would like higher arities.
 
 ### Complexity
 
