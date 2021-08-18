@@ -31,9 +31,9 @@ extension Sequence {
 
 The new `InterspersedSequence` type represents the sequence when the separator
 is inserted between each element. `InterspersedSequence` conforms to
-`Collection`, `BidirectionalCollection`, `RandomAccessCollection`,
-`LazySequenceProtocol` and `LazyCollectionProtocol` when the base sequence
-conforms to those respective protocols.
+`Collection`, `BidirectionalCollection`, `RandomAccessCollection` and
+`LazySequenceProtocol` when the base sequence conforms to those respective 
+protocols.
 
 ### Complexity
 

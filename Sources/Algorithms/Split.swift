@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
-// LazySplitSequence
+// SplitSequence
 //===----------------------------------------------------------------------===//
 /// A sequence that lazily splits a base sequence into subsequences separated by
 /// elements that satisfy the given `whereSeparator` predicate.
@@ -48,7 +48,7 @@ public struct SplitSequence<Base: Sequence> {
   }
 }
 
-extension SplitSequence {
+extension SplitSequence: Sequence {
   public struct Iterator {
     public typealias Element = [Base.Element]
 
@@ -84,6 +84,16 @@ extension SplitSequence {
       self.maxSplits = maxSplits
       self.omittingEmptySubsequences = omittingEmptySubsequences
     }
+  }
+  
+  @inlinable
+  public func makeIterator() -> Iterator {
+    Iterator(
+      base: base.makeIterator(),
+      whereSeparator: self.isSeparator,
+      maxSplits: self.maxSplits,
+      omittingEmptySubsequences: self.omittingEmptySubsequences
+    )
   }
 }
 
@@ -128,17 +138,7 @@ extension SplitSequence.Iterator: IteratorProtocol {
   }
 }
 
-extension SplitSequence: LazySequenceProtocol {
-  @inlinable
-  public func makeIterator() -> Iterator {
-    return Iterator(
-      base: base.makeIterator(),
-      whereSeparator: self.isSeparator,
-      maxSplits: self.maxSplits,
-      omittingEmptySubsequences: self.omittingEmptySubsequences
-    )
-  }
-}
+extension SplitSequence: LazySequenceProtocol {}
 
 extension LazySequenceProtocol {
   /// Lazily returns the longest possible subsequences of the sequence, in
@@ -333,7 +333,7 @@ extension LazySequenceProtocol where Element: Equatable {
 }
 
 //===----------------------------------------------------------------------===//
-// LazySplitCollection
+// SplitCollection
 //===----------------------------------------------------------------------===//
 /// A collection that lazily splits a base collection into subsequences
 /// separated by elements that satisfy the given `whereSeparator` predicate.
@@ -343,7 +343,7 @@ extension LazySequenceProtocol where Element: Equatable {
 ///     x.split(maxSplits:omittingEmptySubsequences:whereSeparator)
 ///     x.split(separator:maxSplits:omittingEmptySubsequences)
 ///
-///   where `x` conforms to `LazyCollectionProtocol`.
+///   where `x` conforms to `LazySequenceProtocol` and `Collection`.
 public struct SplitCollection<Base: Collection> {
   @usableFromInline
   internal let base: Base
@@ -398,7 +398,7 @@ public struct SplitCollection<Base: Collection> {
   }
 }
 
-extension SplitCollection: LazyCollectionProtocol {
+extension SplitCollection: Collection {
   /// Position of a subsequence in a split collection.
   public struct Index: Comparable {
     /// The range corresponding to the subsequence at this position.
@@ -475,7 +475,7 @@ extension SplitCollection: LazyCollectionProtocol {
     }
 
     var updatedSplitCount = splitCount
-    if end < base.endIndex {
+    if end != base.endIndex {
       // This subsequence ends on a separator (and perhaps includes other
       // separators, if we're omitting empty subsequences), so we've performed
       // another split.
@@ -548,12 +548,15 @@ extension SplitCollection: LazyCollectionProtocol {
 }
 
 extension SplitCollection.Index: Hashable {
+  @inlinable
   public func hash(into hasher: inout Hasher) {
     hasher.combine(sequenceLength)
   }
 }
 
-extension LazyCollectionProtocol {
+extension SplitCollection: LazyCollectionProtocol {}
+
+extension LazySequenceProtocol where Self: Collection, Elements: Collection {
   /// Lazily returns the longest possible subsequences of the collection, in
   /// order, that don't contain elements satisfying the given predicate.
   ///
@@ -653,8 +656,9 @@ extension LazyCollectionProtocol {
   }
 }
 
-extension LazyCollectionProtocol
-where Element: Equatable {
+extension LazySequenceProtocol
+  where Self: Collection, Elements: Collection, Element: Equatable
+{
   /// Lazily returns the longest possible subsequences of the collection, in
   /// order, around elements equal to the given element.
   ///

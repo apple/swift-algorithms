@@ -21,7 +21,7 @@ for (i, n) in numbers.indexed() {
 
 ## Detailed Design
 
-The `indexed` method returns an `Indexed` type:
+The `indexed` method returns an `IndexedCollection` type:
 
 ```swift
 extension Collection {
@@ -31,5 +31,5 @@ extension Collection {
 
 `IndexedCollection` scales from a collection up to a random-access collection, 
 depending on its base type. `Indexed` also conforms to `LazySequenceProtocol` 
-and `LazyCollectionProtocol` when the base type conforms.
+when the base type conforms.
 

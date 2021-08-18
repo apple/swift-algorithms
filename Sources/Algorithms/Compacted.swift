@@ -9,7 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-/// A `Sequence` that iterates over every non-nil element from the original `Sequence`.
+/// A `Sequence` that iterates over every non-nil element from the original
+/// `Sequence`.
 public struct CompactedSequence<Base: Sequence, Element>: Sequence
   where Base.Element == Element? {
 
@@ -42,14 +43,15 @@ public struct CompactedSequence<Base: Sequence, Element>: Sequence
 
   @inlinable
   public func makeIterator() -> Iterator {
-    return Iterator(base: base.makeIterator())
+    Iterator(base: base.makeIterator())
   }
 }
 
 extension Sequence {
-  /// Returns a new `Sequence` that iterates over every non-nil element
-  /// from the original `Sequence`.
-  /// It produces the same result as `c.compactMap { $0 }`.
+  /// Returns a new `Sequence` that iterates over every non-nil element from the
+  /// original `Sequence`.
+  ///
+  /// Produces the same result as `c.compactMap { $0 }`.
   ///
   ///     let c = [1, nil, 2, 3, nil]
   ///     for num in c.compacted() {
@@ -71,7 +73,8 @@ extension Sequence {
   }
 }
 
-/// A `Collection` that iterates over every non-nil element from the original `Collection`.
+/// A `Collection` that iterates over every non-nil element from the original
+/// `Collection`.
 public struct CompactedCollection<Base: Collection, Element>: Collection
   where Base.Element == Element? {
 
@@ -143,9 +146,10 @@ extension CompactedCollection.Index: Hashable
   where Base.Index: Hashable {}
 
 extension Collection {
-  /// Returns a new `Collection` that iterates over every non-nil element
-  /// from the original `Collection`.
-  /// It produces the same result as `c.compactMap { $0 }`.
+  /// Returns a new `Collection` that iterates over every non-nil element from
+  /// the original `Collection`.
+  ///
+  /// Produces the same result as `c.compactMap { $0 }`.
   ///
   ///     let c = [1, nil, 2, 3, nil]
   ///     for num in c.compacted() {
@@ -163,7 +167,8 @@ extension Collection {
   /// original `Collection`.
   @inlinable
   public func compacted<Unwrapped>() -> CompactedCollection<Self, Unwrapped>
-    where Element == Unwrapped? {
+    where Element == Unwrapped?
+  {
     CompactedCollection(base: self)
   }
 }
@@ -175,7 +180,5 @@ extension Collection {
 extension CompactedSequence: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
 
-extension CompactedCollection: LazySequenceProtocol
+extension CompactedCollection: LazySequenceProtocol, LazyCollectionProtocol
   where Base: LazySequenceProtocol {}
-extension CompactedCollection: LazyCollectionProtocol
-  where Base: LazyCollectionProtocol {}

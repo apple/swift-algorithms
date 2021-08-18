@@ -75,8 +75,8 @@ extension MutableCollection where Self: BidirectionalCollection {
 
 extension MutableCollection {
   /// Swaps the elements of the two given subranges, up to the upper bound of
-  /// the smaller subrange. The returned indices are the ends of the two
-  /// ranges that were actually swapped.
+  /// the smaller subrange. The returned indices are the ends of the two ranges
+  /// that were actually swapped.
   ///
   ///     Input:
   ///     [a b c d e f g h i j k l m n o p]
@@ -112,8 +112,8 @@ extension MutableCollection {
     return (p, q)
   }
 
-  /// Rotates the elements within the given subrange so that the element
-  /// at the specified index becomes the start of the subrange.
+  /// Rotates the elements within the given subrange so that the element at the
+  /// specified index becomes the start of the subrange.
   ///
   /// Rotating a collection is equivalent to breaking the collection into two
   /// sections at the index `newStart`, and then swapping those two sections.
@@ -146,10 +146,9 @@ extension MutableCollection {
     if s == m { return e }
     if m == e { return s }
     
-    // We have two regions of possibly-unequal length that need to be
-    // exchanged.  The return value of this method is going to be the
-    // position following that of the element that is currently last
-    // (element j).
+    // We have two regions of possibly-unequal length that need to be exchanged.
+    // The return value of this method is going to be the position following
+    // that of the element that is currently last (element j).
     //
     //   [a b c d e f g|h i j]   or   [a b c|d e f g h i j]
     //   ^             ^     ^        ^     ^             ^
@@ -157,8 +156,8 @@ extension MutableCollection {
     //
     var ret = e // start with a known incorrect result.
     while true {
-      // Exchange the leading elements of each region (up to the
-      // length of the shorter region).
+      // Exchange the leading elements of each region (up to the length of the
+      // shorter region).
       //
       //   [a b c d e f g|h i j]   or   [a b c|d e f g h i j]
       //    ^^^^^         ^^^^^          ^^^^^ ^^^^^
@@ -169,21 +168,20 @@ extension MutableCollection {
       let (s1, m1) = _swapNonemptySubrangePrefixes(s..<m, m..<e)
       
       if m1 == e {
-        // Left-hand case: we have moved element j into position.  if
-        // we haven't already, we can capture the return value which
-        // is in s1.
+        // Left-hand case: we have moved element j into position. If we haven't
+        // already, we can capture the return value which is in s1.
         //
-        // Note: the STL breaks the loop into two just to avoid this
-        // comparison once the return value is known.  I'm not sure
-        // it's a worthwhile optimization, though.
+        // Note: the STL breaks the loop into two just to avoid this comparison
+        // once the return value is known. I'm not sure it's a worthwhile
+        // optimization, though.
         if ret == e { ret = s1 }
         
         // If both regions were the same size, we're done.
         if s1 == m { break }
       }
       
-      // Now we have a smaller problem that is also a rotation, so we
-      // can adjust our bounds and repeat.
+      // Now we have a smaller problem that is also a rotation, so we can adjust
+      // our bounds and repeat.
       //
       //    h i j[d e f g|a b c]   or    d e f[a b c|g h i j]
       //         ^       ^     ^              ^     ^       ^
@@ -195,8 +193,8 @@ extension MutableCollection {
     return ret
   }
   
-  /// Rotates the elements of this collection so that the element
-  /// at the specified index becomes the start of the collection.
+  /// Rotates the elements of this collection so that the element at the
+  /// specified index becomes the start of the collection.
   ///
   /// Rotating a collection is equivalent to breaking the collection into two
   /// sections at the index `newStart`, and then swapping those two sections.
@@ -221,8 +219,8 @@ extension MutableCollection {
 }
 
 extension MutableCollection where Self: BidirectionalCollection {
-  /// Rotates the elements within the given subrange so that the element
-  /// at the specified index becomes the start of the subrange.
+  /// Rotates the elements within the given subrange so that the element at the
+  /// specified index becomes the start of the subrange.
   ///
   /// Rotating a collection is equivalent to breaking the collection into two
   /// sections at the index `newStart`, and then swapping those two sections.
@@ -255,13 +253,13 @@ extension MutableCollection where Self: BidirectionalCollection {
     return newStart == p ? q : p
   }
 
-  /// Rotates the elements of this collection so that the element
-  /// at the specified index becomes the start of the collection.
+  /// Rotates the elements of this collection so that the element at the
+  /// specified index becomes the start of the collection.
   ///
   /// Rotating a collection is equivalent to breaking the collection into two
-  /// sections at the index `newStart`, and then swapping those two sections.
-  /// In this example, the `numbers` array is rotated so that the element at
-  /// index `3` (`40`) is first:
+  /// sections at the index `newStart`, and then swapping those two sections. In
+  /// this example, the `numbers` array is rotated so that the element at index
+  /// `3` (`40`) is first:
   ///
   ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
   ///     let oldStart = numbers.rotate(toStartAt: 3)

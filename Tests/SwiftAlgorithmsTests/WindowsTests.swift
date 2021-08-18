@@ -99,7 +99,7 @@ final class windowsTests: XCTestCase {
       indices: { windows in
         let endIndex = windows.base.endIndex
         let indices = windows.base.indices + [endIndex]
-        return zip(indices, indices.dropFirst(windows.size))
+        return zip(indices, indices.dropFirst(windows.windowSize))
           .map { .init(lowerBound: $0, upperBound: $1) }
           + [.init(lowerBound: endIndex, upperBound: endIndex)]
       })

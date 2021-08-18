@@ -13,7 +13,6 @@ import XCTest
 import Algorithms
 
 final class ReductionsTests: XCTestCase {
-
   struct TestError: Error {}
 
   // MARK: - Exclusive Reductions

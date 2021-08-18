@@ -59,7 +59,7 @@ extension AnyMutableCollection: MutableCollection {
   var endIndex: Base.Index { base.endIndex }
 
   func index(after i: Index) -> Index {
-    return base.index(after: i)
+    base.index(after: i)
   }
 
   subscript(position: Base.Index) -> Base.Element {
@@ -180,8 +180,9 @@ func XCTAssertEqualCollections<C1: Collection, C2: Collection>(
 ///     independently of the `Collection` conformance, e.g. by using the
 ///     contents of the collection directly.
 ///
-/// - Complexity: O(*n*^3) for each collection, where *n* is the length of the
-///   collection.
+/// - Complexity: O(*n*^3) where *n* is the length of the collection per
+///   collection if the collection conforms to `RandomAccesCollection`,
+///   otherwise O(*n*^4).
 func validateIndexTraversals<C>(
   _ collections: C...,
   indices: ((C) -> [C.Index])? = nil,

@@ -3,7 +3,7 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Stride.swift) | 
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/StrideTests.swift)]
 
-A type that steps over sequence elements by the specified amount.
+Step over the elements of a sequence elements by a specified amount.
 
 This is available through the `striding(by:)` method on any `Sequence`.
 
@@ -11,29 +11,35 @@ This is available through the `striding(by:)` method on any `Sequence`.
 (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
 ```
 
-If the stride is larger than the count, the resulting wrapper only contains the 
-first element.
+If the stride is larger than the length of the sequence, the resulting wrapper
+only contains the first element.
 
 The stride amount must be a positive value.
 
 ## Detailed Design
 
-The `striding(by:)` method is declared as a `Sequence` extension, and returns a 
-`StridingSequence` type:
+The `striding(by:)` method is declared in extension of both `Sequence` and
+`Collection`:
 
 ```swift
 extension Sequence {
-  public func striding(by step: Int) -> StridingSequence<Self>
+    public func striding(by step: Int) -> StridingSequence<Self>
+}
+
+extension Collection {
+    public func striding(by step: Int) -> StridingCollection<Self>
 }
 ```
 
-A custom `Index` type is defined so that it's not possible to get confused when 
-trying to access an index of the stride collection.
-
-```swift
-[0, 1, 2, 3, 4].striding(by: 2)[1] // == 1
-[0, 1, 2, 3, 4].striding(by: 2).map { $0 }[1] // == 2
-```
+The reason for this distinction is subtle. The `StridingSequence.Iterator` type
+is unable to skip over multiple elements of the wrapped iterator at once since
+that's not part of `IteratorProtocol`'s interface. In order to efficiently
+stride over collections that provide a fast way of skipping multiple elements at
+once, the `StridingCollection` type was added which does not provide a custom
+`Iterator` type and therefore always strides over the underlying collection in
+the fastest way possible. See the related
+[GitHub issue](https://github.com/apple/swift-algorithms/issues/63) for more
+information.
 
 A careful thought was given to the composition of these strides by giving a 
 custom implementation to `index(_:offsetBy:limitedBy)` which multiplies the 
