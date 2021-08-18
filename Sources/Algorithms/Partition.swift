@@ -283,14 +283,6 @@ extension Collection {
     
     let count = self.count
     
-    // The overhead of this implementation isn’t worth it for collections fewer
-    // than 8 elements. Use the simple `Sequence`-based implementation instead.
-    // This constant was determined using benchmarking. More information:
-    // https://github.com/apple/swift-algorithms/pull/152#issuecomment-887130149
-    if count < 8 {
-      return try _partitioned(belongsInSecondCollection)
-    }
-    
     // Inside of the `initializer` closure, we set what the actual mid-point is.
     // We will use this to partitioned the single array into two in constant time.
     var midPoint: Int = 0
