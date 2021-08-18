@@ -252,10 +252,7 @@ extension Sequence {
       }
     }
     
-    return (
-      Array(lhs),
-      Array(rhs)
-    )
+    return (lhs, rhs)
   }
 }
 
