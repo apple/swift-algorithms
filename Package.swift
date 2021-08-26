@@ -18,9 +18,12 @@ let package = Package(
         .library(
             name: "Algorithms",
             targets: ["Algorithms"]),
+        .executable(name: "algorithms-benchmark",
+                    targets: ["AlgorithmsBenchmark"]),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-numerics", from: "0.0.1"),
+        .package(url: "https://github.com/apple/swift-collections-benchmark", from: "0.0.1"),
     ],
     targets: [
         .target(
@@ -28,6 +31,13 @@ let package = Package(
             dependencies: [
               .product(name: "Numerics", package: "swift-numerics"),
             ]),
+        .target(
+          name: "AlgorithmsBenchmark",
+          dependencies: [
+            "Algorithms",
+            .product(name: "CollectionsBenchmark",
+                     package: "swift-collections-benchmark"),
+          ]),
         .testTarget(
             name: "SwiftAlgorithmsTests",
             dependencies: ["Algorithms"]),
