@@ -64,6 +64,34 @@ final class RotateTests: XCTestCase {
     XCTAssertEqual(numbers[oldStart], 10)
   }
   
+  func testRotateSubrangeClosed() {
+    var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+    let oldStart = numbers.rotate(subrange: 0...3, toStartAt: 2)
+    XCTAssertEqual(numbers, [30, 40, 10, 20, 50, 60, 70, 80])
+    XCTAssertEqual(numbers[oldStart], 10)
+  }
+  
+  func testRotateSubrangePartialUpTo() {
+    var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+    let oldStart = numbers.rotate(subrange: ..<4, toStartAt: 2)
+    XCTAssertEqual(numbers, [30, 40, 10, 20, 50, 60, 70, 80])
+    XCTAssertEqual(numbers[oldStart], 10)
+  }
+  
+  func testRotateSubrangePartialUpThrough() {
+    var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+    let oldStart = numbers.rotate(subrange: ...3, toStartAt: 2)
+    XCTAssertEqual(numbers, [30, 40, 10, 20, 50, 60, 70, 80])
+    XCTAssertEqual(numbers[oldStart], 10)
+  }
+  
+  func testRotateSubrangePartialRangeFrom() {
+    var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+    let oldStart = numbers.rotate(subrange: 2..., toStartAt: 3)
+    XCTAssertEqual(numbers, [10, 20, 40, 50, 60, 70, 80, 30])
+    XCTAssertEqual(numbers[oldStart], 30)
+  }
+  
   /// Tests the example given in `rotate(toStartAt:)`’s documentation
   func testRotateExample() {
     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]

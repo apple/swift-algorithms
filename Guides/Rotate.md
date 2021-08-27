@@ -24,6 +24,15 @@ numbers.rotate(subrange: 3..<6, toStartAt: 4)
 // numbers = [20, 30, 10, 50, 60, 40]
 ```
 
+The examples above can also be expressed with other range expressions:
+```swift
+var numbers = [10, 20, 30, 40, 50, 60]
+numbers.rotate(subrange: ..<3, toStartAt: 1)
+// numbers = [20, 30, 10, 40, 50, 60]
+numbers.rotate(subrange: 3..., toStartAt: 4)
+// numbers = [20, 30, 10, 50, 60, 40]
+```
+
 ## Detailed Design
 
 This adds the two `MutableCollection` methods shown above:

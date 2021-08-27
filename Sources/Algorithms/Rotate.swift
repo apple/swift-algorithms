@@ -132,15 +132,17 @@ extension MutableCollection {
   /// - Returns: The new index of the element that was at the start of
   ///   `subrange` pre-rotation.
   ///
-  /// - Complexity: O(*n*), where *n* is the length of `subrange`.
+  /// - Complexity: O(*n*), where *n* is the length of `subrange` relative to
+  ///   this collection.
   @inlinable
   @discardableResult
-  public mutating func rotate(
-    subrange: Range<Index>,
+  public mutating func rotate<Range: RangeExpression>(
+    subrange: Range,
     toStartAt newStart: Index
-  ) -> Index {
-    var m = newStart, s = subrange.lowerBound
-    let e = subrange.upperBound
+  ) -> Index where Range.Bound == Index {
+    let cSubrange = subrange.relative(to: self)
+    var m = newStart, s = cSubrange.lowerBound
+    let e = cSubrange.upperBound
     
     // Handle the trivial cases
     if s == m { return e }
@@ -239,16 +241,18 @@ extension MutableCollection where Self: BidirectionalCollection {
   /// - Returns: The new index of the element that was at the start of
   ///   `subrange` pre-rotation.
   ///
-  /// - Complexity: O(*n*), where *n* is the length of `subrange`.
+  /// - Complexity: O(*n*), where *n* is the length of `subrange` relative to
+  ///   this collection.
   @inlinable
   @discardableResult
-  public mutating func rotate(
-    subrange: Range<Index>,
+  public mutating func rotate<Range: RangeExpression>(
+    subrange: Range,
     toStartAt newStart: Index
-  ) -> Index {
-    reverse(subrange: subrange.lowerBound..<newStart)
-    reverse(subrange: newStart..<subrange.upperBound)
-    let (p, q) = _reverse(subrange: subrange, until: newStart)
+  ) -> Index where Range.Bound == Index {
+    let cSubrange = subrange.relative(to: self)
+    reverse(subrange: cSubrange.lowerBound..<newStart)
+    reverse(subrange: newStart..<cSubrange.upperBound)
+    let (p, q) = _reverse(subrange: cSubrange, until: newStart)
     reverse(subrange: p..<q)
     return newStart == p ? q : p
   }
