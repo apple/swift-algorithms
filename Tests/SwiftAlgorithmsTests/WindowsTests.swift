@@ -12,8 +12,7 @@
 import XCTest
 @testable import Algorithms
 
-final class windowsTests: XCTestCase {
-  
+final class WindowsTests: XCTestCase {
   func testWindowsOfString() {
     let s = "swift"
     let w = s.windows(ofCount: 2)
@@ -87,22 +86,23 @@ final class windowsTests: XCTestCase {
   }
   
   func testWindowsIndexTraversals() {
-    validateIndexTraversals(
-      "".windows(ofCount: 1),
-      "a".windows(ofCount: 1),
-      "ab".windows(ofCount: 1),
-      "abc".windows(ofCount: 1),
-      "".windows(ofCount: 3),
-      "a".windows(ofCount: 3),
-      "abc".windows(ofCount: 3),
-      "abcdefgh".windows(ofCount: 3),
-      indices: { windows in
+    let validator = IndexValidator<WindowsCollection<String>>(
+      indicesIncludingEnd: { windows in
         let endIndex = windows.base.endIndex
         let indices = windows.base.indices + [endIndex]
         return zip(indices, indices.dropFirst(windows.windowSize))
           .map { .init(lowerBound: $0, upperBound: $1) }
-          + [.init(lowerBound: endIndex, upperBound: endIndex)]
+        + [.init(lowerBound: endIndex, upperBound: endIndex)]
       })
+    
+    validator.validate("".windows(ofCount: 1), expectedCount: 0)
+    validator.validate("a".windows(ofCount: 1), expectedCount: 1)
+    validator.validate("ab".windows(ofCount: 1), expectedCount: 2)
+    validator.validate("abc".windows(ofCount: 1), expectedCount: 3)
+    validator.validate("".windows(ofCount: 3), expectedCount: 0)
+    validator.validate("a".windows(ofCount: 3), expectedCount: 0)
+    validator.validate("abc".windows(ofCount: 3), expectedCount: 1)
+    validator.validate("abcdefgh".windows(ofCount: 3), expectedCount: 6)
   }
 
   func testWindowsLazy() {

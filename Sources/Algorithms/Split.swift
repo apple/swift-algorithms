@@ -12,6 +12,7 @@
 //===----------------------------------------------------------------------===//
 // SplitSequence
 //===----------------------------------------------------------------------===//
+
 /// A sequence that lazily splits a base sequence into subsequences separated by
 /// elements that satisfy the given `whereSeparator` predicate.
 ///
@@ -335,6 +336,7 @@ extension LazySequenceProtocol where Element: Equatable {
 //===----------------------------------------------------------------------===//
 // SplitCollection
 //===----------------------------------------------------------------------===//
+
 /// A collection that lazily splits a base collection into subsequences
 /// separated by elements that satisfy the given `whereSeparator` predicate.
 ///

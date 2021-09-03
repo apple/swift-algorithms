@@ -111,15 +111,22 @@ final class JoinedTests: XCTestCase {
   }
   
   func testJoinedIndexTraversals() {
+    let validator = IndexValidator<FlattenCollection<[String]>>()
+    
     // the last test case takes too long to run
     for strings in stringArrays.dropLast() {
-      validateIndexTraversals(strings.joined() as FlattenCollection)
-      validateIndexTraversals(strings.joined(by: ", "))
+      validator.validate(strings.joined() as FlattenCollection)
     }
+  }
+  
+  func testJoinedByIndexTraversals() {
+    let validator1 = IndexValidator<JoinedByCollection<[String], String>>()
+    let validator2 = IndexValidator<JoinedByClosureCollection<[String], String>>()
     
+    // the last test case takes too long to run
     for (strings, separator) in product(stringArrays.dropLast(), ["", " ", ", "]) {
-      validateIndexTraversals(strings.joined(by: separator))
-      validateIndexTraversals(strings.lazy.joined(by: { _, _ in separator }))
+      validator1.validate(strings.joined(by: separator))
+      validator2.validate(strings.lazy.joined(by: { _, _ in separator }))
     }
   }
 }

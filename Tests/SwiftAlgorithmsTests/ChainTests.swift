@@ -36,16 +36,17 @@ final class ChainTests: XCTestCase {
   }
   
   func testChainIndexTraversals() {
-    validateIndexTraversals(
-      chain("abcd", "XYZ"),
-      chain("abcd", ""),
-      chain("", "XYZ"),
-      chain("", ""),
-      indices: { chain in
+    let validator = IndexValidator<Chain2Sequence<String, String>>(
+      indicesIncludingEnd: { chain in
         chain.base1.indices.map { .init(first: $0) }
           + chain.base2.indices.map { .init(second: $0) }
           + [.init(second: chain.base2.endIndex)]
       })
+    
+    validator.validate(chain("abcd", "XYZ"), expectedCount: 4 + 3)
+    validator.validate(chain("abcd", ""), expectedCount: 4 + 0)
+    validator.validate(chain("", "XYZ"), expectedCount: 0 + 3)
+    validator.validate(chain("", ""), expectedCount: 0 + 0)
   }
   
   func testChainIndexOffsetAcrossBoundary() {
