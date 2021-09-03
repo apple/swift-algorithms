@@ -88,29 +88,36 @@ final class StridingTests: XCTestCase {
   }
   
   func testIndexTraversals() {
-    let empty = [Int]()
-    validateIndexTraversals(
-      empty.striding(by: 1),
-      empty.striding(by: 2)
-    )
-    let zero_to_one_hundered_range = 0...100
-    validateIndexTraversals(
-      zero_to_one_hundered_range.striding(by: 10),
-      zero_to_one_hundered_range.striding(by: 11),
-      zero_to_one_hundered_range.striding(by: 101)
-    )
-    let zero_to_one_hundered_array = Array(zero_to_one_hundered_range)
-    validateIndexTraversals(
-      zero_to_one_hundered_array.striding(by: 10),
-      zero_to_one_hundered_array.striding(by: 11),
-      zero_to_one_hundered_array.striding(by: 101)
-    )
-    let string = "swift rocks".map(String.init)
-    validateIndexTraversals(
-      string.striding(by: 1),
-      string.striding(by: 2),
-      string.striding(by: 10)
-    )
+    do {
+      let empty = [Int]()
+      let validator = IndexValidator<StridingCollection<[Int]>>()
+      validator.validate(empty.striding(by: 1))
+      validator.validate(empty.striding(by: 2))
+    }
+    
+    do {
+      let range = 0...100
+      let validator = IndexValidator<StridingCollection<ClosedRange<Int>>>()
+      validator.validate(range.striding(by: 10))
+      validator.validate(range.striding(by: 11))
+      validator.validate(range.striding(by: 101))
+    }
+    
+    do {
+      let array = Array(0...100)
+      let validator = IndexValidator<StridingCollection<[Int]>>()
+      validator.validate(array.striding(by: 10))
+      validator.validate(array.striding(by: 11))
+      validator.validate(array.striding(by: 101))
+    }
+    
+    do {
+      let string = "swift rocks"
+      let validator = IndexValidator<StridingCollection<String>>()
+      validator.validate(string.striding(by: 1))
+      validator.validate(string.striding(by: 2))
+      validator.validate(string.striding(by: 10))
+    }
   }
 
   
