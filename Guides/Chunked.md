@@ -3,8 +3,8 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Chunked.swift) | 
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/ChunkedTests.swift)]
 
-Break a collection into subsequences where consecutive elements pass a binary
-predicate, or where all elements in each chunk project to the same value. 
+Break a collection into subsequences where consecutive elements pass a binary or
+reducing predicate, or where all elements in each chunk project to the same value. 
 
 Also, includes a `chunks(ofCount:)` that breaks a collection into subsequences 
 of a given `count`.
@@ -18,6 +18,20 @@ you can chunk a collection into ascending sequences using this method:
 let numbers = [10, 20, 30, 10, 40, 40, 10, 20]
 let chunks = numbers.chunked(by: { $0 <= $1 })
 // [[10, 20, 30], [10, 40, 40], [10, 20]]
+```
+
+`chunkedByReduction(into:_)` uses a reducing predicate to chunk the base collection
+into subsequences of elements that reduce to a value for which the predicate returns `true`.
+For example, you can chunk a collection of numbers into sequences whose sum does not
+exceed some maximum value.
+
+```swift
+let numbers = [16, 8, 8, 19, 12, 5]
+let chunks = numbers.chunkedByReduction(into: 0) { sum, n in
+  sum += n
+  return sum <= 16
+}
+// [[16], [8, 8], [19], [12], [5]]
 ```
 
 The `chunk(on:)` method, by contrast, takes a projection of each element and

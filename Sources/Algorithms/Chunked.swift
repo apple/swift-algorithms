@@ -585,3 +585,214 @@ extension ChunkedByCount: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
 extension ChunkedByCount: LazyCollectionProtocol
   where Base: LazyCollectionProtocol {}
+
+//===----------------------------------------------------------------------===//
+// lazy.chunkedByReduction(into:_)
+//===----------------------------------------------------------------------===//
+
+/// A collection that lazily chunks a base collection into subsequences using
+/// the given reducing predicate.
+///
+/// - Note: This type is the result of
+///
+///     x.chunkedByReduction(into:_)
+///
+///   where `x` conforms to `LazyCollectionProtocol`.
+public struct ChunkedByReduction<Accumulator, Base: Collection> {
+  /// The collection that this instance provides a view onto.
+  @usableFromInline
+  internal let base: Base
+
+  /// Initial value passed to the reducing predicate.
+  @usableFromInline
+  internal let initialValue: Accumulator
+
+  /// The reducing predicate function.
+  @usableFromInline
+  internal let predicate: (inout Accumulator, Base.Element) -> Bool
+
+  /// The precomputed start index.
+  @usableFromInline
+  internal var _startIndex: Index
+
+  @inlinable
+  internal init(
+    base: Base,
+    initialValue: Accumulator,
+    predicate: @escaping (inout Accumulator, Base.Element) -> Bool
+  ) {
+    self.base = base
+    self.initialValue = initialValue
+    self.predicate = predicate
+
+    self._startIndex = Index(baseRange: base.startIndex..<base.startIndex)
+    if !base.isEmpty {
+      self._startIndex = indexForChunk(startingAt: base.startIndex)
+    }
+  }
+}
+
+extension ChunkedByReduction: LazyCollectionProtocol {
+  /// A position in a chunked collection.
+  public struct Index: Comparable {
+    /// The range of base collection elements corresponding to the chunk at this position.
+    @usableFromInline
+    internal let baseRange: Range<Base.Index>
+
+    @inlinable
+    internal init(baseRange: Range<Base.Index>) {
+      self.baseRange = baseRange
+    }
+
+    @inlinable
+    public static func == (lhs: Index, rhs: Index) -> Bool {
+      // Since each index represents the range of a disparate chunk, no two
+      // unique indices will have the same lower bound.
+      lhs.baseRange.lowerBound == rhs.baseRange.lowerBound
+    }
+
+    @inlinable
+    public static func < (lhs: Index, rhs: Index) -> Bool {
+      // Only use the lower bound to test for ordering, as above.
+      lhs.baseRange.lowerBound < rhs.baseRange.lowerBound
+    }
+  }
+
+  /// Returns the index in the chunked collection of the chunk starting at the given
+  /// base collection index.
+  @inlinable
+  internal func indexForChunk(
+    startingAt lowerBound: Base.Index
+  ) -> Index {
+    guard lowerBound < base.endIndex else { return endIndex }
+
+    var accumulator = initialValue
+    var i = lowerBound
+
+    while i != base.endIndex && predicate(&accumulator, base[i]) {
+      base.formIndex(after: &i)
+    }
+
+    if i == lowerBound { base.formIndex(after: &i) }
+
+    return Index(baseRange: lowerBound..<i)
+  }
+
+  @inlinable
+  public var startIndex: Index {
+    _startIndex
+  }
+
+  @inlinable
+  public var endIndex: Index {
+    Index(
+      baseRange: base.endIndex..<base.endIndex
+    )
+  }
+
+  @inlinable
+  public func index(after i: Index) -> Index {
+    precondition(i != endIndex, "Can't advance past endIndex")
+
+    return indexForChunk(startingAt: i.baseRange.upperBound)
+  }
+
+  @inlinable
+  public subscript(position: Index) -> Base.SubSequence {
+    precondition(position != endIndex, "Can't subscript using endIndex")
+    return base[position.baseRange]
+  }
+}
+
+extension ChunkedByReduction.Index: Hashable where Base.Index: Hashable {}
+
+extension LazyCollectionProtocol {
+  /// Lazily returns a collection of subsequences of this collection, chunked by
+  /// the given reducing predicate.
+  ///
+  /// This example shows how to lazily chunk a list of integers into
+  /// subsequences that sum to no more than 16.
+  ///
+  ///     let chunks = [16, 8, 8, 19, 12, 5].lazy.chunkedByReduction(into: 0) { sum, n in
+  ///       sum += n
+  ///       return sum <= 16
+  ///     }
+  ///
+  ///     for chunk in chunks {
+  ///       print(chunk)
+  ///     }
+  ///     // Prints:
+  ///     // [16]
+  ///     // [8, 8]
+  ///     // [19]
+  ///     // [12]
+  ///     // [5]
+  ///
+  /// Note that a single element which fails the predicate is included in the resulting collection.
+  ///
+  /// - Complexity: O(*n*), because the start index is pre-computed.
+  public func chunkedByReduction<Accumulator>(
+    into initialValue: Accumulator,
+    _ predicate: @escaping (inout Accumulator, Element) -> Bool
+  ) -> ChunkedByReduction<Accumulator, Self> {
+    ChunkedByReduction(
+      base: self,
+      initialValue: initialValue,
+      predicate: predicate
+    )
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// chunkedByReduction(into:_)
+//===----------------------------------------------------------------------===//
+
+extension Collection {
+  /// Eagerly returns a collection of subsequences of this collection, chunked by
+  /// the given reducing predicate.
+  ///
+  /// This example shows how to lazily chunk a list of integers into
+  /// subsequences that sum to no more than 16.
+  ///
+  ///     let chunks = [16, 8, 8, 19, 12, 5].chunkedByReduction(into: 0) { sum, n in
+  ///       sum += n
+  ///       return sum <= 16
+  ///     }
+  ///
+  ///     for chunk in chunks {
+  ///       print(chunk)
+  ///     }
+  ///     // Prints:
+  ///     // [16]
+  ///     // [8, 8]
+  ///     // [19]
+  ///     // [12]
+  ///     // [5]
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of this collection.
+  public func chunkedByReduction<Accumulator>(
+    into initialValue: Accumulator,
+    _ predicate: @escaping (inout Accumulator, Element) throws -> Bool
+  ) rethrows -> [SubSequence] {
+    guard !isEmpty else { return [] }
+
+    var result: [SubSequence] = []
+    var accumulator = initialValue
+    var start = startIndex
+    var i = start
+
+    while start < endIndex {
+      while try i != endIndex && predicate(&accumulator, self[i]) {
+        formIndex(after: &i)
+      }
+
+      if i == start { formIndex(after: &i) }
+
+      result.append(self[start..<i])
+      accumulator = initialValue
+      start = i
+    }
+
+    return result
+  }
+}
