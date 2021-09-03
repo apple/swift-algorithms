@@ -112,6 +112,9 @@ extension StridingSequence: Sequence {
   }
 }
 
+extension StridingSequence: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
+
 /// A wrapper that strides over a base collection.
 public struct StridingCollection<Base: Collection> {
   @usableFromInline
@@ -273,4 +276,8 @@ extension StridingCollection: BidirectionalCollection
 
 extension StridingCollection: RandomAccessCollection
   where Base: RandomAccessCollection {}
+
+extension StridingCollection: LazySequenceProtocol, LazyCollectionProtocol
+  where Base: LazySequenceProtocol {}
+
 extension StridingCollection.Index: Hashable where Base.Index: Hashable {}

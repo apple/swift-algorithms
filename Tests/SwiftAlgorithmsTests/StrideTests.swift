@@ -119,7 +119,6 @@ final class StridingTests: XCTestCase {
       validator.validate(string.striding(by: 10))
     }
   }
-
   
   func testOffsetBy() {
     let a = (0...100).striding(by: 22)
@@ -134,5 +133,11 @@ final class StridingTests: XCTestCase {
     let b = a.striding(by: 3) // [1, 4]
     let i = b.index(b.startIndex, offsetBy: 2)
     XCTAssertEqual(i, b.endIndex)
+  }
+  
+  func testLazy() {
+    XCTAssertLazySequence(AnySequence(0..<100).lazy.striding(by: 3))
+    XCTAssertLazySequence((0..<100).lazy.striding(by: 3))
+    XCTAssertLazyCollection((0..<100).lazy.striding(by: 3))
   }
 }
