@@ -64,6 +64,11 @@ extension IndexedCollection: Collection {
   public func distance(from start: Base.Index, to end: Base.Index) -> Int {
     base.distance(from: start, to: end)
   }
+  
+  @inlinable
+  public var indices: Base.Indices {
+    base.indices
+  }
 }
 
 extension IndexedCollection: BidirectionalCollection
