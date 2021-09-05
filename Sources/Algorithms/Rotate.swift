@@ -277,22 +277,3 @@ extension MutableCollection where Self: BidirectionalCollection {
     rotate(subrange: startIndex..<endIndex, toStartAt: newStart)
   }
 }
-
-// Deprecations
-
-extension MutableCollection {
-  @available(*, deprecated, renamed: "rotate(subrange:toStartAt:)")
-  @discardableResult
-  public mutating func rotate(
-    subrange: Range<Index>,
-    at newStart: Index) -> Index
-  {
-    rotate(subrange: subrange, toStartAt: newStart)
-  }
-  
-  @available(*, deprecated, renamed: "rotate(toStartAt:)")
-  @discardableResult
-  public mutating func rotate(at newStart: Index) -> Index {
-    rotate(toStartAt: newStart)
-  }
-}

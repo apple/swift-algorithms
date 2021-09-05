@@ -317,20 +317,3 @@ extension Chain2Sequence: RandomAccessCollection
 public func chain<S1, S2>(_ s1: S1, _ s2: S2) -> Chain2Sequence<S1, S2> {
   Chain2Sequence(base1: s1, base2: s2)
 }
-
-// MARK: - Deprecations
-
-@available(*, deprecated, renamed: "Chain2Sequence")
-public typealias Chain = Chain2Sequence
-
-@available(*, deprecated, renamed: "Chain2Sequence")
-public typealias Chain2 = Chain2Sequence
-
-extension Sequence {
-  @available(*, deprecated, message: "Use the chain(_:_:) function, instead.")
-  public func chained<S: Sequence>(with other: S) -> Chain2Sequence<Self, S>
-    where Element == S.Element
-  {
-    Chain2Sequence(base1: self, base2: other)
-  }
-}
