@@ -141,18 +141,6 @@ extension ChunkedByCollection: BidirectionalCollection
 
 extension ChunkedByCollection: LazyCollectionProtocol {}
 
-@available(*, deprecated, renamed: "ChunkedByCollection")
-public typealias LazyChunked<Base: Collection, Subject>
-  = ChunkedByCollection<Base, Subject>
-
-@available(*, deprecated, renamed: "ChunkedByCollection")
-public typealias Chunked<Base: Collection, Subject>
-  = ChunkedByCollection<Base, Subject>
-
-@available(*, deprecated, renamed: "ChunkedByCollection")
-public typealias ChunkedBy<Base: Collection, Subject>
-  = ChunkedByCollection<Base, Subject>
-
 /// A collection wrapper that breaks a collection into chunks based on a
 /// predicate.
 ///
