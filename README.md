@@ -57,32 +57,25 @@ To use the `Algorithms` library in a SwiftPM project,
 add the following line to the dependencies in your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/apple/swift-algorithms", from: "0.0.1"),
+.package(url: "https://github.com/apple/swift-algorithms", from: "1.0.0"),
 ```
 
-Because `Algorithms` is under active development,
-source-stability is only guaranteed within minor versions (e.g. between `0.0.3` and `0.0.4`).
-If you don't want potentially source-breaking package updates,
-use this dependency specification instead:
+Include `"Algorithms"` as a dependency for your executable target:
 
 ```swift
-.package(url: "https://github.com/apple/swift-algorithms", .upToNextMinor(from: "0.1.0")),
+.target(name: "<target>", dependencies: [
+    .product(name: "Algorithms", package: "swift-algorithms"),
+]),
 ```
 
-Finally, include `"Algorithms"` as a dependency for your executable target:
+Finally, add `import Algorithms` to your source code.
 
-```swift
-let package = Package(
-    // name, platforms, products, etc.
-    dependencies: [
-        .package(url: "https://github.com/apple/swift-algorithms", from: "0.1.0"),
-        // other dependencies
-    ],
-    targets: [
-        .target(name: "<target>", dependencies: [
-            .product(name: "Algorithms", package: "swift-algorithms"),
-        ]),
-        // other targets
-    ]
-)
-```
+## Source Stability
+
+The Swift Numerics package is source stable; version numbers follow [Semantic Versioning](https://semver.org/). Source breaking changes to public API can only land in a new major version.
+
+The public API of version 1.0 of the `swift-algorithms` package consists of non-underscored declarations that are marked `public` in the `Algorithms` module. Interfaces that aren't part of the public API may continue to change in any release, including patch releases.
+
+Future minor versions of the package may introduce changes to these rules as needed.
+
+We'd like this package to quickly embrace Swift language and toolchain improvements that are relevant to its mandate. Accordingly, from time to time, we expect that new versions of this package will require clients to upgrade to a more recent Swift toolchain release. Requiring a new Swift release will only require a minor version bump.
