@@ -222,7 +222,7 @@ extension IndexValidator {
     expectedCount: Int? = nil,
     file: StaticString = #file, line: UInt = #line
   ) {
-    let indicesIncludingEnd = indicesIncludingEnd(collection)
+    let indicesIncludingEnd = self.indicesIncludingEnd(collection)
     let count = indicesIncludingEnd.count - 1
     
     let validator = Validator(
@@ -242,7 +242,7 @@ extension IndexValidator where C: BidirectionalCollection {
     _ collection: C, expectedCount: Int? = nil,
     file: StaticString = #file, line: UInt = #line
   ) {
-    let indicesIncludingEnd = indicesIncludingEnd(collection)
+    let indicesIncludingEnd = self.indicesIncludingEnd(collection)
     let count = indicesIncludingEnd.count - 1
     
     let validator = Validator(
