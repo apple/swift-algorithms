@@ -23,7 +23,7 @@ The `windows(ofCount:)` method is added as an extension `Collection` method:
 
 ```swift
 extension Collection {
-    public func windows(ofCount count: Int) -> WindowsCollection<Self>
+    public func windows(ofCount count: Int) -> WindowsOfCountCollection<Self>
 }
 ```
 
@@ -34,7 +34,7 @@ collection is empty.
 [1, 2, 3].windows(ofCount: 5).isEmpty // true
 ```
 
-The resulting `WindowsCollection` type is a collection, with conditional
+The resulting `WindowsOfCountCollection` type is a collection, with conditional
 conformance to the `BidirectionalCollection`, `RandomAccessCollection`, and
 `LazySequenceProtocol` protocols when the base collection conforms.
 

@@ -43,7 +43,7 @@ This project follows semantic versioning.
   StrideSequence      -> StridingSequence
   StrideCollection    -> StridingCollection
   Uniqued             -> UniquedSequence
-  Windows             -> WindowsCollection
+  Windows             -> WindowsOfCountCollection
   ```
 - Types that can only be produced from a lazy sequence chain now unconditionally
   conform to `LazySequenceProtocol` and wrap the base sequence instead of the

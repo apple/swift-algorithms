@@ -86,7 +86,7 @@ final class WindowsTests: XCTestCase {
   }
   
   func testWindowsIndexTraversals() {
-    let validator = IndexValidator<WindowsCollection<String>>(
+    let validator = IndexValidator<WindowsOfCountCollection<String>>(
       indicesIncludingEnd: { windows in
         let endIndex = windows.base.endIndex
         let indices = windows.base.indices + [endIndex]
