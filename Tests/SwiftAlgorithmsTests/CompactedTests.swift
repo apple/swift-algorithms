@@ -37,8 +37,9 @@ final class CompactedTests: XCTestCase {
   }
   
   func testCollectionTraversals() {
+    let validator = IndexValidator<CompactedCollection<[Int?], Int>>()
     for array in self.tests {
-      validateIndexTraversals(array.compacted())
+      validator.validate(array.compacted())
     }
   }
 }

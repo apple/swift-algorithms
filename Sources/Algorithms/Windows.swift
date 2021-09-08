@@ -39,35 +39,35 @@ extension Collection {
   ///   `RandomAccessCollection`, otherwise O(*k*) where `k` is `count`.
   ///   Access to successive windows is O(1).
   @inlinable
-  public func windows(ofCount count: Int) -> Windows<Self> {
-    Windows(base: self, size: count)
+  public func windows(ofCount count: Int) -> WindowsOfCountCollection<Self> {
+    WindowsOfCountCollection(base: self, windowSize: count)
   }
 }
 
 /// A collection wrapper that presents a sliding window over the elements of
 /// a collection.
-public struct Windows<Base: Collection> {
+public struct WindowsOfCountCollection<Base: Collection> {
   @usableFromInline
   internal let base: Base
   
   @usableFromInline
-  internal let size: Int
+  internal let windowSize: Int
   
   @usableFromInline
-  internal var firstUpperBound: Base.Index?
+  internal var endOfFirstWindow: Base.Index?
 
   @inlinable
-  internal init(base: Base, size: Int) {
-    precondition(size > 0, "Windows size must be greater than zero")
+  internal init(base: Base, windowSize: Int) {
+    precondition(windowSize > 0, "Windows size must be greater than zero")
     self.base = base
-    self.size = size
-    self.firstUpperBound =
-      base.index(base.startIndex, offsetBy: size, limitedBy: base.endIndex)
+    self.windowSize = windowSize
+    self.endOfFirstWindow =
+      base.index(base.startIndex, offsetBy: windowSize, limitedBy: base.endIndex)
   }
 }
 
-extension Windows: Collection {
-  /// A position in a `Windows` collection.
+extension WindowsOfCountCollection: Collection {
+  /// A position in a `WindowsOfCountCollection` instance.
   public struct Index: Comparable {
     @usableFromInline
     internal var lowerBound: Base.Index
@@ -94,7 +94,7 @@ extension Windows: Collection {
   
   @inlinable
   public var startIndex: Index {
-    if let upperBound = firstUpperBound {
+    if let upperBound = endOfFirstWindow {
       return Index(lowerBound: base.startIndex, upperBound: upperBound)
     } else {
       return endIndex
@@ -116,12 +116,14 @@ extension Windows: Collection {
   
   @inlinable
   public func index(after index: Index) -> Index {
-    precondition(index < endIndex, "Advancing past end index")
+    precondition(index != endIndex, "Advancing past end index")
     guard index.upperBound < base.endIndex else { return endIndex }
-    return Index(
-      lowerBound: base.index(after: index.lowerBound),
-      upperBound: base.index(after: index.upperBound)
-    )
+    
+    let lowerBound = windowSize == 1
+      ? index.upperBound
+      : base.index(after: index.lowerBound)
+    let upperBound = base.index(after: index.upperBound)
+    return Index(lowerBound: lowerBound, upperBound: upperBound)
   }
   
   @inlinable
@@ -185,7 +187,7 @@ extension Windows: Collection {
     //                     |> > >|>|   or                 |> > >|
     // output: [x x x x x|x x x x x]        [x x x x x x x x x x]  (`endIndex`)
     
-    if distance >= size {
+    if distance >= windowSize {
       // Avoid traversing `self[i.lowerBound..<i.upperBound]` when the lower
       // bound of the output is greater than or equal to the upper bound of the
       // input.
@@ -197,11 +199,11 @@ extension Windows: Collection {
       guard limit.lowerBound >= i.upperBound,
             let lowerBound = base.index(
               i.upperBound,
-              offsetBy: distance - size,
+              offsetBy: distance - windowSize,
               limitedBy: limit.lowerBound),
             let indexBeforeUpperBound = base.index(
               lowerBound,
-              offsetBy: size - 1,
+              offsetBy: windowSize - 1,
               limitedBy: limit.upperBound)
       else { return nil }
       
@@ -262,9 +264,9 @@ extension Windows: Collection {
       else { return nil }
       
       return Index(
-        lowerBound: base.index(upperBound, offsetBy: -size),
+        lowerBound: base.index(upperBound, offsetBy: -windowSize),
         upperBound: upperBound)
-    } else if distance >= size {
+    } else if distance >= windowSize {
       // Avoid traversing `self[i.lowerBound..<i.upperBound]` when the upper
       // bound of the output is less than or equal to the lower bound of the
       // input.
@@ -276,12 +278,12 @@ extension Windows: Collection {
       guard limit.upperBound <= i.lowerBound,
             let upperBound = base.index(
               i.lowerBound,
-              offsetBy: -(distance - size),
+              offsetBy: -(distance - windowSize),
               limitedBy: limit.upperBound)
       else { return nil }
       
       return Index(
-        lowerBound: base.index(upperBound, offsetBy: -size),
+        lowerBound: base.index(upperBound, offsetBy: -windowSize),
         upperBound: upperBound)
     } else {
       //  input: [x x x x x|x x x x x x|x]
@@ -304,7 +306,7 @@ extension Windows: Collection {
   public func distance(from start: Index, to end: Index) -> Int {
     guard start <= end else { return -distance(from: end, to: start) }
     guard start != end else { return 0 }
-    guard end < endIndex else {
+    guard end != endIndex else {
       // We add 1 here because the index before `endIndex` also has
       // `base.endIndex` as its upper bound.
       return base[start.upperBound...].count + 1
@@ -318,7 +320,7 @@ extension Windows: Collection {
       //          |- - - -|> >|
       //   end: [x x x x x x x|x x x x|x]
       
-      return size + base[start.upperBound..<end.lowerBound].count
+      return windowSize + base[start.upperBound..<end.lowerBound].count
     } else {
       // start: [x|x x x x x x|x x x x x]
       //          |> > > >|
@@ -329,13 +331,15 @@ extension Windows: Collection {
   }
 }
 
-extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
+extension WindowsOfCountCollection: BidirectionalCollection
+  where Base: BidirectionalCollection
+{
   @inlinable
   public func index(before index: Index) -> Index {
-    precondition(index > startIndex, "Incrementing past start index")
+    precondition(index != startIndex, "Incrementing past start index")
     if index == endIndex {
       return Index(
-        lowerBound: base.index(index.lowerBound, offsetBy: -size),
+        lowerBound: base.index(index.lowerBound, offsetBy: -windowSize),
         upperBound: index.upperBound
       )
     } else {
@@ -347,7 +351,10 @@ extension Windows: BidirectionalCollection where Base: BidirectionalCollection {
   }
 }
 
-extension Windows: LazySequenceProtocol where Base: LazySequenceProtocol {}
-extension Windows: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
-extension Windows: RandomAccessCollection where Base: RandomAccessCollection {}
-extension Windows.Index: Hashable where Base.Index: Hashable {}
+extension WindowsOfCountCollection: RandomAccessCollection
+  where Base: RandomAccessCollection {}
+
+extension WindowsOfCountCollection: LazySequenceProtocol, LazyCollectionProtocol
+  where Base: LazySequenceProtocol {}
+
+extension WindowsOfCountCollection.Index: Hashable where Base.Index: Hashable {}

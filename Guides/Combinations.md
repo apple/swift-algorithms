@@ -60,27 +60,28 @@ for combo in numbers.combinations(ofCount: 2...3) {
 ## Detailed Design
 
 The `combinations(ofCount:)` method is declared as a  `Collection` extension,
-and returns a `Combinations` type:
+and returns a `CombinationsSequence` type:
 
 ```swift
 extension Collection {
-    public func combinations(ofCount k: Int) -> Combinations<Self>
+    public func combinations(ofCount k: Int) -> CombinationsSequence<Self>
 }
 ```
 
-Since the `Combinations` type needs to store an array of the collection’s
-indices and mutate the array to generate each permutation, `Combinations` only
-has `Sequence` conformance. Adding `Collection` conformance would require
-storing the array in the index type, which would in turn lead to copying the
-array at every index advancement. `Combinations` does conform to
-`LazySequenceProtocol` when the base type conforms.
+Since the `CombinationsSequence` type needs to store an array of the
+collection’s indices and mutate the array to generate each permutation,
+`CombinationsSequence` only has `Sequence` conformance. Adding `Collection` 
+conformance would require storing the array in the index type, which would in 
+turn lead to copying the array at every index advancement.
+`CombinationsSequence` does conform to `LazySequenceProtocol` when the base type
+conforms.
 
 ### Complexity
 
 Calling `combinations(ofCount:)` accesses the count of the collection, so it’s
 an O(1) operation for random-access collections, or an O(_n_) operation
-otherwise. Creating the iterator for a `Combinations` instance and each call to
-`Combinations.Iterator.next()` is an O(_n_) operation.
+otherwise. Creating the iterator for a `CombinationsSequence` instance and each
+call to `CombinationsSequence.Iterator.next()` is an O(_n_) operation.
 
 ### Naming
 

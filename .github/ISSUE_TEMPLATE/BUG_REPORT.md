@@ -16,7 +16,7 @@ about: Something isn't working as expected
 
 Replace this paragraph with a short description of the incorrect incorrect behavior. If this is a regression, please note the last version that the behavior was correct in addition to your current version.
 
-**Swift Algorithms version:** `0.0.1` or the `main` branch, for example.
+**Swift Algorithms version:** `1.0.0` or the `main` branch, for example.
 **Swift version:** Paste the output of `swift --version` here.
 
 ### Checklist

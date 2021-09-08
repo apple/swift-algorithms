@@ -19,8 +19,8 @@ public struct JoinedBySequence<Base: Sequence, Separator: Sequence>
   where Base.Element: Sequence, Base.Element.Element == Separator.Element
 {
   @usableFromInline
-  internal typealias Inner = FlattenSequence<
-    Intersperse<LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>>>
+  internal typealias Inner = FlattenSequence<InterspersedSequence<
+    LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>>>
   
   @usableFromInline
   internal let inner: Inner
@@ -70,8 +70,8 @@ public struct JoinedByClosureSequence<Base: Sequence, Separator: Sequence>
   where Base.Element: Sequence, Base.Element.Element == Separator.Element
 {
   @usableFromInline
-  internal typealias Inner = FlattenSequence<
-    InterspersedMap<LazySequence<Base>, EitherSequence<Base.Element, Separator>>>
+  internal typealias Inner = FlattenSequence<InterspersedMapSequence<
+    Base, EitherSequence<Base.Element, Separator>>>
   
   @usableFromInline
   internal let inner: Inner
@@ -111,8 +111,7 @@ extension JoinedByClosureSequence: Sequence {
   }
 }
 
-extension JoinedByClosureSequence: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+extension JoinedByClosureSequence: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // JoinedByCollection
@@ -124,8 +123,8 @@ public struct JoinedByCollection<Base: Collection, Separator: Collection>
   where Base.Element: Collection, Base.Element.Element == Separator.Element
 {
   @usableFromInline
-  internal typealias Inner = FlattenCollection<
-    Intersperse<LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>>>
+  internal typealias Inner = FlattenCollection<InterspersedSequence<
+    LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>>>
   
   @usableFromInline
   internal let inner: Inner
@@ -212,10 +211,8 @@ extension JoinedByCollection: BidirectionalCollection
   }
 }
 
-extension JoinedByCollection: LazySequenceProtocol
+extension JoinedByCollection: LazySequenceProtocol, LazyCollectionProtocol
   where Base: LazySequenceProtocol {}
-extension JoinedByCollection: LazyCollectionProtocol
-  where Base: LazyCollectionProtocol {}
 
 //===----------------------------------------------------------------------===//
 // JoinedByClosureCollection
@@ -228,8 +225,8 @@ public struct JoinedByClosureCollection<Base: Collection, Separator: Collection>
   where Base.Element: Collection, Base.Element.Element == Separator.Element
 {
   @usableFromInline
-  internal typealias Inner = FlattenCollection<
-    InterspersedMap<LazySequence<Base>, EitherSequence<Base.Element, Separator>>>
+  internal typealias Inner = FlattenCollection<InterspersedMapSequence<
+    Base, EitherSequence<Base.Element, Separator>>>
   
   @usableFromInline
   internal let inner: Inner
@@ -320,10 +317,7 @@ extension JoinedByClosureCollection: BidirectionalCollection
   }
 }
 
-extension JoinedByClosureCollection: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
-extension JoinedByClosureCollection: LazyCollectionProtocol
-  where Base: LazyCollectionProtocol {}
+extension JoinedByClosureCollection: LazyCollectionProtocol {}
 
 //===----------------------------------------------------------------------===//
 // Sequence.joined(by:)
@@ -420,7 +414,7 @@ extension LazySequenceProtocol where Element: Sequence {
   @inlinable
   public func joined(
     by separator: @escaping (Element, Element) -> Element.Element
-  ) -> JoinedByClosureSequence<Self, CollectionOfOne<Element.Element>> {
+  ) -> JoinedByClosureSequence<Elements, CollectionOfOne<Element.Element>> {
     joined(by: { CollectionOfOne(separator($0, $1)) })
   }
   
@@ -429,8 +423,8 @@ extension LazySequenceProtocol where Element: Sequence {
   @inlinable
   public func joined<Separator>(
     by separator: @escaping (Element, Element) -> Separator
-  ) -> JoinedByClosureSequence<Self, Separator> {
-    JoinedByClosureSequence(base: self, separator: separator)
+  ) -> JoinedByClosureSequence<Elements, Separator> {
+    JoinedByClosureSequence(base: elements, separator: separator)
   }
 }
 
@@ -469,17 +463,17 @@ extension Collection where Element: Collection {
 }
 
 //===----------------------------------------------------------------------===//
-// LazyCollectionProtocol.joined(by:)
+// LazySequenceProtocol.joined(by:) where Self: Collection
 //===----------------------------------------------------------------------===//
 
-extension LazyCollectionProtocol where Element: Collection {
+extension LazySequenceProtocol where Elements: Collection, Element: Collection {
   /// Returns the concatenation of the elements in this collection of
   /// collections, inserting the separator produced by the closure between each
   /// sequence.
   @inlinable
   public func joined(
     by separator: @escaping (Element, Element) -> Element.Element
-  ) -> JoinedByClosureCollection<Self, CollectionOfOne<Element.Element>> {
+  ) -> JoinedByClosureCollection<Elements, CollectionOfOne<Element.Element>> {
     joined(by: { CollectionOfOne(separator($0, $1)) })
   }
   
@@ -489,7 +483,7 @@ extension LazyCollectionProtocol where Element: Collection {
   @inlinable
   public func joined<Separator>(
     by separator: @escaping (Element, Element) -> Separator
-  ) -> JoinedByClosureCollection<Self, Separator> {
-    JoinedByClosureCollection(base: self, separator: separator)
+  ) -> JoinedByClosureCollection<Elements, Separator> {
+    JoinedByClosureCollection(base: elements, separator: separator)
   }
 }

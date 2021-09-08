@@ -26,25 +26,21 @@ final class IntersperseTests: XCTestCase {
   func testString() {
     let interspersed = "ABCDE".interspersed(with: "-")
     XCTAssertEqualSequences(interspersed, "A-B-C-D-E")
-    validateIndexTraversals(interspersed)
   }
 
   func testStringEmpty() {
     let interspersed = "".interspersed(with: "-")
     XCTAssertEqualSequences(interspersed, "")
-    validateIndexTraversals(interspersed)
   }
 
   func testArray() {
     let interspersed = [1,2,3,4].interspersed(with: 0)
     XCTAssertEqualSequences(interspersed, [1,0,2,0,3,0,4])
-    validateIndexTraversals(interspersed)
   }
 
   func testArrayEmpty() {
     let interspersed = [].interspersed(with: 0)
     XCTAssertEqualSequences(interspersed, [])
-    validateIndexTraversals(interspersed)
   }
 
   func testCollection() {
@@ -55,7 +51,14 @@ final class IntersperseTests: XCTestCase {
   func testBidirectionalCollection() {
     let reversed = "ABCDE".interspersed(with: "-").reversed()
     XCTAssertEqualSequences(reversed, "E-D-C-B-A")
-    validateIndexTraversals(reversed)
+  }
+  
+  func testIndexTraversals() {
+    let validator = IndexValidator<InterspersedSequence<String>>()
+    validator.validate("".interspersed(with: "-"), expectedCount: 0)
+    validator.validate("A".interspersed(with: "-"), expectedCount: 1)
+    validator.validate("AB".interspersed(with: "-"), expectedCount: 3)
+    validator.validate("ABCDE".interspersed(with: "-"), expectedCount: 9)
   }
 
   func testIntersperseLazy() {
@@ -83,10 +86,18 @@ final class IntersperseTests: XCTestCase {
   }
     
   func testInterspersedMapIndexTraversals() {
-    validateIndexTraversals(
-      (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
-      (0..<1).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
-      (0..<2).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
-      (0..<5).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
+    let validator = IndexValidator<InterspersedMapSequence<Range<Int>, Int>>()
+    validator.validate(
+      (0..<0).lazy.interspersedMap({ $0 }, with: {_, _ in 100 }),
+      expectedCount: 0)
+    validator.validate(
+      (0..<1).lazy.interspersedMap({ $0 }, with: {_, _ in 100 }),
+      expectedCount: 1)
+    validator.validate(
+      (0..<2).lazy.interspersedMap({ $0 }, with: {_, _ in 100 }),
+      expectedCount: 3)
+    validator.validate(
+      (0..<5).lazy.interspersedMap({ $0 }, with: {_, _ in 100 }),
+      expectedCount: 9)
   }
 }

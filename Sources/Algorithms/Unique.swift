@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 /// A sequence wrapper that leaves out duplicate elements of a base sequence.
-public struct Uniqued<Base: Sequence, Subject: Hashable> {
+public struct UniquedSequence<Base: Sequence, Subject: Hashable> {
   /// The base collection.
   @usableFromInline
   internal let base: Base
@@ -26,8 +26,8 @@ public struct Uniqued<Base: Sequence, Subject: Hashable> {
   }
 }
 
-extension Uniqued: Sequence {
-  /// The iterator for a `Uniqued` sequence.
+extension UniquedSequence: Sequence {
+  /// The iterator for a `UniquedSequence` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var base: Base.Iterator
@@ -64,7 +64,8 @@ extension Uniqued: Sequence {
   }
 }
 
-extension Uniqued: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension UniquedSequence: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // uniqued()
@@ -83,8 +84,8 @@ extension Sequence where Element: Hashable {
   ///  .
   /// - Complexity: O(1).
   @inlinable
-  public func uniqued() -> Uniqued<Self, Element> {
-    Uniqued(base: self, projection: { $0 })
+  public func uniqued() -> UniquedSequence<Self, Element> {
+    UniquedSequence(base: self, projection: { $0 })
   }
 }
 
@@ -102,9 +103,9 @@ extension Sequence {
   ///     // Prints '["dog", "pig", "cat", "ox"]'
   ///
   /// - Parameter projection: A closure that transforms an element into the
-  ///   value to use for uniqueness. If `projection` returns the same value
-  ///   for two different elements, the second element will be excluded
-  ///   from the resulting array.
+  ///   value to use for uniqueness. If `projection` returns the same value for
+  ///   two different elements, the second element will be excluded from the
+  ///   resulting array.
   ///
   /// - Returns: An array with only the unique elements of this sequence, as
   ///   determined by the result of `projection` for each element.
@@ -138,7 +139,7 @@ extension LazySequenceProtocol {
   @inlinable
   public func uniqued<Subject: Hashable>(
     on projection: @escaping (Element) -> Subject
-  ) -> Uniqued<Self, Subject> {
-    Uniqued(base: self, projection: projection)
+  ) -> UniquedSequence<Self, Subject> {
+    UniquedSequence(base: self, projection: projection)
   }
 }
