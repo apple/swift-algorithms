@@ -67,7 +67,7 @@ final class ChunkedTests: XCTestCase {
     
     let lazyChunks = fruits.lazy.chunked(on: { $0.first })
     validateFruitChunks(lazyChunks.map { $1 })
-    validateIndexTraversals(lazyChunks)
+    IndexValidator().validate(lazyChunks)
   }
 
   func testChunkedBy() {
@@ -75,7 +75,26 @@ final class ChunkedTests: XCTestCase {
     
     let lazyChunks = fruits.lazy.chunked(by: { $0.first == $1.first })
     validateFruitChunks(lazyChunks)
-    validateIndexTraversals(lazyChunks)
+    IndexValidator().validate(lazyChunks)
+  }
+  
+  func testChunkedByComparesConsecutiveElements() {
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 6, 7, 8, 9].chunked(by: { $1 - $0 == 1 }),
+      [[1, 2, 3, 4], [6, 7, 8, 9]])
+    
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 6, 7, 8, 9].lazy.chunked(by: { $1 - $0 == 1 }),
+      [[1, 2, 3, 4], [6, 7, 8, 9]])
+    
+    print(Array([1, 2, 3].lazy.chunked(by: { $1 - $0 == 1 })))
+    print(Array([1, 2, 3].lazy.chunked(by: { $1 - $0 == 1 }).reversed()))
+    
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 6, 7, 8, 9].lazy.chunked(by: { $1 - $0 == 1 }).reversed(),
+      [[6, 7, 8, 9], [1, 2, 3, 4]])
+    
+    IndexValidator().validate([1, 2, 3].lazy.chunked(by: { $1 - $0 == 1 }))
   }
   
   func testChunkedLazy() {
@@ -140,15 +159,18 @@ final class ChunkedTests: XCTestCase {
   func testEmptyChunksOfCountTraversal() {
     let emptyChunks = [Int]().chunks(ofCount: 1)
     
-    validateIndexTraversals(emptyChunks)
+    IndexValidator().validate(emptyChunks, expectedCount: 0)
   }
   
   func testChunksOfCountTraversal() {
-    for i in 1..<10 {
-      let collection = (1...50).map { $0 }
-      let chunks = collection.chunks(ofCount: i)
-      
-      validateIndexTraversals(chunks)
+    let validator = IndexValidator<ChunksOfCountCollection<ClosedRange<Int>>>()
+    
+    for i in 1...10 {
+      let range = 1...50
+      let chunks = range.chunks(ofCount: i)
+      validator.validate(
+        chunks,
+        expectedCount: range.count / i + (range.count % i).signum())
     }
   }
 }

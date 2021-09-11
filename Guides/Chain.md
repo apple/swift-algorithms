@@ -25,13 +25,13 @@ the shared conformances of the two underlying types.
 The `chain(_:_:)` function takes two sequences as arguments:
 
 ```swift
-public func chain<S1, S2>(_ s1: S1, _ s2: S2) -> Chain2<S1, S2>
+public func chain<S1, S2>(_ s1: S1, _ s2: S2) -> Chain2Sequence<S1, S2>
     where S1.Element == S2.Element
 ```
 
-The resulting `Chain2` type is a sequence, with conditional conformance to
-`Collection`, `BidirectionalCollection`, and `RandomAccessCollection` when both
-the first and second arguments conform.
+The resulting `Chain2Sequence` type is a sequence, with conditional conformance
+to `Collection`, `BidirectionalCollection`, and `RandomAccessCollection` when
+both the first and second arguments conform.
 
 ### Naming
 

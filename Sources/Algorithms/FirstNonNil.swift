@@ -13,7 +13,7 @@
 // firstNonNil(_:)
 //===----------------------------------------------------------------------===//
 
-public extension Sequence {
+extension Sequence {
   /// Returns the first non-`nil` result obtained from applying the given
   /// transformation to the elements of the sequence.
   ///
@@ -30,7 +30,8 @@ public extension Sequence {
   ///
   /// - Complexity: O(*n*), where *n* is the number of elements at the start of
   ///   the sequence that result in `nil` when applying the transformation.
-  func firstNonNil<Result>(
+  @inlinable
+  public func firstNonNil<Result>(
     _ transform: (Element) throws -> Result?
   ) rethrows -> Result? {
     for value in self {

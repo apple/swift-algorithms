@@ -4,17 +4,80 @@
 Add new items at the end of the relevant section under **Unreleased**.
 -->
 
-This project follows semantic versioning. While still in major version `0`,
-source-stability is only guaranteed within minor versions (e.g. between
-`0.0.3` and `0.0.4`). If you want to guard against potentially source-breaking
-package updates, you can specify your package dependency using
-`.upToNextMinor(from: "0.1.0")` as the requirement.
+This project follows semantic versioning.
 
 ## [Unreleased]
 
 *No new changes.*
 
 ---
+
+## [1.0.0] - 2021-09-08
+
+### Changes
+
+- Most sequence and collection types have been renamed, following a more
+  consistent naming structure:
+  - The `Lazy` prefix was dropped.
+  - Either a `Sequence` or `Collection` suffix was added depending on whether or
+    not the type is unconditionally a collection.
+  - The base name was derived from the name of the method that produces it,
+    including an argument label to disambiguate if necessary.
+  ```
+  Chain2              -> Chain2Sequence
+  ChunkedBy           -> ChunkedByCollection
+  ChunkedOn           -> ChunkedOnCollection
+  ChunkedByCount      -> ChunksOfCountCollection
+  Combinations        -> CombinationsSequence
+  Cycle               -> CycledSequence
+  FiniteCycle         -> CycledTimesCollection
+  Indexed             -> IndexedCollection
+  Intersperse         -> InterspersedSequence
+  LazySplitSequence   -> SplitSequence
+  LazySplitCollection -> SplitCollection
+  Permutations        -> PermutationsSequence
+  UniquePermutations  -> UniquePermutationsSequence
+  Product2            -> Product2Sequence
+  ExclusiveReductions -> ExclusiveReductionsSequence
+  InclusiveReductions -> InclusiveReductionsSequence
+  StrideSequence      -> StridingSequence
+  StrideCollection    -> StridingCollection
+  Uniqued             -> UniquedSequence
+  Windows             -> WindowsOfCountCollection
+  ```
+- Types that can only be produced from a lazy sequence chain now unconditionally
+  conform to `LazySequenceProtocol` and wrap the base sequence instead of the
+  lazy wrapper, making some return types slightly simpler.
+  - e.g. `[1, 2, 3].lazy.reductions(+)` now returns
+    `ExclusiveReductionsSequence<[Int]>`, not
+    `ExclusiveReductionsSequence<LazySequence<[Int]>>`.
+  - This concerns `JoinedByClosureSequence`, `JoinedByClosureCollection`,
+    `ExclusiveReductionsSequence`, `InclusiveReductionsSequence`.
+- The generic parameters of the `ExclusiveReductions` type have been swapped,
+  putting the base collection first and the result type second.
+- The `Indices` associated type of `IndexedCollection` now matches
+  `Base.Indices`.
+
+### Removals
+
+- Previously deprecated type and method names have been removed:
+  - The `Chain` type alias for `Chain2Sequence`
+  - The `chained(with:)` method which was replaced with the `chain(_:_:)` free
+    function
+  - The `LazyChunked` and `Chunked` type aliases for `ChunkedByCollection`
+  - The `rotate(subrange:at:)` and `rotate(at:)` methods which were renamed to 
+    `rotate(subrange:toStartAt:)` and `rotate(toStartAt:)` respectively
+
+### Fixes
+
+- The `StridingSequence` and `StridingCollection` types now conditionally
+  conform to `LazySequenceProtocol`, allowing the `striding(by:)` method to
+  properly propagate laziness in a lazy sequence chain.
+- Fixed `chunked(by:)` to always compare two consecutive elements rather than
+  each element with the first element of the current chunk. ([#162])
+
+The 1.0.0 release includes contributions from [iainsmith], [mdznr], and
+[timvermeulen]. Thank you!
 
 ## [0.2.1] - 2021-06-01
 
@@ -206,7 +269,8 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for releases -->
 
-[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.2.1...HEAD
+[Unreleased]: https://github.com/apple/swift-algorithms/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/apple/swift-algorithms/compare/0.2.1...1.0.0
 [0.2.1]: https://github.com/apple/swift-algorithms/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/apple/swift-algorithms/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/apple/swift-algorithms/compare/0.1.0...0.1.1
@@ -243,6 +307,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#125]: https://github.com/apple/swift-algorithms/pull/125
 [#130]: https://github.com/apple/swift-algorithms/pull/130
 [#138]: https://github.com/apple/swift-algorithms/pull/138
+[#162]: https://github.com/apple/swift-algorithms/pull/162
 
 <!-- Link references for contributors -->
 
@@ -256,6 +321,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [fedeci]: https://github.com/apple/swift-algorithms/commits?author=fedeci
 [hashemi]: https://github.com/apple/swift-algorithms/commits?author=hashemi
 [IanKeen]: https://github.com/apple/swift-algorithms/commits?author=IanKeen
+[iainsmith]: https://github.com/apple/swift-algorithms/commits?author=iainsmith
 [iSame7]: https://github.com/apple/swift-algorithms/commits?author=iSame7
 [karwa]: https://github.com/apple/swift-algorithms/commits?author=karwa
 [kylemacomber]: https://github.com/apple/swift-algorithms/commits?author=kylemacomber

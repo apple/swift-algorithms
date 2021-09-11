@@ -14,9 +14,9 @@
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection {
-  /// Moves all elements satisfying `belongsInSecondPartition` into a suffix
-  /// of the collection, preserving their relative order, and returns the
-  /// start of the resulting suffix.
+  /// Moves all elements satisfying `belongsInSecondPartition` into a suffix of
+  /// the collection, preserving their relative order, and returns the start of
+  /// the resulting suffix.
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the number of elements.
   /// - Precondition:
@@ -25,7 +25,7 @@ extension MutableCollection {
   internal mutating func stablePartition(
     count n: Int,
     subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws-> Bool
+    by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     if n == 0 { return subrange.lowerBound }
     if n == 1 {
@@ -138,22 +138,22 @@ extension MutableCollection where Self: BidirectionalCollection {
     // * predicate(self[i]) == true, for i in hi ..< endIndex
 
     Loop: while true {
-      FindLo: repeat {
+      FindLo: do {
         while lo < hi {
           if try belongsInSecondPartition(self[lo]) { break FindLo }
           formIndex(after: &lo)
         }
         break Loop
-      } while false
+      }
 
-      FindHi: repeat {
+      FindHi: do {
         formIndex(before: &hi)
         while lo < hi {
           if try !belongsInSecondPartition(self[hi]) { break FindHi }
           formIndex(before: &hi)
         }
         break Loop
-      } while false
+      }
 
       swapAt(lo, hi)
       formIndex(after: &lo)
@@ -173,8 +173,8 @@ extension Collection {
   ///
   /// The collection must already be partitioned according to the predicate.
   /// That is, there should be an index `i` where for every element in
-  /// `collection[..<i]` the predicate is `false`, and for every element
-  /// in `collection[i...]` the predicate is `true`.
+  /// `collection[..<i]` the predicate is `false`, and for every element in
+  /// `collection[i...]` the predicate is `true`.
   ///
   /// - Parameter belongsInSecondPartition: A predicate that partitions the
   ///   collection.
