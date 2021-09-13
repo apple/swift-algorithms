@@ -72,7 +72,7 @@ Finally, add `import Algorithms` to your source code.
 
 ## Source Stability
 
-The Swift Numerics package is source stable; version numbers follow [Semantic Versioning](https://semver.org/). Source breaking changes to public API can only land in a new major version.
+The Swift Algorithms package is source stable; version numbers follow [Semantic Versioning](https://semver.org/). Source breaking changes to public API can only land in a new major version.
 
 The public API of version 1.0 of the `swift-algorithms` package consists of non-underscored declarations that are marked `public` in the `Algorithms` module. Interfaces that aren't part of the public API may continue to change in any release, including patch releases.
 
