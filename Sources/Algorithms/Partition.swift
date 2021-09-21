@@ -241,8 +241,8 @@ extension Sequence {
   public func partitioned(
     _ belongsInSecondCollection: (Element) throws -> Bool
   ) rethrows -> ([Element], [Element]) {
-    var lhs = Array<Element>()
-    var rhs = Array<Element>()
+    var lhs = [Element]()
+    var rhs = [Element]()
     
     for element in self {
       if try belongsInSecondCollection(element) {
