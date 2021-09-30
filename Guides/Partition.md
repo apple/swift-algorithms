@@ -43,13 +43,13 @@ let p = numbers.partitioningIndex(where: { $0.isMultiple(of: 20) })
 ```
 
 The standard library’s existing `filter(_:)` method provides functionality to
-get the elements that do match a given predicate. `partitioned(_:)` returns
-both the elements that match the preciate as well as those that don’t, as a
+get the elements that do match a given predicate. `partitioned(by:)` returns
+both the elements that match the predicate as well as those that don’t, as a
 tuple.
 
 ```swift
 let cast = ["Vivien", "Marlon", "Kim", "Karl"]
-let (longNames, shortNames) = cast.partitioned({ $0.count < 5 })
+let (longNames, shortNames) = cast.partitioned(by: { $0.count < 5 })
 print(longNames)
 // Prints "["Vivien", "Marlon"]"
 print(shortNames)
@@ -102,8 +102,8 @@ to eventually land in the standard library.
 `partitioningIndex(where:)` is a slight generalization of a binary search, and
 is an O(log _n_) operation for random-access collections; O(_n_) otherwise.
 
-`partitioned(_:)` is an O(_n_) operation, where _n_ is the number of elements in
-the original sequence.
+`partitioned(by:)` is an O(_n_) operation, where _n_ is the number of elements
+in the original sequence.
 
 ### Comparison with other languages
 

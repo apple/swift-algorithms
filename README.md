@@ -27,7 +27,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 #### Subsetting operations
 
 - [`compacted()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Compacted.md): Drops the `nil`s from a sequence or collection, unwrapping the remaining elements.
-- [`partitioned(_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Partition.md): Returns the elements in a sequence or collection that do and do not match a given predicate.
+- [`partitioned(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Partition.md): Returns the elements in a sequence or collection that do and do not match a given predicate.
 - [`randomSample(count:)`, `randomSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection.
 - [`randomStableSample(count:)`, `randomStableSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection, preserving their original relative order.
 - [`striding(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Stride.md): Returns every nth element of a collection.

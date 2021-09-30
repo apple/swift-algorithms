@@ -137,25 +137,25 @@ final class PartitionTests: XCTestCase {
   func testPartitionedWithEmptyInput() {
     let input: [Int] = []
     
-    let s0 = input.partitioned({ _ in return true })
+    let s0 = input.partitioned(by: { _ in return true })
     
     XCTAssertTrue(s0.0.isEmpty)
     XCTAssertTrue(s0.1.isEmpty)
   }
   
-  /// Test the example given in the `partitioned(_:)` documentation
+  /// Test the example given in the `partitioned(by:)` documentation
   func testPartitionedExample() throws {
     let cast = ["Vivien", "Marlon", "Kim", "Karl"]
-    let (longNames, shortNames) = cast.partitioned({ $0.count < 5 })
+    let (longNames, shortNames) = cast.partitioned(by: { $0.count < 5 })
     XCTAssertEqual(longNames, ["Vivien", "Marlon"])
     XCTAssertEqual(shortNames, ["Kim", "Karl"])
   }
   
   func testPartitionedWithPredicate() throws {
-    let s0 = ["A", "B", "C", "D"].partitioned({ $0 == $0.lowercased() })
-    let s1 = ["a", "B", "C", "D"].partitioned({ $0 == $0.lowercased() })
-    let s2 = ["a", "B", "c", "D"].partitioned({ $0 == $0.lowercased() })
-    let s3 = ["a", "B", "c", "d"].partitioned({ $0 == $0.lowercased() })
+    let s0 = ["A", "B", "C", "D"].partitioned(by: { $0 == $0.lowercased() })
+    let s1 = ["a", "B", "C", "D"].partitioned(by: { $0 == $0.lowercased() })
+    let s2 = ["a", "B", "c", "D"].partitioned(by: { $0 == $0.lowercased() })
+    let s3 = ["a", "B", "c", "d"].partitioned(by: { $0 == $0.lowercased() })
     
     XCTAssertEqual(s0.0, ["A", "B", "C", "D"])
     XCTAssertEqual(s0.1, [])

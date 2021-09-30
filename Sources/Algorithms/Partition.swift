@@ -205,18 +205,18 @@ extension Collection {
 }
 
 //===----------------------------------------------------------------------===//
-// partitioned(_:)
+// partitioned(by:)
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
   /// Returns two arrays containing, in order, the elements of the sequence that
   /// do and don’t satisfy the given predicate, respectively.
   ///
-  /// In this example, `partitioned(_:)` is used to separate the input based on
+  /// In this example, `partitioned(by:)` is used to separate the input based on
   /// names that aren’t and are shorter than five characters, respectively:
   ///
   ///     let cast = ["Vivien", "Marlon", "Kim", "Karl"]
-  ///     let (longNames, shortNames) = cast.partitioned({ $0.count < 5 })
+  ///     let (longNames, shortNames) = cast.partitioned(by: { $0.count < 5 })
   ///     print(longNames)
   ///     // Prints "["Vivien", "Marlon"]"
   ///     print(shortNames)
@@ -239,7 +239,7 @@ extension Sequence {
   /// `RandomAccessCollection`.
   @inlinable
   public func partitioned(
-    _ belongsInSecondCollection: (Element) throws -> Bool
+    by belongsInSecondCollection: (Element) throws -> Bool
   ) rethrows -> ([Element], [Element]) {
     var lhs = [Element]()
     var rhs = [Element]()
@@ -260,11 +260,11 @@ extension Collection {
   /// Returns two arrays containing, in order, the elements of the collection
   /// that do and don’t satisfy the given predicate, respectively.
   ///
-  /// In this example, `partitioned(_:)` is used to separate the input based on
+  /// In this example, `partitioned(by:)` is used to separate the input based on
   /// names that aren’t and are shorter than five characters, respectively:
   ///
   ///     let cast = ["Vivien", "Marlon", "Kim", "Karl"]
-  ///     let (longNames, shortNames) = cast.partitioned({ $0.count < 5 })
+  ///     let (longNames, shortNames) = cast.partitioned(by: { $0.count < 5 })
   ///     print(longNames)
   ///     // Prints "["Vivien", "Marlon"]"
   ///     print(shortNames)
@@ -288,7 +288,7 @@ extension Collection {
   /// avoid array resizing.
   @inlinable
   public func partitioned(
-    _ belongsInSecondCollection: (Element) throws -> Bool
+    by belongsInSecondCollection: (Element) throws -> Bool
   ) rethrows -> ([Element], [Element]) {
     guard !self.isEmpty else {
       return ([], [])
