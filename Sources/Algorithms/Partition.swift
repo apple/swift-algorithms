@@ -240,7 +240,7 @@ extension Sequence {
   @inlinable
   public func partitioned(
     by belongsInSecondCollection: (Element) throws -> Bool
-  ) rethrows -> ([Element], [Element]) {
+  ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
     var lhs = [Element]()
     var rhs = [Element]()
     
@@ -289,7 +289,7 @@ extension Collection {
   @inlinable
   public func partitioned(
     by belongsInSecondCollection: (Element) throws -> Bool
-  ) rethrows -> ([Element], [Element]) {
+  ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
     guard !self.isEmpty else {
       return ([], [])
     }
