@@ -86,7 +86,7 @@ extension Collection {
 
 extension Sequence {
     public func partitioned(
-        by belongsInSecondCollection: (Element) throws -> Bool
+        by predicate: (Element) throws -> Bool
     ) rethrows -> (falseElements: [Element], trueElements: [Element])
 }
 ```

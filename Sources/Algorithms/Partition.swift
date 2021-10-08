@@ -222,15 +222,14 @@ extension Sequence {
   ///     print(shortNames)
   ///     // Prints "["Kim", "Karl"]"
   ///
-  /// - Parameter belongsInSecondCollection: A closure that takes an element of
-  /// the sequence as its argument and returns a Boolean value indicating
-  /// whether the element should be included in the second returned array.
-  /// Otherwise, the element will appear in the first returned array.
+  /// - Parameter predicate: A closure that takes an element of the sequence as
+  /// its argument and returns a Boolean value indicating whether the element
+  /// should be included in the second returned array. Otherwise, the element
+  /// will appear in the first returned array.
   ///
   /// - Returns: Two arrays with with all of the elements of the receiver. The
-  /// first array contains all the elements that `belongsInSecondCollection`
-  /// didn’t allow, and the second array contains all the elements that
-  /// `belongsInSecondCollection` allowed.
+  /// first array contains all the elements that `predicate` didn’t allow, and
+  /// the second array contains all the elements that `predicate` allowed.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   ///
@@ -239,13 +238,13 @@ extension Sequence {
   /// `RandomAccessCollection`.
   @inlinable
   public func partitioned(
-    by belongsInSecondCollection: (Element) throws -> Bool
+    by predicate: (Element) throws -> Bool
   ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
     var lhs = [Element]()
     var rhs = [Element]()
     
     for element in self {
-      if try belongsInSecondCollection(element) {
+      if try predicate(element) {
         rhs.append(element)
       } else {
         lhs.append(element)
@@ -270,15 +269,14 @@ extension Collection {
   ///     print(shortNames)
   ///     // Prints "["Kim", "Karl"]"
   ///
-  /// - Parameter belongsInSecondCollection: A closure that takes an element of
-  /// the collection as its argument and returns a Boolean value indicating
-  /// whether the element should be included in the second returned array.
-  /// Otherwise, the element will appear in the first returned array.
+  /// - Parameter predicate: A closure that takes an element of the collection
+  /// as its argument and returns a Boolean value indicating whether the element
+  /// should be included in the second returned array. Otherwise, the element
+  /// will appear in the first returned array.
   ///
   /// - Returns: Two arrays with with all of the elements of the receiver. The
-  /// first array contains all the elements that `belongsInSecondCollection`
-  /// didn’t allow, and the second array contains all the elements that
-  /// `belongsInSecondCollection` allowed.
+  /// first array contains all the elements that `predicate` didn’t allow, and
+  /// the second array contains all the elements that `predicate` allowed.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   ///
@@ -288,7 +286,7 @@ extension Collection {
   /// avoid array resizing.
   @inlinable
   public func partitioned(
-    by belongsInSecondCollection: (Element) throws -> Bool
+    by predicate: (Element) throws -> Bool
   ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
     guard !self.isEmpty else {
       return ([], [])
@@ -314,7 +312,7 @@ extension Collection {
         var rhs = lhs + buffer.count
         do {
           for element in self {
-            if try belongsInSecondCollection(element) {
+            if try predicate(element) {
               rhs -= 1
               rhs.initialize(to: element)
             } else {
