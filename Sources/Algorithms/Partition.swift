@@ -311,6 +311,11 @@ extension Collection {
             }
           }
           
+          precondition(lhs == rhs, """
+            Collection's `count` differed from the number of elements iterated.
+            """
+          )
+          
           let rhsIndex = rhs - buffer.baseAddress!
           buffer[rhsIndex...].reverse()
           initializedCount = buffer.count
