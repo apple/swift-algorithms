@@ -210,10 +210,10 @@ extension Collection {
 
 extension Sequence {
   /// Returns two arrays containing, in order, the elements of the sequence that
-  /// do and don’t satisfy the given predicate, respectively.
+  /// do and don’t satisfy the given predicate.
   ///
   /// In this example, `partitioned(by:)` is used to separate the input based on
-  /// names that aren’t and are shorter than five characters, respectively:
+  /// whether a name is shorter than five characters:
   ///
   ///     let cast = ["Vivien", "Marlon", "Kim", "Karl"]
   ///     let (longNames, shortNames) = cast.partitioned(by: { $0.count < 5 })
@@ -227,15 +227,11 @@ extension Sequence {
   /// should be included in the second returned array. Otherwise, the element
   /// will appear in the first returned array.
   ///
-  /// - Returns: Two arrays with with all of the elements of the receiver. The
+  /// - Returns: Two arrays with all of the elements of the receiver. The
   /// first array contains all the elements that `predicate` didn’t allow, and
   /// the second array contains all the elements that `predicate` allowed.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
-  ///
-  /// - Note: This algorithm performs a bit slower than the same algorithm on
-  /// `RandomAccessCollection` since the size of the sequence is unknown, unlike
-  /// `RandomAccessCollection`.
   @inlinable
   public func partitioned(
     by predicate: (Element) throws -> Bool
@@ -257,10 +253,10 @@ extension Sequence {
 
 extension Collection {
   /// Returns two arrays containing, in order, the elements of the collection
-  /// that do and don’t satisfy the given predicate, respectively.
+  /// that do and don’t satisfy the given predicate.
   ///
   /// In this example, `partitioned(by:)` is used to separate the input based on
-  /// names that aren’t and are shorter than five characters, respectively:
+  /// whether a name is shorter than five characters.
   ///
   ///     let cast = ["Vivien", "Marlon", "Kim", "Karl"]
   ///     let (longNames, shortNames) = cast.partitioned(by: { $0.count < 5 })
@@ -274,16 +270,11 @@ extension Collection {
   /// should be included in the second returned array. Otherwise, the element
   /// will appear in the first returned array.
   ///
-  /// - Returns: Two arrays with with all of the elements of the receiver. The
+  /// - Returns: Two arrays with all of the elements of the receiver. The
   /// first array contains all the elements that `predicate` didn’t allow, and
   /// the second array contains all the elements that `predicate` allowed.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
-  ///
-  /// - Note: This function on `Collection` performs a bit faster than the
-  /// `Sequence` implementation. Since the size of the collection, and therefore
-  /// the total size of the two returned arrays, is known ahead of time, it can
-  /// avoid array resizing.
   @inlinable
   public func partitioned(
     by predicate: (Element) throws -> Bool
@@ -292,12 +283,11 @@ extension Collection {
       return ([], [])
     }
     
-    // Since `RandomAccessCollection`s have known sizes (access to `count` is
-    // constant time, O(1)), we can allocate one array of size `self.count`,
-    // then insert items at the beginning or end of that contiguous block. This
-    // way, we don’t have to do any dynamic array resizing. Since we insert the
-    // right elements on the right side in reverse order, we need to reverse
-    // them back to the original order at the end.
+    // Since collections have known sizes, we can allocate one array of size
+    // `self.count`, then insert items at the beginning or end of that contiguous
+    // block. This way, we don’t have to do any dynamic array resizing. Since we
+    // insert the right elements on the right side in reverse order, we need to
+    // reverse them back to the original order at the end.
     
     let count = self.count
     
