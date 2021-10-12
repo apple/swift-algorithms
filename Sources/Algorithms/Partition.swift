@@ -292,7 +292,7 @@ extension Collection {
     let count = self.count
     
     // Inside of the `initializer` closure, we set what the actual mid-point is.
-    // We will use this to partitioned the single array into two in constant time.
+    // We will use this to partition the single array into two.
     var midPoint: Int = 0
     
     let elements = try [Element](
