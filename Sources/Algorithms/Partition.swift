@@ -179,7 +179,8 @@ extension Collection {
   /// - Parameter belongsInSecondPartition: A predicate that partitions the
   ///   collection.
   /// - Returns: The index of the first element in the collection for which
-  ///   `predicate` returns `true`.
+  ///   `predicate` returns `true`, or `endIndex` if there are no elements
+  ///   for which `predicate` returns `true`.
   ///
   /// - Complexity: O(log *n*), where *n* is the length of this collection if
   ///   the collection conforms to `RandomAccessCollection`, otherwise O(*n*).
