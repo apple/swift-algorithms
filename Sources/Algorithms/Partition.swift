@@ -168,8 +168,8 @@ extension MutableCollection where Self: BidirectionalCollection {
 //===----------------------------------------------------------------------===//
 
 extension Collection {
-  /// Returns the index of the first element in the collection that matches
-  /// the predicate.
+  /// Returns the start index of the partition of a collection that matches
+  /// the given predicate.
   ///
   /// The collection must already be partitioned according to the predicate.
   /// That is, there should be an index `i` where for every element in
