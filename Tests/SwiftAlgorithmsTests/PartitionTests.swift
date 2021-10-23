@@ -92,6 +92,16 @@ final class PartitionTests: XCTestCase {
     }
   }
   
+  func testPartitioningIndexWithEmptyInput() {
+    let input: [Int] = []
+    
+    let a = input.partitioningIndex(where: { _ in return true })
+    XCTAssertEqual(a, input.startIndex)
+    
+    let b = input.partitioningIndex(where: { _ in return false })
+    XCTAssertEqual(b, input.endIndex)
+  }
+  
   func testPartitionWithSubrangeBidirectionalCollection() {
     for length in 10...20 {
       let a = Array(0..<length)
