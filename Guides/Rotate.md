@@ -24,6 +24,18 @@ numbers.rotate(subrange: 3..<6, toStartAt: 4)
 // numbers = [20, 30, 10, 50, 60, 40]
 ```
 
+We also provide non-mutating variants of `rotate(toStartAt:)` and `rotate(subrange:toStartAt:)` 
+that are `rotated(toStartAt:)` and `rotated(subrange:toStartAt:)` respectively and results in 
+a `RotatedCollection` view that presents the elements of a `base` collection rotated. 
+
+```swift
+var numbers = [10, 20, 30, 40, 50, 60]
+let first = numbers.rotated(subrange: 0..<3, toStartAt: 1)
+// first = [20, 30, 10, 40, 50, 60]
+let second = numbers.rotate(subrange: 3..<6, toStartAt: 4)
+// second = [20, 30, 10, 50, 60, 40]
+```
+
 ## Detailed Design
 
 This adds the two `MutableCollection` methods shown above:
@@ -39,12 +51,28 @@ extension MutableCollection {
 }
 ```
 
+For the non-mutating variants 
+```swift
+extension Collection {
+    func rotated(toStartAt p: Index) -> RotatedCollection<Self>
+
+    func rotated(
+        subrange: Range<Index>,
+        toStartAt p: Index
+    ) -> RotatedCollection<Self>
+}
+```
+
 ### Complexity
 
 Rotation is a O(_n_) operation, where _n_ is the length of the range being
 rotated. The `BidirectionalCollection` version of rotation significantly lowers
 the number of swaps required per element, so `rotate` would need to be a
 `MutableCollection` customization point were it adopted by the standard library.
+
+The non-mutating variants are O(1) when `Base` collection conforms to `RandomAccessCollection`.
+Otherwise, O(_n_) where _n_ is the length of the range being rotated which is the length of the
+whole base collection for `func rotated(toStartAt p: Index) -> RotatedCollection<Self>`.
 
 ### Naming
 

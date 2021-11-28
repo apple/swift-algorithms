@@ -302,8 +302,9 @@ public struct RotatedCollection<Base: Collection> {
   @usableFromInline
   internal let lowerboundRotatedDistance: Int
 
-  /// - Complexity: O(1) when `Base` conforms to `RandomAccessCollection`.
-  /// Otherwise, O(*n*), where *n* is the count of the subrange.
+  /// - Complexity: O(1) when `Base` conforms to
+  /// `RandomAccessCollection`. Otherwise, O(*n*), where
+  /// *n* is the count of the `subrange`.
   @inlinable
   internal init(
     _base: Base, _subrange: Range<Base.Index>, _newStart: Base.Index
@@ -334,17 +335,19 @@ extension RotatedCollection: Collection {
     }
   }
 
+  /// - Complexity: O(1)
   @inlinable
   public var startIndex: Index {
     Index(_baseIndex: base.startIndex)
   }
 
+  /// - Complexity: O(1)
   @inlinable
   public var endIndex: Index {
     Index(_baseIndex: base.endIndex)
   }
 
-  /// - Complexity: O(1) if the collection conforms to
+  /// - Complexity: O(1) when `Base` conforms to
   /// `RandomAccessCollection`. Otherwise, O(*n*), where
   /// *n* is the count of the `subrange`.
   @inlinable
