@@ -86,4 +86,84 @@ final class RotateTests: XCTestCase {
       }
     }
   }
+
+//===----------------------------------------------------------------------===//
+// RotatedCollection Tests
+//===----------------------------------------------------------------------===//
+  
+  /// Tests  lazy `rotated(subrange:toStartAt:)` with an empty collection
+  func testLazyRotateSubrangeOnEmptyCollection() {
+    let numbers = [Int]()
+    let actual = numbers.rotated(subrange: 0..<0, toStartAt: 0)
+    XCTAssertEqualSequences(actual, [])
+  }
+  
+  /// Tests  lazy `rotated(subrange:toStartAt:)` with the full range of the collection
+  func testLazyRotatedFullRange() {
+    let numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+    let actual = numbers.rotated(subrange: 0..<8, toStartAt: 1)
+    XCTAssertEqualSequences(actual, [20, 30, 40, 50, 60, 70, 80, 10])
+  }
+  
+  /// Tests the example given in lazy `rotated(subrange:toStartAt:)`’s documentation
+  func testLazyRotatedSubrange() {
+    let numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+    let actual = numbers.rotated(subrange: 0..<4, toStartAt: 2)
+    XCTAssertEqualSequences(actual, [30, 40, 10, 20, 50, 60, 70, 80])
+  }
+  
+  /// Tests the example given in lazy `rotated(toStartAt:)`’s documentation
+  func testLazyRotatedExample() {
+    let numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+    let actual = numbers.rotated(toStartAt: 3)
+    XCTAssertEqualSequences(actual, [40, 50, 60, 70, 80, 10, 20, 30])
+  }
+  
+  /// Tests the `RotatedCollection` bidirectional conformance.
+  func testLazyRotatedReversed() {
+    let numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+    let actual = numbers.rotated(toStartAt: 3)
+    XCTAssertEqualSequences(actual, [40, 50, 60, 70, 80, 10, 20, 30])
+    let reversed: ReversedCollection<RotatedCollection<[Int]>> = actual.reversed()
+    XCTAssertEqualSequences(reversed, [30, 20, 10, 80, 70, 60, 50, 40])
+  }
+  
+  /// Tests lazy `rotated(toStartAt:)` on collections of varying lengths, at different
+  /// starting points.
+  func testLazyRotated() {
+    for length in 0...15 {
+      let a = Array(0..<length)
+      var b = a
+      for j in 0..<length {
+        var origB = b
+        let i = b.rotate(toStartAt: j)
+        XCTAssertEqualSequences(a[j...] + a[..<j], b)
+        
+        var bRotated = origB.rotated(toStartAt: j)
+        // Lazy RotatedCollection of `b` produces same
+        // result as in-place rotation.
+        XCTAssertEqualSequences(b, bRotated)
+        
+        origB = b
+        b.rotate(toStartAt: i)
+        bRotated = origB.rotated(toStartAt: i)
+        // Assert that both in-place rotated and lazy
+        // RotatedCollection of `b` produces `a`.
+        XCTAssertEqual(a, b)
+        XCTAssertEqualSequences(a, bRotated)
+      }
+    }
+  }
+
+  /// Tests lazy `rotated(toStartAt:)` index traversals.
+  func testIndexTraversals() {
+    let validator = IndexValidator<RotatedCollection<[Int]>>()
+    for length in 0...15 {
+      let a = Array(0..<length)
+      for j in 0..<length {
+        let aRotated = a.rotated(toStartAt: j)
+        validator.validate(aRotated, expectedCount: length)
+      }
+    }
+  }
 }

@@ -277,3 +277,245 @@ extension MutableCollection where Self: BidirectionalCollection {
     rotate(subrange: startIndex..<endIndex, toStartAt: newStart)
   }
 }
+
+//===----------------------------------------------------------------------===//
+// RotatedCollection
+//===----------------------------------------------------------------------===//
+public struct RotatedCollection<Base: Collection> {
+  public typealias Element = Base.Element
+
+  @usableFromInline
+  internal let base: Base
+
+  @usableFromInline
+  internal let newStart: Base.Index
+
+  @usableFromInline
+  internal let subrange: Range<Base.Index>
+
+  @usableFromInline
+  internal let rotatedStartIdx: Base.Index
+
+  @usableFromInline
+  internal let newStartDistance: Int
+
+  @usableFromInline
+  internal let lowerboundRotatedDistance: Int
+
+  /// - Complexity: O(1) when `Base` conforms to `RandomAccessCollection`.
+  /// Otherwise, O(*n*), where *n* is the count of the subrange.
+  @inlinable
+  internal init(
+    _base: Base, _subrange: Range<Base.Index>, _newStart: Base.Index
+  ) {
+    self.base = _base
+    self.subrange = _subrange
+    self.newStart = _newStart
+
+    // Pre-computed indexes and distance in order to calculate rotated
+    // position.
+    self.newStartDistance = base.distance(from: subrange.lowerBound,
+                                          to: newStart)
+    self.lowerboundRotatedDistance = base.distance(from: newStart,
+                                                   to: subrange.upperBound)
+    self.rotatedStartIdx = base.index(subrange.lowerBound,
+                                      offsetBy: lowerboundRotatedDistance)
+  }
+}
+
+extension RotatedCollection: Collection {
+  public struct Index {
+    @usableFromInline
+    internal let baseIndex: Base.Index
+
+    @inlinable
+    internal init(_baseIndex: Base.Index) {
+      self.baseIndex = _baseIndex
+    }
+  }
+
+  @inlinable
+  public var startIndex: Index {
+    Index(_baseIndex: base.startIndex)
+  }
+
+  @inlinable
+  public var endIndex: Index {
+    Index(_baseIndex: base.endIndex)
+  }
+
+  /// - Complexity: O(1) if the collection conforms to
+  /// `RandomAccessCollection`. Otherwise, O(*n*), where
+  /// *n* is the count of the `subrange`.
+  @inlinable
+  public subscript(i: Index) -> Element {
+    precondition(i != endIndex, "Index out of range")
+    return base[_computeRotated(i.baseIndex)]
+  }
+
+  @inlinable
+  public func index(after i: Index) -> Index {
+    precondition(i != endIndex, "Advancing past end index")
+    let next = base.index(after: i.baseIndex)
+    return Index(_baseIndex: next)
+  }
+
+  @inlinable
+  internal func _computeRotated(_ _originalIndex: Base.Index) -> Base.Index {
+    guard subrange.contains(_originalIndex) else {
+      return _originalIndex
+    }
+
+    guard subrange.lowerBound != newStart else {
+      return _originalIndex
+    }
+
+    if _originalIndex < rotatedStartIdx {
+      return base.index(_originalIndex, offsetBy: newStartDistance)
+    } else {
+      return base.index(_originalIndex, offsetBy: -lowerboundRotatedDistance)
+    }
+  }
+}
+
+extension RotatedCollection {
+  /// - Complexity: O(1) when `Base` conforms to `RandomAccessCollection`.
+  /// Otherwise, O(*n*), where *n* is the absolute value of `distance`.
+  @inlinable
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    Index(_baseIndex: base.index(i.baseIndex, offsetBy: distance))
+  }
+
+  /// - Complexity: O(1) when `Base` conforms to `RandomAccessCollection`.
+  /// Otherwise, O(*n*), where *n* is the absolute value of `distance`.
+  @inlinable
+  public func index(
+    _ i: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    guard let idx = base.index(
+      i.baseIndex, offsetBy: distance, limitedBy: limit.baseIndex
+    ) else { return nil }
+    return Index(_baseIndex: idx)
+  }
+
+  /// - Complexity: O(1) when `Base` conforms to `RandomAccessCollection`.
+  /// Otherwise, O(*n*), where *n* is the absolute value of resulting `distance`.
+  @inlinable
+  public func distance(from start: Index, to end: Index) -> Int {
+    base.distance(from: start.baseIndex, to: end.baseIndex)
+  }
+
+  /// - Complexity: O(1) when `Base` conforms to `RandomAccessCollection`.
+  /// Otherwise O(*n*), where *n* is the count of base collection.
+  @inlinable
+  public var count: Int { base.count }
+}
+
+/// Bidirectional Collection Conformance 
+extension RotatedCollection: BidirectionalCollection
+  where Base: BidirectionalCollection {
+  @inlinable
+  public func index(before i: Index) -> Index {
+    precondition(i != startIndex, "Advancing past start index")
+    let previous = base.index(before: i.baseIndex)
+    return Index(_baseIndex: previous)
+  }
+}
+
+extension RotatedCollection.Index: Comparable {
+  @inlinable
+  public static func == (lhs: RotatedCollection.Index,
+                         rhs: RotatedCollection.Index) -> Bool {
+    lhs.baseIndex == rhs.baseIndex
+  }
+
+  @inlinable
+  public static func < (lhs: RotatedCollection.Index,
+                        rhs: RotatedCollection.Index) -> Bool {
+    lhs.baseIndex < rhs.baseIndex
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// rotated(toStartAt:) / rotated(subrange:toStartAt:)
+//===----------------------------------------------------------------------===//
+extension Collection {
+  /// Returns a `RotatedCollection<Self>` view where the elements of this collection
+  /// in the given `subrange` are rotated so that the element at the specified `newStart`
+  /// becomes the start of that subrange..
+  ///
+  /// Rotating a collection is equivalent to breaking the collection into two
+  /// sections at the index `newStart`, and then swapping those two sections.
+  /// In this example, the `numbers` array rotated  is a
+  /// `RotatedCollection<Self>` view  where the element originally
+  /// at`2` (`30`) is first of the collection subrange `0..<4`:
+  ///
+  ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+  ///     let rotatedNumbers = numbers.rotated(subrange: 0..<4, toStartAt: 2)
+  ///     // rotatedNumbers == [30, 40, 10, 20, 50, 60, 70, 80]
+  ///
+  /// - Parameters:
+  ///   - subrange: The subrange of this collection to rotate.
+  ///   - newStart: The index of the element that should be at the start of
+  ///     `subrange` after rotating.
+  /// - Returns: A `RotatedCollection<Self>` view presenting the
+  /// elements in the `subrange` of the base collection rotated according with
+  /// `newStart` index.
+  /// - Complexity: O(1) when `Base` conforms to `RandomAccessCollection`.
+  /// Otherwise, O(*n*), where *n* is the `distance` of the subrange in the base collection.
+  @inlinable
+  public func rotated(
+    subrange: Range<Index>,
+    toStartAt newStart: Index
+  ) -> RotatedCollection<Self> {
+    precondition(subrange.isEmpty ||
+                 subrange.contains(newStart), "newStart not in subrange")
+    precondition(
+      subrange.lowerBound >= startIndex && subrange.upperBound <= endIndex
+    )
+    return RotatedCollection(
+      _base: self, _subrange: subrange, _newStart: newStart
+    )
+  }
+
+  /// Returns a `RotatedCollection<Self>` view where the elements of
+  /// this collection so that the element at the specified `newStart` becomes
+  /// the start of the collection.
+  ///
+  /// Rotating a collection is equivalent to breaking the collection into two
+  /// sections at the index `newStart`, and then swapping those two sections.
+  /// In this example, the result of `numbers` rotated is a
+  /// `RotatedCollection<Self>` view where the element at index
+  /// `3` (`40`) is the first element:
+  ///
+  ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+  ///     let rotatedNumbers = numbers.rotated(toStartAt: 3)
+  ///     // rotatedNumbers == [40, 50, 60, 70, 80, 10, 20, 30]
+  ///
+  /// - Parameter newStart: The index of the element that should be first after
+  ///   rotating.
+  /// - Returns: A `RotatedCollection<Self>` view presenting the elements
+  /// of the base collection in the given `subrange` rotated according with
+  /// `newStart` index.
+  ///
+  /// - Complexity: O(1) when `Base` conforms to `RandomAccessCollection`.
+  /// Otherwise, O(*n*), where *n* is the length of the collection.
+  @inlinable
+  public func rotated(
+    toStartAt newStart: Index
+  ) -> RotatedCollection<Self> {
+    RotatedCollection(
+      _base: self, _subrange: startIndex..<endIndex, _newStart: newStart
+    )
+  }
+}
+
+extension RotatedCollection.Index: Hashable where Base.Index: Hashable {}
+
+extension RotatedCollection: RandomAccessCollection
+  where Base: RandomAccessCollection {}
+
+extension RotatedCollection: LazySequenceProtocol, LazyCollectionProtocol
+  where Base: LazySequenceProtocol {}
