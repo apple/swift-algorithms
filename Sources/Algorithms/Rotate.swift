@@ -118,7 +118,7 @@ extension MutableCollection {
   /// Rotating a collection is equivalent to breaking the collection into two
   /// sections at the index `newStart`, and then swapping those two sections.
   /// In this example, the `numbers` array is rotated so that the element at
-  /// index `3` (`40`) is first:
+  /// index `2` (`30`) is first:
   ///
   ///     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
   ///     let oldStart = numbers.rotate(subrange: 0..<4, toStartAt: 2)
