@@ -313,7 +313,7 @@ public struct RotatedCollection<Base: Collection> {
     self.subrange = _subrange
     self.newStart = _newStart
 
-    // Pre-computed indexes and distance in order to calculate rotated
+    // Pre-computed indexes and distances in order to calculate rotated
     // position.
     self.newStartDistance = base.distance(from: subrange.lowerBound,
                                           to: newStart)
@@ -413,6 +413,7 @@ extension RotatedCollection {
   /// - Complexity: O(1) when `Base` conforms to `RandomAccessCollection`.
   /// Otherwise O(*n*), where *n* is the count of base collection.
   @inlinable
+  @inline(__always)
   public var count: Int { base.count }
 }
 
@@ -479,7 +480,9 @@ extension Collection {
       subrange.lowerBound >= startIndex && subrange.upperBound <= endIndex
     )
     return RotatedCollection(
-      _base: self, _subrange: subrange, _newStart: newStart
+      _base: self,
+      _subrange: subrange,
+      _newStart: newStart
     )
   }
 
@@ -510,7 +513,9 @@ extension Collection {
     toStartAt newStart: Index
   ) -> RotatedCollection<Self> {
     RotatedCollection(
-      _base: self, _subrange: startIndex..<endIndex, _newStart: newStart
+      _base: self,
+      _subrange: startIndex..<endIndex,
+      _newStart: newStart
     )
   }
 }
