@@ -28,11 +28,9 @@ extension Sequence {
     while let e = iterator.next() {
       // To be part of `result`, `e` must be strictly less than `result.last`.
       guard try areInIncreasingOrder(e, result.last!) else { continue }
+      result.removeLast()
       let insertionIndex =
         try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
-      
-      assert(insertionIndex != result.endIndex)
-      result.removeLast()
       result.insert(e, at: insertionIndex)
     }
 
