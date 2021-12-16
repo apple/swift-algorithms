@@ -168,8 +168,8 @@ extension MutableCollection where Self: BidirectionalCollection {
 //===----------------------------------------------------------------------===//
 
 extension Collection {
-  /// Returns the index of the first element in the collection that matches
-  /// the predicate.
+  /// Returns the start index of the partition of a collection that matches
+  /// the given predicate.
   ///
   /// The collection must already be partitioned according to the predicate.
   /// That is, there should be an index `i` where for every element in
@@ -179,7 +179,8 @@ extension Collection {
   /// - Parameter belongsInSecondPartition: A predicate that partitions the
   ///   collection.
   /// - Returns: The index of the first element in the collection for which
-  ///   `predicate` returns `true`.
+  ///   `predicate` returns `true`, or `endIndex` if there are no elements
+  ///   for which `predicate` returns `true`.
   ///
   /// - Complexity: O(log *n*), where *n* is the length of this collection if
   ///   the collection conforms to `RandomAccessCollection`, otherwise O(*n*).
