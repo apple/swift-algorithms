@@ -117,7 +117,52 @@ func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
   if !s1.isEmpty {
     fail("first sequence contains \(s1) missing from second sequence")
   }
+}
 
+/// Asserts two sequences contain exactly the same elements but not necessarily
+/// in the same order.
+/// - Complexity: O(*n* + *m*) where *n* is the number of elements in the first
+/// sequence and *m* is the number of elements in the second sequence
+func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
+  _ expression1: @autoclosure () throws -> S1,
+  _ expression2: @autoclosure () throws -> S2,
+  _ message: @autoclosure () -> String = "",
+  file: StaticString = #file, line: UInt = #line
+) rethrows where S1.Element: Hashable, S1.Element == S2.Element {
+  func fail(_ reason: String) {
+    let message = message()
+    XCTFail(message.isEmpty ? reason : "\(message) - \(reason)",
+            file: file, line: line)
+  }
+  
+  // Map the elements of the first sequence to the number of times it appeared
+  // in the sequence
+  var s1 = [S1.Element: Int](try expression1().lazy.map({
+    ($0, 1)
+  }), uniquingKeysWith: {
+    $0 + $1
+  })
+  
+  var missing: [S1.Element] = []
+  for elt in try expression2() {
+    if let count = s1[elt] {
+      if count > 1 {
+        s1[elt] = (count - 1)
+      } else {
+        s1[elt] = nil
+      }
+    } else {
+      missing.append(elt)
+    }
+  }
+  
+  if !missing.isEmpty {
+    fail("first sequence missing '\(missing)' elements from second sequence")
+  }
+  
+  if !s1.isEmpty {
+    fail("second sequence missing one or more occurrences of '\(s1.keys)' elements from first sequence")
+  }
 }
 
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
