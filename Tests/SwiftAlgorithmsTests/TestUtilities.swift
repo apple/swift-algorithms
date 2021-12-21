@@ -86,6 +86,8 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
 
 /// Asserts two sequences contain exactly the same elements but not necessarily
 /// in the same order.
+/// - Complexity: O(*n* * *m*) where *n* is the number of elements in the first
+/// sequence and *m* is the number of elements in the second sequence
 func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
