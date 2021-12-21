@@ -84,7 +84,8 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
     message(), file: file, line: line)
 }
 
-// Two sequences contains exactly the same element but not necessarily in the same order.
+/// Asserts two sequences contain exactly the same elements but not necessarily
+/// in the same order.
 func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
