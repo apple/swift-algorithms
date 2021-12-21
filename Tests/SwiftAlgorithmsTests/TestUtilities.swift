@@ -89,8 +89,15 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
 func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
+  _ message: @autoclosure () -> String = "",
   file: StaticString = #file, line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
+  func fail(_ reason: String) {
+    let message = message()
+    XCTFail(message.isEmpty ? reason : "\(message) - \(reason)",
+            file: file, line: line)
+  }
+  
   var s1 = Array(try expression1())
   var missing: [S1.Element] = []
   for elt in try expression2() {
@@ -101,15 +108,14 @@ func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
     s1.remove(at: idx)
   }
   
-  XCTAssertTrue(
-    missing.isEmpty, "first sequence missing '\(missing)' elements from second sequence",
-    file: file, line: line
-  )
+  if !missing.isEmpty {
+    fail("first sequence missing '\(missing)' elements from second sequence")
+  }
+  
+  if !s1.isEmpty {
+    fail("first sequence contains \(s1) missing from second sequence")
+  }
 
-  XCTAssertTrue(
-    s1.isEmpty, "first sequence contains \(s1) missing from second sequence",
-    file: file, line: line
-  )
 }
 
 func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
