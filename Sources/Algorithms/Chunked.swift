@@ -486,7 +486,7 @@ extension ChunksOfCountCollection {
     _ i: Index, _ distance: Int
   ) -> Int {
     if i == endIndex {
-      let remainder = base.count%chunkCount
+      let remainder = base.count % chunkCount
       // We have to take it into account when calculating offsets.
       if remainder != 0 {
         // Distance "minus" one (at this point distance is negative) because we
