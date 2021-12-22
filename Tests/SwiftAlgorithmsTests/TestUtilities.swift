@@ -107,7 +107,14 @@ func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
       missing.append(elt)
       continue
     }
-    s1.remove(at: idx)
+    // Since ordering does not matter, this is a small
+    // optmization that avoid removing a index in the middle
+    // of the array and having to slide all elements.
+    let lastIdx = s1.index(before: s1.endIndex)
+    if lastIdx != idx {
+      s1.swapAt(idx, lastIdx)
+    }
+    s1.remove(at: lastIdx)
   }
   
   if !missing.isEmpty {
