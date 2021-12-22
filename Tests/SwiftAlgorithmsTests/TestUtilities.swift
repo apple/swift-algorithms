@@ -111,9 +111,7 @@ func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
     // an element at an index in the middle of the array, which requires
     // shifting all subsequent elements down.
     let lastIdx = s1.index(before: s1.endIndex)
-    if lastIdx != idx {
-      s1.swapAt(idx, lastIdx)
-    }
+    s1.swapAt(idx, lastIdx)
     s1.remove(at: lastIdx)
   }
   
