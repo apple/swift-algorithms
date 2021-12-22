@@ -525,13 +525,13 @@ extension ChunksOfCountCollection {
     
     if let limit = limit {
       if baseIdx == nil {
-        // If we past the bounds while advancing forward and the limit is the
-        // `endIndex`, since the computation on base don't take into account the
-        // remainder, we have to make sure that passing the bound was because of
-        // the distance not just because of a remainder. Special casing is less
-        // expensive than always use count(which could be O(n) for non-random
-        // access collection base) to compute the base distance taking remainder
-        // into account.
+        // If we passed the bounds while advancing forward, and the limit is the
+        // `endIndex`, since the computation on `base` don't take into account
+        // the remainder, we have to make sure that passing the bound was
+        // because of the distance not just because of a remainder. Special
+        // casing is less expensive than always using `count` (which could be
+        // O(n) for non-random access collection base) to compute the base
+        // distance taking remainder into account.
         if baseDistance > 0 && limit == endIndex {
           if self.distance(from: i, to: limit) < distance {
             return nil
