@@ -489,8 +489,8 @@ extension ChunksOfCountCollection {
       let remainder = base.count%chunkCount
       // We have to take it into account when calculating offsets.
       if remainder != 0 {
-        // Distance "minus" one(at this point distance is negative) because we
-        // need to adjust for the last position that have a variadic(remainder)
+        // Distance "minus" one (at this point distance is negative) because we
+        // need to adjust for the last position that have a variadic (remainder)
         // number of elements.
         return ((distance + 1) * chunkCount) - remainder
       }
