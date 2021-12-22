@@ -303,7 +303,7 @@ extension Collection {
 /// A collection that presents the elements of its base collection in
 /// `SubSequence` chunks of any given count.
 ///
-/// A `ChunksOfCountCollection` is a lazy view on the base Collection, but it
+/// A `ChunksOfCountCollection` is a lazy view on the base `Collection`, but it
 /// does not implicitly confer laziness on algorithms applied to its result. In
 /// other words, for ordinary collections `c`:
 ///
@@ -512,7 +512,7 @@ extension ChunksOfCountCollection {
     )
   }
   
-  // Helper to compute index(offsetBy:) index.
+  // Helper to compute `index(offsetBy:)` index.
   @inlinable
   internal func makeOffsetIndex(
     from i: Index, baseBound: Base.Index, distance: Int, baseDistance: Int,
@@ -561,7 +561,7 @@ extension Collection {
   /// Returns a `ChunksOfCountCollection<Self>` view presenting the elements in
   /// chunks with count of the given count parameter.
   ///
-  /// - Parameter count: The size of the chunks. If the count parameter is
+  /// - Parameter count: The size of the chunks. If the `count` parameter is
   ///   evenly divided by the count of the base `Collection` all the chunks will
   ///   have the count equals to size. Otherwise, the last chunk will contain
   ///   the remaining elements.
