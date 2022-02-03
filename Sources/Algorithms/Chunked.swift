@@ -218,7 +218,7 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
   }
   
   /// Returns a lazy collection of subsequences of this collection, chunked by
-  /// grouping elements that project to the same value.
+  /// grouping elements that project to the equal values.
   ///
   /// - Complexity: O(*n*), because the start index is pre-computed.
   @inlinable
@@ -266,7 +266,7 @@ extension Collection {
   }
 
   /// Returns a collection of subsequences of this collection, chunked by
-  /// grouping elements that project to the same value.
+  /// grouping elements that project to equal values.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
   @inlinable
