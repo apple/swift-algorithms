@@ -96,7 +96,8 @@ collection conforms.
 
 ### Complexity
 
-The eager methods are O(_n_), the lazy methods are O(_1_).
+The eager methods are O(_n_) where _n_ is the number of elements in the
+collection. The lazy methods are O(_n_) because the start index is pre-computed.
 
 ### Naming
 
