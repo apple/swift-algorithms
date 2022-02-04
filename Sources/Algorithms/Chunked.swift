@@ -221,7 +221,7 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
   }
   
   /// Returns a lazy collection of subsequences of this collection, chunked by
-  /// grouping elements that project to the equal values.
+  /// grouping elements that project to equal values.
   ///
   /// - Parameter projection: A closure that takes an element in the sequence
   /// and returns an `Equatable` value that can be used to determine if adjacent
