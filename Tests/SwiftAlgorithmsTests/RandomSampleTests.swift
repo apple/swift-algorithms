@@ -132,4 +132,37 @@ final class RandomSampleTests: XCTestCase {
     almostAllZero = AlmostAllZeroGenerator(seed: 0)
     _ = c.randomSample(count: k, using: &almostAllZero) // must not crash
   }
+  
+  func testSequenceRandomElement() {
+    XCTAssertNil(emptySequence.randomElement())
+    
+    let expectedRange = expectedRange(for: iterations)
+    let randomElements = (0..<(n*iterations)).map { _ in
+      s.randomElement()!
+    }.frequencies
+    XCTAssertEqual(randomElements.count, n)
+    XCTAssert(randomElements.values.allSatisfy { expectedRange.contains($0) })
+    
+    let oneElementSequence = sequence(first: 0, next: { _ in nil })
+    let randomOneElement = (0..<iterations).map { _ in
+      oneElementSequence.randomElement()!
+    }
+    XCTAssert(randomOneElement.allSatisfy { $0 == 0 })
+    
+    let twoElementSequence = sequence(state: [1, 2].makeIterator(), next: { $0.next() })
+    let randomTwoElement = (0..<(2*iterations)).map { _ in
+      twoElementSequence.randomElement()!
+    }.frequencies
+    XCTAssertEqual(randomTwoElement.count, 2)
+    XCTAssert(randomElements.values.allSatisfy { expectedRange.contains($0) })
+  }
+
+  func testSequenceRandomElementRepeatable() {
+    let seed = UInt64.random(in: 0 ... .max)
+    var generator = SplitMix64(seed: seed)
+    let elements1 = (0..<500).map { _ in s.randomElement(using: &generator)! }
+    generator = SplitMix64(seed: seed)
+    let elements2 = (0..<500).map { _ in s.randomElement(using: &generator)! }
+    XCTAssertEqual(elements1, elements2)
+  }
 }

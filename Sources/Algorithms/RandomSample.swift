@@ -235,3 +235,61 @@ extension Sequence {
     return randomSample(count: k, using: &g)
   }
 }
+
+//===----------------------------------------------------------------------===//
+// randomElement()
+//===----------------------------------------------------------------------===//
+
+// This method is a single-element specialization of `randomSample(count:)`,
+// and extends the stdlib's `randomElement()` functionality (which is available
+// for collections) down to sequences.
+
+extension Sequence {
+  /// Randomly selects an element from this sequence, using the given generator
+  /// as the source of randomness.
+  ///
+  /// - Parameter rng: The random number generator to use for sampling.
+  /// - Returns: A random element. If the sequence has no elements, this method
+  ///   returns `nil`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  @inlinable
+  public func randomElement<G: RandomNumberGenerator>(
+    using rng: inout G
+  ) -> Element? {
+    var iterator = makeIterator()
+    guard var result = iterator.next() else {
+      return nil
+    }
+
+    var w = 1.0
+    while true {
+      w *= nextW(k: 1, using: &rng)
+      var offset = nextOffset(w: w, using: &rng)
+      while offset > 0, let _ = iterator.next() {
+        offset -= 1
+      }
+      guard let nextElement = iterator.next()
+        else { break }
+      
+      result = nextElement
+    }
+
+    return result
+  }
+  
+  /// Randomly selects an element from this sequence.
+  ///
+  /// This method is equivalent to calling `randomSample(using:)`, passing in
+  /// the system's default random generator.
+  ///
+  /// - Returns: A random element. If the sequence has no elements, this method
+  ///   returns `nil`.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  @inlinable
+  public func randomElement() -> Element? {
+    var g = SystemRandomNumberGenerator()
+    return randomElement(using: &g)
+  }
+}
