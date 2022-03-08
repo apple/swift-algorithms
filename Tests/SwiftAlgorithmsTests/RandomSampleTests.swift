@@ -12,13 +12,17 @@
 import XCTest
 @testable import Algorithms
 
+func expectedRange(for value: Int) -> ClosedRange<Int> {
+  ((value / 3) * 2) ... ((value / 3) * 4)
+}
+
 func validateRandomSamples<S: Sequence>(
   _ samples: [Int: Int],
   elements: S,
   expectedValue: Int,
   file: StaticString = #file, line: UInt = #line
 ) where S.Element == Int {
-  let expectedRange = ((expectedValue / 3) * 2) ... ((expectedValue / 3) * 4)
+  let expectedRange = expectedRange(for: expectedValue)
   XCTAssertEqualSequences(samples.keys.sorted(), elements,
     file: file, line: line)
   for v in samples.values {
@@ -28,41 +32,44 @@ func validateRandomSamples<S: Sequence>(
 
 private let n = 100
 private let k = 12
-private let iterations = 10_000
+private let iterations = 1000
+
+/// A collection to sample from.
 private let c = 0..<n
+/// A sequence to sample from.
 private let s = sequence(first: 0, next: { $0 == n - 1 ? nil : $0 + 1 })
+/// An empty sequence
+private let emptySequence = sequence(state: 0, next: { (_) -> Int? in nil })
 
 final class RandomSampleTests: XCTestCase {
   func testRandomStableSampleCollection() {
     let samples: [Int: Int] = (0..<iterations).reduce(into: [:]) { result, _ in
       let sample = c.randomStableSample(count: k)
       XCTAssert(sample.isSorted())
-      for x in sample {
-        result[x, default: 0] += 1
-      }
+      result.merge(sample.frequencies, uniquingKeysWith: +)
     }
     validateRandomSamples(samples, elements: c, expectedValue: (k * iterations) / n)
   }
   
   func testRandomSampleCollection() {
     let samples: [Int: Int] = (0..<iterations).reduce(into: [:]) { result, _ in
-      for x in c.randomSample(count: k) {
-        result[x, default: 0] += 1
-      }
+      result.merge(c.randomSample(count: k).frequencies, uniquingKeysWith: +)
     }
     validateRandomSamples(samples, elements: c, expectedValue: (k * iterations) / n)
   }
   
   func testRandomSampleSequence() {
     let samples: [Int: Int] = (0..<iterations).reduce(into: [:]) { result, _ in
-      for x in s.randomSample(count: k) {
-        result[x, default: 0] += 1
-      }
+      result.merge(s.randomSample(count: k).frequencies, uniquingKeysWith: +)
     }
     validateRandomSamples(samples, elements: s, expectedValue: (k * iterations) / n)
   }
   
   func testRandomSampleEdgeCases() {
+    XCTAssert(emptySequence.randomSample(count: 10).isEmpty)
+    XCTAssert(([] as [Int]).randomSample(count: 10).isEmpty)
+    XCTAssert(([] as [Int]).randomStableSample(count: 10).isEmpty)
+
     XCTAssert(c.randomStableSample(count: 0).isEmpty)
     XCTAssertEqualSequences(c.randomStableSample(count: n), c)
     XCTAssertEqualSequences(c.randomStableSample(count: n * 2), c)
@@ -77,21 +84,23 @@ final class RandomSampleTests: XCTestCase {
   }
   
   func testRandomSampleRepeatable() {
-    var generator = SplitMix64(seed: 0)
+    let seed = UInt64.random(in: 0 ... .max)
+
+    var generator = SplitMix64(seed: seed)
     let sample1a = c.randomSample(count: k, using: &generator)
-    generator = SplitMix64(seed: 0)
+    generator = SplitMix64(seed: seed)
     let sample2a = c.randomSample(count: k, using: &generator)
     XCTAssertEqual(sample1a, sample2a)
 
-    generator = SplitMix64(seed: 0)
+    generator = SplitMix64(seed: seed)
     let sample1b = s.randomSample(count: k, using: &generator)
-    generator = SplitMix64(seed: 0)
+    generator = SplitMix64(seed: seed)
     let sample2b = s.randomSample(count: k, using: &generator)
     XCTAssertEqual(sample1b, sample2b)
     
-    generator = SplitMix64(seed: 0)
+    generator = SplitMix64(seed: seed)
     let sample1c = c.randomStableSample(count: k, using: &generator)
-    generator = SplitMix64(seed: 0)
+    generator = SplitMix64(seed: seed)
     let sample2c = c.randomStableSample(count: k, using: &generator)
     XCTAssertEqual(sample1c, sample2c)
   }

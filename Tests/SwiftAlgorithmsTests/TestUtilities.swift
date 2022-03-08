@@ -23,6 +23,12 @@ extension Sequence where Element: Comparable {
   }
 }
 
+extension Sequence where Element: Hashable {
+  var frequencies: [Element: Int] {
+    reduce(into: [:]) { $0[$1, default: 0] += 1 }
+  }
+}
+
 extension Numeric {
   func factorial() -> Self {
     guard self != 0 else { return 1 }
