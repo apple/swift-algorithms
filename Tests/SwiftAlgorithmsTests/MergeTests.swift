@@ -184,4 +184,28 @@ final class MergeTests: XCTestCase {
                           repeatElement(2.0, count: .max).lazy)
     XCTAssertEqual(big.underestimatedCount, .max)
   }
+
+  /// Check using a custom predicate, especially one that access only some of
+  /// each elements' data.
+  func testCustomPredicate() {
+    struct Pair: Hashable {
+      let value: Int
+      let flag: Bool
+    }
+    func compare(_ a: Pair, _ b: Pair) -> Bool {
+      return a.value < b.value
+    }
+
+    let p0 = Pair(value: 0, flag: true), p1a = Pair(value: 1, flag: true)
+    let p1b = Pair(value: 1, flag: false), p2 = Pair(value: 2, flag: false)
+    let list1 = [p0, p1a], list2 = [p1b, p2]
+    XCTAssertEqualSequences(SetOperation.allCases.map {
+      merge(list1, list2, keeping: $0, along: compare)
+    }, [[], [p0], [p2], [p0, p2], [p1a], [p0, p1a], [p1b, p2], [p0, p1a, p2],
+        [p0, p1a, p1b, p2]])
+    XCTAssertEqualSequences(SetOperation.allCases.map {
+      merge(list2, list1, keeping: $0, along: compare)
+    }, [[], [p2], [p0], [p0, p2], [p1b], [p1b, p2], [p0, p1a], [p0, p1b, p2],
+        [p0, p1b, p1a, p2]])
+  }
 }
