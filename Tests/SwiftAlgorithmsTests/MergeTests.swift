@@ -106,8 +106,9 @@ final class MergeTests: XCTestCase {
     XCTAssertEqual(merge("", ""), "")
   }
 
-  /// Check the lazy versions of merging.
-  func testLazyMerge() {
+  /// Check the estimated length for (lazy) merging.
+  func testMergerUnderestimatedCount() {
+    // Set up
     let array1 = [0, 2, 3, 4, 4, 7], array2 = [-3, 0, 1, 6, 7, 7, 10]
     let lazyMergers = SetOperation.allCases.map {
       lazilyMerge(array1.lazy, array2.lazy, keeping: $0)
@@ -118,19 +119,36 @@ final class MergeTests: XCTestCase {
       [-3, 0, 0, 1, 2, 3, 4, 4, 6, 7, 7, 7, 10]
     ])
 
-    // Check the non-traversal operations.
-    XCTAssertEqualSequences(lazyMergers.map(\.underestimatedCount), [
-      0, 0, 1, 1, 0, 6, 7, 7, 13
-    ])
+    // Finite estimates
+    XCTAssertEqualSequences(lazyMergers.map(\.underestimatedCount),
+                            [0, 0, 1, 1, 0, 6, 7, 7, 13])
 
-    // - Check memory access; needs sequence type that uses memory blocks.
+    // Over-sized estimates
+    let big = lazilyMerge(repeatElement(1.0, count: .max).lazy,
+                          repeatElement(2.0, count: .max).lazy)
+    XCTAssertEqual(big.underestimatedCount, .max)
+  }
+
+  /// Check accessing memory to the elements of a (lazy) merger.
+  func testMergerMemoryBlocks() {
+    // Set up, using sequence type(s) with internal storage
+    let array1 = [0, 2, 3, 4, 4, 7], array2 = [-3, 0, 1, 6, 7, 7, 10]
+    let lazyMergers = SetOperation.allCases.map {
+      lazilyMerge(array1.lazy, array2.lazy, keeping: $0)
+    }
+
+    // Only the degenerate cases can support a single memory block.
     XCTAssertEqualSequences(lazyMergers.map({ merger in
       return merger.withContiguousStorageIfAvailable { buffer in
         buffer.baseAddress == nil
       }
     }), [true, nil, nil, nil, nil, false, false, nil, nil])
+  }
 
-    // - Check containment; needs sequence type with customized `contains`.
+  /// Check searching for an element within a (lazy) merger, for `contains`.
+  func testMergerEasyContainmentSearch() {
+    // Set up, using sequence type(s) with custom `contains` search
+    // (Guarantee sorted order in a `Set` by using at most one element.)
     let set1: Set = [5], set2: Set = [6]
     let setMergers = SetOperation.allCases.map {
       lazilyMerge(set1.lazy, set2.lazy, keeping: $0)
@@ -138,6 +156,8 @@ final class MergeTests: XCTestCase {
     XCTAssertEqualSequences(setMergers.map(Array.init), [
       [], [5], [6], [5, 6], [], [5], [6], [5, 6], [5, 6]
     ])
+
+    // One total miss, and one match per operand
     XCTAssertEqualSequences(setMergers.map({ merger in
       return merger._customContainsEquatableElement(4)
     }), [false, nil, nil, nil, nil, false, false, nil, false])
@@ -147,16 +167,23 @@ final class MergeTests: XCTestCase {
     XCTAssertEqualSequences(setMergers.map({ merger in
       return merger._customContainsEquatableElement(6)
     }), [false, nil, nil, nil, nil, false, true, nil, true])
+  }
 
-    // - Check containment, with mixed types that differ in `contains` support.
+  /// Check searching for an element within a (lazy) merger, for `contains`,
+  /// when only one operand supports custom search.
+  func testMergerHardContainmentSearch() {
+    // Set up
+    let array = [-3, 0, 1, 6, 7, 7, 10], set: Set = [6]
     let mixedMerger1 = SetOperation.allCases.map {
-      lazilyMerge(array2.lazy, set2.lazy, keeping: $0)
+      lazilyMerge(array.lazy, set.lazy, keeping: $0)
     }
     XCTAssertEqualSequences(mixedMerger1.map(Array.init), [
       [], [-3, 0, 1, 7, 7, 10], [], [-3, 0, 1, 7, 7, 10], [6],
       [-3, 0, 1, 6, 7, 7, 10], [6], [-3, 0, 1, 6, 7, 7, 10],
       [-3, 0, 1, 6, 6, 7, 7, 10]
     ])
+
+    // One total miss, and one match
     XCTAssertEqualSequences(mixedMerger1.map({ merger in
       return merger._customContainsEquatableElement(4)
     }), [false, nil, nil, nil, nil, nil, false, nil, nil])
@@ -164,25 +191,22 @@ final class MergeTests: XCTestCase {
       return merger._customContainsEquatableElement(6)
     }), [false, nil, nil, nil, nil, nil, true, nil, true])
 
+    // Repeat the tests, but flip the operand order.
     let mixedMerger2 = SetOperation.allCases.map {
-      lazilyMerge(set2.lazy, array2.lazy, keeping: $0)
+      lazilyMerge(set.lazy, array.lazy, keeping: $0)
     }
     XCTAssertEqualSequences(mixedMerger2.map(Array.init), [
       [], [], [-3, 0, 1, 7, 7, 10], [-3, 0, 1, 7, 7, 10], [6],
       [6], [-3, 0, 1, 6, 7, 7, 10], [-3, 0, 1, 6, 7, 7, 10],
       [-3, 0, 1, 6, 6, 7, 7, 10]
     ])
+
     XCTAssertEqualSequences(mixedMerger2.map({ merger in
       return merger._customContainsEquatableElement(4)
     }), [false, nil, nil, nil, nil, false, nil, nil, nil])
     XCTAssertEqualSequences(mixedMerger2.map({ merger in
       return merger._customContainsEquatableElement(6)
     }), [false, nil, nil, nil, nil, true, nil, nil, true])
-
-    // (Pseudo-)infinite sequences
-    let big = lazilyMerge(repeatElement(1.0, count: .max).lazy,
-                          repeatElement(2.0, count: .max).lazy)
-    XCTAssertEqual(big.underestimatedCount, .max)
   }
 
   /// Check using a custom predicate, especially one that access only some of
