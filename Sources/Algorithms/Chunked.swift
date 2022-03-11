@@ -303,7 +303,7 @@ extension Collection {
 /// A collection that presents the elements of its base collection in
 /// `SubSequence` chunks of any given count.
 ///
-/// A `ChunksOfCountCollection` is a lazy view on the base Collection, but it
+/// A `ChunksOfCountCollection` is a lazy view on the base `Collection`, but it
 /// does not implicitly confer laziness on algorithms applied to its result. In
 /// other words, for ordinary collections `c`:
 ///
@@ -486,11 +486,11 @@ extension ChunksOfCountCollection {
     _ i: Index, _ distance: Int
   ) -> Int {
     if i == endIndex {
-      let remainder = base.count%chunkCount
+      let remainder = base.count % chunkCount
       // We have to take it into account when calculating offsets.
       if remainder != 0 {
-        // Distance "minus" one(at this point distance is negative) because we
-        // need to adjust for the last position that have a variadic(remainder)
+        // Distance "minus" one (at this point distance is negative) because we
+        // need to adjust for the last position that have a variadic (remainder)
         // number of elements.
         return ((distance + 1) * chunkCount) - remainder
       }
@@ -512,7 +512,7 @@ extension ChunksOfCountCollection {
     )
   }
   
-  // Helper to compute index(offsetBy:) index.
+  // Helper to compute `index(offsetBy:)` index.
   @inlinable
   internal func makeOffsetIndex(
     from i: Index, baseBound: Base.Index, distance: Int, baseDistance: Int,
@@ -525,13 +525,13 @@ extension ChunksOfCountCollection {
     
     if let limit = limit {
       if baseIdx == nil {
-        // If we past the bounds while advancing forward and the limit is the
-        // `endIndex`, since the computation on base don't take into account the
-        // remainder, we have to make sure that passing the bound was because of
-        // the distance not just because of a remainder. Special casing is less
-        // expensive than always use count(which could be O(n) for non-random
-        // access collection base) to compute the base distance taking remainder
-        // into account.
+        // If we passed the bounds while advancing forward, and the limit is the
+        // `endIndex`, since the computation on `base` don't take into account
+        // the remainder, we have to make sure that passing the bound was
+        // because of the distance not just because of a remainder. Special
+        // casing is less expensive than always using `count` (which could be
+        // O(n) for non-random access collection base) to compute the base
+        // distance taking remainder into account.
         if baseDistance > 0 && limit == endIndex {
           if self.distance(from: i, to: limit) < distance {
             return nil
@@ -561,7 +561,7 @@ extension Collection {
   /// Returns a `ChunksOfCountCollection<Self>` view presenting the elements in
   /// chunks with count of the given count parameter.
   ///
-  /// - Parameter count: The size of the chunks. If the count parameter is
+  /// - Parameter count: The size of the chunks. If the `count` parameter is
   ///   evenly divided by the count of the base `Collection` all the chunks will
   ///   have the count equals to size. Otherwise, the last chunk will contain
   ///   the remaining elements.
