@@ -16,7 +16,7 @@ One new addition to the list of algorithms:
   and sorting criterion into a collection that is likewise sorted. When using
   lazy sequences, mergers can be done lazily with `lazilyMerge(_:_:)`. Treating
   the sorted sequences as multi-sets, a parameter can be provided to return the
-  sequences' union, intersection, *etc.* instead. ([???])
+  sequences' union, intersection, *etc.* instead. ([#184])
 
 ---
 
@@ -316,6 +316,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#130]: https://github.com/apple/swift-algorithms/pull/130
 [#138]: https://github.com/apple/swift-algorithms/pull/138
 [#162]: https://github.com/apple/swift-algorithms/pull/162
+[#184]: https://github.com/apple/swift-algorithms/pull/184
 
 <!-- Link references for contributors -->
 
