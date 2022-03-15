@@ -40,10 +40,6 @@ Read more about the package, and the intent behind it, in the [announcement on s
 
 - [`min(count:)`, `max(count:)`, `min(count:sortedBy:)`, `max(count:sortedBy:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/MinMax.md): Returns the smallest or largest elements of a collection, sorted by a predicate.
 
-#### Comparisons
-
--[`sortedOverlap(with: by:)`, `sortedOverlap(with:)`](./Guides/SortedInclusion.md): Reports the degree two sorted sequences overlap.
-
 #### Other useful operations
 
 - [`adjacentPairs()`](https://github.com/apple/swift-algorithms/blob/main/Guides/AdjacentPairs.md): Lazily iterates over tuples of adjacent elements.
@@ -55,6 +51,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 - [`reductions(_:)`, `reductions(_:_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Reductions.md): Returns all the intermediate states of reducing the elements of a sequence or collection.
 - [`split(maxSplits:omittingEmptySubsequences:whereSeparator)`, `split(separator:maxSplits:omittingEmptySubsequences)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Split.md): Lazy versions of the Standard Library's eager operations that split sequences and collections into subsequences separated by the specified separator element.
 - [`windows(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Windows.md): Breaks a collection into overlapping subsequences where elements are slices from the original collection.
+- [`sortedOverlap(with:by:)`, `sortedOverlap(with:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SortedInclusion.md): Reports the degree two sorted sequences overlap.
 
 ## Adding Swift Algorithms as a Dependency
 
