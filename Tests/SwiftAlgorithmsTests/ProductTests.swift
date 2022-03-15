@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
-import Algorithms
+@testable import Algorithms
 
 final class ProductTests: XCTestCase {
   func testProduct() {
@@ -36,5 +36,21 @@ final class ProductTests: XCTestCase {
   func testProductDistanceFromTo() {
     let p = product([1, 2], "abc")
     XCTAssertEqual(p.distance(from: p.startIndex, to: p.endIndex), 6)
+  }
+  
+  func testProductIndexTraversals() {
+    let validator = IndexValidator<Product2Sequence<[Int], String>>(
+      indicesIncludingEnd: { product in
+        product.base1.indices.flatMap { i1 in
+          product.base2.indices.map { i2 in
+            .init(i1: i1, i2: i2)
+          }
+        } + [.init(i1: product.base1.endIndex, i2: product.base2.startIndex)]
+      })
+    
+    validator.validate(product([1, 2, 3, 4], "abc"), expectedCount: 4 * 3)
+    validator.validate(product([1, 2, 3, 4], ""), expectedCount: 4 * 0)
+    validator.validate(product([], "abc"), expectedCount: 0 * 3)
+    validator.validate(product([], ""), expectedCount: 0 * 0)
   }
 }

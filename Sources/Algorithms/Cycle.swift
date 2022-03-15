@@ -10,21 +10,27 @@
 //===----------------------------------------------------------------------===//
 
 /// A collection wrapper that repeats the elements of a base collection.
-public struct Cycle<Base: Collection> {
+public struct CycledSequence<Base: Collection> {
   /// The collection to repeat.
-  public let base: Base
+  @usableFromInline
+  internal let base: Base
+  
+  @inlinable
+  internal init(base: Base) {
+    self.base = base
+  }
 }
 
-extension Cycle: Sequence {
-  /// The iterator for a `Cycle` sequence.
+extension CycledSequence: Sequence {
+  /// The iterator for a `CycledSequence` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
-    let base: Base
+    internal let base: Base
     
     @usableFromInline
-    var current: Base.Index
+    internal var current: Base.Index
     
-    @usableFromInline
+    @inlinable
     internal init(base: Base) {
       self.base = base
       self.current = base.startIndex
@@ -43,12 +49,119 @@ extension Cycle: Sequence {
     }
   }
   
+  @inlinable
   public func makeIterator() -> Iterator {
     Iterator(base: base)
   }
 }
 
-extension Cycle: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension CycledSequence: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
+
+/// A collection wrapper that repeats the elements of a base collection for a
+/// finite number of times.
+public struct CycledTimesCollection<Base: Collection> {
+  /// A `Product2Sequence` instance for iterating the base collection.
+  @usableFromInline
+  internal let product: Product2Sequence<Range<Int>, Base>
+
+  @inlinable
+  internal init(base: Base, times: Int) {
+    self.product = Product2Sequence(0..<times, base)
+  }
+}
+
+extension CycledTimesCollection: Collection {
+  public typealias Element = Base.Element
+
+  public struct Index: Comparable {
+    /// The index corresponding to the `Product2Sequence` index at this
+    /// position.
+    @usableFromInline
+    internal let productIndex: Product2Sequence<Range<Int>, Base>.Index
+
+    @inlinable
+    internal init(_ productIndex: Product2Sequence<Range<Int>, Base>.Index) {
+      self.productIndex = productIndex
+    }
+
+    @inlinable
+    public static func == (lhs: Index, rhs: Index) -> Bool {
+      lhs.productIndex == rhs.productIndex
+    }
+
+    @inlinable
+    public static func < (lhs: Index, rhs: Index) -> Bool {
+      lhs.productIndex < rhs.productIndex
+    }
+  }
+
+  @inlinable
+  public var startIndex: Index {
+    Index(product.startIndex)
+  }
+
+  @inlinable
+  public var endIndex: Index {
+    Index(product.endIndex)
+  }
+
+  @inlinable
+  public subscript(_ index: Index) -> Element {
+    product[index.productIndex].1
+  }
+
+  @inlinable
+  public func index(after i: Index) -> Index {
+    let productIndex = product.index(after: i.productIndex)
+    return Index(productIndex)
+  }
+
+  @inlinable
+  public func distance(from start: Index, to end: Index) -> Int {
+    product.distance(from: start.productIndex, to: end.productIndex)
+  }
+
+  @inlinable
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    let productIndex = product.index(i.productIndex, offsetBy: distance)
+    return Index(productIndex)
+  }
+
+  @inlinable
+  public func index(
+    _ i: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    guard let productIndex = product.index(
+      i.productIndex,
+      offsetBy: distance,
+      limitedBy: limit.productIndex)
+    else { return nil }
+    return Index(productIndex)
+  }
+
+  @inlinable
+  public var count: Int {
+    product.count
+  }
+}
+
+extension CycledTimesCollection: BidirectionalCollection
+  where Base: BidirectionalCollection {
+  @inlinable
+  public func index(before i: Index) -> Index {
+    let productIndex = product.index(before: i.productIndex)
+    return Index(productIndex)
+  }
+}
+
+extension CycledTimesCollection: RandomAccessCollection
+  where Base: RandomAccessCollection {}
+
+extension CycledTimesCollection: LazySequenceProtocol, LazyCollectionProtocol
+  where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // cycled()
@@ -80,8 +193,9 @@ extension Collection {
   ///   forever.
   ///
   /// - Complexity: O(1)
-  public func cycled() -> Cycle<Self> {
-    Cycle(base: self)
+  @inlinable
+  public func cycled() -> CycledSequence<Self> {
+    CycledSequence(base: self)
   }
   
   /// Returns a sequence that repeats the elements of this collection the
@@ -101,7 +215,8 @@ extension Collection {
   ///   times.
   ///
   /// - Complexity: O(1)
-  public func cycled(times: Int) -> FlattenSequence<Repeated<Self>> {
-    repeatElement(self, count: times).joined()
+  @inlinable
+  public func cycled(times: Int) -> CycledTimesCollection<Self> {
+    CycledTimesCollection(base: self, times: times)
   }
 }

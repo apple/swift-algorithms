@@ -3,7 +3,7 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Permutations.swift) | 
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/PermutationsTests.swift)]
 
-A type that computes permutations of a collection’s elements, or of a subset of
+Methods that compute permutations of a collection’s elements, or of a subset of
 those elements.
 
 The `permutations(ofCount:)` method, when called without the `ofCount`
@@ -60,29 +60,79 @@ for perm in numbers2.permutations() {
 // [10, 10, 20]
 ```
 
+To generate only unique permutations, use the `uniquePermutations(ofCount:)` method:
+
+```swift
+for perm in numbers2.uniquePermutations() {
+    print(perm)
+}
+// [20, 10, 10]
+// [10, 20, 10]
+// [10, 10, 20]
+```
+
+Given a range, the methods return a sequence of all the different permutations of the given sizes of a collection’s elements in increasing order of size.
+
+```swift
+let numbers = [10, 20, 30]
+for perm in numbers.permutations(ofCount: 0...) {
+    print(perm)
+}
+// []
+// [10]
+// [20]
+// [30]
+// [10, 20]
+// [10, 30]
+// [20, 10]
+// [20, 30]
+// [30, 10]
+// [30, 20]
+// [10, 20, 30]
+// [10, 30, 20]
+// [20, 10, 30]
+// [20, 30, 10]
+// [30, 10, 20]
+// [30, 20, 10]
+```
+
 ## Detailed Design
 
-The `permutations(ofCount:)` method is declared as a `Collection` extension,
-and returns a `Permutations` type:
+The `permutations(ofCount:)` and `uniquePermutations(ofCount:)` methods are 
+declared as `Collection` extensions, and return `PermutationsSequence` and 
+`UniquePermutationsSequence` instances, respectively:
 
 ```swift
 extension Collection {
-    public func permutations(ofCount k: Int? = nil) -> Permutations<Self>
+    public func permutations(ofCount k: Int? = nil) -> PermutationsSequence<Self>
+    public func permutations<R>(ofCount kRange: R) -> PermutationsSequence<Self>
+        where R: RangeExpression, R.Bound == Int
+}
+
+extension Collection where Element: Hashable {
+    public func uniquePermutations(ofCount k: Int? = nil) -> UniquePermutationsSequence<Self>
+    public func uniquePermutations<R>(ofCount kRange: R) -> UniquePermutationsSequence<Self>
+        where R: RangeExpression, R.Bound == Int
 }
 ```
 
-Since the `Permutations` type needs to store an array of the collection’s
-indices and mutate the array to generate each permutation, `Permutations` only
-has `Sequence` conformance. Adding `Collection` conformance would require
+Since both result types need to store an array of the collection’s
+indices and mutate the array to generate each permutation, they only
+have `Sequence` conformance. Adding `Collection` conformance would require
 storing the array in the index type, which would in turn lead to copying the
-array at every index advancement. `Combinations` does conform to
-`LazySequenceProtocol` when the base type conforms.
+array at every index advancement. The `PermutationsSequence` and
+`UniquePermutationsSequence` types conforms to `LazySequenceProtocol` when their
+base type conforms.
 
 ### Complexity
 
 Calling `permutations()` is an O(1) operation. Creating the iterator for a
-`Permutations` instance and each call to `Permutations.Iterator.next()` is an
-O(_n_) operation.
+`PermutationsSequence` instance and each call to
+`PermutationsSequence.Iterator.next()` is an O(_n_) operation.
+
+Calling `uniquePermutations()` is an O(_n_) operation, because it preprocesses 
+the collection to find duplicate elements. Creating the iterator for and each 
+call to `next()` is also an O(_n_) operation.
 
 ### Naming
 
@@ -92,9 +142,8 @@ See the ["Naming" section for `combinations(ofCount:)`](Combinations.md#naming) 
 
 **C++:** The `<algorithm>` library defines a `next_permutation` function that
 advances an array of comparable values through their lexicographic orderings.
-This function is tricky to use and understand, so while it’s included in
-`swift-algorithms` as an implementation detail of the `Permutations` type, it
-isn’t public.
+This function is very similar to the `uniquePermutations(ofCount:)` method.
 
 **Rust/Ruby/Python:** Rust, Ruby, and Python all define functions with
-essentially the same semantics as the method described here.
+essentially the same semantics as the `permutations(ofCount:)` method 
+described here.
