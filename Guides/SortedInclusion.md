@@ -5,7 +5,15 @@
 
 Methods to find how much two sorted sequences overlap.
 
-(To-do: expand on this.)
+```swift
+if (1...7).sortedOverlap(with: [1, 5, 6]).doesFirstIncludeSecond {
+  print("The range is a superset of the array.")
+}
+```
+
+The result is an enumeration type, instead of a simple `Bool`, so an useful
+answer can be extracted if which source sequence is actually the superset is
+called from the wrong spot.
 
 ## Detailed Design
 
