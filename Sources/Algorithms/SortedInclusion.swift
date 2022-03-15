@@ -66,17 +66,16 @@ extension Sequence {
   ///   and `c` are incomparable, then `a` and `c` are also incomparable.
   ///   (Transitive incomparability)
   ///
-  /// - Precondition:
-  ///   - Both the receiver and `other` are sorted according to
-  ///     `areInIncreasingOrder`.
-  ///   - Both the receiver and `other` should be finite.
+  /// - Precondition: Both the receiver and `other` are sorted according to
+  ///   `areInIncreasingOrder`; and both should be finite.
   ///
   /// - Parameters:
   ///   - other: A sequence to compare to this sequence.
   ///   - areInIncreasingOrder:  A predicate that returns `true` if its first
   ///     argument should be ordered before its second argument; otherwise,
   ///     `false`.
-  /// - Returns: The degree of inclusion between the sequences.
+  /// - Returns: The degree of inclusion between the sequences. The receiver is
+  ///   considered the first source, and `other` second.
   ///
   /// - Complexity: O(*m*), where *m* is the lesser of the length of the
   ///   sequence and the length of `other`.
@@ -125,13 +124,13 @@ extension Sequence where Element: Comparable {
   /// Returns how this sequence and the given sequence overlap, assuming both
   /// are sorted.
   ///
-  /// - Precondition:
-  ///   - Both the receiver and `other` are sorted.
-  ///   - Both the receiver and `other` should be finite.
+  /// - Precondition: Both the receiver and `other` are sorted; and both should
+  ///   be finite.
   ///
   /// - Parameters:
   ///   - other: A sequence to compare to this sequence.
-  /// - Returns: The degree of inclusion between the sequences.
+  /// - Returns: The degree of inclusion between the sequences. The receiver is
+  ///   considered the first source, and `other` second.
   ///
   /// - Complexity: O(*m*), where *m* is the lesser of the length of the
   ///   sequence and the length of `other`.
