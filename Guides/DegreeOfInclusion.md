@@ -11,20 +11,23 @@ if (1...7).degreeOfInclusion(with: [1, 5, 6]).doesFirstIncludeSecond {
 }
 ```
 
-The result is an enumeration type, instead of a simple `Bool`, so an useful
-answer can be extracted if which source sequence is actually the superset is
-called from the wrong spot.
+The result is an enumeration detailing the precise containment relationship, if
+any. If the result was `Bool`, then the method would need to be called again
+(with swapped arguments) to confirm the actual inclusion degree.
 
 ## Detailed Design
 
-The inclusion-detection methods are declared as extensions to `Sequence`.  The
+The inclusion-detection methods are declared as extensions to `Sequence`. The
 overload that defaults comparisons to the standard less-than operator is
 constrained to when the `Element` type conforms to `Comparable`.
 
-A reported inclusion state is expressed with the `SetInclusion` type.  This state
+A reported inclusion state is expressed with the `SetInclusion` type. This state
 is based on the existence of elements that are shared, exclusive to the first
 sequence, and exclusive to the second sequence.  This includes all the
-degenerate combinations.  Convenience properties are included for easy tests.
+degenerate combinations, which are the ones where at least one source is empty.
+Use the convenience properties `doesFirstIncludeSecond` and
+`doesSecondIncludeFirst` (and `areIdentical`) to actually check if one source is
+a superset of the other.
 
 ```swift
 enum SetInclusion {
@@ -64,10 +67,10 @@ O(_n_) operations, where _n_ is the length of the shorter source.
 ### Comparison with other languages
 
 **C++:** The `<algorithm>` library defines the `includes` function, whose
-functionality is part of the semantics of `degreeOfInclusion`.  The `includes`
+functionality is part of the semantics of `degreeOfInclusion`. The `includes`
 function only detects of the second sequence is included within the first; it
 doesn't notify if the inclusion is degenerate, or if inclusion fails because
-it's actually reversed, both of which `degreeOfInclusion` can do.  To get the
+it's actually reversed, both of which `degreeOfInclusion` can do. To get the
 direct functionality of `includes`, check the `doesFirstIncludeSecond` property
 of the return value from `degreeOfInclusion`.
 
