@@ -10,9 +10,9 @@ This project follows semantic versioning.
 
 ### Additions
 
-- The `sortedOverlap(with: by:)` and `sortedOverlap(with:)` methods have been
-  added.  They report how much overlap two sorted sequences have, expressed by
-  the new `SetInclusion` type. ([#38])
+- The `degreeOfInclusion(with:by:)` and `degreeOfInclusion(with:)` methods have
+  been added. They report how much overlap two sorted sequences have, expressed
+  by the `SetInclusion` type. ([#38])
 
 ---
 

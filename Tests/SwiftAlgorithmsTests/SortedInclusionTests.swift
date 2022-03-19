@@ -46,21 +46,21 @@ final class SortedInclusionTests: XCTestCase {
   /// Check when both sources are empty.
   func testEmpty() {
     let empty = EmptyCollection<Int>()
-    XCTAssertEqual(empty.sortedOverlap(with: empty), .bothUninhabited)
+    XCTAssertEqual(empty.degreeOfInclusion(with: empty), .bothUninhabited)
   }
 
   /// Check when exactly one source is empty.
   func testOnlyOneEmpty() {
     let empty = EmptyCollection<Int>(), single = CollectionOfOne(1)
-    XCTAssertEqual(single.sortedOverlap(with: empty), .onlyFirstInhabited)
-    XCTAssertEqual(empty.sortedOverlap(with: single), .onlySecondInhabited)
+    XCTAssertEqual(single.degreeOfInclusion(with: empty), .onlyFirstInhabited)
+    XCTAssertEqual(empty.degreeOfInclusion(with: single), .onlySecondInhabited)
   }
 
   /// Check when there are no common elements.
   func testDisjoint() {
     let one = CollectionOfOne(1), two = CollectionOfOne(2)
-    XCTAssertEqual(one.sortedOverlap(with: two), .dualExclusivesOnly)
-    XCTAssertEqual(two.sortedOverlap(with: one), .dualExclusivesOnly)
+    XCTAssertEqual(one.degreeOfInclusion(with: two), .dualExclusivesOnly)
+    XCTAssertEqual(two.degreeOfInclusion(with: one), .dualExclusivesOnly)
     // The order changes which comparison branch is used and which versus-nil
     // case is used.
   }
@@ -68,14 +68,14 @@ final class SortedInclusionTests: XCTestCase {
   /// Check when there are only common elements.
   func testIdentical() {
     let single = CollectionOfOne(1)
-    XCTAssertEqual(single.sortedOverlap(with: single), .sharedOnly)
+    XCTAssertEqual(single.degreeOfInclusion(with: single), .sharedOnly)
   }
 
   /// Check when the first source is a superset of the second.
   func testFirstIncludesSecond() {
-    XCTAssertEqual([1, 2, 3, 5, 7].sortedOverlap(with: [1, 3, 5, 7]),
+    XCTAssertEqual([1, 2, 3, 5, 7].degreeOfInclusion(with: [1, 3, 5, 7]),
                    .firstExtendsSecond)
-    XCTAssertEqual([2, 4, 6, 8].sortedOverlap(with: [2, 4, 6]),
+    XCTAssertEqual([2, 4, 6, 8].degreeOfInclusion(with: [2, 4, 6]),
                    .firstExtendsSecond)
     // The logic path differs if the last elements tie, or the first source's
     // last element is bigger.  (The second's last element can't be biggest.)
@@ -83,9 +83,9 @@ final class SortedInclusionTests: XCTestCase {
 
   /// Check when the second source is a superset of the first.
   func testSecondIncludesFirst() {
-    XCTAssertEqual([1, 3, 5, 7].sortedOverlap(with: [1, 2, 3, 5, 7]),
+    XCTAssertEqual([1, 3, 5, 7].degreeOfInclusion(with: [1, 2, 3, 5, 7]),
                    .secondExtendsFirst)
-    XCTAssertEqual([2, 4, 6].sortedOverlap(with: [2, 4, 6, 8]),
+    XCTAssertEqual([2, 4, 6].degreeOfInclusion(with: [2, 4, 6, 8]),
                    .secondExtendsFirst)
     // The logic path differs if the last elements tie, or the second source's
     // last element is bigger.  (The first's last element can't be biggest.)
@@ -93,9 +93,9 @@ final class SortedInclusionTests: XCTestCase {
 
   /// Check when there are shared and two-way exclusive elements.
   func testPartialOverlap() {
-    XCTAssertEqual([3, 6, 9].sortedOverlap(with: [2, 4, 6, 8]),
+    XCTAssertEqual([3, 6, 9].degreeOfInclusion(with: [2, 4, 6, 8]),
                    .dualExclusivesAndShared)
-    XCTAssertEqual([1, 2, 4].sortedOverlap(with: [1, 4, 16]),
+    XCTAssertEqual([1, 2, 4].degreeOfInclusion(with: [1, 4, 16]),
                    .dualExclusivesAndShared)
     // For the three categories; exclusive to first, exclusive to second, and
     // shared; if the third one encountered isn't from the last element(s) from

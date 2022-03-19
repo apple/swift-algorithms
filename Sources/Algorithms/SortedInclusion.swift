@@ -46,7 +46,7 @@ extension SetInclusion {
 }
 
 //===----------------------------------------------------------------------===//
-// sortedOverlap(with: by:)
+// degreeOfInclusion(with:by:)
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
@@ -79,7 +79,7 @@ extension Sequence {
   ///
   /// - Complexity: O(*m*), where *m* is the lesser of the length of the
   ///   sequence and the length of `other`.
-  public func sortedOverlap<S: Sequence>(
+  public func degreeOfInclusion<S: Sequence>(
     with other: S,
     by areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> SetInclusion where S.Element == Element {
@@ -117,7 +117,7 @@ extension Sequence {
 }
 
 //===----------------------------------------------------------------------===//
-// sortedOverlap(with:)
+// degreeOfInclusion(with:)
 //===----------------------------------------------------------------------===//
 
 extension Sequence where Element: Comparable {
@@ -135,8 +135,8 @@ extension Sequence where Element: Comparable {
   /// - Complexity: O(*m*), where *m* is the lesser of the length of the
   ///   sequence and the length of `other`.
   @inlinable
-  public func sortedOverlap<S: Sequence>(with other: S) -> SetInclusion
+  public func degreeOfInclusion<S: Sequence>(with other: S) -> SetInclusion
   where S.Element == Element {
-    return sortedOverlap(with: other, by: <)
+    return degreeOfInclusion(with: other, by: <)
   }
 }

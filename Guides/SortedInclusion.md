@@ -6,7 +6,7 @@
 Methods to find how much two sorted sequences overlap.
 
 ```swift
-if (1...7).sortedOverlap(with: [1, 5, 6]).doesFirstIncludeSecond {
+if (1...7).degreeOfInclusion(with: [1, 5, 6]).doesFirstIncludeSecond {
   print("The range is a superset of the array.")
 }
 ```
@@ -43,14 +43,14 @@ extension SetInclusion {
 }
 
 extension Sequence {
-  func sortedOverlap<S: Sequence>(
+  func degreeOfInclusion<S: Sequence>(
     with other: S,
     by areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> SetInclusion where S.Element == Element
 }
 
 extension Sequence where Element: Comparable {
-  func sortedOverlap<S: Sequence>(
+  func degreeOfInclusion<S: Sequence>(
     with other: S
   ) -> SetInclusion where S.Element == Element
 }
@@ -64,11 +64,11 @@ O(_n_) operations, where _n_ is the length of the shorter source.
 ### Comparison with other languages
 
 **C++:** The `<algorithm>` library defines the `includes` function, whose
-functionality is part of the semantics of `sortedOverlap`.  The `includes`
+functionality is part of the semantics of `degreeOfInclusion`.  The `includes`
 function only detects of the second sequence is included within the first; it
 doesn't notify if the inclusion is degenerate, or if inclusion fails because
-it's actually reversed, both of which `sortedOverlap` can do.  To get the
+it's actually reversed, both of which `degreeOfInclusion` can do.  To get the
 direct functionality of `includes`, check the `doesFirstIncludeSecond` property
-of the return value from `sortedOverlap`.
+of the return value from `degreeOfInclusion`.
 
 (To-do: add other languages.)
