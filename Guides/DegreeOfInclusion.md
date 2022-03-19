@@ -1,7 +1,7 @@
 # Sorted Sequence Inclusion
 
-[[Source](../Sources/Algorithms/SortedInclusion.swift) | 
- [Tests](../Tests/SwiftAlgorithmsTests/SortedInclusionTests.swift)]
+[[Source](../Sources/Algorithms/DegreeOfInclusion.swift) | 
+ [Tests](../Tests/SwiftAlgorithmsTests/DegreeOfInclusionTests.swift)]
 
 Methods to find how much two sorted sequences overlap.
 
