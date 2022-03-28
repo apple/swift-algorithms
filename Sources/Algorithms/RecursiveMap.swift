@@ -10,14 +10,46 @@
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
-    
+    /// Returns a sequence containing the original sequence followed by recursive mapped sequence
+    ///
+    /// ```
+    ///struct View {
+    ///    var id: Int
+    ///    var children: [View] = []
+    ///}
+    ///let tree = [
+    ///    View(id: 1, children: [
+    ///        View(id: 3),
+    ///        View(id: 4, children: [
+    ///            View(id: 6),
+    ///        ]),
+    ///        View(id: 5),
+    ///    ]),
+    ///    View(id: 2),
+    ///]
+    ///for view in tree.recursiveMap({ $0.children }) {
+    ///    print(view.id)
+    ///}
+    ///// 1
+    ///// 2
+    ///// 3
+    ///// 4
+    ///// 5
+    ///// 6
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - transform: A closure that map the element to new sequence.
+    /// - Returns: A sequence of the original sequence followed by recursive mapped sequence
+    ///   elements.
+    ///
+    /// - Complexity: O(1)
     @inlinable
     public func recursiveMap<S>(_ transform: @escaping (Element) -> S) -> RecursiveMapSequence<Self, S> {
         return RecursiveMapSequence(self, transform)
     }
 }
 
-@frozen
 public struct RecursiveMapSequence<Base: Sequence, Transformed: Sequence>: Sequence where Base.Element == Transformed.Element {
     
     @usableFromInline
@@ -40,7 +72,6 @@ public struct RecursiveMapSequence<Base: Sequence, Transformed: Sequence>: Seque
 
 extension RecursiveMapSequence {
     
-    @frozen
     public struct Iterator: IteratorProtocol {
         
         @usableFromInline

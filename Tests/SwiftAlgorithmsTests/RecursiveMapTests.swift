@@ -14,25 +14,25 @@ import Algorithms
 
 final class RecursiveMapTests: XCTestCase {
     
-    struct Dir: Hashable {
-        
-        var id: UUID = UUID()
-        
-        var parent: UUID?
-        
-        var name: String
-        
-    }
-    
-    struct Path: Hashable {
-        
-        var id: UUID
-        
-        var path: String
-        
-    }
-    
     func testRecursiveMap() {
+        
+        struct Dir: Hashable {
+            
+            var id: UUID = UUID()
+            
+            var parent: UUID?
+            
+            var name: String
+            
+        }
+        
+        struct Path: Hashable {
+            
+            var id: UUID
+            
+            var path: String
+            
+        }
         
         var list: [Dir] = []
         list.append(Dir(name: "root"))
@@ -54,7 +54,32 @@ final class RecursiveMapTests: XCTestCase {
         let result = list.lazy.compactMap { $0.parent == nil ? Path(id: $0.id, path: "/\($0.name)") : nil }
             .recursiveMap { parent in list.lazy.compactMap { $0.parent == parent.id ? Path(id: $0.id, path: "\(parent.path)/\($0.name)") : nil } }
         
-        XCTAssert(result.elementsEqual(answer))
+        XCTAssertEqualSequences(result, answer)
+    }
+    
+    func testRecursiveMap2() {
+        
+        struct View {
+            
+            var id: Int
+            
+            var children: [View] = []
+        }
+        
+        let tree = [
+            View(id: 1, children: [
+                View(id: 3),
+                View(id: 4, children: [
+                    View(id: 6),
+                ]),
+                View(id: 5),
+            ]),
+            View(id: 2),
+        ]
+        
+        let views = tree.recursiveMap { $0.children }
+        
+        XCTAssertEqualSequences(views.map { $0.id }, 1...6)
     }
     
 }
