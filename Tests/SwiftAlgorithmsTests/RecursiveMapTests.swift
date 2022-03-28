@@ -59,27 +59,27 @@ final class RecursiveMapTests: XCTestCase {
     
     func testRecursiveMap2() {
         
-        struct View {
+        struct Node {
             
             var id: Int
             
-            var children: [View] = []
+            var children: [Node] = []
         }
         
         let tree = [
-            View(id: 1, children: [
-                View(id: 3),
-                View(id: 4, children: [
-                    View(id: 6),
+            Node(id: 1, children: [
+                Node(id: 3),
+                Node(id: 4, children: [
+                    Node(id: 6),
                 ]),
-                View(id: 5),
+                Node(id: 5),
             ]),
-            View(id: 2),
+            Node(id: 2),
         ]
         
-        let views = tree.recursiveMap { $0.children }
+        let nodes = tree.recursiveMap { $0.children }
         
-        XCTAssertEqualSequences(views.map { $0.id }, 1...6)
+        XCTAssertEqualSequences(nodes.map { $0.id }, 1...6)
     }
     
 }
