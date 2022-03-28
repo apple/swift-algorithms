@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
-    /// Returns a sequence containing the original sequence followed by recursive mapped sequence
+    /// Returns a sequence containing the original sequence followed by recursive mapped sequence.
     ///
     /// ```
     ///struct View {
@@ -40,8 +40,7 @@ extension Sequence {
     ///
     /// - Parameters:
     ///   - transform: A closure that map the element to new sequence.
-    /// - Returns: A sequence of the original sequence followed by recursive mapped sequence
-    ///   elements.
+    /// - Returns: A sequence of the original sequence followed by recursive mapped sequence.
     ///
     /// - Complexity: O(1)
     @inlinable
