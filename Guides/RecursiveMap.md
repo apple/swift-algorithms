@@ -3,7 +3,9 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/RecursiveMap.swift) |
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/RecursiveMapTests.swift)]
 
-Produces a sequence containing the original sequence followed by recursive mapped sequence.
+## Proposed Solution
+
+Produces a sequence containing the original sequence and the recursive mapped sequence. The order of ouput elements affects by the traversal option.
 
 ```swift
 struct Node {
@@ -31,13 +33,18 @@ for node in tree.recursiveMap({ $0.children }) {
 // 6
 ```
 
+### Traversal Option
+
+This function comes with two different traversal methods.
+
 ## Detailed Design
 
-The `recursiveMap(_:)` method is declared as `Sequence` extensions, and return `RecursiveMapSequence` instance:
+The `recursiveMap(option:_:)` method is declared as `Sequence` extensions, and return `RecursiveMapSequence` instance:
 
 ```swift
 extension Sequence {
     public func recursiveMap<S>(
+        option: RecursiveMapSequence<Self, S>.TraversalOption = .depthFirst,
         _ transform: @escaping (Element) -> S
     ) -> RecursiveMapSequence<Self, S>
 }

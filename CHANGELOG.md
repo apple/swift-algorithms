@@ -12,7 +12,9 @@ This project follows semantic versioning.
 
  One new addition to the list of algorithms:
 
- - `recursiveMap(_:)` Produces a sequence containing the original sequence followed by recursive mapped sequence. ([#185])
+ - `recursiveMap(option:_:)` Produces a sequence containing the original sequence and
+   the recursive mapped sequence. The order of ouput elements affects by the traversal
+   option. ([#185])
 
 ---
 
