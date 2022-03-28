@@ -55,6 +55,8 @@ This function comes with two different traversal methods. This option affects th
   ```
   
   The resulting sequence will be 1 -> 2 -> 3 -> 4 -> 5 -> 6
+  
+  The sequence using a buffer keep tracking the path of nodes. It should not using this option for searching the indefinite deep of tree.
 
 - `breadthFirst`: The algorithm will go through the previous sequence first and chaining all the occurring sequences.
 
@@ -73,6 +75,8 @@ This function comes with two different traversal methods. This option affects th
   ```
   
   The resulting sequence will be 1 -> 6 -> 2 -> 3 -> 5 -> 4
+  
+  The sequence using a buffer storing occuring nodes of sequences. It should not using this option for searching the indefinite length of occuring sequences.
 
 ## Detailed Design
 
