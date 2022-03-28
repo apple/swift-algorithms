@@ -52,12 +52,37 @@ final class RecursiveMapTests: XCTestCase {
         ]
         
         let result = list.lazy.compactMap { $0.parent == nil ? Path(id: $0.id, path: "/\($0.name)") : nil }
-            .recursiveMap { parent in list.lazy.compactMap { $0.parent == parent.id ? Path(id: $0.id, path: "\(parent.path)/\($0.name)") : nil } }
+            .recursiveMap(option: .breadthFirst) { parent in list.lazy.compactMap { $0.parent == parent.id ? Path(id: $0.id, path: "\(parent.path)/\($0.name)") : nil } }
         
         XCTAssertEqualSequences(result, answer)
     }
     
     func testRecursiveMap2() {
+        
+        struct Node {
+            
+            var id: Int
+            
+            var children: [Node] = []
+        }
+        
+        let tree = [
+            Node(id: 1, children: [
+                Node(id: 2),
+                Node(id: 3, children: [
+                    Node(id: 4),
+                ]),
+                Node(id: 5),
+            ]),
+            Node(id: 6),
+        ]
+        
+        let nodes = tree.recursiveMap { $0.children }  // default depthFirst option
+        
+        XCTAssertEqualSequences(nodes.map { $0.id }, 1...6)
+    }
+    
+    func testRecursiveMap3() {
         
         struct Node {
             
@@ -77,7 +102,7 @@ final class RecursiveMapTests: XCTestCase {
             Node(id: 2),
         ]
         
-        let nodes = tree.recursiveMap { $0.children }
+        let nodes = tree.recursiveMap(option: .breadthFirst) { $0.children }
         
         XCTAssertEqualSequences(nodes.map { $0.id }, 1...6)
     }
