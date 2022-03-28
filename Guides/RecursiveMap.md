@@ -33,7 +33,7 @@ for view in tree.recursiveMap({ $0.children }) {
 
 ## Detailed Design
 
-The `recursiveMap()` method is declared as `Sequence` extensions, and return `RecursiveMapSequence` instance:
+The `recursiveMap(_:)` method is declared as `Sequence` extensions, and return `RecursiveMapSequence` instance:
 
 ```swift
 extension Sequence {
