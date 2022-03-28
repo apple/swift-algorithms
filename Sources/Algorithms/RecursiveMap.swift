@@ -13,29 +13,29 @@ extension Sequence {
     /// Returns a sequence containing the original sequence followed by recursive mapped sequence.
     ///
     /// ```
-    ///struct View {
-    ///    var id: Int
-    ///    var children: [View] = []
-    ///}
-    ///let tree = [
-    ///    View(id: 1, children: [
-    ///        View(id: 3),
-    ///        View(id: 4, children: [
-    ///            View(id: 6),
-    ///        ]),
-    ///        View(id: 5),
-    ///    ]),
-    ///    View(id: 2),
-    ///]
-    ///for view in tree.recursiveMap({ $0.children }) {
-    ///    print(view.id)
-    ///}
-    ///// 1
-    ///// 2
-    ///// 3
-    ///// 4
-    ///// 5
-    ///// 6
+    /// struct View {
+    ///     var id: Int
+    ///     var children: [View] = []
+    /// }
+    /// let tree = [
+    ///     View(id: 1, children: [
+    ///         View(id: 3),
+    ///         View(id: 4, children: [
+    ///             View(id: 6),
+    ///         ]),
+    ///         View(id: 5),
+    ///     ]),
+    ///     View(id: 2),
+    /// ]
+    /// for view in tree.recursiveMap({ $0.children }) {
+    ///     print(view.id)
+    /// }
+    /// // 1
+    /// // 2
+    /// // 3
+    /// // 4
+    /// // 5
+    /// // 6
     /// ```
     ///
     /// - Parameters:
