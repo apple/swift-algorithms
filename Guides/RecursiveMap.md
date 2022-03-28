@@ -39,8 +39,40 @@ This function comes with two different traversal methods. This option affects th
 
 - `depthFirst`: The algorithm will go down first and produce the resulting path. The algorithm starts with original 
   sequence and calling the supplied closure first. This is default option.
+  
+  With the structure of tree:
+  ```swift
+  let tree = [
+      Node(id: 1, children: [
+          Node(id: 2),
+          Node(id: 3, children: [
+              Node(id: 4),
+          ]),
+          Node(id: 5),
+      ]),
+      Node(id: 6),
+  ]
+  ```
+  
+  The resulting sequence will be 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 - `breadthFirst`: The algorithm will go through the previous sequence first and chaining all the occurring sequences.
+
+  With the structure of tree:
+  ```swift
+  let tree = [
+      Node(id: 1, children: [
+          Node(id: 2),
+          Node(id: 3, children: [
+              Node(id: 4),
+          ]),
+          Node(id: 5),
+      ]),
+      Node(id: 6),
+  ]
+  ```
+  
+  The resulting sequence will be 1 -> 6 -> 2 -> 3 -> 5 -> 4
 
 ## Detailed Design
 
