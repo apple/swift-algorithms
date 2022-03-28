@@ -106,7 +106,7 @@ extension RecursiveMapSequence {
         var mapped_iterator: Transformed.Iterator?
         
         @usableFromInline
-        var transform: (Base.Element) -> Transformed
+        let transform: (Base.Element) -> Transformed
         
         @inlinable
         init(
