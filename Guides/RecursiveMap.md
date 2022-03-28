@@ -35,7 +35,11 @@ for node in tree.recursiveMap({ $0.children }) {
 
 ### Traversal Option
 
-This function comes with two different traversal methods.
+This function comes with two different traversal methods. This option affects the element order of the output sequence.
+
+- `depthFirst`: The algorithm will go down first and produce the resulting path.
+
+- `breadthFirst`: The algorithm will go through the previous sequence first and chaining all the occurring sequences.
 
 ## Detailed Design
 
