@@ -128,6 +128,18 @@ extension Merge2Sequence: Sequence {
   public func makeIterator() -> Iterator {
     Iterator(self)
   }
+  
+  @inlinable
+  public var underestimatedCount: Int {
+    return base1.underestimatedCount + base2.underestimatedCount
+  }
+}
+
+extension Merge2Sequence where Base1: Collection, Base2: Collection {
+  @inlinable
+  public var count: Int {
+    return base1.count + base2.count
+  }
 }
 
 //===----------------------------------------------------------------------===//
