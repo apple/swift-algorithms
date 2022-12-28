@@ -140,6 +140,11 @@ extension Merge2Sequence where Base1: Collection, Base2: Collection {
   public var count: Int {
     return base1.count + base2.count
   }
+  
+  @inlinable
+  public var isEmpty: Bool {
+    return base1.isEmpty && base2.isEmpty
+  }
 }
 
 //===----------------------------------------------------------------------===//
