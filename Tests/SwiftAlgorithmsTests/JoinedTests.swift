@@ -129,4 +129,53 @@ final class JoinedTests: XCTestCase {
       validator2.validate(strings.lazy.joined(by: { _, _ in separator }))
     }
   }
+  
+  func testJoinedPrefixSuffix() {
+    let input = [
+        [5,3,0, 0,7,0, 0,0,0],
+        [6,0,0, 1,9,5, 0,0,0],
+        [0,9,8, 0,0,0, 0,6,0],
+      
+        [8,0,0, 0,6,0, 0,0,3],
+        [4,0,0, 8,0,3, 0,0,1],
+        [7,0,0, 0,2,0, 0,0,6],
+          
+        [0,6,0, 0,0,0, 2,8,0],
+        [0,0,0, 4,1,9, 0,0,5],
+        [0,0,0, 0,8,0, 0,7,9],
+    ]
+
+    func prettyString(_ sudoku: [[Int]]) -> String {
+      sudoku.chunks(ofCount: 3).map { (bigChunk: ArraySlice<[Int]>) -> String in
+           bigChunk.map { (row: [Int]) -> String in
+             row.chunks(ofCount: 3).map { (smallChunk: ArraySlice<Int>) -> String in
+               smallChunk.lazy.map(String.init).joined(separator: " ", prefix: " ", suffix: " ")
+                }.joined(separator: "|", prefix: "|", suffix: "|")
+            }.joined(separator: "\n")
+        }.joined(
+          separator: "\n+-------+-------+-------+\n",
+          prefix: "+-------+-------+-------+\n",
+          suffix: "\n+-------+-------+-------+")
+    }
+    
+    let output = prettyString(input)
+    XCTAssertEqual(
+      output,
+      """
+        +-------+-------+-------+
+        | 5 3 0 | 0 7 0 | 0 0 0 |
+        | 6 0 0 | 1 9 5 | 0 0 0 |
+        | 0 9 8 | 0 0 0 | 0 6 0 |
+        +-------+-------+-------+
+        | 8 0 0 | 0 6 0 | 0 0 3 |
+        | 4 0 0 | 8 0 3 | 0 0 1 |
+        | 7 0 0 | 0 2 0 | 0 0 6 |
+        +-------+-------+-------+
+        | 0 6 0 | 0 0 0 | 2 8 0 |
+        | 0 0 0 | 4 1 9 | 0 0 5 |
+        | 0 0 0 | 0 8 0 | 0 7 9 |
+        +-------+-------+-------+
+        """
+    )
+  }
 }

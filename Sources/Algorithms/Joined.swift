@@ -487,3 +487,13 @@ extension LazySequenceProtocol where Elements: Collection, Element: Collection {
     JoinedByClosureCollection(base: elements, separator: separator)
   }
 }
+
+extension Sequence where Element: Collection, Element.SubSequence == Substring {
+  public func joined(separator: Element, prefix: Element, suffix: Element) -> String {
+    var result = ""
+    result.append(contentsOf: prefix[...])
+    result.append(contentsOf: self.joined(separator: separator[...]))
+    result.append(contentsOf: suffix[...])
+    return result
+  }
+}
