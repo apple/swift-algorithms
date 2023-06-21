@@ -30,18 +30,41 @@ extension Sequence {
   @inlinable
   public func keyed<Key>(
     by keyForValue: (Element) throws -> Key,
-    // TODO: pass `Key` into `combine`: (Key, Element, Element) throws -> Element
-    uniquingKeysWith combine: ((Element, Element) throws -> Element)? = nil
+    uniquingKeysWith combine: ((Key, Element, Element) throws -> Element)? = nil
   ) rethrows -> [Key: Element] {
-    // Note: This implementation is a bit convoluted, but it's just aiming to reuse the existing stdlib logic,
-    // to ensure consistent behaviour, error messages, etc.
-    // If this API ends up in the stdlib itself, it could just call the underlying `_NativeDictionary` methods.
-    try withoutActuallyEscaping(keyForValue) { keyForValue in
-      if let combine {
-        return try Dictionary(self.lazy.map { (try keyForValue($0), $0) }, uniquingKeysWith: combine)
-      } else {
-        return try Dictionary(uniqueKeysWithValues: self.lazy.map { (try keyForValue($0), $0) } )
+    var result = [Key: Element]()
+
+    if combine != nil {
+      // We have a `combine` closure. Use it to resolve duplicate keys.
+
+      for element in self {
+        let key = try keyForValue(element)
+        
+        if let oldValue = result.updateValue(element, forKey: key) {
+          // Can't use a conditional binding to unwrap this, because the newly bound variable
+          // doesn't play nice with the `rethrows` system.
+          let valueToKeep = try combine!(key, oldValue, element)
+          
+          // This causes a second look-up for the same key. The standard library can avoid that
+          // by calling `mutatingFind` to get access to the bucket where the value will end up,
+          // and updating in place.
+          // Swift Algorithms doesn't have access to that API, so we make due.
+          // When this gets merged into the standard library, we should optimize this.
+          result[key] = valueToKeep
+        }
+      }
+    } else {
+      // There's no `combine` closure. Duplicate keys are disallowed.
+
+      for element in self {
+        let key = try keyForValue(element)
+
+        guard result.updateValue(element, forKey: key) == nil else {
+          fatalError("Duplicate values for key: '\(key)'")
+        }
       }
     }
+
+    return result
   }
 }
