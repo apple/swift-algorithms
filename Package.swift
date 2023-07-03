@@ -20,14 +20,19 @@ let package = Package(
             targets: ["Algorithms"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-numerics", from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-numerics.git", from: "1.0.0"),
     ],
     targets: [
         .target(
             name: "Algorithms",
             dependencies: [
               .product(name: "RealModule", package: "swift-numerics"),
-            ]),
+            ],
+            swiftSettings: [
+              .define("INSERTION_TEMP"),
+//              .define("INSERTION_MAX_32"),
+            ]
+        ),
         .testTarget(
             name: "SwiftAlgorithmsTests",
             dependencies: ["Algorithms"]),
