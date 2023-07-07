@@ -35,36 +35,28 @@ extension Sequence {
   public func keyed<Key>(
     by keyForValue: (Element) throws -> Key
   ) throws -> [Key: Element] {
-    var result = [Key: Element]()
-
-    for element in self {
-      let key = try keyForValue(element)
-
-      if let previousElement = result.updateValue(element, forKey: key) {
-        throw KeysAreNotUnique(key: key, previousElement: previousElement, conflictingElement: element)
-      }
-    }
-
-    return result
+    try self.keyed(by: keyForValue, resolvingConflictsWith: {
+       throw KeysAreNotUnique(key: $0, previousElement: $1, conflictingElement: $2)
+    })
   }
 
   /// Creates a new Dictionary from the elements of `self`, keyed by the
   /// results returned by the given `keyForValue` closure. As the dictionary is
-  /// built, the initializer calls the `combine` closure with the current and
-  /// new values for any duplicate keys. Pass a closure as `combine` that
+  /// built, the initializer calls the `resolve` closure with the current and
+  /// new values for any duplicate keys. Pass a closure as `resolve` that
   /// returns the value to use in the resulting dictionary: The closure can
   /// choose between the two values, combine them to produce a new value, or
   /// even throw an error.
   ///
   /// - Parameters:
   ///   - keyForValue: A closure that returns a key for each element in `self`.
-  ///   - combine: A closure that is called with the values for any duplicate
+  ///   - resolve: A closure that is called with the values for any duplicate
   ///     keys that are encountered. The closure returns the desired value for
   ///     the final dictionary.
   @inlinable
   public func keyed<Key>(
     by keyForValue: (Element) throws -> Key,
-    uniquingKeysWith combine: (Key, Element, Element) throws -> Element
+    resolvingConflictsWith resolve: (Key, Element, Element) throws -> Element
   ) rethrows -> [Key: Element] {
     var result = [Key: Element]()
 
@@ -72,12 +64,12 @@ extension Sequence {
       let key = try keyForValue(element)
 
       if let oldValue = result.updateValue(element, forKey: key) {
-        let valueToKeep = try combine(key, oldValue, element)
+        let valueToKeep = try resolve(key, oldValue, element)
 
         // This causes a second look-up for the same key. The standard library can avoid that
         // by calling `mutatingFind` to get access to the bucket where the value will end up,
         // and updating in place.
-        // Swift Algorithms doesn't have access to that API, so we make due.
+        // Swift Algorithms doesn't have access to that API, so we make do.
         // When this gets merged into the standard library, we should optimize this.
         result[key] = valueToKeep
       }

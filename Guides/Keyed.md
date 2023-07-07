@@ -22,7 +22,7 @@ Duplicate keys throw an error by default. Alternatively, you can provide a closu
 let fruits = ["Apricot", "Banana", "Apple", "Cherry", "Blackberry", "Avocado", "Coconut"]
 let fruitsByLetter = fruits.keyed(
     by: { $0.first! },
-    uniquingKeysWith: { key, old, new in new } // Always pick the latest fruit
+    resolvingConflictsWith: { key, old, new in new } // Always pick the latest fruit
 )
 // Results in:
 // [
@@ -34,7 +34,7 @@ let fruitsByLetter = fruits.keyed(
 
 ## Detailed Design
 
-The `keyed(by:)` and `keyed(by:uniquingKeysWith:)` methods are declared in an `Sequence` extension, both returning `[Key: Element]`.
+The `keyed(by:)` and `keyed(by:resolvingConflictsWith:)` methods are declared in an `Sequence` extension, both returning `[Key: Element]`.
 
 ```swift
 extension Sequence {
@@ -44,7 +44,7 @@ extension Sequence {
     
     public func keyed<Key>(
         by keyForValue: (Element) throws -> Key,
-        uniquingKeysWith combine: ((Key, Element, Element) throws -> Element)? = nil
+        resolvingConflictsWith resolve: ((Key, Element, Element) throws -> Element)? = nil
     ) rethrows -> [Key: Element]
 }
 ```

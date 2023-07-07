@@ -41,7 +41,7 @@ final class KeyedTests: XCTestCase {
   }
 
   func testNonUniqueKeysWithMergeFunction() {
-    var combineCallHistory = [(key: Character, current: String, new: String)]()
+    var resolveCallHistory = [(key: Character, current: String, new: String)]()
     let expectedCallHistory = [
       (key: "A", current: "Apple", new: "Avocado"),
       (key: "C", current: "Cherry", new: "Coconut"),
@@ -49,8 +49,8 @@ final class KeyedTests: XCTestCase {
 
     let d = ["Apple", "Avocado", "Banana", "Cherry", "Coconut"].keyed(
       by: { $0.first! },
-      uniquingKeysWith: { key, older, newer in
-        combineCallHistory.append((key, older, newer))
+      resolvingConflictsWith: { key, older, newer in
+        resolveCallHistory.append((key, older, newer))
         return "\(older)-\(newer)"
       }
     )
@@ -62,7 +62,7 @@ final class KeyedTests: XCTestCase {
     XCTAssertNil(d["D"])
 
     XCTAssertEqual(
-      combineCallHistory.map(String.init(describing:)), // quick/dirty workaround: tuples aren't Equatable
+      resolveCallHistory.map(String.init(describing:)), // quick/dirty workaround: tuples aren't Equatable
       expectedCallHistory.map(String.init(describing:))
     )
   }
@@ -83,7 +83,7 @@ final class KeyedTests: XCTestCase {
     let error = SampleError()
 
     XCTAssertThrowsError(
-      try input.keyed(by: { $0.first! }, uniquingKeysWith: { _, _, _ in throw error })
+      try input.keyed(by: { $0.first! }, resolvingConflictsWith: { _, _, _ in throw error })
     ) { thrownError in
       XCTAssertIdentical(error, thrownError as? SampleError)
     }
