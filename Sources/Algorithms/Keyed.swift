@@ -9,7 +9,45 @@
 //
 //===----------------------------------------------------------------------===//
 
+public struct KeysAreNotUnique<Key, Element>: Error {
+  public let key: Key
+  public let previousElement: Element
+  public let conflictingElement: Element
+
+  @inlinable
+  public init(key: Key, previousElement: Element, conflictingElement: Element) {
+    self.key = key
+    self.previousElement = previousElement
+    self.conflictingElement = conflictingElement
+  }
+}
+
 extension Sequence {
+  /// Creates a new Dictionary from the elements of `self`, keyed by the
+  /// results returned by the given `keyForValue` closure. Deriving the
+  /// same duplicate key for more than one element of `self` will cause
+  /// an error to be thrown.
+  ///
+  /// - Parameters:
+  ///   - keyForValue: A closure that returns a key for each element in `self`.
+  /// - Throws: `KeysAreNotUnique ` if two values map to the same key (via `keyForValue`).
+  @inlinable
+  public func keyed<Key>(
+    by keyForValue: (Element) throws -> Key
+  ) throws -> [Key: Element] {
+    var result = [Key: Element]()
+
+    for element in self {
+      let key = try keyForValue(element)
+
+      if let previousElement = result.updateValue(element, forKey: key) {
+        throw KeysAreNotUnique(key: key, previousElement: previousElement, conflictingElement: element)
+      }
+    }
+
+    return result
+  }
+
   /// Creates a new Dictionary from the elements of `self`, keyed by the
   /// results returned by the given `keyForValue` closure. As the dictionary is
   /// built, the initializer calls the `combine` closure with the current and
@@ -18,50 +56,30 @@ extension Sequence {
   /// choose between the two values, combine them to produce a new value, or
   /// even throw an error.
   ///
-  /// If no `combine` closure is provided, deriving the same duplicate key for
-  /// more than one element of self results in a runtime error.
-  ///
   /// - Parameters:
-  ///   - keyForValue: A closure that returns a key for each element in
-  ///     `self`.
+  ///   - keyForValue: A closure that returns a key for each element in `self`.
   ///   - combine: A closure that is called with the values for any duplicate
   ///     keys that are encountered. The closure returns the desired value for
   ///     the final dictionary.
   @inlinable
   public func keyed<Key>(
     by keyForValue: (Element) throws -> Key,
-    uniquingKeysWith combine: ((Key, Element, Element) throws -> Element)? = nil
+    uniquingKeysWith combine: (Key, Element, Element) throws -> Element
   ) rethrows -> [Key: Element] {
     var result = [Key: Element]()
 
-    if combine != nil {
-      // We have a `combine` closure. Use it to resolve duplicate keys.
+    for element in self {
+      let key = try keyForValue(element)
 
-      for element in self {
-        let key = try keyForValue(element)
-        
-        if let oldValue = result.updateValue(element, forKey: key) {
-          // Can't use a conditional binding to unwrap this, because the newly bound variable
-          // doesn't play nice with the `rethrows` system.
-          let valueToKeep = try combine!(key, oldValue, element)
-          
-          // This causes a second look-up for the same key. The standard library can avoid that
-          // by calling `mutatingFind` to get access to the bucket where the value will end up,
-          // and updating in place.
-          // Swift Algorithms doesn't have access to that API, so we make due.
-          // When this gets merged into the standard library, we should optimize this.
-          result[key] = valueToKeep
-        }
-      }
-    } else {
-      // There's no `combine` closure. Duplicate keys are disallowed.
+      if let oldValue = result.updateValue(element, forKey: key) {
+        let valueToKeep = try combine(key, oldValue, element)
 
-      for element in self {
-        let key = try keyForValue(element)
-
-        guard result.updateValue(element, forKey: key) == nil else {
-          fatalError("Duplicate values for key: '\(key)'")
-        }
+        // This causes a second look-up for the same key. The standard library can avoid that
+        // by calling `mutatingFind` to get access to the bucket where the value will end up,
+        // and updating in place.
+        // Swift Algorithms doesn't have access to that API, so we make due.
+        // When this gets merged into the standard library, we should optimize this.
+        result[key] = valueToKeep
       }
     }
 

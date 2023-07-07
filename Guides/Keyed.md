@@ -7,7 +7,7 @@ Stores the elements of a sequence as the values of a Dictionary, keyed by the re
 
 ```swift
 let fruits = ["Apple", "Banana", "Cherry"]
-let fruitByLetter = fruits.keyed(by: { $0.first! })
+let fruitByLetter = try! fruits.keyed(by: { $0.first! })
 // Results in:
 // [
 //     "A": "Apple",
@@ -16,7 +16,7 @@ let fruitByLetter = fruits.keyed(by: { $0.first! })
 // ]
 ```
 
-Duplicate keys will trigger a runtime error by default. To handle this, you can provide a closure which specifies which value to keep:
+Duplicate keys throw an error by default. Alternatively, you can provide a closure which specifies which value to keep:
 
 ```swift
 let fruits = ["Apricot", "Banana", "Apple", "Cherry", "Blackberry", "Avocado", "Coconut"]
@@ -34,10 +34,14 @@ let fruitsByLetter = fruits.keyed(
 
 ## Detailed Design
 
-The `keyed(by:)` method is declared as a `Sequence` extension returning `[Key: Element]`.
+The `keyed(by:)` and `keyed(by:uniquingKeysWith:)` methods are declared in an `Sequence` extension, both returning `[Key: Element]`.
 
 ```swift
 extension Sequence {
+    public func keyed<Key>(
+        by keyForValue: (Element) throws -> Key
+    ) throws -> [Key: Element]
+    
     public func keyed<Key>(
         by keyForValue: (Element) throws -> Key,
         uniquingKeysWith combine: ((Key, Element, Element) throws -> Element)? = nil

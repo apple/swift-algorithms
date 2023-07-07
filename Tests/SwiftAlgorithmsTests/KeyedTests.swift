@@ -16,7 +16,7 @@ final class KeyedTests: XCTestCase {
   private class SampleError: Error {}
 
   func testUniqueKeys() {
-    let d = ["Apple", "Banana", "Cherry"].keyed(by: { $0.first! })
+    let d = try! ["Apple", "Banana", "Cherry"].keyed(by: { $0.first! })
     XCTAssertEqual(d.count, 3)
     XCTAssertEqual(d["A"]!, "Apple")
     XCTAssertEqual(d["B"]!, "Banana")
@@ -25,16 +25,19 @@ final class KeyedTests: XCTestCase {
   }
 
   func testEmpty() {
-    let d = EmptyCollection<String>().keyed(by: { $0.first! })
+    let d = try! EmptyCollection<String>().keyed(by: { $0.first! })
     XCTAssertEqual(d.count, 0)
   }
 
   func testNonUniqueKeys() throws {
-    throw XCTSkip("""
-    TODO: What's the XCTest equivalent to `expectCrashLater()`?
-
-    https://github.com/apple/swift/blob/4d1d8a9de5ebc132a17aee9fc267461facf89bf8/validation-test/stdlib/Dictionary.swift#L1914
-    """)
+    XCTAssertThrowsError(
+      try ["Apple", "Avocado", "Banana", "Cherry"].keyed(by: { $0.first! })
+    ) { thrownError in
+      let e = thrownError as! KeysAreNotUnique<Character, String>
+      XCTAssertEqual(e.key, "A")
+      XCTAssertEqual(e.previousElement, "Apple")
+      XCTAssertEqual(e.conflictingElement, "Avocado")
+    }
   }
 
   func testNonUniqueKeysWithMergeFunction() {
