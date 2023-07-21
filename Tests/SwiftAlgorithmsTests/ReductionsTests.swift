@@ -13,7 +13,6 @@ import XCTest
 import Algorithms
 
 final class ReductionsTests: XCTestCase {
-
   struct TestError: Error {}
 
   // MARK: - Exclusive Reductions
@@ -52,6 +51,13 @@ final class ReductionsTests: XCTestCase {
     XCTAssertNoThrow(try [].reductions(0) { _, _ in throw TestError() })
     XCTAssertThrowsError(try [1].reductions(0) { _, _ in throw TestError() })
   }
+  
+  func testExclusiveIndexTraversals() {
+    let validator = IndexValidator<ExclusiveReductionsSequence<Range<Int>, Int>>()
+    validator.validate((0..<0).lazy.reductions(0, +), expectedCount: 1)
+    validator.validate((0..<1).lazy.reductions(0, +), expectedCount: 2)
+    validator.validate((0..<4).lazy.reductions(0, +), expectedCount: 5)
+  }
 
   // MARK: - Inclusive Reductions
 
@@ -77,5 +83,12 @@ final class ReductionsTests: XCTestCase {
     XCTAssertNoThrow(try [].reductions { _, _ in throw TestError() })
     XCTAssertNoThrow(try [1].reductions { _, _ in throw TestError() })
     XCTAssertThrowsError(try [1, 1].reductions { _, _ in throw TestError() })
+  }
+  
+  func testInclusiveIndexTraversals() {
+    let validator = IndexValidator<InclusiveReductionsSequence<Range<Int>>>()
+    validator.validate((0..<0).lazy.reductions(+), expectedCount: 0)
+    validator.validate((0..<1).lazy.reductions(+), expectedCount: 1)
+    validator.validate((0..<4).lazy.reductions(+), expectedCount: 4)
   }
 }

@@ -4,15 +4,129 @@
 Add new items at the end of the relevant section under **Unreleased**.
 -->
 
-This project follows semantic versioning. While still in major version `0`,
-source-stability is only guaranteed within minor versions (e.g. between
-`0.0.3` and `0.0.4`). If you want to guard against potentially source-breaking
-package updates, you can specify your package dependency using
-`.upToNextMinor(from: "0.1.0")` as the requirement.
+This project follows semantic versioning.
 
 ## [Unreleased]
 
-*No changes yet.*
+*No new changes.*
+
+---
+
+## [1.0.0] - 2021-09-08
+
+### Changes
+
+- Most sequence and collection types have been renamed, following a more
+  consistent naming structure:
+  - The `Lazy` prefix was dropped.
+  - Either a `Sequence` or `Collection` suffix was added depending on whether or
+    not the type is unconditionally a collection.
+  - The base name was derived from the name of the method that produces it,
+    including an argument label to disambiguate if necessary.
+  ```
+  Chain2              -> Chain2Sequence
+  ChunkedBy           -> ChunkedByCollection
+  ChunkedOn           -> ChunkedOnCollection
+  ChunkedByCount      -> ChunksOfCountCollection
+  Combinations        -> CombinationsSequence
+  Cycle               -> CycledSequence
+  FiniteCycle         -> CycledTimesCollection
+  Indexed             -> IndexedCollection
+  Intersperse         -> InterspersedSequence
+  LazySplitSequence   -> SplitSequence
+  LazySplitCollection -> SplitCollection
+  Permutations        -> PermutationsSequence
+  UniquePermutations  -> UniquePermutationsSequence
+  Product2            -> Product2Sequence
+  ExclusiveReductions -> ExclusiveReductionsSequence
+  InclusiveReductions -> InclusiveReductionsSequence
+  StrideSequence      -> StridingSequence
+  StrideCollection    -> StridingCollection
+  Uniqued             -> UniquedSequence
+  Windows             -> WindowsOfCountCollection
+  ```
+- Types that can only be produced from a lazy sequence chain now unconditionally
+  conform to `LazySequenceProtocol` and wrap the base sequence instead of the
+  lazy wrapper, making some return types slightly simpler.
+  - e.g. `[1, 2, 3].lazy.reductions(+)` now returns
+    `ExclusiveReductionsSequence<[Int]>`, not
+    `ExclusiveReductionsSequence<LazySequence<[Int]>>`.
+  - This concerns `JoinedByClosureSequence`, `JoinedByClosureCollection`,
+    `ExclusiveReductionsSequence`, `InclusiveReductionsSequence`.
+- The generic parameters of the `ExclusiveReductions` type have been swapped,
+  putting the base collection first and the result type second.
+- The `Indices` associated type of `IndexedCollection` now matches
+  `Base.Indices`.
+
+### Removals
+
+- Previously deprecated type and method names have been removed:
+  - The `Chain` type alias for `Chain2Sequence`
+  - The `chained(with:)` method which was replaced with the `chain(_:_:)` free
+    function
+  - The `LazyChunked` and `Chunked` type aliases for `ChunkedByCollection`
+  - The `rotate(subrange:at:)` and `rotate(at:)` methods which were renamed to 
+    `rotate(subrange:toStartAt:)` and `rotate(toStartAt:)` respectively
+
+### Fixes
+
+- The `StridingSequence` and `StridingCollection` types now conditionally
+  conform to `LazySequenceProtocol`, allowing the `striding(by:)` method to
+  properly propagate laziness in a lazy sequence chain.
+- Fixed `chunked(by:)` to always compare two consecutive elements rather than
+  each element with the first element of the current chunk. ([#162])
+
+The 1.0.0 release includes contributions from [iainsmith], [mdznr], and
+[timvermeulen]. Thank you!
+
+## [0.2.1] - 2021-06-01
+
+### Additions
+
+Expanded versatility for two existing operations:
+
+- A series of `joined(by:)` overloads concatenate a sequence of sequences using
+  an element or a collection, either passed in or generated from consecutive
+  elements via a closure. ([#138])
+- Additional `trimming(while:)` methods for trimming only the start or end of a
+  collection, as well as mutating versions of all three variants. ([#104])
+
+The 0.2.1 release includes contributions from [fedeci] and [timvermeulen]. 
+Thank you!
+
+## [0.2.0] - 2021-05-17
+
+### Additions
+
+Two new additions to the list of algorithms:
+
+- `adjacentPairs()` lazily iterates over tuples of adjacent elements of a
+  sequence. ([#119])
+- `minAndMax()` finds both the smallest and largest elements of a sequence in 
+  a single pass. ([#90])
+
+### Changes
+
+- When calling `chunked(on:)`, the resulting collection has an element type of
+  `(Subject, SubSequence)` instead of just `SubSequence`, making the subject
+  value available when iterating.
+
+    ```swift
+    let numbers = [5, 6, -3, -9, -11, 2, 7, 6]
+    for (signum, values) in numbers.chunked(on: { $0.signum() }) {
+        print(signum, values)
+    }
+    // 1 [5, 6]
+    // -1 [-3, -9, -11]
+    // 1 [2, 7, 6]
+    ```
+
+### Fixes
+
+- Improvements to the documentation and PR templates.
+
+The 0.2.0 release includes contributions from [CTMacUser], [LemonSpike],
+[mpangburn], and [natecook1000]. Thank you!
 
 ---
 
@@ -155,7 +269,10 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for releases -->
 
-[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.1.1...HEAD
+[Unreleased]: https://github.com/apple/swift-algorithms/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/apple/swift-algorithms/compare/0.2.1...1.0.0
+[0.2.1]: https://github.com/apple/swift-algorithms/compare/0.2.0...0.2.1
+[0.2.0]: https://github.com/apple/swift-algorithms/compare/0.1.1...0.2.0
 [0.1.1]: https://github.com/apple/swift-algorithms/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/apple/swift-algorithms/compare/0.0.4...0.1.0
 [0.0.4]: https://github.com/apple/swift-algorithms/compare/0.0.3...0.0.4
@@ -180,23 +297,31 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#77]: https://github.com/apple/swift-algorithms/pull/77
 [#78]: https://github.com/apple/swift-algorithms/pull/78
 [#85]: https://github.com/apple/swift-algorithms/pull/85
+[#90]: https://github.com/apple/swift-algorithms/pull/90
 [#91]: https://github.com/apple/swift-algorithms/pull/91
+[#104]: https://github.com/apple/swift-algorithms/pull/104
 [#106]: https://github.com/apple/swift-algorithms/pull/106
 [#112]: https://github.com/apple/swift-algorithms/pull/112
+[#119]: https://github.com/apple/swift-algorithms/pull/119
 [#124]: https://github.com/apple/swift-algorithms/pull/124
 [#125]: https://github.com/apple/swift-algorithms/pull/125
 [#130]: https://github.com/apple/swift-algorithms/pull/130
+[#138]: https://github.com/apple/swift-algorithms/pull/138
+[#162]: https://github.com/apple/swift-algorithms/pull/162
 
 <!-- Link references for contributors -->
 
 [AustinConlon]: https://github.com/apple/swift-algorithms/commits?author=AustinConlon
 [benrimmington]: https://github.com/apple/swift-algorithms/commits?author=benrimmington
 [bjhomer]: https://github.com/apple/swift-algorithms/commits?author=bjhomer
+[CTMacUser]: https://github.com/apple/swift-algorithms/commits?author=CTMacUser
 [danielctull]: https://github.com/apple/swift-algorithms/commits?author=danielctull
 [dhruvshah8]: https://github.com/apple/swift-algorithms/commits?author=dhruvshah8
 [egorzhdan]: https://github.com/apple/swift-algorithms/commits?author=egorzhdan
+[fedeci]: https://github.com/apple/swift-algorithms/commits?author=fedeci
 [hashemi]: https://github.com/apple/swift-algorithms/commits?author=hashemi
 [IanKeen]: https://github.com/apple/swift-algorithms/commits?author=IanKeen
+[iainsmith]: https://github.com/apple/swift-algorithms/commits?author=iainsmith
 [iSame7]: https://github.com/apple/swift-algorithms/commits?author=iSame7
 [karwa]: https://github.com/apple/swift-algorithms/commits?author=karwa
 [kylemacomber]: https://github.com/apple/swift-algorithms/commits?author=kylemacomber
@@ -205,6 +330,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [markuswntr]: https://github.com/apple/swift-algorithms/commits?author=markuswntr
 [mdznr]: https://github.com/apple/swift-algorithms/commits?author=mdznr
 [michiboo]: https://github.com/apple/swift-algorithms/commits?author=michiboo
+[mpangburn]: https://github.com/apple/swift-algorithms/commits?author=mpangburn
 [natecook1000]: https://github.com/apple/swift-algorithms/commits?author=natecook1000
 [nordicio]: https://github.com/apple/swift-algorithms/commits?author=nordicio
 [ollieatkinson]: https://github.com/apple/swift-algorithms/commits?author=ollieatkinson

@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 /// A concatenation of two sequences with the same element type.
-public struct Chain2<Base1: Sequence, Base2: Sequence>
+public struct Chain2Sequence<Base1: Sequence, Base2: Sequence>
   where Base1.Element == Base2.Element
 {
   /// The first sequence in this chain.
@@ -28,8 +28,8 @@ public struct Chain2<Base1: Sequence, Base2: Sequence>
   }
 }
 
-extension Chain2: Sequence {
-  /// The iterator for a `Chain2` sequence.
+extension Chain2Sequence: Sequence {
+  /// The iterator for a `Chain2Sequence` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var iterator1: Base1.Iterator
@@ -38,7 +38,7 @@ extension Chain2: Sequence {
     internal var iterator2: Base2.Iterator
     
     @inlinable
-    internal init(_ concatenation: Chain2) {
+    internal init(_ concatenation: Chain2Sequence) {
       iterator1 = concatenation.base1.makeIterator()
       iterator2 = concatenation.base2.makeIterator()
     }
@@ -55,8 +55,8 @@ extension Chain2: Sequence {
   }
 }
 
-extension Chain2: Collection where Base1: Collection, Base2: Collection {
-  /// A position in a `Chain2` collection.
+extension Chain2Sequence: Collection where Base1: Collection, Base2: Collection {
+  /// A position in a `Chain2Sequence` instance.
   public struct Index: Comparable {
     // The internal index representation, which can either be an index of the
     // first collection or the second. The `endIndex` of the first collection
@@ -64,7 +64,7 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
     // from the penultimate index of the first collection to the start of the
     // second.
     @usableFromInline
-    internal enum Representation : Equatable {
+    internal enum Representation: Equatable {
       case first(Base1.Index)
       case second(Base2.Index)
     }
@@ -115,7 +115,7 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
 
   @inlinable
   public var endIndex: Index {
-    return Index(second: base2.endIndex)
+    Index(second: base2.endIndex)
   }
 
   @inlinable
@@ -263,7 +263,7 @@ extension Chain2: Collection where Base1: Collection, Base2: Collection {
   }
 }
 
-extension Chain2: BidirectionalCollection
+extension Chain2Sequence: BidirectionalCollection
   where Base1: BidirectionalCollection, Base2: BidirectionalCollection
 {
   @inlinable
@@ -280,7 +280,7 @@ extension Chain2: BidirectionalCollection
   }
 }
 
-extension Chain2: RandomAccessCollection
+extension Chain2Sequence: RandomAccessCollection
   where Base1: RandomAccessCollection, Base2: RandomAccessCollection {}
 
 //===----------------------------------------------------------------------===//
@@ -314,20 +314,6 @@ extension Chain2: RandomAccessCollection
 ///
 /// - Complexity: O(1)
 @inlinable
-public func chain<S1, S2>(_ s1: S1, _ s2: S2) -> Chain2<S1, S2> {
-  Chain2(base1: s1, base2: s2)
-}
-
-// MARK: - Deprecations
-
-@available(*, deprecated, renamed: "Chain2")
-public typealias Chain = Chain2
-
-extension Sequence {
-  @available(*, deprecated, message: "Use the chain(_:_:) function, instead.")
-  public func chained<S: Sequence>(with other: S) -> Chain2<Self, S>
-    where Element == S.Element
-  {
-    Chain2(base1: self, base2: other)
-  }
+public func chain<S1, S2>(_ s1: S1, _ s2: S2) -> Chain2Sequence<S1, S2> {
+  Chain2Sequence(base1: s1, base2: s2)
 }

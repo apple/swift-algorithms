@@ -2,7 +2,7 @@
 //
 // This source file is part of the Swift Algorithms open source project
 //
-// Copyright (c) 2020 Apple Inc. and the Swift project authors
+// Copyright (c) 2020-2021 Apple Inc. and the Swift project authors
 // Licensed under Apache License v2.0 with Runtime Library Exception
 //
 // See https://swift.org/LICENSE.txt for license information
@@ -14,9 +14,9 @@
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection {
-  /// Moves all elements satisfying `belongsInSecondPartition` into a suffix
-  /// of the collection, preserving their relative order, and returns the
-  /// start of the resulting suffix.
+  /// Moves all elements satisfying `belongsInSecondPartition` into a suffix of
+  /// the collection, preserving their relative order, and returns the start of
+  /// the resulting suffix.
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the number of elements.
   /// - Precondition:
@@ -25,7 +25,7 @@ extension MutableCollection {
   internal mutating func stablePartition(
     count n: Int,
     subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws-> Bool
+    by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     if n == 0 { return subrange.lowerBound }
     if n == 1 {
@@ -138,22 +138,22 @@ extension MutableCollection where Self: BidirectionalCollection {
     // * predicate(self[i]) == true, for i in hi ..< endIndex
 
     Loop: while true {
-      FindLo: repeat {
+      FindLo: do {
         while lo < hi {
           if try belongsInSecondPartition(self[lo]) { break FindLo }
           formIndex(after: &lo)
         }
         break Loop
-      } while false
+      }
 
-      FindHi: repeat {
+      FindHi: do {
         formIndex(before: &hi)
         while lo < hi {
           if try !belongsInSecondPartition(self[hi]) { break FindHi }
           formIndex(before: &hi)
         }
         break Loop
-      } while false
+      }
 
       swapAt(lo, hi)
       formIndex(after: &lo)
@@ -168,18 +168,19 @@ extension MutableCollection where Self: BidirectionalCollection {
 //===----------------------------------------------------------------------===//
 
 extension Collection {
-  /// Returns the index of the first element in the collection that matches
-  /// the predicate.
+  /// Returns the start index of the partition of a collection that matches
+  /// the given predicate.
   ///
   /// The collection must already be partitioned according to the predicate.
   /// That is, there should be an index `i` where for every element in
-  /// `collection[..<i]` the predicate is `false`, and for every element
-  /// in `collection[i...]` the predicate is `true`.
+  /// `collection[..<i]` the predicate is `false`, and for every element in
+  /// `collection[i...]` the predicate is `true`.
   ///
   /// - Parameter belongsInSecondPartition: A predicate that partitions the
   ///   collection.
   /// - Returns: The index of the first element in the collection for which
-  ///   `predicate` returns `true`.
+  ///   `predicate` returns `true`, or `endIndex` if there are no elements
+  ///   for which `predicate` returns `true`.
   ///
   /// - Complexity: O(log *n*), where *n* is the length of this collection if
   ///   the collection conforms to `RandomAccessCollection`, otherwise O(*n*).
@@ -204,3 +205,137 @@ extension Collection {
   }
 }
 
+//===----------------------------------------------------------------------===//
+// partitioned(by:)
+//===----------------------------------------------------------------------===//
+
+extension Sequence {
+  /// Returns two arrays containing, in order, the elements of the sequence that
+  /// do and don’t satisfy the given predicate.
+  ///
+  /// In this example, `partitioned(by:)` is used to separate the input based on
+  /// whether a name is shorter than five characters:
+  ///
+  ///     let cast = ["Vivien", "Marlon", "Kim", "Karl"]
+  ///     let (longNames, shortNames) = cast.partitioned(by: { $0.count < 5 })
+  ///     print(longNames)
+  ///     // Prints "["Vivien", "Marlon"]"
+  ///     print(shortNames)
+  ///     // Prints "["Kim", "Karl"]"
+  ///
+  /// - Parameter predicate: A closure that takes an element of the sequence as
+  /// its argument and returns a Boolean value indicating whether the element
+  /// should be included in the second returned array. Otherwise, the element
+  /// will appear in the first returned array.
+  ///
+  /// - Returns: Two arrays with all of the elements of the receiver. The
+  /// first array contains all the elements that `predicate` didn’t allow, and
+  /// the second array contains all the elements that `predicate` allowed.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  @inlinable
+  public func partitioned(
+    by predicate: (Element) throws -> Bool
+  ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
+    var lhs = [Element]()
+    var rhs = [Element]()
+    
+    for element in self {
+      if try predicate(element) {
+        rhs.append(element)
+      } else {
+        lhs.append(element)
+      }
+    }
+    
+    return (lhs, rhs)
+  }
+}
+
+extension Collection {
+  /// Returns two arrays containing, in order, the elements of the collection
+  /// that do and don’t satisfy the given predicate.
+  ///
+  /// In this example, `partitioned(by:)` is used to separate the input based on
+  /// whether a name is shorter than five characters.
+  ///
+  ///     let cast = ["Vivien", "Marlon", "Kim", "Karl"]
+  ///     let (longNames, shortNames) = cast.partitioned(by: { $0.count < 5 })
+  ///     print(longNames)
+  ///     // Prints "["Vivien", "Marlon"]"
+  ///     print(shortNames)
+  ///     // Prints "["Kim", "Karl"]"
+  ///
+  /// - Parameter predicate: A closure that takes an element of the collection
+  /// as its argument and returns a Boolean value indicating whether the element
+  /// should be included in the second returned array. Otherwise, the element
+  /// will appear in the first returned array.
+  ///
+  /// - Returns: Two arrays with all of the elements of the receiver. The
+  /// first array contains all the elements that `predicate` didn’t allow, and
+  /// the second array contains all the elements that `predicate` allowed.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the collection.
+  @inlinable
+  public func partitioned(
+    by predicate: (Element) throws -> Bool
+  ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
+    guard !self.isEmpty else {
+      return ([], [])
+    }
+    
+    // Since collections have known sizes, we can allocate one array of size
+    // `self.count`, then insert items at the beginning or end of that contiguous
+    // block. This way, we don’t have to do any dynamic array resizing. Since we
+    // insert the right elements on the right side in reverse order, we need to
+    // reverse them back to the original order at the end.
+    
+    let count = self.count
+    
+    // Inside of the `initializer` closure, we set what the actual mid-point is.
+    // We will use this to partition the single array into two.
+    var midPoint: Int = 0
+    
+    let elements = try [Element](
+      unsafeUninitializedCapacity: count,
+      initializingWith: { buffer, initializedCount in
+        var lhs = buffer.baseAddress!
+        var rhs = lhs + buffer.count
+        do {
+          for element in self {
+            if try predicate(element) {
+              rhs -= 1
+              rhs.initialize(to: element)
+            } else {
+              lhs.initialize(to: element)
+              lhs += 1
+            }
+          }
+          
+          precondition(lhs == rhs, """
+            Collection's `count` differed from the number of elements iterated.
+            """
+          )
+          
+          let rhsIndex = rhs - buffer.baseAddress!
+          buffer[rhsIndex...].reverse()
+          initializedCount = buffer.count
+          
+          midPoint = rhsIndex
+        } catch {
+          let lhsCount = lhs - buffer.baseAddress!
+          let rhsCount = (buffer.baseAddress! + buffer.count) - rhs
+          buffer.baseAddress!.deinitialize(count: lhsCount)
+          rhs.deinitialize(count: rhsCount)
+          throw error
+        }
+      })
+    
+    let lhs = elements[..<midPoint]
+    let rhs = elements[midPoint...]
+    return (
+      Array(lhs),
+      Array(rhs)
+    )
+  }
+}

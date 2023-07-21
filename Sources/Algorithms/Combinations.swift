@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 /// A collection wrapper that generates combinations of a base collection.
-public struct Combinations<Base: Collection> {
+public struct CombinationsSequence<Base: Collection> {
   /// The collection to iterate over for combinations.
   @usableFromInline
   internal let base: Base
@@ -19,12 +19,15 @@ public struct Combinations<Base: Collection> {
   internal let baseCount: Int
   
   /// The range of accepted sizes of combinations.
+  ///
   /// - Note: This may be `nil` if the attempted range entirely exceeds the
   /// upper bounds of the size of the `base` collection.
   @usableFromInline
   internal let kRange: Range<Int>?
   
-  /// Initializes a `Combinations` for all combinations of `base` of size `k`.
+  /// Initializes a `CombinationsSequence` for all combinations of `base` of
+  /// size `k`.
+  ///
   /// - Parameters:
   ///   - base: The collection to iterate over for combinations.
   ///   - k: The expected size of each combination.
@@ -33,8 +36,9 @@ public struct Combinations<Base: Collection> {
     self.init(base, kRange: k...k)
   }
   
-  /// Initializes a `Combinations` for all combinations of `base` of sizes
-  /// within a given range.
+  /// Initializes a `CombinationsSequence` for all combinations of `base` of
+  /// sizes within a given range.
+  ///
   /// - Parameters:
   ///   - base: The collection to iterate over for combinations.
   ///   - kRange: The range of accepted sizes of combinations.
@@ -76,13 +80,14 @@ public struct Combinations<Base: Collection> {
   }
 }
 
-extension Combinations: Sequence {
-  /// The iterator for a `Combinations` instance.
+extension CombinationsSequence: Sequence {
+  /// The iterator for a `CombinationsSequence` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal let base: Base
     
     /// The current range of accepted sizes of combinations.
+    ///
     /// - Note: The range is contracted until empty while iterating over
     /// combinations of different sizes. When the range is empty, iteration is
     /// finished.
@@ -99,7 +104,7 @@ extension Combinations: Sequence {
     internal var indexes: [Base.Index]
     
     @inlinable
-    internal init(_ combinations: Combinations) {
+    internal init(_ combinations: CombinationsSequence) {
       self.base = combinations.base
       self.kRange = combinations.kRange ?? 0..<0
       self.indexes = Array(combinations.base.indices.prefix(kRange.lowerBound))
@@ -175,12 +180,14 @@ extension Combinations: Sequence {
     }
   }
   
+  @inlinable
   public func makeIterator() -> Iterator {
     Iterator(self)
   }
 }
 
-extension Combinations: LazySequenceProtocol where Base: LazySequenceProtocol {}
+extension CombinationsSequence: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // combinations(ofCount:)
@@ -243,16 +250,16 @@ extension Collection {
   /// limited range is empty, the resulting sequence has no elements.
   ///
   /// - Parameter kRange: The range of numbers of elements to include in each
-  /// combination.
+  ///   combination.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
-  /// is the number of elements in the base collection, since `Combinations`
-  /// accesses the `count` of the base collection.
+  ///   is the number of elements in the base collection, since
+  ///   `CombinationsSequence` accesses the `count` of the base collection.
   @inlinable
   public func combinations<R: RangeExpression>(
     ofCount kRange: R
-  ) -> Combinations<Self> where R.Bound == Int {
-    return Combinations(self, kRange: kRange)
+  ) -> CombinationsSequence<Self> where R.Bound == Int {
+    CombinationsSequence(self, kRange: kRange)
   }
   
   /// Returns a collection of combinations of this collection's elements, with
@@ -282,11 +289,11 @@ extension Collection {
   /// - Parameter k: The number of elements to include in each combination.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
-  /// is the number of elements in the base collection, since `Combinations`
-  /// accesses the `count` of the base collection.
+  /// is the number of elements in the base collection, since
+  /// `CombinationsSequence` accesses the `count` of the base collection.
   @inlinable
-  public func combinations(ofCount k: Int) -> Combinations<Self> {
+  public func combinations(ofCount k: Int) -> CombinationsSequence<Self> {
     precondition(k >= 0, "Can't have combinations with a negative number of elements.")
-    return Combinations(self, k: k)
+    return CombinationsSequence(self, k: k)
   }
 }

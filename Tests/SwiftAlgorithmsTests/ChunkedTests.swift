@@ -47,8 +47,12 @@ final class ChunkedTests: XCTestCase {
   func testSimple() {
     // Example
     let names = ["David", "Kyle", "Karoy", "Nate"]
-    let chunks = names.chunked(on: { $0.first })
-    XCTAssertEqualSequences([["David"], ["Kyle", "Karoy"], ["Nate"]], chunks)
+    let chunks = names.chunked(on: { $0.first! })
+    let expected: [(Character, ArraySlice<String>)] = [
+      ("D", ["David"]),
+      ("K", ["Kyle", "Karoy"]),
+      ("N", ["Nate"])]
+    XCTAssertEqualSequences(expected, chunks, by: ==)
     
     // Empty sequence
     XCTAssertEqual(0, names.prefix(0).chunked(on: { $0.first }).count)
@@ -59,10 +63,11 @@ final class ChunkedTests: XCTestCase {
   }
   
   func testChunkedOn() {
-    validateFruitChunks(fruits.chunked(on: { $0.first }))
+    validateFruitChunks(fruits.chunked(on: { $0.first }).map { $1 })
     
     let lazyChunks = fruits.lazy.chunked(on: { $0.first })
-    validateFruitChunks(lazyChunks)
+    validateFruitChunks(lazyChunks.map { $1 })
+    IndexValidator().validate(lazyChunks)
   }
 
   func testChunkedBy() {
@@ -70,6 +75,23 @@ final class ChunkedTests: XCTestCase {
     
     let lazyChunks = fruits.lazy.chunked(by: { $0.first == $1.first })
     validateFruitChunks(lazyChunks)
+    IndexValidator().validate(lazyChunks)
+  }
+  
+  func testChunkedByComparesConsecutiveElements() {
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 6, 7, 8, 9].chunked(by: { $1 - $0 == 1 }),
+      [[1, 2, 3, 4], [6, 7, 8, 9]])
+    
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 6, 7, 8, 9].lazy.chunked(by: { $1 - $0 == 1 }),
+      [[1, 2, 3, 4], [6, 7, 8, 9]])
+    
+    XCTAssertEqualSequences(
+      [1, 2, 3, 4, 6, 7, 8, 9].lazy.chunked(by: { $1 - $0 == 1 }).reversed(),
+      [[6, 7, 8, 9], [1, 2, 3, 4]])
+    
+    IndexValidator().validate([1, 2, 3].lazy.chunked(by: { $1 - $0 == 1 }))
   }
   
   func testChunkedLazy() {
@@ -77,10 +99,10 @@ final class ChunkedTests: XCTestCase {
     XCTAssertLazySequence(fruits.lazy.chunked(on: { $0.first }))
   }
   
-  
   //===----------------------------------------------------------------------===//
   // Tests for `chunks(ofCount:)`
   //===----------------------------------------------------------------------===//
+  
   func testChunksOfCount() {
     XCTAssertEqualSequences([Int]().chunks(ofCount: 1), [])
     XCTAssertEqualSequences([Int]().chunks(ofCount: 5), [])
@@ -134,15 +156,18 @@ final class ChunkedTests: XCTestCase {
   func testEmptyChunksOfCountTraversal() {
     let emptyChunks = [Int]().chunks(ofCount: 1)
     
-    validateIndexTraversals(emptyChunks)
+    IndexValidator().validate(emptyChunks, expectedCount: 0)
   }
   
   func testChunksOfCountTraversal() {
-    for i in 1..<10 {
-      let collection = (1...50).map { $0 }
-      let chunks = collection.chunks(ofCount: i)
-      
-      validateIndexTraversals(chunks)
+    let validator = IndexValidator<ChunksOfCountCollection<ClosedRange<Int>>>()
+    
+    for i in 1...10 {
+      let range = 1...50
+      let chunks = range.chunks(ofCount: i)
+      validator.validate(
+        chunks,
+        expectedCount: range.count / i + (range.count % i).signum())
     }
   }
   
@@ -165,7 +190,9 @@ final class ChunkedTests: XCTestCase {
   }
   
   func testEvenChunksIndexTraversals() {
-    validateIndexTraversals(
+    let validator = IndexValidator<EvenChunksCollection<Range<Int>>>()
+
+    [
       (0..<10).evenlyChunked(in: 1),
       (0..<10).evenlyChunked(in: 2),
       (0..<10).evenlyChunked(in: 3),
@@ -173,6 +200,7 @@ final class ChunkedTests: XCTestCase {
       (0..<10).evenlyChunked(in: 20),
       (0..<0).evenlyChunked(in: 0),
       (0..<0).evenlyChunked(in: 1),
-      (0..<0).evenlyChunked(in: 10))
+      (0..<0).evenlyChunked(in: 10),
+    ].forEach { validator.validate($0) }
   }
 }

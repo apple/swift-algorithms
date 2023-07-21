@@ -22,17 +22,19 @@ let chunks = numbers.chunked(by: { $0 <= $1 })
 
 The `chunked(on:)` method, by contrast, takes a projection of each element and
 separates chunks where the projection of two consecutive elements is not equal.
+The result includes both the projected value and the subsequence that groups
+elements with that projected value:
 
 ```swift
 let names = ["David", "Kyle", "Karoy", "Nate"]
 let chunks = names.chunked(on: \.first!)
-// [["David"], ["Kyle", "Karoy"], ["Nate"]] 
+// [("D", ["David"]), ("K", ["Kyle", "Karoy"]), ("N", ["Nate"])] 
 ```
 
 The `chunks(ofCount:)` method takes a `count` parameter (required to be > 0) and
 separates the collection into chunks of this given count. If the length of the
 collection is a multiple of the `count` parameter, all chunks will have the
-specified size. Otherwise, the last chunk will contain the remaining elements.
+a count equal to the parameter. Otherwise, the last chunk will contain the remaining elements.
  
 ```swift
 let names = ["David", "Kyle", "Karoy", "Nate"]
@@ -59,8 +61,9 @@ let nearlyEvenChunks = (0..<15).evenlyChunked(in: 4)
 // equivalent to [0..<4, 4..<8, 8..<12, 12..<15]
 ```
 
-Unlike the `split` family of methods, the entire collection is included in the
-chunked result — joining the resulting chunks recreates the original collection. 
+When "chunking" a collection, the entire collection is included in the result,
+unlike the `split` family of methods, where separators are dropped.
+Joining the result of a chunking method call recreates the original collection.
 
 ```swift
 c.elementsEqual(c.chunked(...).joined())
@@ -82,37 +85,29 @@ extension Collection {
     ) -> [SubSequence]
 
     public func chunked<Subject: Equatable>(
-        on projection: (Element) -> Subject
+      on projection: (Element) -> Subject
     ) -> [SubSequence]
-    
+      
     public func chunks(ofCount count: Int) -> ChunkedByCount<Self>
-    
+      
     public func evenlyChunked(in count: Int) -> EvenChunks<Self>
-  }
 }
 
 extension LazyCollectionProtocol {
     public func chunked(
         by belongInSameGroup: @escaping (Element, Element) -> Bool
-    ) -> Chunked<Elements>
+    ) -> ChunkedByCollection<Elements>
 
     public func chunked<Subject: Equatable>(
         on projection: @escaping (Element) -> Subject
-    ) -> Chunked<Elements>
+    ) -> ChunkedOnCollection<Elements, Subject>
 }
 ```
 
-The `Chunked` type conforms to `LazyCollectionProtocol` and also conforms to
-`BidirectionalCollection` when the base collection conforms.
-
-The `ChunkedByCount` type conforms to `Collection` and also conforms to both
-`BidirectionalCollection` and `RandomAccessCollection` when the base collection
-is random-access, as well as to `LazyCollectionProtocol` when the base
-collection conforms.
-
-The `EvenChunks` type conforms to `Collection` and also
-conforms to `BidirectionalCollection`, `RandomAccessCollection`, and
-`LazyCollectionProtocol` when the base collection conforms..
+Each of the "chunked" collection types are bidirectional when the wrapped
+collection is bidirectional. `ChunksOfCountCollection` and 
+`EvenChunksCollection` also conform to `RandomAccessCollection` and 
+`LazySequenceProtocol` when their base collections conform.
 
 ### Complexity
 
@@ -120,12 +115,20 @@ The eager methods are O(_n_), the lazy methods are O(_1_).
 
 ### Naming
 
-The operation performed by these methods is similar to other ways of breaking a collection up into subsequences. In particular, the predicate-based `split(where:)` method looks similar to `chunked(on:)`. You can draw a distinction between these different operations based on the resulting subsequences:
+The operation performed by these methods is similar to other ways of breaking a 
+collection up into subsequences. In particular, the predicate-based 
+`split(where:)` method looks similar to `chunked(on:)`. You can draw a 
+distinction between these different operations based on the resulting 
+subsequences:
 
-- `split`: *In the standard library.* Breaks a collection into subsequences, removing any elements that are considered "separators". The original collection cannot be recovered from the result of splitting.
-- `chunked`: *In this package.* Breaks a collection into subsequences, preserving each element in its initial ordering. Joining the resulting subsequences re-forms the original collection.
-- `sliced`: *Not included in this package or the stdlib.* Breaks a collection into potentially overlapping subsequences.
-
+- `split`: *In the standard library.* Breaks a collection into subsequences, 
+removing any elements that are considered "separators". The original collection 
+cannot be recovered from the result of splitting.
+- `chunked`: *In this package.* Breaks a collection into subsequences, 
+preserving each element in its initial ordering. Joining the resulting 
+subsequences re-forms the original collection.
+- `sliced`: *Not included in this package or the stdlib.* Breaks a collection 
+into potentially overlapping subsequences.
 
 ### Comparison with other languages
 

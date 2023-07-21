@@ -185,3 +185,90 @@ final class SortedPrefixTests: XCTestCase {
     }
   }
 }
+
+final class MinAndMaxTests: XCTestCase {
+  /// Confirms that empty sequences yield no results.
+  func testEmpty() {
+    XCTAssertNil(EmptyCollection<Int>().minAndMax())
+  }
+
+  /// Confirms the same element is used when there is only one.
+  func testSingleElement() {
+    let result = CollectionOfOne(2).minAndMax()
+    XCTAssertEqual(result?.min, 2)
+    XCTAssertEqual(result?.max, 2)
+  }
+
+  /// Confirms the same value is used when all the elements have it.
+  func testSingleValueMultipleElements() {
+    let result = repeatElement(3.3, count: 5).minAndMax()
+    XCTAssertEqual(result?.min, 3.3)
+    XCTAssertEqual(result?.max, 3.3)
+
+    // Even count
+    let result2 = repeatElement("c" as Character, count: 6).minAndMax()
+    XCTAssertEqual(result2?.min, "c")
+    XCTAssertEqual(result2?.max, "c")
+  }
+
+  /// Confirms when the minimum value is constantly updated, but the maximum
+  /// never is.
+  func testRampDown() {
+    let result = (1...5).reversed().minAndMax()
+    XCTAssertEqual(result?.min, 1)
+    XCTAssertEqual(result?.max, 5)
+
+    // Even count
+    let result2 = "fedcba".minAndMax()
+    XCTAssertEqual(result2?.min, "a")
+    XCTAssertEqual(result2?.max, "f")
+  }
+
+  /// Confirms when the maximum value is constantly updated, but the minimum
+  /// never is.
+  func testRampUp() {
+    let result = (1...5).minAndMax()
+    XCTAssertEqual(result?.min, 1)
+    XCTAssertEqual(result?.max, 5)
+
+    // Even count
+    let result2 = "abcdef".minAndMax()
+    XCTAssertEqual(result2?.min, "a")
+    XCTAssertEqual(result2?.max, "f")
+  }
+
+  /// Confirms when the maximum and minimum change during a run.
+  func testUpsAndDowns() {
+    let result = [4, 3, 3, 5, 2, 0, 7, 6].minAndMax()
+    XCTAssertEqual(result?.min, 0)
+    XCTAssertEqual(result?.max, 7)
+
+    // Odd count
+    let result2 = "gfabdec".minAndMax()
+    XCTAssertEqual(result2?.min, "a")
+    XCTAssertEqual(result2?.max, "g")
+  }
+
+  /// Confirms that the given predicate is used to find the min/max.
+  func testPredicate() {
+    let result = (1...5).minAndMax(by: >)
+    XCTAssertEqual(result?.min, 5)
+    XCTAssertEqual(result?.max, 1)
+
+    // Odd count
+    let result2 = "gfabdec".minAndMax(by: >)
+    XCTAssertEqual(result2?.min, "g")
+    XCTAssertEqual(result2?.max, "a")
+  }
+
+  /// Confirms that the min and max are "stable" as defined for minAndMax.
+  func testStability() {
+    for n in 1...10 {
+      let result = repeatElement(0, count: n)
+        .enumerated()
+        .minAndMax(by: { $0.element < $1.element })
+      XCTAssertEqual(result?.min.offset, 0)
+      XCTAssertEqual(result?.max.offset, n - 1)
+    }
+  }
+}

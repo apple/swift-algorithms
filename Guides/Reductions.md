@@ -3,7 +3,8 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Reductions.swift) |
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/ReductionsTests.swift)]
 
-Produces all the intermediate results of reducing a sequence's elements using a closure.
+Produces all the intermediate results of reducing a sequence's elements using a 
+closure.
 
 ```swift
 let exclusiveRunningTotal = (1...5).reductions(0, +)
@@ -26,39 +27,37 @@ sequence and another trio are added to `Sequence` which are eagerly evaluated.
 
 ```swift
 extension LazySequenceProtocol {
+    public func reductions<Result>(
+        _ initial: Result,
+        _ transform: @escaping (Result, Element) -> Result
+    ) -> ExclusiveReductionsSequence<Result, Self>
 
-  public func reductions<Result>(
-    _ initial: Result,
-    _ transform: @escaping (Result, Element) -> Result
-  ) -> ExclusiveReductions<Result, Self>
+    public func reductions<Result>(
+        into initial: Result,
+        _ transform: @escaping (inout Result, Element) -> Void
+    ) -> ExclusiveReductionsSequence<Result, Self>
 
-  public func reductions<Result>(
-    into initial: Result,
-    _ transform: @escaping (inout Result, Element) -> Void
-  ) -> ExclusiveReductions<Result, Self>
-
-  public func reductions(
-    _ transform: @escaping (Element, Element) -> Element
-  ) -> InclusiveReductions<Self>
+    public func reductions(
+        _ transform: @escaping (Element, Element) -> Element
+    ) -> InclusiveReductionsSequence<Self>
 }
 ```
 
 ```swift
 extension Sequence {
+    public func reductions<Result>(
+        _ initial: Result, 
+        _ transform: (Result, Element) throws -> Result
+    ) rethrows -> [Result]
 
-  public func reductions<Result>(
-    _ initial: Result, 
-    _ transform: (Result, Element) throws -> Result
-  ) rethrows -> [Result]
+    public func reductions<Result>(
+        into initial: Result,
+        _ transform: (inout Result, Element) throws -> Void
+    ) rethrows -> [Result]
 
-  public func reductions<Result>(
-    into initial: Result,
-    _ transform: (inout Result, Element) throws -> Void
-  ) rethrows -> [Result]
-
-  public func reductions(
-    _ transform: (Element, Element) throws -> Element
-  ) rethrows -> [Element]
+    public func reductions(
+        _ transform: (Element, Element) throws -> Element
+    ) rethrows -> [Element]
 }
 ```
 
@@ -102,7 +101,7 @@ takes an initial value to use for the first element in the returned sequence,
 and another which uses the first value of the base sequence as the initial
 value. C++ calls these variants exclusive and inclusive respectively and so 
 these terms carry through as the name for the lazy sequences; 
-`ExclusiveReductions` and `InclusiveReductions`.
+`ExclusiveReductionsSequence` and `InclusiveReductionsSequence`.
 
 [SE-0045]: https://forums.swift.org/t/review-se-0045-add-scan-prefix-while-drop-while-and-iterate-to-the-stdlib/2382
 [Issue 25]: https://github.com/apple/swift-algorithms/issues/25

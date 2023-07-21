@@ -11,10 +11,7 @@
 
 /// A collection wrapper that iterates over the indices and elements of a
 /// collection together.
-public struct Indexed<Base: Collection> {
-  /// The element type for an `Indexed` collection.
-  public typealias Element = (index: Base.Index, element: Base.Element)
-  
+public struct IndexedCollection<Base: Collection> {
   /// The base collection.
   @usableFromInline
   internal let base: Base
@@ -25,7 +22,10 @@ public struct Indexed<Base: Collection> {
   }
 }
 
-extension Indexed: Collection {
+extension IndexedCollection: Collection {
+  /// The element type for an `IndexedCollection` collection.
+  public typealias Element = (index: Base.Index, element: Base.Element)
+  
   @inlinable
   public var startIndex: Base.Index {
     base.startIndex
@@ -52,7 +52,11 @@ extension Indexed: Collection {
   }
   
   @inlinable
-  public func index(_ i: Base.Index, offsetBy distance: Int, limitedBy limit: Base.Index) -> Base.Index? {
+  public func index(
+    _ i: Base.Index,
+    offsetBy distance: Int,
+    limitedBy limit: Base.Index
+  ) -> Base.Index? {
     base.index(i, offsetBy: distance, limitedBy: limit)
   }
   
@@ -60,18 +64,27 @@ extension Indexed: Collection {
   public func distance(from start: Base.Index, to end: Base.Index) -> Int {
     base.distance(from: start, to: end)
   }
+  
+  @inlinable
+  public var indices: Base.Indices {
+    base.indices
+  }
 }
 
-extension Indexed: BidirectionalCollection where Base: BidirectionalCollection {
+extension IndexedCollection: BidirectionalCollection
+  where Base: BidirectionalCollection
+{
   @inlinable
   public func index(before i: Base.Index) -> Base.Index {
     base.index(before: i)
   }
 }
 
-extension Indexed: RandomAccessCollection where Base: RandomAccessCollection {}
-extension Indexed: LazySequenceProtocol where Base: LazySequenceProtocol {}
-extension Indexed: LazyCollectionProtocol where Base: LazyCollectionProtocol {}
+extension IndexedCollection: RandomAccessCollection
+  where Base: RandomAccessCollection {}
+
+extension IndexedCollection: LazySequenceProtocol, LazyCollectionProtocol
+  where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // indexed()
@@ -94,7 +107,7 @@ extension Collection {
   ///
   /// Returns: A collection of paired indices and elements of this collection.
   @inlinable
-  public func indexed() -> Indexed<Self> {
-    Indexed(base: self)
+  public func indexed() -> IndexedCollection<Self> {
+    IndexedCollection(base: self)
   }
 }

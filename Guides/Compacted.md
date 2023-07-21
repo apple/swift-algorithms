@@ -37,8 +37,9 @@ extension Collection {
 
 The `Sequence` version of `compacted()` returns a `CompactedSequence` type,
 while the `Collection` version returns `CompactedCollection`. The collection
-has conditional conformance to `BidirectionalCollection` and
-`LazyCollectionProtocol` when the base collection conforms.
+has conditional conformance to `BidirectionalCollection` when the base
+collection conforms, and both have conditional conformance to 
+`LazySequenceProtocol` when the base collection conforms.
 
 ### Naming
 

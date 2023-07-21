@@ -92,6 +92,26 @@ final class PartitionTests: XCTestCase {
     }
   }
   
+  func testPartitioningIndexWithEmptyInput() {
+    let input: [Int] = []
+    
+    let a = input.partitioningIndex(where: { _ in return true })
+    XCTAssertEqual(a, input.startIndex)
+    
+    let b = input.partitioningIndex(where: { _ in return false })
+    XCTAssertEqual(b, input.endIndex)
+  }
+  
+  func testPartitioningIndexWithOneEmptyPartition() {
+    let input: Range<Int> = (0 ..< 10)
+    
+    let a = input.partitioningIndex(where: { $0 > 10 })
+    XCTAssertEqual(a, input.endIndex)
+    
+    let b = input.partitioningIndex(where: { $0 >= 0 })
+    XCTAssertEqual(b, input.startIndex)
+  }
+  
   func testPartitionWithSubrangeBidirectionalCollection() {
     for length in 10...20 {
       let a = Array(0..<length)
@@ -132,5 +152,41 @@ final class PartitionTests: XCTestCase {
         }
       }
     }
+  }
+  
+  func testPartitionedWithEmptyInput() {
+    let input: [Int] = []
+    
+    let s0 = input.partitioned(by: { _ in return true })
+    
+    XCTAssertTrue(s0.0.isEmpty)
+    XCTAssertTrue(s0.1.isEmpty)
+  }
+  
+  /// Test the example given in the `partitioned(by:)` documentation
+  func testPartitionedExample() throws {
+    let cast = ["Vivien", "Marlon", "Kim", "Karl"]
+    let (longNames, shortNames) = cast.partitioned(by: { $0.count < 5 })
+    XCTAssertEqual(longNames, ["Vivien", "Marlon"])
+    XCTAssertEqual(shortNames, ["Kim", "Karl"])
+  }
+  
+  func testPartitionedWithPredicate() throws {
+    let s0 = ["A", "B", "C", "D"].partitioned(by: { $0 == $0.lowercased() })
+    let s1 = ["a", "B", "C", "D"].partitioned(by: { $0 == $0.lowercased() })
+    let s2 = ["a", "B", "c", "D"].partitioned(by: { $0 == $0.lowercased() })
+    let s3 = ["a", "B", "c", "d"].partitioned(by: { $0 == $0.lowercased() })
+    
+    XCTAssertEqual(s0.0, ["A", "B", "C", "D"])
+    XCTAssertEqual(s0.1, [])
+    
+    XCTAssertEqual(s1.0, ["B", "C", "D"])
+    XCTAssertEqual(s1.1, ["a"])
+    
+    XCTAssertEqual(s2.0, ["B", "D"])
+    XCTAssertEqual(s2.1, ["a", "c"])
+    
+    XCTAssertEqual(s3.0, ["B"])
+    XCTAssertEqual(s3.1, ["a", "c", "d"])
   }
 }

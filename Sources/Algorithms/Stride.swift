@@ -14,47 +14,46 @@
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
-  /// Returns a sequence stepping through the elements every `step` starting
-  /// at the first value. Any remainders of the stride will be trimmed.
+  /// Returns a sequence stepping through the elements every `step` starting at
+  /// the first value. Any remainders of the stride will be trimmed.
   ///
   ///     (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
   ///     (0...10).striding(by: 3) // == [0, 3, 6, 9]
   ///
-  /// - Complexity: O(1). Access to successive values is O(k) where
-  ///   _k_ is the striding `step`.
+  /// - Complexity: O(1). Access to successive values is O(k) where _k_ is the
+  ///   striding `step`.
   ///
   /// - Parameter step: The amount to step with each iteration.
-  /// - Returns: Returns a sequence for stepping through the
-  /// elements by the specified amount.
+  /// - Returns: Returns a sequence for stepping through the elements by the
+  ///   specified amount.
   @inlinable
-  public func striding(by step: Int) -> StrideSequence<Self> {
-    StrideSequence(base: self, stride: step)
+  public func striding(by step: Int) -> StridingSequence<Self> {
+    StridingSequence(base: self, stride: step)
   }
 }
 
 extension Collection {
-  /// Returns a sequence stepping through the elements every `step` starting
-  /// at the first value. Any remainders of the stride will be trimmed.
+  /// Returns a sequence stepping through the elements every `step` starting at
+  /// the first value. Any remainders of the stride will be trimmed.
   ///
   ///     (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
   ///     (0...10).striding(by: 3) // == [0, 3, 6, 9]
   ///
-  /// - Complexity: O(1). Access to successive values is O(1) if the
-  /// collection conforms to `RandomAccessCollection`; otherwise,
-  /// O(_k_), where _k_ is the striding `step`.
+  /// - Complexity: O(1). Access to successive values is O(1) if the collection
+  ///   conforms to `RandomAccessCollection`; otherwise, O(_k_), where _k_ is
+  ///   the striding `step`.
   ///
   /// - Parameter step: The amount to step with each iteration.
-  /// - Returns: Returns a collection for stepping through the
-  /// elements by the specified amount.
+  /// - Returns: Returns a collection for stepping through the elements by the
+  ///   specified amount.
   @inlinable
-  public func striding(by step: Int) -> StrideCollection<Self> {
-    StrideCollection(base: self, stride: step)
+  public func striding(by step: Int) -> StridingCollection<Self> {
+    StridingCollection(base: self, stride: step)
   }
 }
 
 /// A wrapper that strides over a base sequence.
-public struct StrideSequence<Base: Sequence>: Sequence {
-  
+public struct StridingSequence<Base: Sequence> {
   @usableFromInline
   internal let base: Base
   
@@ -63,15 +62,21 @@ public struct StrideSequence<Base: Sequence>: Sequence {
   
   @inlinable
   internal init(base: Base, stride: Int) {
-    precondition(stride > 0, "striding must be greater than zero")
+    precondition(stride > 0, "Stride must be greater than zero")
     self.base = base
     self.stride = stride
   }
 }
 
-extension StrideSequence {
-  
-  /// An iterator over a `Stride` sequence.
+extension StridingSequence {
+  @inlinable
+  public func striding(by step: Int) -> Self {
+    Self(base: base, stride: stride * step)
+  }
+}
+
+extension StridingSequence: Sequence {
+  /// An iterator over a `StridingSequence` instance.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var iterator: Base.Iterator
@@ -107,15 +112,11 @@ extension StrideSequence {
   }
 }
 
-extension StrideSequence {
-  @inlinable
-  public func striding(by step: Int) -> Self {
-    Self(base: base, stride: stride * step)
-  }
-}
+extension StridingSequence: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
 
 /// A wrapper that strides over a base collection.
-public struct StrideCollection<Base: Collection> {
+public struct StridingCollection<Base: Collection> {
   @usableFromInline
   internal let base: Base
   
@@ -130,16 +131,15 @@ public struct StrideCollection<Base: Collection> {
   }
 }
 
-extension StrideCollection {
+extension StridingCollection {
   @inlinable
   public func striding(by step: Int) -> Self {
     Self(base: base, stride: stride * step)
   }
 }
 
-extension StrideCollection: Collection {
-  
-  /// A position in a `Stride` collection.
+extension StridingCollection: Collection {
+  /// A position in a `StridingCollection` instance.
   public struct Index: Comparable {
     @usableFromInline
     internal let base: Base.Index
@@ -172,7 +172,7 @@ extension StrideCollection: Collection {
   
   @inlinable
   public func index(after i: Index) -> Index {
-    precondition(i.base < base.endIndex, "Advancing past end index")
+    precondition(i.base != base.endIndex, "Advancing past end index")
     return index(i, offsetBy: 1)
   }
   
@@ -226,9 +226,15 @@ extension StrideCollection: Collection {
     offsetBy n: Int,
     limitedBy limit: Index
   ) -> Index? {
-    let distance = i == endIndex
-      ? -((base.count - 1) % stride + 1) + (n - 1) * -stride
-      : n * -stride
+    // We typically use the ternary operator but this significantly increases
+    // compile times when using Swift 5.3.2
+    // https://github.com/apple/swift-algorithms/issues/146
+    let distance: Int
+    if i == endIndex {
+      distance = -((base.count - 1) % stride + 1) + (n - 1) * -stride
+    } else {
+      distance = n * -stride
+    }
     return base.index(
         i.base,
         offsetBy: distance,
@@ -249,8 +255,8 @@ extension StrideCollection: Collection {
   
   @inlinable
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
-    precondition(distance <= 0 || i.base < base.endIndex, "Advancing past end index")
-    precondition(distance >= 0 || i.base > base.startIndex, "Incrementing past start index")
+    precondition(distance <= 0 || i.base != base.endIndex, "Advancing past end index")
+    precondition(distance >= 0 || i.base != base.startIndex, "Incrementing past start index")
     let limit = distance > 0 ? endIndex : startIndex
     let idx = index(i, offsetBy: distance, limitedBy: limit)
     precondition(idx != nil, "The distance \(distance) is not valid for this collection")
@@ -258,15 +264,20 @@ extension StrideCollection: Collection {
   }
 }
 
-extension StrideCollection: BidirectionalCollection
+extension StridingCollection: BidirectionalCollection
   where Base: RandomAccessCollection {
   
   @inlinable
   public func index(before i: Index) -> Index {
-    precondition(i.base > base.startIndex, "Incrementing past start index")
+    precondition(i.base != base.startIndex, "Incrementing past start index")
     return index(i, offsetBy: -1)
   }
 }
 
-extension StrideCollection: RandomAccessCollection where Base: RandomAccessCollection {}
-extension StrideCollection.Index: Hashable where Base.Index: Hashable {}
+extension StridingCollection: RandomAccessCollection
+  where Base: RandomAccessCollection {}
+
+extension StridingCollection: LazySequenceProtocol, LazyCollectionProtocol
+  where Base: LazySequenceProtocol {}
+
+extension StridingCollection.Index: Hashable where Base.Index: Hashable {}
