@@ -3,16 +3,16 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Chunked.swift) | 
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/ChunkedTests.swift)]
 
-Break a collection into subsequences where consecutive elements pass a binary
-predicate, or where all elements in each chunk project to the same value.
+Break a collection into nonoverlapping subsequences:
 
-Also includes a `chunks(ofCount:)` that breaks a collection into subsequences 
-of a given `count`.
+* `chunked(by:)` forms chunks of consecutive elements that pass a binary predicate,
+* `chunked(on:)` forms chunks of consecutive elements that project to equal values,
+* `chunks(ofCount:)` forms chunks of a given size, and
+* `evenlyChunked(in:)` forms a given number of equally-sized chunks.
 
-There are two variations of the `chunked` method: `chunked(by:)` and
-`chunked(on:)`. `chunked(by:)` uses a binary predicate to test consecutive
-elements, separating chunks where the predicate returns `false`. For example,
-you can chunk a collection into ascending sequences using this method:
+`chunked(by:)` uses a binary predicate to test consecutive elements, separating
+chunks where the predicate returns `false`. For example, you can chunk a
+collection into ascending sequences using this method:
 
 ```swift
 let numbers = [10, 20, 30, 10, 40, 40, 10, 20]
@@ -31,11 +31,10 @@ let chunks = names.chunked(on: \.first!)
 // [("D", ["David"]), ("K", ["Kyle", "Karoy"]), ("N", ["Nate"])] 
 ```
 
-The `chunks(ofCount:)` method takes a `count` parameter (greater than zero)
-and separates the collection into chunks of this given count. If the `count`
-parameter is evenly divided by the count of the base `Collection`, all the
-chunks will have a count equal to the parameter. Otherwise, the last chunk will
-contain the remaining elements.
+The `chunks(ofCount:)` method takes a `count` parameter (required to be > 0) and
+separates the collection into chunks of this given count. If the length of the
+collection is a multiple of the `count` parameter, all chunks will have the
+a count equal to the parameter. Otherwise, the last chunk will contain the remaining elements.
  
 ```swift
 let names = ["David", "Kyle", "Karoy", "Nate"]
@@ -46,7 +45,21 @@ let remaining = names.chunks(ofCount: 3)
 // equivalent to [["David", "Kyle", "Karoy"], ["Nate"]]
 ```
 
-The `chunks(ofCount:)` is the subject of an [existing SE proposal][proposal].
+The `chunks(ofCount:)` method was previously [proposed](proposal) for inclusion
+in the standard library.
+
+The `evenlyChunked(in:)` method takes a `count` parameter and divides the
+collection into `count` number of equally-sized chunks. If the length of the
+collection is not a multiple of the `count` parameter, the chunks at the start
+will be longer than the chunks at the end.
+
+```swift
+let evenChunks = (0..<15).evenlyChunked(in: 3)
+// equivalent to [0..<5, 5..<10, 10..<15]
+
+let nearlyEvenChunks = (0..<15).evenlyChunked(in: 4)
+// equivalent to [0..<4, 4..<8, 8..<12, 12..<15]
+```
 
 When "chunking" a collection, the entire collection is included in the result,
 unlike the `split` family of methods, where separators are dropped.
@@ -61,38 +74,40 @@ c.elementsEqual(c.chunked(...).joined())
 
 ## Detailed Design
 
-The three methods are added as extension to `Collection`. `chunked(by:)` and
-`chunked(on:)` are eager by default, both with a matching version that return a
-lazy wrapper added to `LazySequenceProtocol`.
+The four methods are added to `Collection`, with matching versions of
+`chunked(by:)` and `chunked(on:)` that return a lazy wrapper added to
+`LazyCollectionProtocol`.
 
 ```swift
 extension Collection {
-  public func chunked(
-      by belongInSameGroup: (Element, Element) -> Bool
-  ) -> [SubSequence]
+    public func chunked(
+        by belongInSameGroup: (Element, Element) -> Bool
+    ) -> [SubSequence]
 
-  public func chunked<Subject: Equatable>(
+    public func chunked<Subject: Equatable>(
       on projection: (Element) -> Subject
-  ) -> [(Subject, SubSequence)]
-  
-  public func chunks(ofCount count: Int) -> ChunksOfCountCollection<Self>
+    ) -> [SubSequence]
+      
+    public func chunks(ofCount count: Int) -> ChunkedByCount<Self>
+      
+    public func evenlyChunked(in count: Int) -> EvenChunks<Self>
 }
 
-extension LazySequenceProtocol where Self: Collection, Elements: Collection {
-  public func chunked(
-      by belongInSameGroup: @escaping (Element, Element) -> Bool
-  ) -> ChunkedByCollection<Elements, Element>
+extension LazyCollectionProtocol {
+    public func chunked(
+        by belongInSameGroup: @escaping (Element, Element) -> Bool
+    ) -> ChunkedByCollection<Elements>
 
-  public func chunked<Subject: Equatable>(
-      on projection: @escaping (Element) -> Subject
-  ) -> ChunkedOnCollection<Elements, Subject>
+    public func chunked<Subject: Equatable>(
+        on projection: @escaping (Element) -> Subject
+    ) -> ChunkedOnCollection<Elements, Subject>
 }
 ```
 
-The `ChunkedByCollection`, `ChunkedOnCollection`, and `ChunksOfCountCollection`
-types are bidirectional when the wrapped collection is bidirectional.
-`ChunksOfCountCollection` also conforms to `LazySequenceProtocol` when the base
-collection conforms.
+Each of the "chunked" collection types are bidirectional when the wrapped
+collection is bidirectional. `ChunksOfCountCollection` and 
+`EvenChunksCollection` also conform to `RandomAccessCollection` and 
+`LazySequenceProtocol` when their base collections conform.
 
 ### Complexity
 
@@ -120,5 +135,5 @@ into potentially overlapping subsequences.
 **Ruby:** Ruby’s `Enumerable` class defines `chunk_while` and `chunk`, which map
 to the proposed `chunked(by:)` and `chunked(on:)` methods.
 
-**Rust:** Rust defines a variety of size-based `chunks` methods, but doesn’t
-include any with the functionality described here.
+**Rust:** Rust defines a variety of size-based `chunks` methods, of which the
+standard version corresponds to the `chunks(ofCount:)` method defined here.

@@ -198,6 +198,210 @@ extension ChunkedOnCollection: BidirectionalCollection
 
 extension ChunkedOnCollection: LazyCollectionProtocol {}
 
+/// A collection wrapper that evenly breaks a collection into a given number of
+/// chunks.
+public struct EvenChunksCollection<Base: Collection> {
+  /// The base collection.
+  @usableFromInline
+  internal let base: Base
+  
+  /// The number of equal chunks the base collection is divided into.
+  @usableFromInline
+  internal let numberOfChunks: Int
+  
+  /// The count of the base collection.
+  @usableFromInline
+  internal let baseCount: Int
+  
+  /// The upper bound of the first chunk.
+  @usableFromInline
+  internal var firstUpperBound: Base.Index
+  
+  @inlinable
+  internal init(base: Base, numberOfChunks: Int) {
+    self.base = base
+    self.numberOfChunks = numberOfChunks
+    self.baseCount = base.count
+    self.firstUpperBound = base.startIndex
+    
+    if numberOfChunks > 0 {
+      firstUpperBound = endOfChunk(startingAt: base.startIndex, offset: 0)
+    }
+  }
+}
+
+extension EvenChunksCollection {
+  /// Returns the number of chunks with size `smallChunkSize + 1` at the start
+  /// of this collection.
+  @inlinable
+  internal var numberOfLargeChunks: Int {
+    baseCount % numberOfChunks
+  }
+  
+  /// Returns the size of a chunk at a given offset.
+  @inlinable
+  internal func sizeOfChunk(offset: Int) -> Int {
+    let isLargeChunk = offset < numberOfLargeChunks
+    return baseCount / numberOfChunks + (isLargeChunk ? 1 : 0)
+  }
+  
+  /// Returns the index in the base collection of the end of the chunk starting
+  /// at the given index.
+  @inlinable
+  internal func endOfChunk(startingAt start: Base.Index, offset: Int) -> Base.Index {
+    base.index(start, offsetBy: sizeOfChunk(offset: offset))
+  }
+  
+  /// Returns the index in the base collection of the start of the chunk ending
+  /// at the given index.
+  @inlinable
+  internal func startOfChunk(endingAt end: Base.Index, offset: Int) -> Base.Index {
+    base.index(end, offsetBy: -sizeOfChunk(offset: offset))
+  }
+  
+  /// Returns the index that corresponds to the chunk that starts at the given
+  /// base index.
+  @inlinable
+  internal func indexOfChunk(startingAt start: Base.Index, offset: Int) -> Index {
+    guard offset != numberOfChunks else { return endIndex }
+    let end = endOfChunk(startingAt: start, offset: offset)
+    return Index(start..<end, offset: offset)
+  }
+  
+  /// Returns the index that corresponds to the chunk that ends at the given
+  /// base index.
+  @inlinable
+  internal func indexOfChunk(endingAt end: Base.Index, offset: Int) -> Index {
+    let start = startOfChunk(endingAt: end, offset: offset)
+    return Index(start..<end, offset: offset)
+  }
+}
+
+extension EvenChunksCollection: Collection {
+  public struct Index: Comparable {
+    /// The range corresponding to the chunk at this position.
+    @usableFromInline
+    internal var baseRange: Range<Base.Index>
+    
+    /// The offset corresponding to the chunk at this position. The first chunk
+    /// has offset `0` and all other chunks have an offset `1` greater than the
+    /// previous.
+    @usableFromInline
+    internal var offset: Int
+    
+    @inlinable
+    internal init(_ baseRange: Range<Base.Index>, offset: Int) {
+      self.baseRange = baseRange
+      self.offset = offset
+    }
+    
+    @inlinable
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+      lhs.offset == rhs.offset
+    }
+    
+    @inlinable
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+      lhs.offset < rhs.offset
+    }
+  }
+  
+  public typealias Element = Base.SubSequence
+
+  @inlinable
+  public var startIndex: Index {
+    Index(base.startIndex..<firstUpperBound, offset: 0)
+  }
+  
+  @inlinable
+  public var endIndex: Index {
+    Index(base.endIndex..<base.endIndex, offset: numberOfChunks)
+  }
+  
+  @inlinable
+  public func index(after i: Index) -> Index {
+    precondition(i != endIndex, "Can't advance past endIndex")
+    let start = i.baseRange.upperBound
+    return indexOfChunk(startingAt: start, offset: i.offset + 1)
+  }
+  
+  @inlinable
+  public subscript(position: Index) -> Element {
+    precondition(position != endIndex)
+    return base[position.baseRange]
+  }
+  
+  @inlinable
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    /// Returns the base distance between two `EvenChunksCollection` indices
+    /// from the end of one to the start of the other, when given their offsets.
+    func baseDistance(from offsetA: Int, to offsetB: Int) -> Int {
+      let smallChunkSize = baseCount / numberOfChunks
+      let numberOfChunks = (offsetB - offsetA) - 1
+      
+      let largeChunksEnd = Swift.min(self.numberOfLargeChunks, offsetB)
+      let largeChunksStart = Swift.min(self.numberOfLargeChunks, offsetA + 1)
+      let numberOfLargeChunks = largeChunksEnd - largeChunksStart
+      
+      return smallChunkSize * numberOfChunks + numberOfLargeChunks
+    }
+    
+    if distance == 0 {
+      return i
+    } else if distance > 0 {
+      let offset = i.offset + distance
+      let baseOffset = baseDistance(from: i.offset, to: offset)
+      let start = base.index(i.baseRange.upperBound, offsetBy: baseOffset)
+      return indexOfChunk(startingAt: start, offset: offset)
+    } else {
+      let offset = i.offset + distance
+      let baseOffset = baseDistance(from: offset, to: i.offset)
+      let end = base.index(i.baseRange.lowerBound, offsetBy: -baseOffset)
+      return indexOfChunk(endingAt: end, offset: offset)
+    }
+  }
+  
+  @inlinable
+  public func index(_ i: Index, offsetBy distance: Int, limitedBy limit: Index) -> Index? {
+    if distance >= 0 {
+      if (0..<distance).contains(self.distance(from: i, to: limit)) {
+        return nil
+      }
+    } else {
+      if (0..<(-distance)).contains(self.distance(from: limit, to: i)) {
+        return nil
+      }
+    }
+    return index(i, offsetBy: distance)
+  }
+  
+  @inlinable
+  public func distance(from start: Index, to end: Index) -> Int {
+    end.offset - start.offset
+  }
+}
+
+extension EvenChunksCollection.Index: Hashable where Base.Index: Hashable {}
+
+extension EvenChunksCollection: BidirectionalCollection
+  where Base: BidirectionalCollection
+{
+  @inlinable
+  public func index(before i: Index) -> Index {
+    precondition(i != startIndex, "Can't advance before startIndex")
+    return indexOfChunk(endingAt: i.baseRange.lowerBound, offset: i.offset - 1)
+  }
+}
+
+extension EvenChunksCollection: RandomAccessCollection
+  where Base: RandomAccessCollection {}
+
+extension EvenChunksCollection: LazySequenceProtocol
+  where Base: LazySequenceProtocol {}
+
+extension EvenChunksCollection: LazyCollectionProtocol
+  where Base: LazyCollectionProtocol {}
+
 //===----------------------------------------------------------------------===//
 // lazy.chunked(by:) / lazy.chunked(on:)
 //===----------------------------------------------------------------------===//
@@ -583,5 +787,40 @@ extension Collection {
 
 extension ChunksOfCountCollection.Index: Hashable where Base.Index: Hashable {}
 
-extension ChunksOfCountCollection: LazySequenceProtocol, LazyCollectionProtocol
+extension ChunksOfCountCollection: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
+
+extension ChunksOfCountCollection: LazyCollectionProtocol
+  where Base: LazyCollectionProtocol {}
+
+//===----------------------------------------------------------------------===//
+// evenlyChunked(in:)
+//===----------------------------------------------------------------------===//
+
+extension Collection {
+  /// Returns a collection of `count` evenly divided subsequences of this
+  /// collection.
+  ///
+  /// This method divides the collection into a given number of equally sized
+  /// chunks. If the length of the collection is not divisible by `count`, the
+  /// chunks at the start will be longer than the chunks at the end, like in
+  /// this example:
+  ///
+  ///     for chunk in "Hello, world!".evenlyChunked(in: 5) {
+  ///         print(chunk)
+  ///     }
+  ///     // "Hel"
+  ///     // "lo,"
+  ///     // " wo"
+  ///     // "rl"
+  ///     // "d!"
+  ///
+  /// - Complexity: O(1) if the collection conforms to `RandomAccessCollection`,
+  ///   otherwise O(*n*), where *n* is the length of the collection.
+  @inlinable
+  public func evenlyChunked(in count: Int) -> EvenChunksCollection<Self> {
+    precondition(count >= 0, "Can't divide into a negative number of chunks")
+    precondition(count > 0 || isEmpty, "Can't divide a non-empty collection into 0 chunks")
+    return EvenChunksCollection(base: self, numberOfChunks: count)
+  }
+}
