@@ -200,7 +200,7 @@ extension ChunkedOnCollection: LazyCollectionProtocol {}
 
 /// A collection wrapper that evenly breaks a collection into a given number of
 /// chunks.
-public struct EvenChunksCollection<Base: Collection> {
+public struct EvenlyChunkedCollection<Base: Collection> {
   /// The base collection.
   @usableFromInline
   internal let base: Base
@@ -230,7 +230,7 @@ public struct EvenChunksCollection<Base: Collection> {
   }
 }
 
-extension EvenChunksCollection {
+extension EvenlyChunkedCollection {
   /// Returns the number of chunks with size `smallChunkSize + 1` at the start
   /// of this collection.
   @inlinable
@@ -277,7 +277,7 @@ extension EvenChunksCollection {
   }
 }
 
-extension EvenChunksCollection: Collection {
+extension EvenlyChunkedCollection: Collection {
   public struct Index: Comparable {
     /// The range corresponding to the chunk at this position.
     @usableFromInline
@@ -381,9 +381,9 @@ extension EvenChunksCollection: Collection {
   }
 }
 
-extension EvenChunksCollection.Index: Hashable where Base.Index: Hashable {}
+extension EvenlyChunkedCollection.Index: Hashable where Base.Index: Hashable {}
 
-extension EvenChunksCollection: BidirectionalCollection
+extension EvenlyChunkedCollection: BidirectionalCollection
   where Base: BidirectionalCollection
 {
   @inlinable
@@ -393,13 +393,13 @@ extension EvenChunksCollection: BidirectionalCollection
   }
 }
 
-extension EvenChunksCollection: RandomAccessCollection
+extension EvenlyChunkedCollection: RandomAccessCollection
   where Base: RandomAccessCollection {}
 
-extension EvenChunksCollection: LazySequenceProtocol
+extension EvenlyChunkedCollection: LazySequenceProtocol
   where Base: LazySequenceProtocol {}
 
-extension EvenChunksCollection: LazyCollectionProtocol
+extension EvenlyChunkedCollection: LazyCollectionProtocol
   where Base: LazyCollectionProtocol {}
 
 //===----------------------------------------------------------------------===//
@@ -762,22 +762,37 @@ extension ChunksOfCountCollection {
 }
 
 extension Collection {
-  /// Returns a `ChunksOfCountCollection<Self>` view presenting the elements in
-  /// chunks with count of the given count parameter.
+  /// Returns a collection of subsequences of this collection, each with the
+  /// specified length.
   ///
-  /// - Parameter count: The size of the chunks. If the `count` parameter is
-  ///   evenly divided by the count of the base `Collection` all the chunks will
-  ///   have the count equals to size. Otherwise, the last chunk will contain
-  ///   the remaining elements.
+  /// If the number of elements in the collection is evenly divided by `count`,
+  /// then every chunk will have a length equal to `count`. Otherwise, every
+  /// chunk but the last will have a length equal to `count`, with the
+  /// remaining elements in the last chunk.
   ///
-  ///     let c = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-  ///     print(c.chunks(ofCount: 5).map(Array.init))
-  ///     // [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+  ///     let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  ///     for chunk in numbers.chunks(ofCount: 5) {
+  ///         print(chunk)
+  ///     }
+  ///     // [1, 2, 3, 4, 5]
+  ///     // [6, 7, 8, 9, 10]
   ///
   ///     print(c.chunks(ofCount: 3).map(Array.init))
-  ///     // [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]
+  ///     for chunk in numbers.chunks(ofCount: 5) {
+  ///         print(chunk)
+  ///     }
+  ///     // [1, 2, 3]
+  ///     // [4, 5, 5]
+  ///     // [7, 8, 9]
+  ///     // [10]
   ///
-  /// - Complexity: O(*n*), because the start index is pre-computed.
+  /// - Parameter count: The desired size of each chunk.
+  /// - Returns: A collection of consescutive, non-overlapping subseqeunces of
+  ///   this collection, where each subsequence (except possibly the last) has
+  ///   the length `count`.
+  ///
+  /// - Complexity: O(1) if the collection conforms to `RandomAccessCollection`;
+  ///   otherwise, O(*k*), where *k* is equal to `count`.
   @inlinable
   public func chunks(ofCount count: Int) -> ChunksOfCountCollection<Self> {
     precondition(count > 0, "Cannot chunk with count <= 0!")
@@ -798,10 +813,9 @@ extension ChunksOfCountCollection: LazyCollectionProtocol
 //===----------------------------------------------------------------------===//
 
 extension Collection {
-  /// Returns a collection of `count` evenly divided subsequences of this
-  /// collection.
+  /// Returns a collection of evenly divided subsequences of this collection.
   ///
-  /// This method divides the collection into a given number of equally sized
+  /// This method divides the collection into a given number of evenly sized
   /// chunks. If the length of the collection is not divisible by `count`, the
   /// chunks at the start will be longer than the chunks at the end, like in
   /// this example:
@@ -815,12 +829,30 @@ extension Collection {
   ///     // "rl"
   ///     // "d!"
   ///
-  /// - Complexity: O(1) if the collection conforms to `RandomAccessCollection`,
-  ///   otherwise O(*n*), where *n* is the length of the collection.
+  /// If the number passed as `count` is greater than the number of elements in
+  /// the collection, the result will include one or more empty subsequences.
+  ///
+  ///     for chunk in "Hi!".evenlyChunked(in: 5) {
+  ///         print(chunk)
+  ///     }
+  ///     // "H"
+  ///     // "i"
+  ///     // "!"
+  ///     // ""
+  ///     // ""
+  ///
+  /// - Parameter count: The number of chunks to evenly divide this collection
+  ///   into. If this collection is non-empty, `count` must be greater than
+  ///   zero; otherwise, `count` may be zero or greater.
+  /// - Returns: A collection of `count` subsequences of this collection,
+  ///   divided as evenly as possible.
+  ///
+  /// - Complexity: O(1) if the collection conforms to `RandomAccessCollection`;
+  ///   otherwise, O(*n*), where *n* is the length of the collection.
   @inlinable
-  public func evenlyChunked(in count: Int) -> EvenChunksCollection<Self> {
+  public func evenlyChunked(in count: Int) -> EvenlyChunkedCollection<Self> {
     precondition(count >= 0, "Can't divide into a negative number of chunks")
     precondition(count > 0 || isEmpty, "Can't divide a non-empty collection into 0 chunks")
-    return EvenChunksCollection(base: self, numberOfChunks: count)
+    return EvenlyChunkedCollection(base: self, numberOfChunks: count)
   }
 }
