@@ -190,7 +190,7 @@ final class ChunkedTests: XCTestCase {
   }
   
   func testEvenChunksIndexTraversals() {
-    let validator = IndexValidator<EvenChunksCollection<Range<Int>>>()
+    let validator = IndexValidator<EvenlyChunkedCollection<Range<Int>>>()
 
     [
       (0..<10).evenlyChunked(in: 1),

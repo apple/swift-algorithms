@@ -63,7 +63,8 @@ let nearlyEvenChunks = (0..<15).evenlyChunked(in: 4)
 
 When "chunking" a collection, the entire collection is included in the result,
 unlike the `split` family of methods, where separators are dropped.
-Joining the result of a chunking method call recreates the original collection.
+Joining the result of a chunking method call results in a collection equivalent
+to the original.
 
 ```swift
 c.elementsEqual(c.chunked(...).joined())
@@ -90,7 +91,7 @@ extension Collection {
       
     public func chunks(ofCount count: Int) -> ChunkedByCount<Self>
       
-    public func evenlyChunked(in count: Int) -> EvenChunks<Self>
+    public func evenlyChunked(in count: Int) -> EvenlyChunkedCollection<Self>
 }
 
 extension LazyCollectionProtocol {
@@ -106,7 +107,7 @@ extension LazyCollectionProtocol {
 
 Each of the "chunked" collection types are bidirectional when the wrapped
 collection is bidirectional. `ChunksOfCountCollection` and 
-`EvenChunksCollection` also conform to `RandomAccessCollection` and 
+`EvenlyChunkedCollection` also conform to `RandomAccessCollection` and 
 `LazySequenceProtocol` when their base collections conform.
 
 ### Complexity
