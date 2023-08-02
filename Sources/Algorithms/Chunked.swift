@@ -410,6 +410,9 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
   /// Returns a lazy collection of subsequences of this collection, chunked by
   /// the given predicate.
   ///
+  /// - Parameter belongInSameGroup: A closure that takes two adjacent elements
+  /// of the sequence and returns whether or not they belong in the same group.
+  ///
   /// - Complexity: O(*n*), because the start index is pre-computed.
   @inlinable
   public func chunked(
@@ -422,7 +425,11 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
   }
   
   /// Returns a lazy collection of subsequences of this collection, chunked by
-  /// grouping elements that project to the same value.
+  /// grouping elements that project to equal values.
+  ///
+  /// - Parameter projection: A closure that takes an element in the sequence
+  /// and returns an `Equatable` value that can be used to determine if adjacent
+  /// elements belong in the same group.
   ///
   /// - Complexity: O(*n*), because the start index is pre-computed.
   @inlinable
@@ -442,6 +449,10 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
 extension Collection {
   /// Returns a collection of subsequences of this collection, chunked by the
   /// given predicate.
+  ///
+  /// - Parameter belongInSameGroup: A closure that takes two adjacent elements
+  /// of the collection and returns whether or not they belong in the same
+  /// group.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
   @inlinable
@@ -470,7 +481,11 @@ extension Collection {
   }
 
   /// Returns a collection of subsequences of this collection, chunked by
-  /// grouping elements that project to the same value.
+  /// grouping elements that project to equal values.
+  ///
+  /// - Parameter projection: A closure that takes an element in the collection
+  /// and returns an `Equatable` value that can be used to determine if adjacent
+  /// elements belong in the same group.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
   @inlinable
