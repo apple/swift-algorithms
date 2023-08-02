@@ -87,9 +87,6 @@ final class ChunkedTests: XCTestCase {
       [1, 2, 3, 4, 6, 7, 8, 9].lazy.chunked(by: { $1 - $0 == 1 }),
       [[1, 2, 3, 4], [6, 7, 8, 9]])
     
-    print(Array([1, 2, 3].lazy.chunked(by: { $1 - $0 == 1 })))
-    print(Array([1, 2, 3].lazy.chunked(by: { $1 - $0 == 1 }).reversed()))
-    
     XCTAssertEqualSequences(
       [1, 2, 3, 4, 6, 7, 8, 9].lazy.chunked(by: { $1 - $0 == 1 }).reversed(),
       [[6, 7, 8, 9], [1, 2, 3, 4]])
@@ -172,5 +169,38 @@ final class ChunkedTests: XCTestCase {
         chunks,
         expectedCount: range.count / i + (range.count % i).signum())
     }
+  }
+  
+  func testEvenChunks() {
+    XCTAssertEqualSequences(
+      (0..<10).evenlyChunked(in: 4),
+      [0..<3, 3..<6, 6..<8, 8..<10])
+    
+    XCTAssertEqualSequences(
+      (0..<3).evenlyChunked(in: 5),
+      [0..<1, 1..<2, 2..<3, 3..<3, 3..<3])
+    
+    XCTAssertEqualSequences(
+      "".evenlyChunked(in: 0),
+      [])
+    
+    XCTAssertEqualSequences(
+      "".evenlyChunked(in: 1),
+      [""])
+  }
+  
+  func testEvenChunksIndexTraversals() {
+    let validator = IndexValidator<EvenlyChunkedCollection<Range<Int>>>()
+
+    [
+      (0..<10).evenlyChunked(in: 1),
+      (0..<10).evenlyChunked(in: 2),
+      (0..<10).evenlyChunked(in: 3),
+      (0..<10).evenlyChunked(in: 10),
+      (0..<10).evenlyChunked(in: 20),
+      (0..<0).evenlyChunked(in: 0),
+      (0..<0).evenlyChunked(in: 1),
+      (0..<0).evenlyChunked(in: 10),
+    ].forEach { validator.validate($0) }
   }
 }
