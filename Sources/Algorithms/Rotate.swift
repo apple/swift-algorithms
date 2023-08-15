@@ -140,9 +140,9 @@ extension MutableCollection {
     subrange: Range,
     toStartAt newStart: Index
   ) -> Index where Range.Bound == Index {
-    let cSubrange = subrange.relative(to: self)
-    var m = newStart, s = cSubrange.lowerBound
-    let e = cSubrange.upperBound
+    let relativeSubrange = subrange.relative(to: self)
+    var m = newStart, s = relativeSubrange.lowerBound
+    let e = relativeSubrange.upperBound
     
     // Handle the trivial cases
     if s == m { return e }
@@ -249,10 +249,10 @@ extension MutableCollection where Self: BidirectionalCollection {
     subrange: Range,
     toStartAt newStart: Index
   ) -> Index where Range.Bound == Index {
-    let cSubrange = subrange.relative(to: self)
-    reverse(subrange: cSubrange.lowerBound..<newStart)
-    reverse(subrange: newStart..<cSubrange.upperBound)
-    let (p, q) = _reverse(subrange: cSubrange, until: newStart)
+    let relativeSubrange = subrange.relative(to: self)
+    reverse(subrange: relativeSubrange.lowerBound..<newStart)
+    reverse(subrange: newStart..<relativeSubrange.upperBound)
+    let (p, q) = _reverse(subrange: relativeSubrange, until: newStart)
     reverse(subrange: p..<q)
     return newStart == p ? q : p
   }
