@@ -1,10 +1,6 @@
-# Trimming a Collection
+# Trimming
 
 Remove unwanted elements from the start, the end, or both ends of a collection. 
-
-## Overview
-
-...
 
 ## Topics
 
@@ -26,3 +22,6 @@ Remove unwanted elements from the start, the end, or both ends of a collection.
 - ``Swift/BidirectionalCollection/trimSuffix(while:)-33ubj``
 - ``Swift/BidirectionalCollection/trimSuffix(while:)-3o6x9``
 
+### Finding the Suffix of a Collection
+
+- ``Swift/BidirectionalCollection/suffix(while:)``

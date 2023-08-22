@@ -1,17 +1,10 @@
 # Partitioning and Rotating
 
-...
-
-## Overview
-
-...
+Partition a collection according to a unary predicate,
+rotate a collection around a particular index,
+or find the index where a collection is already partitioned.
 
 ## Topics
-
-### Partition
-
-- ``Swift/MutableCollection/partition(subrange:by:)-5vdh7``
-- ``Swift/MutableCollection/partition(subrange:by:)-4gpqz``
 
 ### Stable Partition
 
@@ -19,6 +12,11 @@
 - ``Swift/MutableCollection/stablePartition(subrange:by:)``
 - ``Swift/Sequence/partitioned(by:)``
 - ``Swift/Collection/partitioned(by:)``
+
+### Partition of Subranges
+
+- ``Swift/MutableCollection/partition(subrange:by:)-5vdh7``
+- ``Swift/MutableCollection/partition(subrange:by:)-4gpqz``
 
 ### Finding a Partition Index
 

@@ -2,10 +2,6 @@
 
 Iterate over tuple pairs of adjacent elements, overlapping windows of a specified size, or lazily-calculated splits.
 
-## Overview
-
-...
-
 ## Topics
 
 ### Adjacent Pairs

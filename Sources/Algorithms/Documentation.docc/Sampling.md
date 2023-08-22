@@ -2,10 +2,6 @@
 
 Choose a specified number of random elements from a sequence or collection.
 
-## Overview
-
-...
-
 ## Topics
 
 ### Random Sampling 

@@ -1,21 +1,24 @@
 # ``Algorithms``
 
-**Swift Algorithms** is an open-source package of sequence and collection algorithms, along with their related types.
+**Swift Algorithms** is an open-source package of sequence and collection algorithms, 
+along with their related types.
 
 ## Overview
 
-This library provides a bunch of new `Sequence` and `Collection` methods, plus some global functions. 
+This library adds a variety of extended operations to the Swift standard library's
+`Sequence` and `Collection` protocols, via extension methods and global functions.
 
 ## Topics
 
 - <doc:CombinationsPermutations>
-- <doc:Slices>
-- <doc:Chunked>
+- <doc:SlicingSplitting>
+- <doc:Chunking>
 - <doc:Joining>
 - <doc:Extending>
-- <doc:Trim>
+- <doc:Trimming>
 - <doc:Sampling>
-- <doc:Selection>
+- <doc:MinAndMax>
+- <doc:Selecting>
 - <doc:Filtering>
 - <doc:Reductions>
 - <doc:Partitioning>

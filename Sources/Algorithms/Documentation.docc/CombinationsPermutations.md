@@ -1,10 +1,7 @@
 # Combinations and Permutations
 
-You can call the `combinations(ofCount:)`, `permutations(ofCount:)`, and `uniquePermutations(ofCount:)` methods on any collection, or combine two collections using the `product(_:_:)` function.
-
-## Overview
-
-...
+Find the combinations and permutations of any collection's elements,
+or the product of two different collections.
 
 ## Topics
 

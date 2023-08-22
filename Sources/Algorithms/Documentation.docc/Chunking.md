@@ -1,6 +1,6 @@
-# Chunked
+# Chunking
 
-Break collections into consecutive chunks by length or based on closure-based logic.
+Break collections into consecutive chunks by length, count, or based on closure-based logic.
 
 ## Overview
 

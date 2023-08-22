@@ -1,6 +1,6 @@
 # Filtering
 
-<!--@START_MENU_TOKEN@-->Summary<!--@END_MENU_TOKEN@-->
+Remove duplicated elements or strip the `nil` values from a sequence or collection. 
 
 ## Overview
 

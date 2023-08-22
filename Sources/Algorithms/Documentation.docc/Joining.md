@@ -1,10 +1,8 @@
 # Joining
 
-...
-
-## Overview
-
-...
+Join the parts of a collection of collections,
+providing a connecting element or collection,
+or a closure that produces the connector.
 
 ## Topics
 

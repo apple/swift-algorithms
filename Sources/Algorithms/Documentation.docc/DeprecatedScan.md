@@ -1,10 +1,8 @@
 # DeprecatedScan
 
-<!--@START_MENU_TOKEN@-->Summary<!--@END_MENU_TOKEN@-->
+These methods are deprecated, use the `reductions` family of methods instead.
 
 ## Overview
-
-<!--@START_MENU_TOKEN@-->Text<!--@END_MENU_TOKEN@-->
 
 ## Topics
 
