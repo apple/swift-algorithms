@@ -10,7 +10,8 @@
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
-  /// Creates a sequence of adjacent pairs of elements from this sequence.
+  /// Returns a sequence of overlapping adjacent pairs of the elements of this
+  /// sequence.
   ///
   /// In the `AdjacentPairsSequence` returned by this method, the elements of
   /// the *i*th pair are the *i*th and *(i+1)*th elements of the underlying
@@ -24,6 +25,11 @@ extension Sequence {
   ///     // Prints "(2, 3)"
   ///     // Prints "(3, 4)"
   ///     // Prints "(4, 5)"
+  ///
+  /// The resulting sequence is empty when called on an empty or single-element
+  /// sequence.
+  ///
+  /// - Complexity: O(1)
   @inlinable
   public func adjacentPairs() -> AdjacentPairsSequence<Self> {
     AdjacentPairsSequence(base: self)
@@ -31,7 +37,7 @@ extension Sequence {
 }
 
 extension Collection {
-  /// A collection of adjacent pairs of elements built from an underlying
+  /// Returns a collection of overlapping adjacent pairs of the elements of this
   /// collection.
   ///
   /// In an `AdjacentPairsCollection`, the elements of the *i*th pair are the
@@ -46,6 +52,11 @@ extension Collection {
   ///     // Prints "(2, 3)"
   ///     // Prints "(3, 4)"
   ///     // Prints "(4, 5)"
+  ///
+  /// The resulting collection is empty when called on an empty or
+  /// single-element collection.
+  ///
+  /// - Complexity: O(1)
   @inlinable
   public func adjacentPairs() -> AdjacentPairsCollection<Self> {
     AdjacentPairsCollection(base: self)
