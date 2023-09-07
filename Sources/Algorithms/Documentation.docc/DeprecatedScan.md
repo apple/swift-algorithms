@@ -1,8 +1,8 @@
 # DeprecatedScan
 
-These methods are deprecated, use the `reductions` family of methods instead.
+These methods are deprecated; use the `reductions` family of methods instead.
 
-## Overview
+See: <doc:Reductions>
 
 ## Topics
 

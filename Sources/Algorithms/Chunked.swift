@@ -777,8 +777,8 @@ extension ChunksOfCountCollection {
 }
 
 extension Collection {
-  /// Returns a collection of subsequences of this collection, each with the
-  /// specified length.
+  /// Returns a collection of subsequences, each with up to the specified
+  /// length.
   ///
   /// If the number of elements in the collection is evenly divided by `count`,
   /// then every chunk will have a length equal to `count`. Otherwise, every
@@ -792,8 +792,7 @@ extension Collection {
   ///     // [1, 2, 3, 4, 5]
   ///     // [6, 7, 8, 9, 10]
   ///
-  ///     print(c.chunks(ofCount: 3).map(Array.init))
-  ///     for chunk in numbers.chunks(ofCount: 5) {
+  ///     for chunk in numbers.chunks(ofCount: 3) {
   ///         print(chunk)
   ///     }
   ///     // [1, 2, 3]
@@ -808,6 +807,7 @@ extension Collection {
   ///
   /// - Complexity: O(1) if the collection conforms to `RandomAccessCollection`;
   ///   otherwise, O(*k*), where *k* is equal to `count`.
+  ///
   @inlinable
   public func chunks(ofCount count: Int) -> ChunksOfCountCollection<Self> {
     precondition(count > 0, "Cannot chunk with count <= 0!")
@@ -828,7 +828,8 @@ extension ChunksOfCountCollection: LazyCollectionProtocol
 //===----------------------------------------------------------------------===//
 
 extension Collection {
-  /// Returns a collection of evenly divided subsequences of this collection.
+  /// Returns a collection of evenly divided consecutive subsequences of this
+  /// collection.
   ///
   /// This method divides the collection into a given number of evenly sized
   /// chunks. If the length of the collection is not divisible by `count`, the
