@@ -9,37 +9,114 @@
 //
 //===----------------------------------------------------------------------===//
 
-extension LazyCollection {
+/// A namespace for methods which overlay a collection of elements
+/// over a region of a base collection.
+///
+/// Access the namespace via the `.overlay` member, available on all collections:
+///
+/// ```swift
+/// let base = 0..<5
+/// for n in base.overlay.inserting(42, at: 2) {
+///   print(n)
+/// }
+/// // Prints: 0, 1, 42, 2, 3, 4
+/// ```
+///
+public struct OverlayCollectionNamespace<Elements: Collection> {
+
+  @usableFromInline
+  internal var elements: Elements
 
   @inlinable
-  public func replacingSubrange<Replacements>(
-    _ subrange: Range<Index>, with newElements: Replacements
-  ) -> ReplacingSubrangeCollection<Base, Replacements> {
-    ReplacingSubrangeCollection(base: elements, replacements: newElements, replacedRange: subrange)
+  internal init(elements: Elements) {
+    self.elements = elements
   }
 }
 
-public struct ReplacingSubrangeCollection<Base, Replacements>
-where Base: Collection, Replacements: Collection, Base.Element == Replacements.Element {
+extension Collection {
+
+  /// A namespace for methods which overlay another collection of elements
+  /// over a region of this collection.
+  ///
+  @inlinable
+  public var overlay: OverlayCollectionNamespace<Self> {
+    OverlayCollectionNamespace(elements: self)
+  }
+}
+
+extension OverlayCollectionNamespace {
+
+  @inlinable
+  public func replacingSubrange<Overlay>(
+    _ subrange: Range<Elements.Index>, with newElements: Overlay
+  ) -> OverlayCollection<Elements, Overlay> {
+    OverlayCollection(base: elements, overlay: newElements, replacedRange: subrange)
+  }
+
+  @inlinable
+  public func appending<Overlay>(
+    contentsOf newElements: Overlay
+  ) -> OverlayCollection<Elements, Overlay> {
+    replacingSubrange(elements.endIndex..<elements.endIndex, with: newElements)
+  }
+
+  @inlinable
+  public func inserting<Overlay>(
+    contentsOf newElements: Overlay, at position: Elements.Index
+  ) -> OverlayCollection<Elements, Overlay> {
+    replacingSubrange(position..<position, with: newElements)
+  }
+
+  @inlinable
+  public func removingSubrange(
+    _ subrange: Range<Elements.Index>
+  ) -> OverlayCollection<Elements, EmptyCollection<Elements.Element>> {
+    replacingSubrange(subrange, with: EmptyCollection())
+  }
+
+  @inlinable
+  public func appending(
+    _ element: Elements.Element
+  ) -> OverlayCollection<Elements, CollectionOfOne<Elements.Element>> {
+    appending(contentsOf: CollectionOfOne(element))
+  }
+
+  @inlinable
+  public func inserting(
+    _ element: Elements.Element, at position: Elements.Index
+  ) -> OverlayCollection<Elements, CollectionOfOne<Elements.Element>> {
+    inserting(contentsOf: CollectionOfOne(element), at: position)
+  }
+
+  @inlinable
+  public func removing(
+    at position: Elements.Index
+  ) -> OverlayCollection<Elements, EmptyCollection<Elements.Element>> {
+    removingSubrange(position..<position)
+  }
+}
+
+public struct OverlayCollection<Base, Overlay>
+where Base: Collection, Overlay: Collection, Base.Element == Overlay.Element {
 
   @usableFromInline
   internal var base: Base
 
   @usableFromInline
-  internal var replacements: Replacements
+  internal var overlay: Overlay
 
   @usableFromInline
   internal var replacedRange: Range<Base.Index>
 
   @inlinable
-  internal init(base: Base, replacements: Replacements, replacedRange: Range<Base.Index>) {
+  internal init(base: Base, overlay: Overlay, replacedRange: Range<Base.Index>) {
     self.base = base
-    self.replacements = replacements
+    self.overlay = overlay
     self.replacedRange = replacedRange
   }
 }
 
-extension ReplacingSubrangeCollection: Collection {
+extension OverlayCollection: Collection {
 
   public typealias Element = Base.Element
 
@@ -48,10 +125,10 @@ extension ReplacingSubrangeCollection: Collection {
     @usableFromInline
     internal enum Wrapped {
       case base(Base.Index)
-      case replacement(Replacements.Index)
+      case overlay(Overlay.Index)
     }
 
-    /// The underlying base/replacements index.
+    /// The underlying base/overlay index.
     ///
     @usableFromInline
     internal var wrapped: Wrapped
@@ -72,11 +149,11 @@ extension ReplacingSubrangeCollection: Collection {
       switch (lhs.wrapped, rhs.wrapped) {
       case (.base(let unwrappedLeft), .base(let unwrappedRight)):
         return unwrappedLeft < unwrappedRight
-      case (.replacement(let unwrappedLeft), .replacement(let unwrappedRight)):
+      case (.overlay(let unwrappedLeft), .overlay(let unwrappedRight)):
         return unwrappedLeft < unwrappedRight
-      case (.base(let unwrappedLeft), .replacement(_)):
+      case (.base(let unwrappedLeft), .overlay(_)):
         return unwrappedLeft < lhs.replacedRange.lowerBound
-      case (.replacement(_), .base(let unwrappedRight)):
+      case (.overlay(_), .base(let unwrappedRight)):
         return !(unwrappedRight < lhs.replacedRange.lowerBound)
       }
     }
@@ -87,7 +164,7 @@ extension ReplacingSubrangeCollection: Collection {
       switch (lhs.wrapped, rhs.wrapped) {
       case (.base(let unwrappedLeft), .base(let unwrappedRight)):
         return unwrappedLeft == unwrappedRight
-      case (.replacement(let unwrappedLeft), .replacement(let unwrappedRight)):
+      case (.overlay(let unwrappedLeft), .overlay(let unwrappedRight)):
         return unwrappedLeft == unwrappedRight
       default:
         return false
@@ -96,7 +173,7 @@ extension ReplacingSubrangeCollection: Collection {
   }
 }
 
-extension ReplacingSubrangeCollection {
+extension OverlayCollection {
 
   @inlinable
   internal func makeIndex(_ position: Base.Index) -> Index {
@@ -104,33 +181,33 @@ extension ReplacingSubrangeCollection {
   }
 
   @inlinable
-  internal func makeIndex(_ position: Replacements.Index) -> Index {
-    Index(wrapped: .replacement(position), replacedRange: replacedRange)
+  internal func makeIndex(_ position: Overlay.Index) -> Index {
+    Index(wrapped: .overlay(position), replacedRange: replacedRange)
   }
 
   @inlinable
   public var startIndex: Index {
     if base.startIndex == replacedRange.lowerBound {
-      if replacements.isEmpty {
+      if overlay.isEmpty {
         return makeIndex(replacedRange.upperBound)
       }
-      return makeIndex(replacements.startIndex)
+      return makeIndex(overlay.startIndex)
     }
     return makeIndex(base.startIndex)
   }
 
   @inlinable
   public var endIndex: Index {
-    if replacedRange.lowerBound != base.endIndex || replacements.isEmpty {
+    if replacedRange.lowerBound != base.endIndex || overlay.isEmpty {
       return makeIndex(base.endIndex)
     }
-    return makeIndex(replacements.endIndex)
+    return makeIndex(overlay.endIndex)
   }
 
   @inlinable
   public var count: Int {
     base.distance(from: base.startIndex, to: replacedRange.lowerBound)
-    + replacements.count
+    + overlay.count
     + base.distance(from: replacedRange.upperBound, to: base.endIndex)
   }
 
@@ -140,19 +217,19 @@ extension ReplacingSubrangeCollection {
     case .base(var baseIndex):
       base.formIndex(after: &baseIndex)
       if baseIndex == replacedRange.lowerBound {
-        if replacements.isEmpty {
+        if overlay.isEmpty {
           return makeIndex(replacedRange.upperBound)
         }
-        return makeIndex(replacements.startIndex)
+        return makeIndex(overlay.startIndex)
       }
       return makeIndex(baseIndex)
 
-    case .replacement(var replacementIndex):
-      replacements.formIndex(after: &replacementIndex)
-      if replacedRange.lowerBound != base.endIndex, replacementIndex == replacements.endIndex {
+    case .overlay(var overlayIndex):
+      overlay.formIndex(after: &overlayIndex)
+      if replacedRange.lowerBound != base.endIndex, overlayIndex == overlay.endIndex {
         return makeIndex(replacedRange.upperBound)
       }
-      return makeIndex(replacementIndex)
+      return makeIndex(overlayIndex)
     }
   }
 
@@ -161,34 +238,34 @@ extension ReplacingSubrangeCollection {
     switch position.wrapped {
     case .base(let baseIndex): 
       return base[baseIndex]
-    case .replacement(let replacementIndex): 
-      return replacements[replacementIndex]
+    case .overlay(let overlayIndex):
+      return overlay[overlayIndex]
     }
   }
 }
 
-extension ReplacingSubrangeCollection: BidirectionalCollection
-where Base: BidirectionalCollection, Replacements: BidirectionalCollection {
+extension OverlayCollection: BidirectionalCollection
+where Base: BidirectionalCollection, Overlay: BidirectionalCollection {
 
   @inlinable
   public func index(before i: Index) -> Index {
     switch i.wrapped {
     case .base(var baseIndex):
       if baseIndex == replacedRange.upperBound {
-        if replacements.isEmpty {
+        if overlay.isEmpty {
           return makeIndex(base.index(before: replacedRange.lowerBound))
         }
-        return makeIndex(replacements.index(before: replacements.endIndex))
+        return makeIndex(overlay.index(before: overlay.endIndex))
       }
       base.formIndex(before: &baseIndex)
       return makeIndex(baseIndex)
 
-    case .replacement(var replacementIndex):
-      if replacementIndex == replacements.startIndex {
+    case .overlay(var overlayIndex):
+      if overlayIndex == overlay.startIndex {
         return makeIndex(base.index(before: replacedRange.lowerBound))
       }
-      replacements.formIndex(before: &replacementIndex)
-      return makeIndex(replacementIndex)
+      overlay.formIndex(before: &overlayIndex)
+      return makeIndex(overlayIndex)
     }
   }
 }
