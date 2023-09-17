@@ -167,3 +167,28 @@ extension ReplacingSubrangeCollection {
   }
 }
 
+extension ReplacingSubrangeCollection: BidirectionalCollection
+where Base: BidirectionalCollection, Replacements: BidirectionalCollection {
+
+  @inlinable
+  public func index(before i: Index) -> Index {
+    switch i.wrapped {
+    case .base(var baseIndex):
+      if baseIndex == replacedRange.upperBound {
+        if replacements.isEmpty {
+          return makeIndex(base.index(before: replacedRange.lowerBound))
+        }
+        return makeIndex(replacements.index(before: replacements.endIndex))
+      }
+      base.formIndex(before: &baseIndex)
+      return makeIndex(baseIndex)
+
+    case .replacement(var replacementIndex):
+      if replacementIndex == replacements.startIndex {
+        return makeIndex(base.index(before: replacedRange.lowerBound))
+      }
+      replacements.formIndex(before: &replacementIndex)
+      return makeIndex(replacementIndex)
+    }
+  }
+}
