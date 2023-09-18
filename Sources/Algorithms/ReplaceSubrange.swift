@@ -9,8 +9,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-/// A namespace for methods which overlay a collection of elements
-/// over a region of a base collection.
+/// A namespace for methods which return composed collections,
+/// formed by replacing a region of a base collection
+/// with another collection of elements.
 ///
 /// Access the namespace via the `.overlay` member, available on all collections:
 ///
@@ -24,8 +25,7 @@
 ///
 public struct OverlayCollectionNamespace<Elements: Collection> {
 
-  @usableFromInline
-  internal var elements: Elements
+  public let elements: Elements
 
   @inlinable
   internal init(elements: Elements) {
@@ -35,12 +35,43 @@ public struct OverlayCollectionNamespace<Elements: Collection> {
 
 extension Collection {
 
-  /// A namespace for methods which overlay another collection of elements
-  /// over a region of this collection.
+  /// A namespace for methods which return composed collections,
+  /// formed by replacing a region of this collection
+  /// with another collection of elements.
   ///
   @inlinable
   public var overlay: OverlayCollectionNamespace<Self> {
     OverlayCollectionNamespace(elements: self)
+  }
+
+  /// If `condition` is true, returns an `OverlayCollection` by applying the given closure.
+  /// Otherwise, returns an `OverlayCollection` containing the same elements as this collection.
+  ///
+  /// The following example takes an array of products, lazily wraps them in a `ListItem` enum,
+  /// and conditionally inserts a call-to-action element if `showCallToAction` is true.
+  ///
+  /// ```swift
+  /// var listItems: some Collection<ListItem> {
+  ///   let products: [Product] = ...
+  ///   return products
+  ///     .lazy.map { 
+  ///       ListItem.product($0)
+  ///     }
+  ///     .overlay(if: showCallToAction) {
+  ///       $0.inserting(.callToAction, at: min(4, $0.elements.count))
+  ///     }
+  /// }
+  /// ```
+  ///
+  @inlinable
+  public func overlay<Overlay>(
+    if condition: Bool, _ makeOverlay: (OverlayCollectionNamespace<Self>) -> OverlayCollection<Self, Overlay>
+  ) -> OverlayCollection<Self, Overlay> {
+    if condition {
+      return makeOverlay(overlay)
+    } else {
+      return OverlayCollection(base: self, overlay: nil, replacedRange: startIndex..<startIndex)
+    }
   }
 }
 
@@ -96,6 +127,20 @@ extension OverlayCollectionNamespace {
   }
 }
 
+/// A composed collections, formed by replacing a region of a base collection
+/// with another collection of elements.
+///
+/// To create an OverlayCollection, use the methods in the ``OverlayCollectionNamespace``
+/// namespace:
+///
+/// ```swift
+/// let base = 0..<5
+/// for n in base.overlay.inserting(42, at: 2) {
+///   print(n)
+/// }
+/// // Prints: 0, 1, 42, 2, 3, 4
+/// ```
+///
 public struct OverlayCollection<Base, Overlay>
 where Base: Collection, Overlay: Collection, Base.Element == Overlay.Element {
 
@@ -103,13 +148,13 @@ where Base: Collection, Overlay: Collection, Base.Element == Overlay.Element {
   internal var base: Base
 
   @usableFromInline
-  internal var overlay: Overlay
+  internal var overlay: Optional<Overlay>
 
   @usableFromInline
   internal var replacedRange: Range<Base.Index>
 
   @inlinable
-  internal init(base: Base, overlay: Overlay, replacedRange: Range<Base.Index>) {
+  internal init(base: Base, overlay: Overlay?, replacedRange: Range<Base.Index>) {
     self.base = base
     self.overlay = overlay
     self.replacedRange = replacedRange
@@ -187,7 +232,7 @@ extension OverlayCollection {
 
   @inlinable
   public var startIndex: Index {
-    if base.startIndex == replacedRange.lowerBound {
+    if let overlay = overlay, base.startIndex == replacedRange.lowerBound {
       if overlay.isEmpty {
         return makeIndex(replacedRange.upperBound)
       }
@@ -198,6 +243,9 @@ extension OverlayCollection {
 
   @inlinable
   public var endIndex: Index {
+    guard let overlay = overlay else {
+      return makeIndex(base.endIndex)
+    }
     if replacedRange.lowerBound != base.endIndex || overlay.isEmpty {
       return makeIndex(base.endIndex)
     }
@@ -206,7 +254,10 @@ extension OverlayCollection {
 
   @inlinable
   public var count: Int {
-    base.distance(from: base.startIndex, to: replacedRange.lowerBound)
+    guard let overlay = overlay else {
+      return base.count
+    }
+    return base.distance(from: base.startIndex, to: replacedRange.lowerBound)
     + overlay.count
     + base.distance(from: replacedRange.upperBound, to: base.endIndex)
   }
@@ -216,7 +267,7 @@ extension OverlayCollection {
     switch i.wrapped {
     case .base(var baseIndex):
       base.formIndex(after: &baseIndex)
-      if baseIndex == replacedRange.lowerBound {
+      if let overlay = overlay, baseIndex == replacedRange.lowerBound {
         if overlay.isEmpty {
           return makeIndex(replacedRange.upperBound)
         }
@@ -225,8 +276,8 @@ extension OverlayCollection {
       return makeIndex(baseIndex)
 
     case .overlay(var overlayIndex):
-      overlay.formIndex(after: &overlayIndex)
-      if replacedRange.lowerBound != base.endIndex, overlayIndex == overlay.endIndex {
+      overlay!.formIndex(after: &overlayIndex)
+      if replacedRange.lowerBound != base.endIndex, overlayIndex == overlay!.endIndex {
         return makeIndex(replacedRange.upperBound)
       }
       return makeIndex(overlayIndex)
@@ -239,7 +290,7 @@ extension OverlayCollection {
     case .base(let baseIndex): 
       return base[baseIndex]
     case .overlay(let overlayIndex):
-      return overlay[overlayIndex]
+      return overlay![overlayIndex]
     }
   }
 }
@@ -251,7 +302,7 @@ where Base: BidirectionalCollection, Overlay: BidirectionalCollection {
   public func index(before i: Index) -> Index {
     switch i.wrapped {
     case .base(var baseIndex):
-      if baseIndex == replacedRange.upperBound {
+      if let overlay = overlay, baseIndex == replacedRange.upperBound {
         if overlay.isEmpty {
           return makeIndex(base.index(before: replacedRange.lowerBound))
         }
@@ -261,10 +312,10 @@ where Base: BidirectionalCollection, Overlay: BidirectionalCollection {
       return makeIndex(baseIndex)
 
     case .overlay(var overlayIndex):
-      if overlayIndex == overlay.startIndex {
+      if overlayIndex == overlay!.startIndex {
         return makeIndex(base.index(before: replacedRange.lowerBound))
       }
-      overlay.formIndex(before: &overlayIndex)
+      overlay!.formIndex(before: &overlayIndex)
       return makeIndex(overlayIndex)
     }
   }

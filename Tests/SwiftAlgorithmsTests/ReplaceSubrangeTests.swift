@@ -199,4 +199,23 @@ final class ReplaceSubrangeTests: XCTestCase {
       IndexValidator().validate(result, expectedCount: 0)
     }
   }
+
+  func testConditionalReplacement() {
+
+    func getNumbers(shouldInsert: Bool) -> OverlayCollection<Range<Int>, CollectionOfOne<Int>> {
+      (0..<5).overlay(if: shouldInsert) { $0.inserting(42, at: 2) }
+    }
+
+    do {
+      let result = getNumbers(shouldInsert: true)
+      XCTAssertEqualCollections(result, [0, 1, 42, 2, 3, 4])
+      IndexValidator().validate(result, expectedCount: 6)
+    }
+
+    do {
+      let result = getNumbers(shouldInsert: false)
+      XCTAssertEqualCollections(result, [0, 1, 2, 3, 4])
+      IndexValidator().validate(result, expectedCount: 5)
+    }
+  }
 }
