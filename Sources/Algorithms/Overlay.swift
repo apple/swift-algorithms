@@ -123,7 +123,7 @@ extension OverlayCollectionNamespace {
   public func removing(
     at position: Elements.Index
   ) -> OverlayCollection<Elements, EmptyCollection<Elements.Element>> {
-    removingSubrange(position..<position)
+    removingSubrange(position..<elements.index(after: position))
   }
 }
 
@@ -178,15 +178,15 @@ extension OverlayCollection: Collection {
     @usableFromInline
     internal var wrapped: Wrapped
 
-    /// The base indices which have been replaced.
+    /// The base index at which the overlay starts -- i.e. `replacedRange.lowerBound`
     ///
     @usableFromInline
-    internal var replacedRange: Range<Base.Index>
+    internal var startOfReplacedRange: Base.Index
 
     @inlinable
-    internal init(wrapped: Wrapped, replacedRange: Range<Base.Index>) {
+    internal init(wrapped: Wrapped, startOfReplacedRange: Base.Index) {
       self.wrapped = wrapped
-      self.replacedRange = replacedRange
+      self.startOfReplacedRange = startOfReplacedRange
     }
 
     @inlinable
@@ -197,15 +197,15 @@ extension OverlayCollection: Collection {
       case (.overlay(let unwrappedLeft), .overlay(let unwrappedRight)):
         return unwrappedLeft < unwrappedRight
       case (.base(let unwrappedLeft), .overlay(_)):
-        return unwrappedLeft < lhs.replacedRange.lowerBound
+        return unwrappedLeft < lhs.startOfReplacedRange
       case (.overlay(_), .base(let unwrappedRight)):
-        return !(unwrappedRight < lhs.replacedRange.lowerBound)
+        return !(unwrappedRight < lhs.startOfReplacedRange)
       }
     }
 
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
-      // No need to check 'replacedRange', because it does not differ between indices from the same collection.
+      // No need to check 'startOfReplacedRange', because it does not differ between indices from the same collection.
       switch (lhs.wrapped, rhs.wrapped) {
       case (.base(let unwrappedLeft), .base(let unwrappedRight)):
         return unwrappedLeft == unwrappedRight
@@ -222,12 +222,12 @@ extension OverlayCollection {
 
   @inlinable
   internal func makeIndex(_ position: Base.Index) -> Index {
-    Index(wrapped: .base(position), replacedRange: replacedRange)
+    Index(wrapped: .base(position), startOfReplacedRange: replacedRange.lowerBound)
   }
 
   @inlinable
   internal func makeIndex(_ position: Overlay.Index) -> Index {
-    Index(wrapped: .overlay(position), replacedRange: replacedRange)
+    Index(wrapped: .overlay(position), startOfReplacedRange: replacedRange.lowerBound)
   }
 
   @inlinable
@@ -260,6 +260,13 @@ extension OverlayCollection {
     return base.distance(from: base.startIndex, to: replacedRange.lowerBound)
     + overlay.count
     + base.distance(from: replacedRange.upperBound, to: base.endIndex)
+  }
+
+  @inlinable
+  public var isEmpty: Bool {
+    return replacedRange.lowerBound == base.startIndex
+    && replacedRange.upperBound == base.endIndex
+    && (overlay?.isEmpty ?? true)
   }
 
   @inlinable

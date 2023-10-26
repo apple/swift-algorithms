@@ -56,6 +56,25 @@ final class ReplaceSubrangeTests: XCTestCase {
     }
   }
 
+  func testAppendSingle() {
+
+    // Base: empty
+    do {
+      let base = EmptyCollection<Int>()
+      let result = base.overlay.appending(99)
+      XCTAssertEqualCollections(result, [99])
+      IndexValidator().validate(result, expectedCount: 1)
+    }
+
+    // Base: non-empty
+    do {
+      let base = 2..<8
+      let result = base.overlay.appending(99)
+      XCTAssertEqualCollections(result, [2, 3, 4, 5, 6, 7, 99])
+      IndexValidator().validate(result, expectedCount: 7)
+    }
+  }
+
   func testPrepend() {
 
     func _performPrependTest<Base, Overlay>(
@@ -96,6 +115,25 @@ final class ReplaceSubrangeTests: XCTestCase {
     }
   }
 
+  func testPrependSingle() {
+
+    // Base: empty
+    do {
+      let base = EmptyCollection<Int>()
+      let result = base.overlay.inserting(99, at: base.startIndex)
+      XCTAssertEqualCollections(result, [99])
+      IndexValidator().validate(result, expectedCount: 1)
+    }
+
+    // Base: non-empty
+    do {
+      let base = 2..<8
+      let result = base.overlay.inserting(99, at: base.startIndex)
+      XCTAssertEqualCollections(result, [99, 2, 3, 4, 5, 6, 7])
+      IndexValidator().validate(result, expectedCount: 7)
+    }
+  }
+
   func testInsert() {
 
     // Inserting: non-empty
@@ -117,9 +155,17 @@ final class ReplaceSubrangeTests: XCTestCase {
     }
   }
 
+  func testInsertSingle() {
+
+    let base = 2..<8
+    let result = base.overlay.inserting(99, at: base.index(base.startIndex, offsetBy: 3))
+    XCTAssertEqualCollections(result, [2, 3, 4, 99, 5, 6, 7])
+    IndexValidator().validate(result, expectedCount: 7)
+  }
+
   func testReplace() {
 
-    // Location: start
+    // Location: anchored to start
     // Replacement: non-empty
     do {
       let base = "hello, world!"
@@ -129,7 +175,7 @@ final class ReplaceSubrangeTests: XCTestCase {
       IndexValidator().validate(result, expectedCount: 17)
     }
 
-    // Location: start
+    // Location: anchored to start
     // Replacement: empty
     do {
       let base = "hello, world!"
@@ -161,7 +207,7 @@ final class ReplaceSubrangeTests: XCTestCase {
       IndexValidator().validate(result, expectedCount: 9)
     }
 
-    // Location: end
+    // Location: anchored to end
     // Replacement: non-empty
     do {
       let base = "hello, world!"
@@ -171,7 +217,7 @@ final class ReplaceSubrangeTests: XCTestCase {
       IndexValidator().validate(result, expectedCount: 16)
     }
 
-    // Location: end
+    // Location: anchored to end
     // Replacement: empty
     do {
       let base = "hello, world!"
@@ -195,6 +241,82 @@ final class ReplaceSubrangeTests: XCTestCase {
     do {
       let base = "hello, world!"
       let result = base.overlay.replacingSubrange(base.startIndex..<base.endIndex, with: EmptyCollection())
+      XCTAssertEqualCollections(result, "")
+      IndexValidator().validate(result, expectedCount: 0)
+    }
+  }
+
+  func testRemove() {
+
+    // Location: anchored to start
+    do {
+      let base = "hello, world!"
+      let i = base.index(base.startIndex, offsetBy: 3)
+      let result = base.overlay.removingSubrange(base.startIndex..<i)
+      XCTAssertEqualCollections(result, "lo, world!")
+      IndexValidator().validate(result, expectedCount: 10)
+    }
+
+    // Location: middle
+    do {
+      let base = "hello, world!"
+      let start = base.index(base.startIndex, offsetBy: 3)
+      let end = base.index(start, offsetBy: 4)
+      let result = base.overlay.removingSubrange(start..<end)
+      XCTAssertEqualCollections(result, "helworld!")
+      IndexValidator().validate(result, expectedCount: 9)
+    }
+
+    // Location: anchored to end
+    do {
+      let base = "hello, world!"
+      let start = base.index(base.endIndex, offsetBy: -4)
+      let result = base.overlay.removingSubrange(start..<base.endIndex)
+      XCTAssertEqualCollections(result, "hello, wo")
+      IndexValidator().validate(result, expectedCount: 9)
+    }
+
+    // Location: entire collection
+    do {
+      let base = "hello, world!"
+      let result = base.overlay.removingSubrange(base.startIndex..<base.endIndex)
+      XCTAssertEqualCollections(result, "")
+      IndexValidator().validate(result, expectedCount: 0)
+    }
+  }
+
+  func testRemoveSingle() {
+
+    // Location: start
+    do {
+      let base = "hello, world!"
+      let result = base.overlay.removing(at: base.startIndex)
+      XCTAssertEqualCollections(result, "ello, world!")
+      IndexValidator().validate(result, expectedCount: 12)
+    }
+
+    // Location: middle
+    do {
+      let base = "hello, world!"
+      let i = base.index(base.startIndex, offsetBy: 3)
+      let result = base.overlay.removing(at: i)
+      XCTAssertEqualCollections(result, "helo, world!")
+      IndexValidator().validate(result, expectedCount: 12)
+    }
+
+    // Location: end
+    do {
+      let base = "hello, world!"
+      let i = base.index(before: base.endIndex)
+      let result = base.overlay.removing(at: i)
+      XCTAssertEqualCollections(result, "hello, world")
+      IndexValidator().validate(result, expectedCount: 12)
+    }
+
+    // Location: entire collection
+    do {
+      let base = "x"
+      let result = base.overlay.removing(at: base.startIndex)
       XCTAssertEqualCollections(result, "")
       IndexValidator().validate(result, expectedCount: 0)
     }
