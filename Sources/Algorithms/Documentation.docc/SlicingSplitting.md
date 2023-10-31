@@ -15,8 +15,6 @@ Iterate over tuple pairs of adjacent elements, overlapping windows of a specifie
 
 ### Lazily Splitting a Collection
 
-These methods…
-
 - ``Swift/LazySequenceProtocol/split(separator:maxSplits:omittingEmptySubsequences:)-4q4x8``
 - ``Swift/LazySequenceProtocol/split(maxSplits:omittingEmptySubsequences:whereSeparator:)-68oqf``
 - ``Swift/LazySequenceProtocol/split(separator:maxSplits:omittingEmptySubsequences:)-a46s``
