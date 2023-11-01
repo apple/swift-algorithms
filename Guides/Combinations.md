@@ -86,7 +86,7 @@ call to `CombinationsSequence.Iterator.next()` is an O(_n_) operation.
 ### Naming
 
 The parameter label in `combination(ofCount:)` is the best match for the
-Swift API guidelines. A few other options were considered:
+[Swift's API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/). A few other options were considered:
 
 - When the standard library uses `of` as a label, the parameter is generally 
   the object of the operation, as in `type(of:)` and `firstIndex(of:)`, and
