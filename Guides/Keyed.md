@@ -6,29 +6,29 @@
 Stores the elements of a sequence as the values of a Dictionary, keyed by the result of the given closure.
 
 ```swift
-let fruits = ["Apple", "Banana", "Cherry"]
-let fruitByLetter = try! fruits.keyed(by: { $0.first! })
+let fruits = ["Apricot", "Banana", "Apple", "Cherry", "Blackberry", "Avocado", "Coconut"]
+let fruitByLetter = fruits.keyed(by: { $0.first! })
 // Results in:
 // [
-//     "A": "Apple",
-//     "B": "Banana",
-//     "C": "Cherry",
+//     "A": "Avocado",
+//     "B": "Blackberry",
+//     "C": "Coconut",
 // ]
 ```
 
-Duplicate keys throw an error by default. Alternatively, you can provide a closure which specifies which value to keep:
+On a key-collision, the latest element is kept by default. Alternatively, you can provide a closure which specifies which value to keep:
 
 ```swift
 let fruits = ["Apricot", "Banana", "Apple", "Cherry", "Blackberry", "Avocado", "Coconut"]
 let fruitsByLetter = fruits.keyed(
     by: { $0.first! },
-    resolvingConflictsWith: { key, old, new in new } // Always pick the latest fruit
+    resolvingConflictsWith: { key, old, new in old } // Always pick the first fruit
 )
 // Results in:
 // [
-//     "A": "Avocado",
-//     "B": "Blackberry"],
-//     "C": "Coconut",
+//     "A": "Apricot",
+//     "B": "Banana",
+//     "C": "Cherry",
 // ]
 ```
 
@@ -40,7 +40,7 @@ The `keyed(by:)` and `keyed(by:resolvingConflictsWith:)` methods are declared in
 extension Sequence {
     public func keyed<Key>(
         by keyForValue: (Element) throws -> Key
-    ) throws -> [Key: Element]
+    ) rethrows -> [Key: Element]
     
     public func keyed<Key>(
         by keyForValue: (Element) throws -> Key,

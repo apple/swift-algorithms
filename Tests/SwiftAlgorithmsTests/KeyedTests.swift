@@ -16,7 +16,7 @@ final class KeyedTests: XCTestCase {
   private class SampleError: Error {}
 
   func testUniqueKeys() {
-    let d = try! ["Apple", "Banana", "Cherry"].keyed(by: { $0.first! })
+    let d = ["Apple", "Banana", "Cherry"].keyed(by: { $0.first! })
     XCTAssertEqual(d.count, 3)
     XCTAssertEqual(d["A"]!, "Apple")
     XCTAssertEqual(d["B"]!, "Banana")
@@ -25,19 +25,16 @@ final class KeyedTests: XCTestCase {
   }
 
   func testEmpty() {
-    let d = try! EmptyCollection<String>().keyed(by: { $0.first! })
+    let d = EmptyCollection<String>().keyed(by: { $0.first! })
     XCTAssertEqual(d.count, 0)
   }
 
   func testNonUniqueKeys() throws {
-    XCTAssertThrowsError(
-      try ["Apple", "Avocado", "Banana", "Cherry"].keyed(by: { $0.first! })
-    ) { thrownError in
-      let e = thrownError as! KeysAreNotUnique<Character, String>
-      XCTAssertEqual(e.key, "A")
-      XCTAssertEqual(e.previousElement, "Apple")
-      XCTAssertEqual(e.conflictingElement, "Avocado")
-    }
+    let d = ["Apple", "Avocado", "Banana", "Cherry"].keyed(by: { $0.first! })
+    XCTAssertEqual(d.count, 3)
+    XCTAssertEqual(d["A"]!, "Avocado", "On a key-collision, keyed(by:) should take the latest value.")
+    XCTAssertEqual(d["B"]!, "Banana")
+    XCTAssertEqual(d["C"]!, "Cherry")
   }
 
   func testNonUniqueKeysWithMergeFunction() {

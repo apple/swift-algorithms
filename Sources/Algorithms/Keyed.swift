@@ -9,35 +9,20 @@
 //
 //===----------------------------------------------------------------------===//
 
-public struct KeysAreNotUnique<Key, Element>: Error {
-  public let key: Key
-  public let previousElement: Element
-  public let conflictingElement: Element
-
-  @inlinable
-  public init(key: Key, previousElement: Element, conflictingElement: Element) {
-    self.key = key
-    self.previousElement = previousElement
-    self.conflictingElement = conflictingElement
-  }
-}
-
 extension Sequence {
   /// Creates a new Dictionary from the elements of `self`, keyed by the
-  /// results returned by the given `keyForValue` closure. Deriving the
-  /// same duplicate key for more than one element of `self` will cause
-  /// an error to be thrown.
+  /// results returned by the given `keyForValue` closure.
+  ///
+  /// If the key derived for a new element collides with an existing key from a previous element,
+  /// the latest value will be kept.
   ///
   /// - Parameters:
   ///   - keyForValue: A closure that returns a key for each element in `self`.
-  /// - Throws: `KeysAreNotUnique ` if two values map to the same key (via `keyForValue`).
   @inlinable
   public func keyed<Key>(
     by keyForValue: (Element) throws -> Key
-  ) throws -> [Key: Element] {
-    try self.keyed(by: keyForValue, resolvingConflictsWith: {
-       throw KeysAreNotUnique(key: $0, previousElement: $1, conflictingElement: $2)
-    })
+  ) rethrows -> [Key: Element] {
+    return try self.keyed(by: keyForValue, resolvingConflictsWith: { _, old, new in new })
   }
 
   /// Creates a new Dictionary from the elements of `self`, keyed by the
