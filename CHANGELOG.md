@@ -8,7 +8,13 @@ This project follows semantic versioning.
 
 ## [Unreleased]
 
-*No new changes.*
+### Additions
+
+ One new addition to the list of algorithms:
+
+ - `recursiveMap(option:_:)` Produces a sequence containing the original sequence and
+   the recursive mapped sequence. The order of ouput elements affects by the traversal
+   option. ([#185])
 
 ---
 
@@ -354,6 +360,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#138]: https://github.com/apple/swift-algorithms/pull/138
 [#152]: https://github.com/apple/swift-algorithms/pull/152
 [#162]: https://github.com/apple/swift-algorithms/pull/162
+[#185]: https://github.com/apple/swift-algorithms/pull/185
 
 <!-- Link references for contributors -->
 
