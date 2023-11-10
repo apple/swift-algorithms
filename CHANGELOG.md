@@ -8,7 +8,15 @@ This project follows semantic versioning.
 
 ## [Unreleased]
 
-*No new changes.*
+### Additions
+
+One new addition to the list of algorithms:
+
+- `merge(_:_:)` eagerly merges two sorted sequences with the same element type
+  and sorting criterion into a collection that is likewise sorted. When using
+  lazy sequences, mergers can be done lazily with `lazilyMerge(_:_:)`. Treating
+  the sorted sequences as multi-sets, a parameter can be provided to return the
+  sequences' union, intersection, *etc.* instead. ([#184])
 
 ---
 
@@ -354,6 +362,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#138]: https://github.com/apple/swift-algorithms/pull/138
 [#152]: https://github.com/apple/swift-algorithms/pull/152
 [#162]: https://github.com/apple/swift-algorithms/pull/162
+[#184]: https://github.com/apple/swift-algorithms/pull/184
 
 <!-- Link references for contributors -->
 

@@ -23,6 +23,7 @@ Read more about the package, and the intent behind it, in the [announcement on s
 - [`cycled()`, `cycled(times:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Cycle.md): Repeats the elements of a collection forever or a set number of times.
 - [`joined(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Joined.md): Concatenate sequences of sequences, using an element or sequence as a separator, or using a closure to generate each separator. 
 - [`product(_:_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Product.md): Iterates over all the pairs of two collections; equivalent to nested `for`-`in` loops.
+- [`merge(_:_:)`, `lazilyMerge(_:_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Merge.md): Splices two sorted sequences into a new sorted sequence.
 
 #### Subsetting operations
 
