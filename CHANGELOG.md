@@ -8,7 +8,11 @@ This project follows semantic versioning.
 
 ## [Unreleased]
 
-*No new changes.*
+### Additions
+
+- The `degreeOfInclusion(with:by:)` and `degreeOfInclusion(with:)` methods have
+  been added. They report how much overlap two sorted sequences have, expressed
+  by the `SetInclusion` type. ([#38])
 
 ---
 
@@ -332,6 +336,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#24]: https://github.com/apple/swift-algorithms/pull/24
 [#31]: https://github.com/apple/swift-algorithms/pull/31
 [#35]: https://github.com/apple/swift-algorithms/pull/35
+[#38]: https://github.com/apple/swift-algorithms/pull/38
 [#46]: https://github.com/apple/swift-algorithms/pull/46
 [#51]: https://github.com/apple/swift-algorithms/pull/51
 [#54]: https://github.com/apple/swift-algorithms/pull/54
