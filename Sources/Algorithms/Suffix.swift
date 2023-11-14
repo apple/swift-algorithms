@@ -46,7 +46,7 @@ extension Collection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
-  internal func endOfPrefix(
+  public func endOfPrefix(
     while predicate: (Element) throws -> Bool
   ) rethrows -> Index {
     var index = startIndex
@@ -72,7 +72,7 @@ extension BidirectionalCollection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
-  internal func startOfSuffix(
+  public func startOfSuffix(
     while predicate: (Element) throws -> Bool
   ) rethrows -> Index {
     var index = endIndex
