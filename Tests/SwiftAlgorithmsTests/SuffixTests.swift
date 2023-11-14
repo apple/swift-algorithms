@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
-@testable import Algorithms
+import Algorithms
 
 final class SuffixTests: XCTestCase {
   func testSuffix() {
