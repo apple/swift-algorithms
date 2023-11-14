@@ -25,3 +25,8 @@ Remove unwanted elements from the start, the end, or both ends of a collection.
 ### Finding the Suffix of a Collection
 
 - ``Swift/BidirectionalCollection/suffix(while:)``
+
+### Finding Boundaries within a Collection
+
+- ``Swift/Collection/endOfPrefix(while:)``
+- ``Swift/BidirectionalCollection/startOfSuffix(while:)``
