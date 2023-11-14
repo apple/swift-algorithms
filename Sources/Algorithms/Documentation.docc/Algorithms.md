@@ -33,6 +33,7 @@ Explore more chunking methods and the remainder of the Algorithms package, group
 - <doc:Joining>
 - <doc:Extending>
 - <doc:Trimming>
+- <doc:Keying>
 - <doc:Sampling>
 - <doc:MinAndMax>
 - <doc:Selecting>

@@ -8,6 +8,8 @@ This project follows semantic versioning.
 
 ## [Unreleased]
 
+*No new changes.*
+
 ## [1.2.0] - 2023-11-14
 
 ### Additions
@@ -31,6 +33,8 @@ This project follows semantic versioning.
 
 - Documentation and performance improvements. ([#202], [#210])
 
+The 1.2.0 release includes contributions from [amomchilov], [mattyoung], [natecook1000], [stephentyrone], and [ttsugriy].
+Thank you!
 
 ---
 
@@ -334,7 +338,8 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for releases -->
 
-[Unreleased]: https://github.com/apple/swift-algorithms/compare/1.1.0...HEAD
+[Unreleased]: https://github.com/apple/swift-algorithms/compare/1.2.0...HEAD
+[1.2.0]: https://github.com/apple/swift-algorithms/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/apple/swift-algorithms/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/apple/swift-algorithms/compare/0.2.1...1.0.0
 [0.2.1]: https://github.com/apple/swift-algorithms/compare/0.2.0...0.2.1
@@ -383,6 +388,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for contributors -->
 
+[amomchilov]: https://github.com/apple/swift-algorithms/commits?author=amomchilov
 [AustinConlon]: https://github.com/apple/swift-algorithms/commits?author=AustinConlon
 [benrimmington]: https://github.com/apple/swift-algorithms/commits?author=benrimmington
 [bjhomer]: https://github.com/apple/swift-algorithms/commits?author=bjhomer
@@ -420,3 +426,4 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [stephentyrone]: https://github.com/apple/swift-algorithms/commits?author=stephentyrone
 [timvermeulen]: https://github.com/apple/swift-algorithms/commits?author=timvermeulen
 [toddthomas]: https://github.com/apple/swift-algorithms/commits?author=toddthomas
+[ttsugriy]: https://github.com/apple/swift-algorithms/commits?author=ttsugriy
