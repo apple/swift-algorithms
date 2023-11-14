@@ -8,11 +8,33 @@ This project follows semantic versioning.
 
 ## [Unreleased]
 
-*No new changes.*
+## [1.2.0] - 2023-11-14
+
+### Additions
+
+- Sequences have new `grouped(by:)` and `keyed(by:)` methods, which simplify
+  building dictionaries based on sequence elements: ([#197])
+  
+   ```swift
+   let evensOdds = (1...10).grouped(by: { $0.isMultiple(of: 2) ? "even" : "odd" })
+   // ["even": [2, 4, 6, 8, 10], "odd": [1, 3, 5, 7, 9]]
+   
+   let animals = ["Aardvark", "Alpaca", "Armadillo", "Barracuda", "Buffalo", ...]
+   let alphaAnimals = animals.keyed(by: \.first!, resolvingConflictsWith: { _, first, _ in first })
+   // ["A": "Aardvark", "B": "Barracuda", ...]
+   ```
+- The `endOfPrefix(while:)` and `startOfSuffix(while)` methods are now public. 
+  These methods were previously implementation details of the `trimming` group 
+  of methods. ([#211])
+
+### Fixes
+
+- Documentation and performance improvements. ([#202], [#210])
+
 
 ---
 
-## [1.1.0] - 2023-08-24
+## [1.1.0] - 2023-10-05
 
 ### Additions
 
@@ -354,6 +376,10 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#138]: https://github.com/apple/swift-algorithms/pull/138
 [#152]: https://github.com/apple/swift-algorithms/pull/152
 [#162]: https://github.com/apple/swift-algorithms/pull/162
+[#197]: https://github.com/apple/swift-algorithms/pull/197
+[#202]: https://github.com/apple/swift-algorithms/pull/202
+[#210]: https://github.com/apple/swift-algorithms/pull/210
+[#211]: https://github.com/apple/swift-algorithms/pull/211
 
 <!-- Link references for contributors -->
 
@@ -376,6 +402,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [LemonSpike]: https://github.com/apple/swift-algorithms/commits?author=LemonSpike
 [LucianoPAlmeida]: https://github.com/apple/swift-algorithms/commits?author=LucianoPAlmeida
 [markuswntr]: https://github.com/apple/swift-algorithms/commits?author=markuswntr
+[mattyoung]: https://github.com/apple/swift-algorithms/commits?author=mattyoung
 [mdznr]: https://github.com/apple/swift-algorithms/commits?author=mdznr
 [michiboo]: https://github.com/apple/swift-algorithms/commits?author=michiboo
 [mpangburn]: https://github.com/apple/swift-algorithms/commits?author=mpangburn
