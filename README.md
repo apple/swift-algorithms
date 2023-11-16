@@ -26,7 +26,7 @@ Explore more chunking methods and the remainder of the `Algorithms` package in t
 
 ## Documentation
 
-For API documentation, see the library's official documentation in Xocde or on the Web.
+For API documentation, see the library's official documentation in Xcode or on the Web.
 
 - [API documentation][docs]
 - [Swift.org announcement][announcement]
