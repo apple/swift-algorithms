@@ -27,8 +27,10 @@ public struct PartitionMapResult2<A, B> {
   @usableFromInline
   internal let oneOf: _PartitionMapResult2<A, B>
   
-  @usableFromInline
-  internal init(oneOf: _PartitionMapResult2<A, B>) { self.oneOf = oneOf }
+  @inlinable
+  internal init(oneOf: _PartitionMapResult2<A, B>) {
+    self.oneOf = oneOf
+  }
   
   @inlinable
   public static func first(_ value: A) -> Self {
@@ -55,7 +57,7 @@ public struct PartitionMapResult3<A, B, C> {
   @usableFromInline
   internal let oneOf: _PartitionMapResult3<A, B, C>
   
-  @usableFromInline
+  @inlinable
   internal init(oneOf: _PartitionMapResult3<A, B, C>) {
     self.oneOf = oneOf
   }
