@@ -72,7 +72,6 @@ final class CombinationsTests: XCTestCase {
     
     check(cHas: 16, combinationsOfLengths: 0...)
     check(cHas: 15, combinationsOfLengths: ...3)
-    check(cHas: 16, combinationsOfLengths: 0...)
   }
   
   func testCombinations() {
