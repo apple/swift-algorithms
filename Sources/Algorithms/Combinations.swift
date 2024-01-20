@@ -78,6 +78,10 @@ public struct CombinationsSequence<Base: Collection> {
       binomial(n: n, k: $0)
     }.reduce(0, +)
   }
+
+  /// The total number of combinations.
+  @inlinable
+  public var underestimatedCount: Int { count }
 }
 
 extension CombinationsSequence: Sequence {
