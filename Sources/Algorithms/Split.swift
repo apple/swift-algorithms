@@ -512,7 +512,7 @@ extension SplitCollection: Collection {
     var subsequenceStart = i.baseRange.upperBound
     if subsequenceStart < base.endIndex {
       // If we're not already at the end of the base collection, the previous
-      // susequence ended with a separator. Start searching for the next
+      // subsequence ended with a separator. Start searching for the next
       // subsequence at the following element.
       subsequenceStart = base.index(after: i.baseRange.upperBound)
     }
