@@ -216,7 +216,7 @@ extension IndexValidator {
   ///   - expectedCount:
   ///
   /// - Complexity: O(*n*^3) where *n* is the length of the collection if the
-  ///   collection conforms to `RandomAccesCollection`, otherwise O(*n*^4).
+  ///   collection conforms to `RandomAccessCollection`, otherwise O(*n*^4).
   func validate(
     _ collection: C,
     expectedCount: Int? = nil,
