@@ -10,8 +10,14 @@
 //===----------------------------------------------------------------------===//
 
 // For log(_:) and root(_:_:)
+#if swift(>=5.11)
+internal import RealModule
+#elseif swift(>=5.10)
+import RealModule
+#else
 @_implementationOnly
 import RealModule
+#endif
 
 //===----------------------------------------------------------------------===//
 // randomStableSample(count:)
