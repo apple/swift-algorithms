@@ -212,7 +212,8 @@ extension Collection {
 extension Sequence {
   /// Returns two arrays containing the elements of the sequence that
   /// don’t and do satisfy the given predicate, respectively. The order of the
-  /// arrays matches the order of the elements in the original sequence.
+  /// elements in the arrays matches the order of the elements in the original
+  /// sequence.
   ///
   /// In this example, `partitioned(by:)` is used to separate the input based on
   /// whether a name is shorter than five characters:
@@ -254,9 +255,10 @@ extension Sequence {
 }
 
 extension Collection {
-  /// Returns two arrays containing the elements of the sequence that
+  /// Returns two arrays containing the elements of the collection that
   /// don’t and do satisfy the given predicate, respectively. The order of the
-  /// arrays matches the order of the elements in the original collection.
+  /// elements in the arrays matches the order of the elements in the original
+  /// collection.
   ///
   /// In this example, `partitioned(by:)` is used to separate the input based on
   /// whether a name is shorter than five characters.
