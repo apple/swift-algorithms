@@ -13,7 +13,7 @@ import XCTest
 import Algorithms
 
 final class KeyedTests: XCTestCase {
-  private class SampleError: Error {}
+  private final class SampleError: Error {}
 
   func testUniqueKeys() {
     let d = ["Apple", "Banana", "Cherry"].keyed(by: { $0.first! })
