@@ -210,8 +210,8 @@ extension Collection {
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
-  /// Returns two arrays containing, in order, the elements of the sequence that
-  /// do and don’t satisfy the given predicate.
+  /// Returns two arrays containing the elements of the sequence that
+  /// don’t and do satisfy the given predicate, respectively.
   ///
   /// In this example, `partitioned(by:)` is used to separate the input based on
   /// whether a name is shorter than five characters:
@@ -230,7 +230,9 @@ extension Sequence {
   ///
   /// - Returns: Two arrays with all of the elements of the receiver. The
   /// first array contains all the elements that `predicate` didn’t allow, and
-  /// the second array contains all the elements that `predicate` allowed.
+  /// the second array contains all the elements that `predicate` allowed. The
+  /// order of the elements in the arrays matches the order of the elements in
+  /// the original sequence.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   @inlinable
@@ -253,8 +255,8 @@ extension Sequence {
 }
 
 extension Collection {
-  /// Returns two arrays containing, in order, the elements of the collection
-  /// that do and don’t satisfy the given predicate.
+  /// Returns two arrays containing the elements of the collection that
+  /// don’t and do satisfy the given predicate, respectively.
   ///
   /// In this example, `partitioned(by:)` is used to separate the input based on
   /// whether a name is shorter than five characters.
@@ -273,7 +275,9 @@ extension Collection {
   ///
   /// - Returns: Two arrays with all of the elements of the receiver. The
   /// first array contains all the elements that `predicate` didn’t allow, and
-  /// the second array contains all the elements that `predicate` allowed.
+  /// the second array contains all the elements that `predicate` allowed. The
+  /// order of the elements in the arrays matches the order of the elements in
+  /// the original collection.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
