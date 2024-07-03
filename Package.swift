@@ -21,13 +21,18 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-numerics.git", from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.0.0"),
     ],
     targets: [
         .target(
             name: "Algorithms",
             dependencies: [
               .product(name: "RealModule", package: "swift-numerics"),
-            ]),
+            ],
+            resources: [
+                .process("Documentation.docc")
+            ]
+        ),
         .testTarget(
             name: "SwiftAlgorithmsTests",
             dependencies: ["Algorithms"]),
