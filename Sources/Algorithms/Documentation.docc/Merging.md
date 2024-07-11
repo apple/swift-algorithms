@@ -10,8 +10,8 @@ then generate the result of applying a set operation.
 
 - ``Swift/RangeReplaceableCollection/init(mergeSorted:and:retaining:sortedBy:)``
 - ``Swift/RangeReplaceableCollection/init(mergeSorted:and:retaining:)``
-- ``Swift/mergeSorted(_:_:retaining:areInIncreasingOrder:)``
-- ``Swift/mergeSorted(_:_:retaining:)``
+- ``mergeSorted(_:_:retaining:areInIncreasingOrder:)``
+- ``mergeSorted(_:_:retaining:)``
 
 ### Applying Set Operations to Sorted Sequences
 
