@@ -10,7 +10,76 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
-// MARK: MergerSubset
+// MARK: MutableCollection.mergeSortedPartitions(across:sortedBy:)
+//-------------------------------------------------------------------------===//
+
+extension MutableCollection {
+  /// Given a partition point,
+  /// where each side is sorted according to the given predicate,
+  /// rearrange the elements until a single sorted run is formed.
+  ///
+  /// Equivalent elements from a given partition have stable ordering in
+  /// the unified sequence.
+  ///
+  /// - Precondition: The `pivot` must be a valid index of this collection.
+  ///   The partitions of `startIndex..<pivot` and `pivot..<endIndex` must be
+  ///   sorted according to `areInIncreasingOrder`,
+  ///   and said predicate must be a strict weak ordering.
+  ///
+  /// - Parameters:
+  ///   - pivot: The index dividing the partitions.
+  ///     May point to an element, or be at `endIndex`.
+  ///   - areInIncreasingOrder: The criteria for sorting.
+  ///
+  /// - Complexity: O(*n*) in space and time, where `n` is the length of
+  ///   the collection.
+  public mutating func mergeSortedPartitions(
+    across pivot: Index,
+    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
+  ) rethrows {
+    var duplicate = self
+    try withoutActuallyEscaping(areInIncreasingOrder) {
+      var iterator = MergeSortedIterator(
+                   self[startIndex..<pivot].makeIterator(),
+                   self[pivot..<endIndex].makeIterator(),
+           filter: .sum,
+        predicate: $0
+      )
+      var duplicateIndex = duplicate.startIndex
+      while let current = try iterator.throwingNext() {
+        defer { duplicate.formIndex(after: &duplicateIndex) }
+
+        duplicate[duplicateIndex] = current
+      }
+    }
+    self = duplicate
+  }
+}
+
+extension MutableCollection where Element: Comparable {
+  /// Given a partition point, where each side is sorted,
+  /// rearrange the elements until a single sorted run is formed.
+  ///
+  /// Equal elements from a given partition have stable ordering in
+  /// the unified sequence.
+  ///
+  /// - Precondition: The `pivot` must be a valid index of this collection,
+  ///   where the partitions of `startIndex..<pivot` and
+  ///   `pivot..<endIndex` must be sorted.
+  ///
+  /// - Parameter pivot: The index dividing the partitions.
+  ///   May point to an element, or be at `endIndex`.
+  ///
+  /// - Complexity: O(*n*) in space and time, where `n` is the length of
+  ///   the collection.
+  @inlinable
+  public mutating func mergeSortedPartitions(across pivot: Index) {
+    return mergeSortedPartitions(across: pivot, sortedBy: <)
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// MARK: - MergerSubset
 //-------------------------------------------------------------------------===//
 
 /// Description of which elements of a merger were retained.

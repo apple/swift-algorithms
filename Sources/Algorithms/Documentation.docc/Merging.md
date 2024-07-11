@@ -12,6 +12,8 @@ then generate the result of applying a set operation.
 - ``Swift/RangeReplaceableCollection/init(mergeSorted:and:retaining:)``
 - ``mergeSorted(_:_:retaining:areInIncreasingOrder:)``
 - ``mergeSorted(_:_:retaining:)``
+- ``Swift/MutableCollection/mergeSortedPartitions(across:sortedBy:)``
+- ``Swift/MutableCollection/mergeSortedPartitions(across:)``
 
 ### Applying Set Operations to Sorted Sequences
 
