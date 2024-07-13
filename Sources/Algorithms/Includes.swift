@@ -72,7 +72,8 @@ extension Sequence where Element: Comparable {
   /// Assuming that this sequence and the given sequence are sorted,
   /// determine whether the given sequence is contained within this one.
   ///
-  /// - Precondition: Either the receiver, `other`, or both must be finite.
+  /// - Precondition: Both the receiver and `other` must be sorted.
+  ///   At least one of the involved sequences must be finite.
   ///
   /// - Parameter other: The sequence that is compared against the receiver.
   /// - Returns: Whether the entirety of `other` is contained within this
