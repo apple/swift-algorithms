@@ -18,6 +18,12 @@ extension Sequence {
   /// to the given predicate, determine whether the given sequence is contained
   /// within this one.
   ///
+  ///     let base = [9, 8, 7, 6, 6, 3, 2, 1, 0]
+  ///     assert(base.includes(sorted: [8, 7, 6, 2, 1], sortedBy: >))
+  ///     assert(!base.includes(sorted: [8, 7, 5, 2, 1], sortedBy: >))
+  ///
+  /// The elements of the argument need not be contiguous in the receiver.
+  ///
   /// - Precondition: Both the receiver and `other` must be sorted according to
   ///   `areInIncreasingOrder`, which must be a strict weak ordering over
   ///   its arguments. Either the receiver, `other`, or both must be finite.
@@ -71,6 +77,12 @@ extension Sequence {
 extension Sequence where Element: Comparable {
   /// Assuming that this sequence and the given sequence are sorted,
   /// determine whether the given sequence is contained within this one.
+  ///
+  ///     let base = [0, 1, 2, 3, 6, 6, 7, 8, 9]
+  ///     assert(base.includes(sorted: [1, 2, 6, 7, 8]))
+  ///     assert(!base.includes(sorted: [1, 2, 5, 7, 8]))
+  ///
+  /// The elements of the argument need not be contiguous in the receiver.
   ///
   /// - Precondition: Both the receiver and `other` must be sorted.
   ///   At least one of the involved sequences must be finite.

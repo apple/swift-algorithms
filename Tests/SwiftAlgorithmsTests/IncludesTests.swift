@@ -57,4 +57,18 @@ final class IncludesTests: XCTestCase {
     XCTAssertFalse([0, 1, 2, 3].includes(sorted:  2..<5))
     XCTAssertFalse([0, 1, 2, 3].includes(sorted: -1..<2))
   }
+
+  /// Confirm the example code from `Sequence.includes(sorted:sortedBy:)`.
+  func testFirstDiscussionCode() {
+    let base = [9, 8, 7, 6, 6, 3, 2, 1, 0]
+    XCTAssertTrue(base.includes(sorted: [8, 7, 6, 2, 1], sortedBy: >))
+    XCTAssertFalse(base.includes(sorted: [8, 7, 5, 2, 1], sortedBy: >))
+  }
+
+  /// Confirm the example code from `Sequence.includes(sorted:)`.
+  func testSecondDiscussionCode() {
+    let base = [0, 1, 2, 3, 6, 6, 7, 8, 9]
+    XCTAssertTrue(base.includes(sorted: [1, 2, 6, 7, 8]))
+    XCTAssertFalse(base.includes(sorted: [1, 2, 5, 7, 8]))
+  }
 }
