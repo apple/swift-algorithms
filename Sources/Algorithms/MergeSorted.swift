@@ -281,7 +281,7 @@ public func mergeSorted<T: Sequence, U: Sequence>(
   _ second: U,
   retaining filter: MergerSubset = .sum,
   sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool
-) -> some Sequence<T.Element> & LazySequenceProtocol
+) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>>
 where T.Element == U.Element {
   return MergeSortedSequence(
     merging: first.lazy,
@@ -310,7 +310,7 @@ where T.Element == U.Element {
 @inlinable
 public func mergeSorted<T: Sequence, U: Sequence>(
   _ first: T, _ second: U, retaining filter: MergerSubset = .sum
-) -> some Sequence<T.Element> & LazySequenceProtocol
+) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>>
 where T.Element == U.Element, T.Element: Comparable {
   return mergeSorted(first, second, retaining: filter, sortedBy: <)
 }
@@ -352,13 +352,10 @@ where First.Element == Second.Element
 }
 
 extension MergeSortedSequence: Sequence {
-  public func makeIterator() -> some IteratorProtocol<First.Element> {
-    return MergeSortedIterator(
-      first.makeIterator(),
-      second.makeIterator(),
-      filter: filter,
-      predicate: areInIncreasingOrder
-    )
+  public func makeIterator()
+  -> MergeSortedIterator<First.Iterator, Second.Iterator> {
+    return .init(first.makeIterator(), second.makeIterator(), filter: filter,
+                 predicate: areInIncreasingOrder)
   }
 
   public var underestimatedCount: Int {
