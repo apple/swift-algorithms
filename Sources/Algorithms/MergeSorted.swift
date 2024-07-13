@@ -449,7 +449,7 @@ extension MergeSortedIterator: IteratorProtocol {
         guard filter.emitsExclusivesToSecond else { continue }
 
         return latestSecond
-      case let (latestFirst?, latestSecond?):
+      case (let latestFirst?, _?):
         // Purge both of the equivalent elements...
         defer {
           first = nil
