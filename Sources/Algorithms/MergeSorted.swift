@@ -208,15 +208,12 @@ extension RangeReplaceableCollection {
   where T.Element == Element, U.Element == Element
   {
     self.init()
-    self.reserveCapacity(
-      filter.expectedCountRange(given: first.underestimatedCount,
-                                  and: second.underestimatedCount).lowerBound
-    )
     try withoutActuallyEscaping(areInIncreasingOrder) {
-      var iterator = MergeSortedIterator(first.makeIterator(),
-                                         second.makeIterator(),
-                                 filter: filter,
-                              predicate: $0)
+      let sequence = MergeSortedSequence(merging: first, and: second,
+                                         retaining: filter, sortedBy: $0)
+      self.reserveCapacity(sequence.underestimatedCount)
+
+      var iterator = sequence.makeIterator()
       while let current = try iterator.throwingNext() {
         self.append(current)
       }
@@ -332,7 +329,7 @@ where First.Element == Second.Element
   /// The subset of elements to retain.
   let filter: MergerSubset
   /// The sorting predicate.
-  let areInIncreasingOrder: (Element, Element) -> Bool
+  let areInIncreasingOrder: (Element, Element) throws -> Bool
 
   /// Create a sequence using the two given sequences that are sorted according
   /// to the given predicate, to vend the sources' elements combined while still
@@ -342,7 +339,7 @@ where First.Element == Second.Element
     merging first: First,
     and second: Second,
     retaining filter: MergerSubset,
-    sortedBy areInIncreasingOrder: @escaping (Element, Element) -> Bool
+    sortedBy areInIncreasingOrder: @escaping (Element, Element) throws -> Bool
   ) {
     self.first = first
     self.second = second
