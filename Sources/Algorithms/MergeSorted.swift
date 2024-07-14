@@ -39,18 +39,16 @@ extension MutableCollection {
   ) rethrows {
     var duplicate = self
     try withoutActuallyEscaping(areInIncreasingOrder) {
-      var iterator = MergeSortedIterator(
-                   self[startIndex..<pivot].makeIterator(),
-                   self[pivot..<endIndex].makeIterator(),
-           filter: .sum,
-        predicate: $0
-      )
+      let sequence = MergeSortedSequence(merging: self[startIndex..<pivot],
+                     and: self[pivot..<endIndex], retaining: .sum, sortedBy: $0)
+      var iterator = sequence.makeIterator()
       var duplicateIndex = duplicate.startIndex
       while let current = try iterator.throwingNext() {
         defer { duplicate.formIndex(after: &duplicateIndex) }
 
         duplicate[duplicateIndex] = current
       }
+      assert(duplicateIndex == duplicate.endIndex)
     }
     self = duplicate
   }
