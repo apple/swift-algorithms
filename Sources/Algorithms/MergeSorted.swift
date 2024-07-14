@@ -27,8 +27,8 @@ extension MutableCollection {
   ///   and said predicate must be a strict weak ordering.
   ///
   /// - Parameters:
-  ///   - pivot: The index dividing the partitions.
-  ///     May point to an element, or be at `endIndex`.
+  ///   - pivot: The index of the first element of the second partition,
+  ///     or `endIndex` if said partition is empty.
   ///   - areInIncreasingOrder: The criteria for sorting.
   ///
   /// - Complexity: O(*n*) in space and time, where `n` is the length of
@@ -65,8 +65,8 @@ extension MutableCollection where Element: Comparable {
   ///   where the partitions of `startIndex..<pivot` and
   ///   `pivot..<endIndex` must be sorted.
   ///
-  /// - Parameter pivot: The index dividing the partitions.
-  ///   May point to an element, or be at `endIndex`.
+  /// - Parameter pivot: The index of the first element of the second partition,
+  ///   or `endIndex` if said partition is empty.
   ///
   /// - Complexity: O(*n*) in space and time, where `n` is the length of
   ///   the collection.
