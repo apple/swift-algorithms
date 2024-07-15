@@ -80,7 +80,7 @@ extension MutableCollection where Element: Comparable {
 // MARK: - MergerSubset
 //-------------------------------------------------------------------------===//
 
-/// Description of which elements of a merger were retained.
+/// Description of which elements of a merger will be retained.
 public enum MergerSubset: UInt, CaseIterable {
   /// Keep no elements.
   case none
@@ -110,6 +110,7 @@ extension MergerSubset {
   @inlinable
   public var emitsExclusivesToSecond: Bool { rawValue & 0b010 != 0 }
   /// Whether the elements shared by both sources are emitted.
+  @inlinable
   public var emitsSharedElements: Bool { rawValue & 0b100 != 0 }
 }
 
@@ -145,7 +146,7 @@ extension MergerSubset {
   /// - The sources have just partial overlap.
   ///
   /// Both inputs must be nonnegative.
-  @usableFromInline
+  fileprivate
   func expectedCountRange(given firstLength: Int, and secondLength: Int) -> ClosedRange<Int> {
     /// Generate a range for a single value without repeating its expression.
     func singleValueRange(_ v: Int) -> ClosedRange<Int> { return v...v }
@@ -333,7 +334,7 @@ where First.Element == Second.Element
   /// to the given predicate, to vend the sources' elements combined while still
   /// sorted according to the predicate, but keeping only the elements that
   /// match the given set operation.
-  init(
+  fileprivate init(
     merging first: First,
     and second: Second,
     retaining filter: MergerSubset,
@@ -385,16 +386,16 @@ public struct MergeSortedIterator<
   let areInIncreasingOrder: (Element, Element) throws -> Bool
 
   /// The latest element read from the first source.
-  var first: First.Element?
+  fileprivate var first: First.Element?
   /// The latest element read from the second source.
-  var second: Second.Element?
+  fileprivate var second: Second.Element?
   /// Whether to keep on iterating.
-  var isFinished = false
+  fileprivate var isFinished = false
 
   /// Create an iterator reading from two sources, comparing their respective
   /// elements with the predicate, and emitting the given subset of the merged
   /// sequence.
-  init(
+  fileprivate init(
     _ firstSource: First,
     _ secondSource: Second,
     filter: MergerSubset,
@@ -421,7 +422,7 @@ public struct MergeSortedIterator<
 
 extension MergeSortedIterator: IteratorProtocol {
   /// Advance to the next element, if any. May throw.
-  mutating func throwingNext() throws -> First.Element? {
+  fileprivate mutating func throwingNext() throws -> First.Element? {
     while !isFinished {
       // Extract another element from a source if the previous one was purged.
       first = first ?? firstSource?.next()
