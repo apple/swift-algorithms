@@ -14,13 +14,8 @@ then generate the result of applying a set operation.
 - ``mergeSorted(_:_:retaining:)``
 - ``Swift/MutableCollection/mergeSortedPartitions(across:sortedBy:)``
 - ``Swift/MutableCollection/mergeSortedPartitions(across:)``
-
-### Applying Set Operations to Sorted Sequences
-
-``Swift/RangeReplaceableCollection/init(sorted:withoutElementsFrom:)``
-``Swift/RangeReplaceableCollection/init(exclusivesOfSorted:andExclusivesOf:)``
-``Swift/RangeReplaceableCollection/init(elementsOfSorted:sharedWith:)``
-``Swift/RangeReplaceableCollection/init(unionOfSorted:and:)``
+- ``Swift/MutableCollection/mergeSortedPartitionsInPlace(across:sortedBy:)``
+- ``Swift/MutableCollection/mergeSortedPartitionsInPlace(across:)``
 
 ### Supporting Types
 
