@@ -226,4 +226,26 @@ final class MergeSortedTests: XCTestCase {
     XCTAssertNoThrow(try sample5.mergeSortedPartitionsInPlace(across: 4, sortedBy: compare))
     XCTAssertEqualSequences(sample5, [2, 2, 3, 3, 4, 5, 7, 20])
   }
+
+  /// Check the code from documentation.
+  func testSampleCode() {
+    // From the guide.
+    let guide1 = [10, 4, 0, 0, -3], guide2 = [20, 6, 1, -1, -5]
+    let mergedGuides = mergeSorted(guide1, guide2, sortedBy: >)
+    XCTAssertEqualSequences(mergedGuides, [20, 10, 6, 4, 1, 0, 0, -1, -3, -5])
+
+    let guide3 = [0, 1, 1, 2, 5, 10], guide4 = [-1, 0, 1, 2, 2, 7, 10, 20]
+    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .union),
+                            [-1, 0, 1, 1, 2, 2, 5, 7, 10, 20])
+    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .intersection),
+                            [0, 1, 2, 10])
+    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .firstWithoutSecond),
+                            [1, 5])
+    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .secondWithoutFirst),
+                            [-1, 2, 7, 20])
+    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .symmetricDifference),
+                            [-1, 1, 2, 5, 7, 20])
+    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .sum),
+                            [-1, 0, 0, 1, 1, 1, 2, 2, 2, 5, 7, 10, 10, 20])
+  }
 }
