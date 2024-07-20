@@ -46,11 +46,18 @@ The merging algorithm can be applied in three domains:
   creates the result in-place.
 - A function over a `MutableCollection`,
   where the two sources are adjancent partitions of the collection.
-  
-Each version can take a parameter for which set operation is to be applied.
-This defaults to `.sum`, which results in a conventional merge.
-There are variants without an ordering predicate needing to be supplied,
-because they default to the less-than operator (`<`) as the predicate.
+
+The free-function and initializer forms can take an optional parameter,
+that indicates which subset of the merge will be kept.
+For instance, when using `.intersection`, only elements that appear in
+both sources will be returned, any non-matches will be skipped over.
+If a subset argument is not given, it defaults to `.sum`,
+which represents a conventional merge.
+The form for adjancent partitions cannot use subsetting,
+always performing with a subset of `.sum`.
+All of the forms take a parameter for the ordering predicate.
+If the element type conforms to `Comparable`,
+a predicate can be omitted to use a default of the less-than operator (`<`).
 
 ```swift
 // Free-function form. Also used for lazy evaluation.
@@ -90,13 +97,15 @@ extension MutableCollection where Self : BidirectionalCollection, Self.Element :
 }
 ```
 
-Desired subsets are described by a new type.
+Target subsets are described by a new type.
 
 ```swift
 public enum MergerSubset : UInt, CaseIterable {
     case none, firstWithoutSecond, secondWithoutFirst, symmetricDifference,
          intersection, first, second, union,
          sum
+
+    //...
 }
 ```
 
@@ -127,11 +136,11 @@ The merges via:
 - The speed-optimized partition-merge
 
 Operate in **O(** _n_ `+` _m_ **)** for both space and time,
-where *n* and *m* are the lengths of the two operand sequences.
+where *n* and *m* are the lengths of the two operand sequences/partitions.
 The space-optimized partition merge for a collection of length *n* operates in
 **O(** 1 **)** for space,
-with **O(** _n_ **)** for time when the collection is not random-access,
-and *???* for random-access collections.
+**O(** _n_ **)** for time when the collection is not random-access,
+and *???* for time in random-access collections.
 
 ### Naming
 
