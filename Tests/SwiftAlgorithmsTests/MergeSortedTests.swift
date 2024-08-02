@@ -89,7 +89,7 @@ final class MergeSortedTests: XCTestCase {
   func testLazySetMergers() {
     let low = 0..<7, high = 3..<10
     let sequences = Dictionary(uniqueKeysWithValues: MergerSubset.allCases.map {
-      let subsetResult = mergeSorted(low, high, retaining: $0)
+      let subsetResult = mergeSortedSets(low, high, retaining: $0)
       XCTAssertLazySequence(subsetResult)
       return ($0, subsetResult)
     })
@@ -115,7 +115,7 @@ final class MergeSortedTests: XCTestCase {
 
     // This exercises code missed by the `sequences` tests.
     let reversed = Dictionary(uniqueKeysWithValues: MergerSubset.allCases.map {
-      ($0, mergeSorted(high, low, retaining: $0))
+      ($0, mergeSortedSets(high, low, retaining: $0))
     })
     XCTAssertEqualSequences(reversed[.none]!, EmptyCollection())
     XCTAssertEqualSequences(reversed[.firstWithoutSecond]!, 7..<10)
@@ -253,17 +253,17 @@ final class MergeSortedTests: XCTestCase {
     XCTAssertEqualSequences(mergedGuides, [20, 10, 6, 4, 1, 0, 0, -1, -3, -5])
 
     let guide3 = [0, 1, 1, 2, 5, 10], guide4 = [-1, 0, 1, 2, 2, 7, 10, 20]
-    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .union),
+    XCTAssertEqualSequences(mergeSortedSets(guide3, guide4, retaining: .union),
                             [-1, 0, 1, 1, 2, 2, 5, 7, 10, 20])
-    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .intersection),
+    XCTAssertEqualSequences(mergeSortedSets(guide3, guide4, retaining: .intersection),
                             [0, 1, 2, 10])
-    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .firstWithoutSecond),
+    XCTAssertEqualSequences(mergeSortedSets(guide3, guide4, retaining: .firstWithoutSecond),
                             [1, 5])
-    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .secondWithoutFirst),
+    XCTAssertEqualSequences(mergeSortedSets(guide3, guide4, retaining: .secondWithoutFirst),
                             [-1, 2, 7, 20])
-    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .symmetricDifference),
+    XCTAssertEqualSequences(mergeSortedSets(guide3, guide4, retaining: .symmetricDifference),
                             [-1, 1, 2, 5, 7, 20])
-    XCTAssertEqualSequences(mergeSorted(guide3, guide4, retaining: .sum),
+    XCTAssertEqualSequences(mergeSortedSets(guide3, guide4, retaining: .sum),
                             [-1, 0, 0, 1, 1, 1, 2, 2, 2, 5, 7, 10, 10, 20])
   }
 }

@@ -39,7 +39,7 @@ extension MutableCollection {
   ) rethrows {
     var duplicate = self
     try withoutActuallyEscaping(areInIncreasingOrder) {
-      let sequence = MergeSortedSequence(merging: self[startIndex..<pivot],
+      let sequence = MergeSortedSetsSequence(merging: self[startIndex..<pivot],
                      and: self[pivot..<endIndex], retaining: .sum, sortedBy: $0)
       var iterator = sequence.makeIterator()
       var duplicateIndex = duplicate.startIndex
@@ -288,9 +288,9 @@ public func mergeSorted<T: Sequence, U: Sequence>(
   _ first: T,
   _ second: U,
   sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool
-) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>>
+) -> MergeSortedSetsSequence<LazySequence<T>, LazySequence<U>>
 where T.Element == U.Element {
-  return mergeSorted(first, second, retaining: .sum, sortedBy: areInIncreasingOrder)
+  return mergeSortedSets(first, second, retaining: .sum, sortedBy: areInIncreasingOrder)
 }
 
 /// Given two sorted sequences treated as sets, apply the given set operation,
@@ -312,7 +312,7 @@ where T.Element == U.Element {
 @inlinable
 public func mergeSorted<T: Sequence, U: Sequence>(
   _ first: T, _ second: U
-) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>>
+) -> MergeSortedSetsSequence<LazySequence<T>, LazySequence<U>>
 where T.Element == U.Element, T.Element: Comparable {
   return mergeSorted(first, second, sortedBy: <)
 }

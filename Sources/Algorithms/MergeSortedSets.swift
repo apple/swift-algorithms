@@ -140,7 +140,7 @@ extension RangeReplaceableCollection {
   {
     self.init()
     try withoutActuallyEscaping(areInIncreasingOrder) {
-      let sequence = MergeSortedSequence(merging: first, and: second,
+      let sequence = MergeSortedSetsSequence(merging: first, and: second,
                                          retaining: filter, sortedBy: $0)
       self.reserveCapacity(sequence.underestimatedCount)
 
@@ -180,7 +180,7 @@ extension RangeReplaceableCollection where Element: Comparable {
 }
 
 //===----------------------------------------------------------------------===//
-// MARK: - mergeSorted(_:_:retaining:sortedBy:)
+// MARK: - mergeSortedSets(_:_:retaining:sortedBy:)
 //-------------------------------------------------------------------------===//
 
 /// Given two sequences that are both sorted according to the given predicate
@@ -202,14 +202,14 @@ extension RangeReplaceableCollection where Element: Comparable {
 ///
 /// - Complexity: O(1). The actual iteration takes place in O(`n` + `m`),
 ///   where `n` and `m` are the lengths of the sequence arguments.
-public func mergeSorted<T: Sequence, U: Sequence>(
+public func mergeSortedSets<T: Sequence, U: Sequence>(
   _ first: T,
   _ second: U,
   retaining filter: MergerSubset,
   sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool
-) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>>
+) -> MergeSortedSetsSequence<LazySequence<T>, LazySequence<U>>
 where T.Element == U.Element {
-  return MergeSortedSequence(
+  return MergeSortedSetsSequence(
     merging: first.lazy,
     and: second.lazy,
     retaining: filter,
@@ -233,21 +233,21 @@ where T.Element == U.Element {
 /// - Complexity: O(1). The actual iteration takes place in O(`n` + `m`),
 ///   where `n` and `m` are the lengths of the sequence arguments.
 @inlinable
-public func mergeSorted<T: Sequence, U: Sequence>(
+public func mergeSortedSets<T: Sequence, U: Sequence>(
   _ first: T, _ second: U, retaining filter: MergerSubset
-) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>>
+) -> MergeSortedSetsSequence<LazySequence<T>, LazySequence<U>>
 where T.Element == U.Element, T.Element: Comparable {
-  return mergeSorted(first, second, retaining: filter, sortedBy: <)
+  return mergeSortedSets(first, second, retaining: filter, sortedBy: <)
 }
 
 //===----------------------------------------------------------------------===//
-// MARK: - MergeSortedSequence
+// MARK: - MergeSortedSetsSequence
 //-------------------------------------------------------------------------===//
 
 /// A sequence that lazily vends the sorted result of a set operation upon
 /// two sorted sequences treated as sets spliced together, using a predicate as
 /// the sorting criteria for all three sequences involved.
-public struct MergeSortedSequence<First: Sequence, Second: Sequence>
+public struct MergeSortedSetsSequence<First: Sequence, Second: Sequence>
 where First.Element == Second.Element
 {
   /// The first source sequence.
@@ -276,9 +276,9 @@ where First.Element == Second.Element
   }
 }
 
-extension MergeSortedSequence: Sequence {
+extension MergeSortedSetsSequence: Sequence {
   public func makeIterator()
-  -> MergeSortedIterator<First.Iterator, Second.Iterator> {
+  -> MergeSortedSetsIterator<First.Iterator, Second.Iterator> {
     return .init(first.makeIterator(), second.makeIterator(), filter: filter,
                  predicate: areInIncreasingOrder)
   }
@@ -291,16 +291,16 @@ extension MergeSortedSequence: Sequence {
   }
 }
 
-extension MergeSortedSequence: LazySequenceProtocol {}
+extension MergeSortedSetsSequence: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
-// MARK: - MergeSortedIterator
+// MARK: - MergeSortedSetsIterator
 //-------------------------------------------------------------------------===//
 
 /// An iterator that applies a set operation on two virtual sequences,
 /// both treated as sets sorted according a predicate, spliced together to
 /// vend a virtual sequence that is also sorted.
-public struct MergeSortedIterator<
+public struct MergeSortedSetsIterator<
    First: IteratorProtocol,
   Second: IteratorProtocol
 > where First.Element == Second.Element
@@ -349,7 +349,7 @@ public struct MergeSortedIterator<
   }
 }
 
-extension MergeSortedIterator: IteratorProtocol {
+extension MergeSortedSetsIterator: IteratorProtocol {
   /// Advance to the next element, if any. May throw.
   mutating func throwingNext() throws -> First.Element? {
     while !isFinished {
