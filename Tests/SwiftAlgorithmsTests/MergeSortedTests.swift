@@ -13,6 +13,8 @@ import XCTest
 import Algorithms
 
 final class MergeSortedTests: XCTestCase {
+  // MARK: Support Types for Set-Operation Mergers
+
   /// Check the convenience initializers for `MergerSubset`.
   func testMergerSubsetInitializers() {
     XCTAssertEqual(MergerSubset(), .sum)
@@ -81,6 +83,8 @@ final class MergeSortedTests: XCTestCase {
     )
   }
 
+  // MARK: - Set-Operation and Direct Mergers
+
   /// Check the lazily-generated merger/subset sequences.
   func testLazyMergers() {
     let low = 0..<7, high = 3..<10
@@ -145,6 +149,8 @@ final class MergeSortedTests: XCTestCase {
     XCTAssertEqualSequences(sequences[.union]!, 0..<10)
     XCTAssertEqualSequences(sequences[.sum]!, [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9])
   }
+
+  // MARK: - Partition Mergers
 
   /// Check the more-memory version of merging two sorted partitions.
   func testFastPartitionMerge() {
@@ -226,6 +232,8 @@ final class MergeSortedTests: XCTestCase {
     XCTAssertNoThrow(try sample5.mergeSortedPartitionsInPlace(across: 4, sortedBy: compare))
     XCTAssertEqualSequences(sample5, [2, 2, 3, 3, 4, 5, 7, 20])
   }
+
+  // MARK: - Sample Code
 
   /// Check the code from documentation.
   func testSampleCode() {
