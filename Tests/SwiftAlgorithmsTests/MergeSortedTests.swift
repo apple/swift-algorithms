@@ -83,17 +83,15 @@ final class MergeSortedTests: XCTestCase {
     )
   }
 
-  // MARK: - Set-Operation and Direct Mergers
+  // MARK: - Set-Operation Mergers
 
-  /// Check the lazily-generated merger/subset sequences.
-  func testLazyMergers() {
+  /// Check the lazily-generated subset sequences.
+  func testLazySetMergers() {
     let low = 0..<7, high = 3..<10
-    XCTAssertEqualSequences(mergeSorted(low, high),
-                            [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9])
-    XCTAssertLazySequence(mergeSorted(low, high))
-
     let sequences = Dictionary(uniqueKeysWithValues: MergerSubset.allCases.map {
-      ($0, mergeSorted(low, high, retaining: $0))
+      let subsetResult = mergeSorted(low, high, retaining: $0)
+      XCTAssertLazySequence(subsetResult)
+      return ($0, subsetResult)
     })
     XCTAssertEqualSequences(sequences[.none]!, EmptyCollection())
     XCTAssertEqualSequences(sequences[.firstWithoutSecond]!, 0..<3)
@@ -130,12 +128,9 @@ final class MergeSortedTests: XCTestCase {
     XCTAssertEqualSequences(reversed[.sum]!, [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9])
   }
 
-  /// Check the eager merger/subset sequences.
-  func testEagerMergers() {
+  /// Check the eagerly-generated subset sequences.
+  func testEagerSetMergers() {
     let low = 0..<7, high = 3..<10
-    XCTAssertEqualSequences(Array(mergeSorted: low, and: high),
-                            [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9])
-
     let sequences = Dictionary(uniqueKeysWithValues: MergerSubset.allCases.map {
       ($0, Array(mergeSorted: low, and: high, retaining: $0))
     })
@@ -148,6 +143,21 @@ final class MergeSortedTests: XCTestCase {
     XCTAssertEqualSequences(sequences[.second]!, high)
     XCTAssertEqualSequences(sequences[.union]!, 0..<10)
     XCTAssertEqualSequences(sequences[.sum]!, [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9])
+  }
+
+  // MARK: - Direct Mergers
+
+  /// Check lazily-generated mergers.
+  func testLazyMergers() {
+    let low = 0..<7, high = 3..<10, result = mergeSorted(low, high)
+    XCTAssertEqualSequences(result, [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9])
+    XCTAssertLazySequence(result)
+  }
+
+  /// Check eagerly-generated mergers.
+  func testEagerMergers() {
+    let low = 0..<7, high = 3..<10, result = Array(mergeSorted: low, and: high)
+    XCTAssertEqualSequences(result, [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9])
   }
 
   // MARK: - Partition Mergers
