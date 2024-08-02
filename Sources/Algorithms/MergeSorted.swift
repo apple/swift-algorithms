@@ -322,8 +322,7 @@ extension RangeReplaceableCollection {
   /// - Parameters:
   ///   - first: The first sequence spliced.
   ///   - second: The second sequence spliced.
-  ///   - filter: The subset of the merged sequence to keep. If not given,
-  ///     defaults to `.sum`.
+  ///   - filter: The subset of the merged sequence to keep.
   ///   - areInIncreasingOrder: The criteria for sorting.
   ///
   /// - Complexity: O(`n` + `m`) in space and time, where `n` and `m` are the
@@ -331,7 +330,7 @@ extension RangeReplaceableCollection {
   public init<T: Sequence, U: Sequence>(
     mergeSorted first: T,
     and second: U,
-    retaining filter: MergerSubset = .sum,
+    retaining filter: MergerSubset,
     sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows
   where T.Element == Element, U.Element == Element
@@ -362,8 +361,7 @@ extension RangeReplaceableCollection where Element: Comparable {
   /// - Parameters:
   ///   - first: The first sequence spliced.
   ///   - second: The second sequence spliced.
-  ///   - filter: The subset of the merged sequence to keep. If not given,
-  ///     defaults to `.sum`.
+  ///   - filter: The subset of the merged sequence to keep.
   ///
   /// - Complexity: O(`n` + `m`) in space and time, where `n` and `m` are the
   ///   lengths of the sequence arguments.
@@ -371,7 +369,7 @@ extension RangeReplaceableCollection where Element: Comparable {
   public init<T: Sequence, U: Sequence>(
     mergeSorted first: T,
     and second: U,
-    retaining filter: MergerSubset = .sum
+    retaining filter: MergerSubset
   ) where T.Element == Element, U.Element == Element
   {
     self.init(mergeSorted: first, and: second, retaining: filter, sortedBy: <)
@@ -395,8 +393,7 @@ extension RangeReplaceableCollection where Element: Comparable {
 /// - Parameters:
 ///   - first: The first sequence spliced.
 ///   - second: The second sequence spliced.
-///   - filter: The subset of the merged sequence to keep. If not given,
-///     defaults to `.sum`.
+///   - filter: The subset of the merged sequence to keep.
 ///   - areInIncreasingOrder: The criteria for sorting.
 /// - Returns: A sequence that lazily generates the merged sequence subset.
 ///
@@ -405,7 +402,7 @@ extension RangeReplaceableCollection where Element: Comparable {
 public func mergeSorted<T: Sequence, U: Sequence>(
   _ first: T,
   _ second: U,
-  retaining filter: MergerSubset = .sum,
+  retaining filter: MergerSubset,
   sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool
 ) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>>
 where T.Element == U.Element {
@@ -427,15 +424,14 @@ where T.Element == U.Element {
 /// - Parameters:
 ///   - first: The first sequence spliced.
 ///   - second: The second sequence spliced.
-///   - filter: The subset of the merged sequence to keep. If not given,
-///     defaults to `.sum`.
+///   - filter: The subset of the merged sequence to keep.
 /// - Returns: A sequence that lazily generates the merged sequence subset.
 ///
 /// - Complexity: O(1). The actual iteration takes place in O(`n` + `m`),
 ///   where `n` and `m` are the lengths of the sequence arguments.
 @inlinable
 public func mergeSorted<T: Sequence, U: Sequence>(
-  _ first: T, _ second: U, retaining filter: MergerSubset = .sum
+  _ first: T, _ second: U, retaining filter: MergerSubset
 ) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>>
 where T.Element == U.Element, T.Element: Comparable {
   return mergeSorted(first, second, retaining: filter, sortedBy: <)
@@ -603,4 +599,115 @@ extension MergeSortedIterator: IteratorProtocol {
   public mutating func next() -> Second.Element? {
     return try! throwingNext()
   }
+}
+
+//===----------------------------------------------------------------------===//
+// MARK: - RangeReplaceableCollection.init(mergeSorted:and:sortedBy:)
+//-------------------------------------------------------------------------===//
+
+extension RangeReplaceableCollection {
+  /// Given two sequences that are both sorted according to the given predicate,
+  /// create their sorted merger.
+  ///
+  /// - Precondition: Both `first` and `second` must be sorted according to
+  ///   `areInIncreasingOrder`, and said predicate must be a strict weak ordering
+  ///   over its arguments. Both `first` and `second` must be finite.
+  ///
+  /// - Parameters:
+  ///   - first: The first sequence spliced.
+  ///   - second: The second sequence spliced.
+  ///   - areInIncreasingOrder: The criteria for sorting.
+  ///
+  /// - Complexity: O(`n` + `m`) in space and time, where `n` and `m` are the
+  ///   lengths of the sequence arguments.
+  @inlinable
+  public init<T: Sequence, U: Sequence>(
+    mergeSorted first: T,
+    and second: U,
+    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
+  ) rethrows
+  where T.Element == Element, U.Element == Element
+  {
+    try self.init(mergeSorted: first, and: second, retaining: .sum, sortedBy: areInIncreasingOrder)
+  }
+}
+
+extension RangeReplaceableCollection where Element: Comparable {
+  /// Given two sorted sequences, create their sorted merger.
+  ///
+  /// - Precondition: Both `first` and `second` must be sorted, and both
+  ///   must be finite.
+  ///
+  /// - Parameters:
+  ///   - first: The first sequence spliced.
+  ///   - second: The second sequence spliced.
+  ///
+  /// - Complexity: O(`n` + `m`) in space and time, where `n` and `m` are the
+  ///   lengths of the sequence arguments.
+  @inlinable
+  public init<T: Sequence, U: Sequence>(
+    mergeSorted first: T,
+    and second: U
+  ) where T.Element == Element, U.Element == Element
+  {
+    self.init(mergeSorted: first, and: second, sortedBy: <)
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// MARK: - mergeSorted(_:_:sortedBy:)
+//-------------------------------------------------------------------------===//
+
+/// Given two sequences that are both sorted according to the given predicate
+/// and treated as sets, apply the given set operation, returning the result as
+/// a lazy sequence also sorted by the same predicate.
+///
+/// For simply merging the sequences, use `.sum` as the operation.
+///
+/// - Precondition: Both `first` and `second` must be sorted according to
+///   `areInIncreasingOrder`, and said predicate must be a strict weak ordering
+///   over its arguments.
+///
+/// - Parameters:
+///   - first: The first sequence spliced.
+///   - second: The second sequence spliced.
+///   - filter: The subset of the merged sequence to keep. If not given,
+///     defaults to `.sum`.
+///   - areInIncreasingOrder: The criteria for sorting.
+/// - Returns: A sequence that lazily generates the merged sequence subset.
+///
+/// - Complexity: O(1). The actual iteration takes place in O(`n` + `m`),
+///   where `n` and `m` are the lengths of the sequence arguments.
+@inlinable
+public func mergeSorted<T: Sequence, U: Sequence>(
+  _ first: T,
+  _ second: U,
+  sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool
+) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>>
+where T.Element == U.Element {
+  return mergeSorted(first, second, retaining: .sum, sortedBy: areInIncreasingOrder)
+}
+
+/// Given two sorted sequences treated as sets, apply the given set operation,
+/// returning the result as a sorted lazy sequence.
+///
+/// For simply merging the sequences, use `.sum` as the operation.
+///
+/// - Precondition: Both `first` and `second` must be sorted.
+///
+/// - Parameters:
+///   - first: The first sequence spliced.
+///   - second: The second sequence spliced.
+///   - filter: The subset of the merged sequence to keep. If not given,
+///     defaults to `.sum`.
+/// - Returns: A sequence that lazily generates the merged sequence subset.
+///
+/// - Complexity: O(1). The actual iteration takes place in O(`n` + `m`),
+///   where `n` and `m` are the lengths of the sequence arguments.
+@inlinable
+public func mergeSorted<T: Sequence, U: Sequence>(
+  _ first: T, _ second: U
+) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>>
+where T.Element == U.Element, T.Element: Comparable {
+  return mergeSorted(first, second, sortedBy: <)
 }
