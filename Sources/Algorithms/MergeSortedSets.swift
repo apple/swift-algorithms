@@ -207,11 +207,11 @@ public func mergeSortedSets<T: Sequence, U: Sequence>(
   _ second: U,
   retaining filter: MergerSubset,
   sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool
-) -> MergeSortedSetsSequence<LazySequence<T>, LazySequence<U>>
+) -> MergeSortedSetsSequence<T, U>
 where T.Element == U.Element {
   return MergeSortedSetsSequence(
-    merging: first.lazy,
-    and: second.lazy,
+    merging: first,
+    and: second,
     retaining: filter,
     sortedBy: areInIncreasingOrder
   )
@@ -235,7 +235,7 @@ where T.Element == U.Element {
 @inlinable
 public func mergeSortedSets<T: Sequence, U: Sequence>(
   _ first: T, _ second: U, retaining filter: MergerSubset
-) -> MergeSortedSetsSequence<LazySequence<T>, LazySequence<U>>
+) -> MergeSortedSetsSequence<T, U>
 where T.Element == U.Element, T.Element: Comparable {
   return mergeSortedSets(first, second, retaining: filter, sortedBy: <)
 }
@@ -291,7 +291,13 @@ extension MergeSortedSetsSequence: Sequence {
   }
 }
 
-extension MergeSortedSetsSequence: LazySequenceProtocol {}
+extension MergeSortedSetsSequence: LazySequenceProtocol
+where First: LazySequenceProtocol, Second: LazySequenceProtocol
+{
+  public var elements: MergeSortedSetsSequence<First.Elements, Second.Elements> {
+    return Elements(merging: first.elements, and: second.elements, retaining: filter, sortedBy: areInIncreasingOrder)
+  }
+}
 
 //===----------------------------------------------------------------------===//
 // MARK: - MergeSortedSetsIterator

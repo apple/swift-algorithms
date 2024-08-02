@@ -288,7 +288,7 @@ public func mergeSorted<T: Sequence, U: Sequence>(
   _ first: T,
   _ second: U,
   sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool
-) -> MergeSortedSetsSequence<LazySequence<T>, LazySequence<U>>
+) -> MergeSortedSetsSequence<T, U>
 where T.Element == U.Element {
   return mergeSortedSets(first, second, retaining: .sum, sortedBy: areInIncreasingOrder)
 }
@@ -312,7 +312,7 @@ where T.Element == U.Element {
 @inlinable
 public func mergeSorted<T: Sequence, U: Sequence>(
   _ first: T, _ second: U
-) -> MergeSortedSetsSequence<LazySequence<T>, LazySequence<U>>
+) -> MergeSortedSetsSequence<T, U>
 where T.Element == U.Element, T.Element: Comparable {
   return mergeSorted(first, second, sortedBy: <)
 }

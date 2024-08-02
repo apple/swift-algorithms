@@ -89,9 +89,7 @@ final class MergeSortedTests: XCTestCase {
   func testLazySetMergers() {
     let low = 0..<7, high = 3..<10
     let sequences = Dictionary(uniqueKeysWithValues: MergerSubset.allCases.map {
-      let subsetResult = mergeSortedSets(low, high, retaining: $0)
-      XCTAssertLazySequence(subsetResult)
-      return ($0, subsetResult)
+      return ($0, mergeSortedSets(low, high, retaining: $0))
     })
     XCTAssertEqualSequences(sequences[.none]!, EmptyCollection())
     XCTAssertEqualSequences(sequences[.firstWithoutSecond]!, 0..<3)
@@ -151,7 +149,6 @@ final class MergeSortedTests: XCTestCase {
   func testLazyMergers() {
     let low = 0..<7, high = 3..<10, result = mergeSorted(low, high)
     XCTAssertEqualSequences(result, [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9])
-    XCTAssertLazySequence(result)
   }
 
   /// Check eagerly-generated mergers.
