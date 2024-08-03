@@ -263,11 +263,8 @@ extension RangeReplaceableCollection where Element: Comparable {
 // MARK: - mergeSorted(_:_:sortedBy:)
 //-------------------------------------------------------------------------===//
 
-/// Given two sequences that are both sorted according to the given predicate
-/// and treated as sets, apply the given set operation, returning the result as
-/// a lazy sequence also sorted by the same predicate.
-///
-/// For simply merging the sequences, use `.sum` as the operation.
+/// Given two sequences that are both sorted according to the given predicate,
+/// return their merger that is sorted by the predicate and vended lazily.
 ///
 /// - Precondition: Both `first` and `second` must be sorted according to
 ///   `areInIncreasingOrder`, and said predicate must be a strict weak ordering
@@ -276,10 +273,8 @@ extension RangeReplaceableCollection where Element: Comparable {
 /// - Parameters:
 ///   - first: The first sequence spliced.
 ///   - second: The second sequence spliced.
-///   - filter: The subset of the merged sequence to keep. If not given,
-///     defaults to `.sum`.
 ///   - areInIncreasingOrder: The criteria for sorting.
-/// - Returns: A sequence that lazily generates the merged sequence subset.
+/// - Returns: The merged sequence.
 ///
 /// - Complexity: O(1). The actual iteration takes place in O(`n` + `m`),
 ///   where `n` and `m` are the lengths of the sequence arguments.
@@ -293,19 +288,14 @@ where T.Element == U.Element {
   return mergeSortedSets(first, second, retaining: .sum, sortedBy: areInIncreasingOrder)
 }
 
-/// Given two sorted sequences treated as sets, apply the given set operation,
-/// returning the result as a sorted lazy sequence.
-///
-/// For simply merging the sequences, use `.sum` as the operation.
+/// Given two sorted sequences, return their still-sorted merger, vended lazily.
 ///
 /// - Precondition: Both `first` and `second` must be sorted.
 ///
 /// - Parameters:
 ///   - first: The first sequence spliced.
 ///   - second: The second sequence spliced.
-///   - filter: The subset of the merged sequence to keep. If not given,
-///     defaults to `.sum`.
-/// - Returns: A sequence that lazily generates the merged sequence subset.
+/// - Returns: The merged sequence.
 ///
 /// - Complexity: O(1). The actual iteration takes place in O(`n` + `m`),
 ///   where `n` and `m` are the lengths of the sequence arguments.

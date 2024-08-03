@@ -185,7 +185,7 @@ extension RangeReplaceableCollection where Element: Comparable {
 
 /// Given two sequences that are both sorted according to the given predicate
 /// and treated as sets, apply the given set operation, returning the result as
-/// a lazy sequence also sorted by the same predicate.
+/// a sequence sorted by the predicate and that is vended lazily.
 ///
 /// For simply merging the sequences, use `.sum` as the operation.
 ///
@@ -198,7 +198,7 @@ extension RangeReplaceableCollection where Element: Comparable {
 ///   - second: The second sequence spliced.
 ///   - filter: The subset of the merged sequence to keep.
 ///   - areInIncreasingOrder: The criteria for sorting.
-/// - Returns: A sequence that lazily generates the merged sequence subset.
+/// - Returns: The merged sequence subset.
 ///
 /// - Complexity: O(1). The actual iteration takes place in O(`n` + `m`),
 ///   where `n` and `m` are the lengths of the sequence arguments.
@@ -218,7 +218,7 @@ where T.Element == U.Element {
 }
 
 /// Given two sorted sequences treated as sets, apply the given set operation,
-/// returning the result as a sorted lazy sequence.
+/// returning the result as a sorted sequence that vends lazily.
 ///
 /// For simply merging the sequences, use `.sum` as the operation.
 ///
@@ -228,7 +228,7 @@ where T.Element == U.Element {
 ///   - first: The first sequence spliced.
 ///   - second: The second sequence spliced.
 ///   - filter: The subset of the merged sequence to keep.
-/// - Returns: A sequence that lazily generates the merged sequence subset.
+/// - Returns: The merged sequence subset.
 ///
 /// - Complexity: O(1). The actual iteration takes place in O(`n` + `m`),
 ///   where `n` and `m` are the lengths of the sequence arguments.
