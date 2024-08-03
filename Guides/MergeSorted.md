@@ -124,10 +124,15 @@ Most of the merging functions use these support types:
 
 ```swift
 public struct MergeSortedSequence<First, Second>
- : Sequence, LazySequenceProtocol
+ : Sequence
 where First : Sequence,
       Second : Sequence,
       First.Element == Second.Element
+{ /*...*/ }
+
+extension MergeSortedSetsSequence
+ : LazySequenceProtocol
+where First : LazySequenceProtocol, Second : LazySequenceProtocol
 { /*...*/ }
 
 public struct MergeSortedIterator<First, Second>
