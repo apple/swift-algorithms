@@ -62,46 +62,57 @@ a predicate can be omitted to use a default of the less-than operator (`<`).
 ```swift
 // Free-function form. Also used for lazy evaluation.
 
+/// Given two sequences that are both sorted according to the given predicate, return their merger that is sorted by the predicate and vended lazily.
 @inlinable public func mergeSorted<T, U>(_ first: T, _ second: U, sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool) -> MergeSortedSetsSequence<T, U> where T : Sequence, U : Sequence, T.Element == U.Element
 
+/// Given two sorted sequences, return their still-sorted merger, vended lazily.
 @inlinable public func mergeSorted<T, U>(_ first: T, _ second: U) -> MergeSortedSetsSequence<T, U> where T : Sequence, U : Sequence, T.Element : Comparable, T.Element == U.Element
 
+/// Given two sequences that are both sorted according to the given predicate and treated as sets, apply the given set operation, returning the result as a sequence sorted by the predicate and that is vended lazily.
 public func mergeSortedSets<T, U>(_ first: T, _ second: U, retaining filter: MergerSubset, sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool) -> MergeSortedSetsSequence<T, U> where T : Sequence, U : Sequence, T.Element == U.Element
 
+/// Given two sorted sequences treated as sets, apply the given set operation, returning the result as a sorted sequence that vends lazily.
 @inlinable public func mergeSortedSets<T, U>(_ first: T, _ second: U, retaining filter: MergerSubset) -> MergeSortedSetsSequence<T, U> where T : Sequence, U : Sequence, T.Element : Comparable, T.Element == U.Element
 
 // Initializer form.
 
 extension RangeReplaceableCollection {
+    /// Given two sequences that are both sorted according to the given predicate, create their sorted merger.
     @inlinable public init<T, U>(mergeSorted first: T, and second: U, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
 
+    /// Given two sequences that are both sorted according to the given predicate, treat them as sets, and create the sorted result of the given set operation.
     public init<T, U>(mergeSorted first: T, and second: U, retaining filter: MergerSubset, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
 }
 
 extension RangeReplaceableCollection where Self.Element : Comparable {
+    /// Given two sorted sequences, create their sorted merger.
     @inlinable public init<T, U>(mergeSorted first: T, and second: U) where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
 
+    /// Given two sorted sequences, treat them as sets, and create the sorted result of the given set operation.
     @inlinable public init<T, U>(mergeSorted first: T, and second: U, retaining filter: MergerSubset) where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
-
 }
 
 // Two-partition merging, optimizing for speed.
 
 extension MutableCollection {
+    /// Given a partition point, where each side is sorted according to the given predicate, rearrange the elements until a single sorted run is formed.
     public mutating func mergeSortedPartitions(across pivot: Index, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows
 }
 
 extension MutableCollection where Self.Element : Comparable {
+    /// Given a partition point, where each side is sorted, rearrange the elements until a single sorted run is formed.
     @inlinable public mutating func mergeSortedPartitions(across pivot: Index)
 }
 
 // Two-partition merging, optimizing for space.
 
 extension MutableCollection where Self : BidirectionalCollection {
+    /// Given a partition point, where each side is sorted according to the given predicate, rearrange the elements until a single sorted run is formed, using minimal scratch memory.
     public mutating func mergeSortedPartitionsInPlace(across pivot: Index, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows
 }
 
 extension MutableCollection where Self : BidirectionalCollection, Self.Element : Comparable {
+    /// Given a partition point, where each side is sorted, rearrange the elements until a single sorted run is formed, using minimal scratch memory.
     @inlinable public mutating func mergeSortedPartitionsInPlace(across pivot: Index)
 }
 ```
@@ -109,6 +120,7 @@ extension MutableCollection where Self : BidirectionalCollection, Self.Element :
 Target subsets are described by a new type.
 
 ```swift
+/// Description of which elements of a merger will be retained.
 public enum MergerSubset : UInt, CaseIterable {
     case none, firstWithoutSecond, secondWithoutFirst, symmetricDifference,
          intersection, first, second, union,
@@ -123,6 +135,7 @@ Every set-operation combination is provided, although some are degenerate.
 Most of the merging functions use these support types:
 
 ```swift
+/// A sequence that lazily vends the sorted result of a set operation upon two sorted sequences treated as sets spliced together, using a predicate as the sorting criteria for all three sequences involved.
 public struct MergeSortedSequence<First, Second>
  : Sequence
 where First : Sequence,
@@ -135,6 +148,7 @@ extension MergeSortedSetsSequence
 where First : LazySequenceProtocol, Second : LazySequenceProtocol
 { /*...*/ }
 
+/// An iterator that applies a set operation on two virtual sequences, both treated as sets sorted according a predicate, spliced together to vend a virtual sequence that is also sorted.
 public struct MergeSortedIterator<First, Second>
  : IteratorProtocol
 where First : IteratorProtocol,
