@@ -20,14 +20,14 @@ Due to being sorted,
 distinguishing elements that are shared between sequences or
 are exclusive to a sequence can be determined in a resonable time frame.
 Set operations take advantage of the catagories of sharing,
-so applying operations can be done in-line during the merging:
+so applying operations can be done in-line during merging:
 
 ```swift
 let first = [0, 1, 1, 2, 5, 10], second = [-1, 0, 1, 2, 2, 7, 10, 20]
-print(Array(mergeSorted(first, second, retaining: .union)))
-print(Array(mergeSorted(first, second, retaining: .intersection)))
-print(Array(mergeSorted(first, second, retaining: .secondWithoutFirst)))
-print(Array(mergeSorted(first, second, retaining: .sum)))  // Standard merge!
+print(Array(mergeSortedSets(first, second, retaining: .union)))
+print(Array(mergeSortedSets(first, second, retaining: .intersection)))
+print(Array(mergeSortedSets(first, second, retaining: .secondWithoutFirst)))
+print(Array(mergeSortedSets(first, second, retaining: .sum)))  // Standard merge!
 /*
 [-1, 0, 1, 1, 2, 2, 5, 7, 10, 20]
 [0, 1, 2, 10]
@@ -62,18 +62,27 @@ a predicate can be omitted to use a default of the less-than operator (`<`).
 ```swift
 // Free-function form. Also used for lazy evaluation.
 
-public func mergeSorted<T, U>(_ first: T, _ second: U, retaining filter: MergerSubset = .sum, sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>> where T : Sequence, U : Sequence, T.Element == U.Element
+@inlinable public func mergeSorted<T, U>(_ first: T, _ second: U, sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool) -> MergeSortedSetsSequence<T, U> where T : Sequence, U : Sequence, T.Element == U.Element
 
-@inlinable public func mergeSorted<T, U>(_ first: T, _ second: U, retaining filter: MergerSubset = .sum) -> MergeSortedSequence<LazySequence<T>, LazySequence<U>> where T : Sequence, U : Sequence, T.Element : Comparable, T.Element == U.Element
+@inlinable public func mergeSorted<T, U>(_ first: T, _ second: U) -> MergeSortedSetsSequence<T, U> where T : Sequence, U : Sequence, T.Element : Comparable, T.Element == U.Element
+
+public func mergeSortedSets<T, U>(_ first: T, _ second: U, retaining filter: MergerSubset, sortedBy areInIncreasingOrder: @escaping (T.Element, U.Element) -> Bool) -> MergeSortedSetsSequence<T, U> where T : Sequence, U : Sequence, T.Element == U.Element
+
+@inlinable public func mergeSortedSets<T, U>(_ first: T, _ second: U, retaining filter: MergerSubset) -> MergeSortedSetsSequence<T, U> where T : Sequence, U : Sequence, T.Element : Comparable, T.Element == U.Element
 
 // Initializer form.
 
 extension RangeReplaceableCollection {
-    public init<T, U>(mergeSorted first: T, and second: U, retaining filter: MergerSubset = .sum, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
+    @inlinable public init<T, U>(mergeSorted first: T, and second: U, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
+
+    public init<T, U>(mergeSorted first: T, and second: U, retaining filter: MergerSubset, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
 }
 
 extension RangeReplaceableCollection where Self.Element : Comparable {
-    @inlinable public init<T, U>(mergeSorted first: T, and second: U, retaining filter: MergerSubset = .sum) where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
+    @inlinable public init<T, U>(mergeSorted first: T, and second: U) where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
+
+    @inlinable public init<T, U>(mergeSorted first: T, and second: U, retaining filter: MergerSubset) where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
+
 }
 
 // Two-partition merging, optimizing for speed.

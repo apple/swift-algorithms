@@ -34,7 +34,7 @@ These guides describe the design and intention behind the APIs included in the `
 - [`trimmingPrefix(while:)`, `trimmingSuffix(while)`, `trimming(while:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Trim.md): Returns a slice by trimming elements from a collection's start, end, or both. The mutating `trim...` methods trim a collection in place.
 - [`uniqued()`, `uniqued(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Unique.md): The unique elements of a collection, preserving their order.
 - [`minAndMax()`, `minAndMax(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/MinMax.md): Returns the smallest and largest elements of a sequence.
-- The `mergeSorted(_:_:retaining:sortedBy:)` function is a variant from the "Combining collections" section above that adds a parameter to apply a set operation in-line with the merge.
+- The `mergeSortedSets(_:_:retaining:sortedBy:)` function is a variant from the "Combining collections" section above that adds a parameter to apply a set operation in-line with the merge.
 
 #### Partial sorting
 
