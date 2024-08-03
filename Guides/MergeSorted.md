@@ -40,21 +40,20 @@ print(Array(mergeSortedSets(first, second, retaining: .sum)))  // Standard merge
 
 The merging algorithm can be applied in three domains:
 
-- A free function taking the source sequences.
-- An initializer for `RangeReplaceableCollection`,
-  that takes the source sequences and then
-  creates the result in-place.
-- A function over a `MutableCollection`,
+- Free functions taking the source sequences.
+- Initializers for `RangeReplaceableCollection`,
+  that take the source sequences and then
+  create the result in-place.
+- Functions over a `MutableCollection`,
   where the two sources are adjancent partitions of the collection.
 
-The free-function and initializer forms can take an optional parameter,
-that indicates which subset of the merge will be kept.
-For instance, when using `.intersection`, only elements that appear in
-both sources will be returned, any non-matches will be skipped over.
-If a subset argument is not given, it defaults to `.sum`,
-which represents a conventional merge.
-The form for adjancent partitions cannot use subsetting,
-always performing with a subset of `.sum`.
+The free-function and initializer forms have variants that
+take an extra parameter,
+which represent which subset of the merger will be kept.
+For instance,
+using `.intersection` makes the resulting merger contain only the elements that
+appear in both sources,
+skipping any elements that appear in exactly one source.
 All of the forms take a parameter for the ordering predicate.
 If the element type conforms to `Comparable`,
 a predicate can be omitted to use a default of the less-than operator (`<`).
