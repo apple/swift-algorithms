@@ -135,7 +135,7 @@ Most of the merging functions use these support types:
 
 ```swift
 /// A sequence that lazily vends the sorted result of a set operation upon two sorted sequences treated as sets spliced together, using a predicate as the sorting criteria for all three sequences involved.
-public struct MergeSortedSequence<First, Second>
+public struct MergeSortedSetsSequence<First, Second>
  : Sequence
 where First : Sequence,
       Second : Sequence,
@@ -148,7 +148,7 @@ where First : LazySequenceProtocol, Second : LazySequenceProtocol
 { /*...*/ }
 
 /// An iterator that applies a set operation on two virtual sequences, both treated as sets sorted according a predicate, spliced together to vend a virtual sequence that is also sorted.
-public struct MergeSortedIterator<First, Second>
+public struct MergeSortedSetsIterator<First, Second>
  : IteratorProtocol
 where First : IteratorProtocol,
       Second : IteratorProtocol,
