@@ -17,7 +17,8 @@ let package = Package(
     products: [
         .library(
             name: "Algorithms",
-            targets: ["Algorithms"]),
+            targets: ["Algorithms"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-numerics.git", from: "1.0.0"),
@@ -27,9 +28,12 @@ let package = Package(
             name: "Algorithms",
             dependencies: [
               .product(name: "RealModule", package: "swift-numerics"),
-            ]),
+            ],
+            exclude: ["Documentation.docc"]
+        ),
         .testTarget(
             name: "SwiftAlgorithmsTests",
-            dependencies: ["Algorithms"]),
+            dependencies: ["Algorithms"]
+        ),
     ]
 )
