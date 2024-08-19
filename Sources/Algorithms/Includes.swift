@@ -10,7 +10,60 @@
 //===----------------------------------------------------------------------===//
 
 //===----------------------------------------------------------------------===//
-// MARK: Sequence.includes(sorted:sortedBy:)
+// MARK: OverlapDegree
+//-------------------------------------------------------------------------===//
+
+/// The amount of overlap between two sets.
+public enum OverlapDegree: UInt, CaseIterable {
+  /// Both sets are empty (degenerate).
+  case bothEmpty
+  /// Have a nonempty first set, empty second (degenerate).
+  case onlyFirstNonempty
+  /// Have an empty first set, nonempty second (degenerate).
+  case onlySecondNonempty
+  /// Have two nonempty sets with no overlap.
+  case disjoint
+  /// The two sets are equivalent and nonempty.
+  case identical
+  /// The first set is a strict superset of a nonempty second.
+  case firstIncludesNonemptySecond
+  /// The first set is a nonempty strict subset of the second.
+  case secondIncludesNonemptyFirst
+  /// The sets overlap but each still have exclusive elements.
+  case partialOverlap
+}
+
+extension OverlapDegree {
+  /// The bit mask checking if there are elements exclusive to the first set.
+  @usableFromInline
+  static var firstOnlyMask: RawValue { 1 << 0 }
+  /// The bit mask checking if there are elements exclusive to the second set.
+  @usableFromInline
+  static var secondOnlyMask: RawValue { 1 << 1 }
+  /// The bit mask checking if there are elements shared by both sets.
+  @usableFromInline
+  static var sharedMask: RawValue { 1 << 2 }
+}
+
+extension OverlapDegree {
+  /// Whether there are any elements in the first set that are not in
+  /// the second.
+  @inlinable
+  public var hasElementsExclusiveToFirst: Bool
+  { rawValue & Self.firstOnlyMask != 0 }
+  /// Whether there are any elements in the second set that are not in
+  /// the first.
+  @inlinable
+  public var hasElementsExclusiveToSecond: Bool
+  { rawValue & Self.secondOnlyMask != 0 }
+  /// Whether there are any elements that occur in both sets.
+  @inlinable
+  public var hasSharedElements: Bool
+  { rawValue & Self.sharedMask != 0 }
+}
+
+//===----------------------------------------------------------------------===//
+// MARK: - Sequence.includes(sorted:sortedBy:)
 //-------------------------------------------------------------------------===//
 
 extension Sequence {
@@ -41,8 +94,11 @@ extension Sequence {
     sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> Bool
   where T.Element == Element {
-    return try !overlap(withSorted: other, bailAfterOtherExclusive: true,
-                        sortedBy: areInIncreasingOrder).elementsFromOther!
+    return try !overlap(
+      withSorted: other,
+      bailAfterOtherExclusive: true,
+      sortedBy: areInIncreasingOrder
+    ).hasElementsExclusiveToSecond
   }
 }
 
@@ -83,12 +139,12 @@ extension Sequence {
   ///     let base = [9, 8, 7, 6, 6, 3, 2, 1, 0]
   ///     let test1 = base.overlap(withSorted: [8, 7, 6, 2, 1], sortedBy: >)
   ///     let test2 = base.overlap(withSorted: [8, 7, 5, 2, 1], sortedBy: >)
-  ///     assert(test1.elementsFromSelf!)
-  ///     assert(test1.sharedElements!)
-  ///     assert(!test1.elementsFromOther!)
-  ///     assert(test2.elementsFromSelf!)
-  ///     assert(test2.sharedElements!)
-  ///     assert(test2.elementsFromOther!)
+  ///     assert(test1.hasElementsExclusiveToFirst)
+  ///     assert(test1.hasSharedElements)
+  ///     assert(!test1.hasElementsExclusiveToSecond)
+  ///     assert(test2.hasElementsExclusiveToFirst!)
+  ///     assert(test2.hasSharedElements)
+  ///     assert(test2.hasElementsExclusiveToSecond)
   ///
   /// - Precondition: Both the receiver and `other` must be sorted according to
   ///   `areInIncreasingOrder`,
@@ -107,17 +163,15 @@ extension Sequence {
   ///   - bailAfterOtherExclusive: Indicate that this function should abort as
   ///     soon as one element that is exclusive to `other` is found.
   ///     If not given, defaults to `false`.
-  /// - Returns: A tuple of three `Bool` members indicating whether there are
-  ///   elements exclusive to `self`,
-  ///   there are elements shared between the sequences,
-  ///   and there are elements exclusive to `other`.
-  ///   If a member is `true`,
-  ///   then at least one element in that category exists.
-  ///   If a member is `false`,
-  ///   then there are no elements in that category.
-  ///   If a member is `nil`,
-  ///   then the function aborted before its category's status could be
-  ///   determined.
+  /// - Returns: A value representing the categories of overlap found.
+  ///   If none of the abort arguments were `true`,
+  ///   or otherwise none of their corresponding categories were found,
+  ///   then all of the category flags from the returned value are accurate.
+  ///   Otherwise,
+  ///   the returned value has exactly one of the flags in the
+  ///   short-circuit subset as `true`,
+  ///   and the flags outside that set may have invalid values.
+  ///   The receiver is considered the first set, and `other` as the second.
   ///
   /// - Complexity: O(*n*), where `n` is the length of the shorter sequence.
   public func overlap<T: Sequence>(
@@ -126,37 +180,33 @@ extension Sequence {
     bailAfterShared: Bool = false,
     bailAfterOtherExclusive: Bool = false,
     sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> (
-    elementsFromSelf: Bool?,
-    sharedElements: Bool?,
-    elementsFromOther: Bool?
-  )
+  ) rethrows -> OverlapDegree
   where T.Element == Element {
     var firstElement, secondElement: Element?
     var iterator = makeIterator(), otherIterator = other.makeIterator()
-    var result: (fromSelf: Bool?, shared: Bool?, fromOther: Bool?)
+    var fromSelf, shared, fromOther: Bool?
   loop:
-    while result != (true, true, true) {
+    while (fromSelf, shared, fromOther) != (true, true, true) {
       firstElement = firstElement ?? iterator.next()
       secondElement = secondElement ?? otherIterator.next()
       switch (firstElement, secondElement) {
       case let (s?, o?) where try areInIncreasingOrder(s, o):
         // Exclusive to self
-        result.fromSelf = true
+        fromSelf = true
         guard !bailAfterSelfExclusive else { break loop }
 
         // Move to the next element in self.
         firstElement = nil
       case let (s?, o?) where try areInIncreasingOrder(o, s):
         // Exclusive to other
-        result.fromOther = true
+        fromOther = true
         guard !bailAfterOtherExclusive else { break loop }
 
         // Move to the next element in other.
         secondElement = nil
       case (_?, _?):
         // Shared
-        result.shared = true
+        shared = true
         guard !bailAfterShared else { break loop }
 
         // Iterate to the next element for both sequences.
@@ -164,25 +214,29 @@ extension Sequence {
         secondElement = nil
       case (_?, nil):
         // Never bail, just finalize after finding an exclusive to self.
-        result.fromSelf = true
-        result.shared = result.shared ?? false
-        result.fromOther = result.fromOther ?? false
+        fromSelf = true
+        shared = shared ?? false
+        fromOther = fromOther ?? false
         break loop
       case (nil, _?):
         // Never bail, just finalize after finding an exclusive to other.
-        result.fromSelf = result.fromSelf ?? false
-        result.shared = result.shared ?? false
-        result.fromOther = true
+        fromSelf = fromSelf ?? false
+        shared = shared ?? false
+        fromOther = true
         break loop
       case (nil, nil):
         // Finalize everything instead of bailing
-        result.fromSelf = result.fromSelf ?? false
-        result.shared = result.shared ?? false
-        result.fromOther = result.fromOther ?? false
+        fromSelf = fromSelf ?? false
+        shared = shared ?? false
+        fromOther = fromOther ?? false
         break loop
       }
     }
-    return (result.fromSelf, result.shared, result.fromOther)
+
+    let selfBit  = fromSelf  == true ? OverlapDegree.firstOnlyMask  : 0,
+        shareBit = shared    == true ? OverlapDegree.sharedMask     : 0,
+        otherBit = fromOther == true ? OverlapDegree.secondOnlyMask : 0
+    return .init(rawValue: selfBit | shareBit | otherBit)!
   }
 }
 
@@ -193,12 +247,12 @@ extension Sequence where Element: Comparable {
   ///     let base = [0, 1, 2, 3, 6, 6, 7, 8, 9]
   ///     let test1 = base.overlap(withSorted: [1, 2, 6, 7, 8])
   ///     let test2 = base.overlap(withSorted: [1, 2, 5, 7, 8])
-  ///     assert(test1.elementsFromSelf!)
-  ///     assert(test1.sharedElements!)
-  ///     assert(!test1.elementsFromOther!)
-  ///     assert(test2.elementsFromSelf!)
-  ///     assert(test2.sharedElements!)
-  ///     assert(test2.elementsFromOther!)
+  ///     assert(test1.hasElementsExclusiveToFirst)
+  ///     assert(test1.hasSharedElements)
+  ///     assert(!test1.hasElementsExclusiveToSecond)
+  ///     assert(test2.hasElementsExclusiveToFirst)
+  ///     assert(test2.hasSharedElements)
+  ///     assert(test2.hasElementsExclusiveToSecond)
   ///
   /// - Precondition: Both the receiver and `other` must be sorted.
   ///   At least one of the involved sequences must be finite.
@@ -214,17 +268,15 @@ extension Sequence where Element: Comparable {
   ///   - bailAfterOtherExclusive: Indicate that this function should abort as
   ///     soon as one element that is exclusive to `other` is found.
   ///     If not given, defaults to `false`.
-  /// - Returns: A tuple of three `Bool` members indicating whether there are
-  ///   elements exclusive to `self`,
-  ///   elements shared between the sequences,
-  ///   and elements exclusive to `other`.
-  ///   If a member is `true`,
-  ///   then at least one element in that category exists.
-  ///   If a member is `false`,
-  ///   then there are no elements in that category.
-  ///   If a member is `nil`,
-  ///   then the function aborted before its category's status could be
-  ///   determined.
+  /// - Returns: A value representing the categories of overlap found.
+  ///   If none of the abort arguments were `true`,
+  ///   or otherwise none of their corresponding categories were found,
+  ///   then all of the category flags from the returned value are accurate.
+  ///   Otherwise,
+  ///   the returned value has exactly one of the flags in the
+  ///   short-circuit subset as `true`,
+  ///   and the flags outside that set may have invalid values.
+  ///   The receiver is considered the first set, and `other` as the second.
   ///
   /// - Complexity: O(*n*), where `n` is the length of the shorter sequence.
   @inlinable
@@ -233,11 +285,7 @@ extension Sequence where Element: Comparable {
     bailAfterSelfExclusive: Bool = false,
     bailAfterShared: Bool = false,
     bailAfterOtherExclusive: Bool = false
-  ) -> (
-    elementsFromSelf: Bool?,
-    sharedElements: Bool?,
-    elementsFromOther: Bool?
-  )
+  ) -> OverlapDegree
   where T.Element == Element {
     return overlap(
       withSorted: other,

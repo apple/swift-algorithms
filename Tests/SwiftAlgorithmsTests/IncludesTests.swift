@@ -13,6 +13,31 @@ import XCTest
 import Algorithms
 
 final class IncludesTests: XCTestCase {
+  /// Confirm the operations for `OverlapDegree`.
+  func testOverlapDegree() {
+    XCTAssertEqualSequences(
+      OverlapDegree.allCases,
+      [
+        .bothEmpty, .onlyFirstNonempty, .onlySecondNonempty, .disjoint,
+        .identical, .firstIncludesNonemptySecond, .secondIncludesNonemptyFirst,
+        .partialOverlap
+      ]
+    )
+
+    XCTAssertEqualSequences(
+      OverlapDegree.allCases.map(\.hasElementsExclusiveToFirst),
+      [false, true, false, true, false, true, false, true]
+    )
+    XCTAssertEqualSequences(
+      OverlapDegree.allCases.map(\.hasElementsExclusiveToSecond),
+      [false, false, true, true, false, false, true, true]
+    )
+    XCTAssertEqualSequences(
+      OverlapDegree.allCases.map(\.hasSharedElements),
+      [false, false, false, false, true, true, true, true]
+    )
+  }
+
   /// Check if one empty set includes another.
   func testBothSetsEmpty() {
     XCTAssertTrue(EmptyCollection<Int>().includes(sorted: EmptyCollection()))
@@ -79,12 +104,12 @@ final class IncludesTests: XCTestCase {
     let base = [9, 8, 7, 6, 6, 3, 2, 1, 0]
     let test1 = base.overlap(withSorted: [8, 7, 6, 2, 1], sortedBy: >)
     let test2 = base.overlap(withSorted: [8, 7, 5, 2, 1], sortedBy: >)
-    XCTAssertTrue(test1.elementsFromSelf!)
-    XCTAssertTrue(test1.sharedElements!)
-    XCTAssertFalse(test1.elementsFromOther!)
-    XCTAssertTrue(test2.elementsFromSelf!)
-    XCTAssertTrue(test2.sharedElements!)
-    XCTAssertTrue(test2.elementsFromOther!)
+    XCTAssertTrue(test1.hasElementsExclusiveToFirst)
+    XCTAssertTrue(test1.hasSharedElements)
+    XCTAssertFalse(test1.hasElementsExclusiveToSecond)
+    XCTAssertTrue(test2.hasElementsExclusiveToFirst)
+    XCTAssertTrue(test2.hasSharedElements)
+    XCTAssertTrue(test2.hasElementsExclusiveToSecond)
   }
 
   /// Confirm the example code from `Sequence.overlap(withSorted:`
@@ -93,11 +118,11 @@ final class IncludesTests: XCTestCase {
     let base = [0, 1, 2, 3, 6, 6, 7, 8, 9]
     let test1 = base.overlap(withSorted: [1, 2, 6, 7, 8])
     let test2 = base.overlap(withSorted: [1, 2, 5, 7, 8])
-    XCTAssertTrue(test1.elementsFromSelf!)
-    XCTAssertTrue(test1.sharedElements!)
-    XCTAssertFalse(test1.elementsFromOther!)
-    XCTAssertTrue(test2.elementsFromSelf!)
-    XCTAssertTrue(test2.sharedElements!)
-    XCTAssertTrue(test2.elementsFromOther!)
+    XCTAssertTrue(test1.hasElementsExclusiveToFirst)
+    XCTAssertTrue(test1.hasSharedElements)
+    XCTAssertFalse(test1.hasElementsExclusiveToSecond)
+    XCTAssertTrue(test2.hasElementsExclusiveToFirst)
+    XCTAssertTrue(test2.hasSharedElements)
+    XCTAssertTrue(test2.hasElementsExclusiveToSecond)
   }
 }

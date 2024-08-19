@@ -22,9 +22,9 @@ use the `overlap` function.
 
 ```swift
 let firstOverlapThird = first.overlap(withSorted: third, sortedBy: >)
-assert(firstOverlapThird.elementsFromSelf == .some(true))
-assert(firstOverlapThird.sharedElements == .some(true))
-assert(firstOverlapThird.elementsFromOther == .some(false))
+assert(firstOverlapThird.hasElementsExclusiveToFirst)
+assert(firstOverlapThird.hasSharedElements)
+assert(!firstOverlapThird.hasElementsExclusiveToSecond)
 ```
 
 By default, `overlap` returns its result after at least one of the sequences ends.
@@ -33,18 +33,16 @@ pass in the appropriate "`bail`" argument.
 
 ```swift
 let firstOverlapThirdAgain = first.overlap(withSorted: third, bailAfterShared: true, sortedBy: >)
-assert(firstOverlapThirdAgain.sharedElements == .some(true))
-assert(firstOverlapThirdAgain.elementsFromSelf == .some(true))
-assert(firstOverlapThirdAgain.elementsFromOther == .none)
+assert(firstOverlapThirdAgain.hasSharedElements)
+// The other two flags may have random values.
 ```
 
 When `overlap` ends by a short-circut,
-only the flag for the short-circuted category will be `true`.
-The returned flags for the other categories may be `nil`.
-If multiple categories are flagged for short-circuting,
-only the first one found is guaranteed to be `true`.
-When no bailing argument is supplied,
-none of the returned flags will be `nil`.
+exactly one of the short-circut categories in the argument list will have its
+flag in the return value set to `true`.
+Otherwise all of the short-circut categories will have their flags as `false`.
+Only in the latter case are the flags for categories not short-circuted would
+be accurate.
 
 If a predicate is not supplied,
 then the less-than operator is used,
@@ -94,6 +92,21 @@ extension Sequence where Self.Element : Comparable {
       bailAfterOtherExclusive: Bool = false
     ) -> (elementsFromSelf: Bool?, sharedElements: Bool?, elementsFromOther: Bool?)
     where T : Sequence, Self.Element == T.Element
+}
+```
+
+And one type:
+
+```swift
+public enum OverlapDegree : UInt, CaseIterable {
+  case bothEmpty, onlyFirstNonempty, onlySecondNonempty, disjoint,identical,
+    firstIncludesNonemptySecond, secondIncludesNonemptyFirst, partialOverlap
+}
+
+extension OverlapDegree {
+    @inlinable public var hasElementsExclusiveToFirst: Bool { get }
+    @inlinable public var hasElementsExclusiveToSecond: Bool { get }
+    @inlinable public var hasSharedElements: Bool { get }
 }
 ```
 
