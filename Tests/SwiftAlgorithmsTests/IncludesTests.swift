@@ -71,4 +71,33 @@ final class IncludesTests: XCTestCase {
     XCTAssertTrue(base.includes(sorted: [1, 2, 6, 7, 8]))
     XCTAssertFalse(base.includes(sorted: [1, 2, 5, 7, 8]))
   }
+
+  /// Confirm the example code from `Sequence.overlap(withSorted:`
+  /// `bailAfterSelfExclusive:bailAfterShared:bailAfterOtherExclusive:`
+  /// `sortedBy:)`.
+  func testThirdDiscussionCode() {
+    let base = [9, 8, 7, 6, 6, 3, 2, 1, 0]
+    let test1 = base.overlap(withSorted: [8, 7, 6, 2, 1], sortedBy: >)
+    let test2 = base.overlap(withSorted: [8, 7, 5, 2, 1], sortedBy: >)
+    XCTAssertTrue(test1.elementsFromSelf!)
+    XCTAssertTrue(test1.sharedElements!)
+    XCTAssertFalse(test1.elementsFromOther!)
+    XCTAssertTrue(test2.elementsFromSelf!)
+    XCTAssertTrue(test2.sharedElements!)
+    XCTAssertTrue(test2.elementsFromOther!)
+  }
+
+  /// Confirm the example code from `Sequence.overlap(withSorted:`
+  /// `bailAfterSelfExclusive:bailAfterShared:bailAfterOtherExclusive:)`.
+  func testFourthDiscussionCode() {
+    let base = [0, 1, 2, 3, 6, 6, 7, 8, 9]
+    let test1 = base.overlap(withSorted: [1, 2, 6, 7, 8])
+    let test2 = base.overlap(withSorted: [1, 2, 5, 7, 8])
+    XCTAssertTrue(test1.elementsFromSelf!)
+    XCTAssertTrue(test1.sharedElements!)
+    XCTAssertFalse(test1.elementsFromOther!)
+    XCTAssertTrue(test2.elementsFromSelf!)
+    XCTAssertTrue(test2.sharedElements!)
+    XCTAssertTrue(test2.elementsFromOther!)
+  }
 }
