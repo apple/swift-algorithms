@@ -43,6 +43,11 @@ extension OverlapDegree {
   /// The bit mask checking if there are elements shared by both sets.
   @usableFromInline
   static var sharedMask: RawValue { 1 << 2 }
+
+  /// The bit mask covering all potential mask values.
+  @usableFromInline
+  static var allMask: RawValue
+  { firstOnlyMask | secondOnlyMask | sharedMask }
 }
 
 extension OverlapDegree {
@@ -183,60 +188,50 @@ extension Sequence {
   ) rethrows -> OverlapDegree
   where T.Element == Element {
     var firstElement, secondElement: Element?
-    var iterator = makeIterator(), otherIterator = other.makeIterator()
-    var fromSelf, shared, fromOther: Bool?
+    var selfIterator = makeIterator(), otherIterator = other.makeIterator()
+    var result: OverlapDegree.RawValue = 0
   loop:
-    while (fromSelf, shared, fromOther) != (true, true, true) {
-      firstElement = firstElement ?? iterator.next()
+    while result & OverlapDegree.allMask != OverlapDegree.allMask {
+      firstElement  = firstElement  ?? selfIterator.next()
       secondElement = secondElement ?? otherIterator.next()
       switch (firstElement, secondElement) {
-      case let (s?, o?) where try areInIncreasingOrder(s, o):
+      case let (first?, second?) where try areInIncreasingOrder(first, second):
         // Exclusive to self
-        fromSelf = true
+        result |= OverlapDegree.firstOnlyMask
         guard !bailAfterSelfExclusive else { break loop }
 
         // Move to the next element in self.
         firstElement = nil
-      case let (s?, o?) where try areInIncreasingOrder(o, s):
+      case let (first?, second?) where try areInIncreasingOrder(second, first):
         // Exclusive to other
-        fromOther = true
+        result |= OverlapDegree.secondOnlyMask
         guard !bailAfterOtherExclusive else { break loop }
 
         // Move to the next element in other.
         secondElement = nil
       case (_?, _?):
         // Shared
-        shared = true
+        result |= OverlapDegree.sharedMask
         guard !bailAfterShared else { break loop }
 
         // Iterate to the next element for both sequences.
         firstElement = nil
         secondElement = nil
       case (_?, nil):
-        // Never bail, just finalize after finding an exclusive to self.
-        fromSelf = true
-        shared = shared ?? false
-        fromOther = fromOther ?? false
+        // First exclusive to self after other ended
+        result |= OverlapDegree.firstOnlyMask
         break loop
       case (nil, _?):
-        // Never bail, just finalize after finding an exclusive to other.
-        fromSelf = fromSelf ?? false
-        shared = shared ?? false
-        fromOther = true
+        // First exclusive to other after self ended
+        result |= OverlapDegree.secondOnlyMask
         break loop
       case (nil, nil):
-        // Finalize everything instead of bailing
-        fromSelf = fromSelf ?? false
-        shared = shared ?? false
-        fromOther = fromOther ?? false
+        // No exclusives since both sequences stopped
         break loop
       }
     }
 
-    let selfBit  = fromSelf  == true ? OverlapDegree.firstOnlyMask  : 0,
-        shareBit = shared    == true ? OverlapDegree.sharedMask     : 0,
-        otherBit = fromOther == true ? OverlapDegree.secondOnlyMask : 0
-    return .init(rawValue: selfBit | shareBit | otherBit)!
+    return .init(rawValue: result)!
   }
 }
 
