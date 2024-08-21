@@ -28,21 +28,23 @@ assert(!firstOverlapThird.hasElementsExclusiveToSecond)
 ```
 
 By default, `overlap` returns its result after at least one of the sequences ends.
-To immediately end comparisons as soon as an element for a particular category is found,
-pass in the appropriate "`bail`" argument.
+To immediately end comparisons as soon as an element for a particular part is found,
+pass in the appropriate flags for the optional stopping-point argument.
 
 ```swift
-let firstOverlapThirdAgain = first.overlap(withSorted: third, bailAfterShared: true, sortedBy: >)
+let firstOverlapThirdAgain = first.overlap(withSorted: third, stoppingFor: .anythingShared, sortedBy: >)
 assert(firstOverlapThirdAgain.hasSharedElements)
-// The other two flags may have random values.
 ```
 
-When `overlap` ends by a short-circut,
-exactly one of the short-circut categories in the argument list will have its
-flag in the return value set to `true`.
-Otherwise all of the short-circut categories will have their flags as `false`.
-Only in the latter case are the flags for categories not short-circuted would
-be accurate.
+When `overlap` ends by a short-circuit,
+exactly one of the stopping-condition flags will be set to `true`.
+To avoid checking all the element category properties,
+apply the overlap's' `canSatisfy(:)` function on the stopping conditions to
+check if a short-circuit happened.
+
+```swift
+assert(firstOverlapThirdAgain.canSatisfy(.anythingShared))
+```
 
 If a predicate is not supplied,
 then the less-than operator is used,
@@ -69,9 +71,7 @@ extension Sequence {
     public func
     overlap<T>(
                    withSorted other: T, 
-             bailAfterSelfExclusive: Bool = false,
-                    bailAfterShared: Bool = false,
-            bailAfterOtherExclusive: Bool = false,
+              stoppingFor condition: OverlapHaltCondition = .nothing,
       sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
     ) rethrows -> OverlapDegree
     where T : Sequence, Self.Element == T.Element
@@ -86,16 +86,14 @@ extension Sequence where Self.Element : Comparable {
 
     @inlinable public func
     overlap<T>(
-             withSorted other: T,
-       bailAfterSelfExclusive: Bool = false,
-              bailAfterShared: Bool = false,
-      bailAfterOtherExclusive: Bool = false
-    ) -> (elementsFromSelf: Bool?, sharedElements: Bool?, elementsFromOther: Bool?)
+           withSorted other: T,
+      stoppingFor condition: OverlapHaltCondition = .nothing
+    ) -> OverlapDegree
     where T : Sequence, Self.Element == T.Element
 }
 ```
 
-And one type:
+And two types:
 
 ```swift
 public enum OverlapDegree : UInt, CaseIterable {
@@ -107,6 +105,21 @@ extension OverlapDegree {
     @inlinable public var hasElementsExclusiveToFirst: Bool { get }
     @inlinable public var hasElementsExclusiveToSecond: Bool { get }
     @inlinable public var hasSharedElements: Bool { get }
+}
+
+extension OverlapDegree {
+    @inlinable public func canSatisfy(_ condition: OverlapHaltCondition) -> Bool
+}
+
+public enum OverlapHaltCondition : UInt, CaseIterable {
+  case nothing, anyExclusiveToFirst, anyExclusiveToSecond, anyExclusive,
+    anythingShared, anyFromFirst, anyFromSecond, anything
+}
+
+extension OverlapHaltCondition {
+    @inlinable public var stopsOnElementsExclusiveToFirst: Bool { get }
+    @inlinable public var stopsOnElementsExclusiveToSecond: Bool { get }
+    @inlinable public var stopsOnSharedElements: Bool { get }
 }
 ```
 

@@ -67,6 +67,82 @@ extension OverlapDegree {
   { rawValue & Self.sharedMask != 0 }
 }
 
+extension OverlapDegree {
+  /// Using the given description for which parts of a set operation result need
+  /// to be detected,
+  /// return whether this degree covers at least one of those parts.
+  ///
+  /// A set operation result part is considered to exist if the result has at
+  /// least one element that can qualify to be within that part.
+  /// This means that a degree of `.bothEmpty` never matches any part detection,
+  /// and that a detection request of `.nothing` can never be found.
+  ///
+  /// - Parameter condition: The parts of a set operation result whose
+  ///   existence needs to be tested for.
+  /// - Returns: Whether this degree includes at least one
+  ///   set operation result part that can match the `condition`.
+  ///
+  /// - Complexity: O(1).
+  @inlinable
+  public func canSatisfy(_ condition: OverlapHaltCondition) -> Bool {
+    return rawValue & condition.rawValue != 0
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// MARK: - OverlapHaltCondition
+//-------------------------------------------------------------------------===//
+
+/// The condition when determining overlap should stop early.
+public enum OverlapHaltCondition: UInt, CaseIterable {
+  /// Never stop reading elements if necessary.
+  case nothing
+  /// Stop when an element exclusive to the first set is found.
+  case anyExclusiveToFirst
+  /// Stop when an element exclusive to the second set is found.
+  case anyExclusiveToSecond
+  /// Stop when finding an element from exactly one set.
+  case anyExclusive
+  /// Stop when finding an element present in both sets.
+  case anythingShared
+  /// Stop when an element from the first set is found.
+  case anyFromFirst
+  /// Stop when an element from the second set is found.
+  case anyFromSecond
+  /// Stop on the first element found.
+  case anything
+}
+
+extension OverlapHaltCondition {
+  /// The bit mask checking if analysis stops at the first element exclusive to
+  /// the first set.
+  @usableFromInline
+  static var firstOnlyMask: RawValue { 1 << 0 }
+  /// The bit mask checking if analysis stops at the first element exclusive to
+  /// the second set.
+  @usableFromInline
+  static var secondOnlyMask: RawValue { 1 << 1 }
+  /// The bit mask checking if analysis stops at the first element shared by
+  /// both sets.
+  @usableFromInline
+  static var sharedMask: RawValue { 1 << 2 }
+}
+
+extension OverlapHaltCondition {
+  /// Whether analysis can stop on finding an element exclusive to the first set.
+  @inlinable
+  public var stopsOnElementsExclusiveToFirst: Bool
+  { rawValue & Self.firstOnlyMask != 0 }
+  /// Whether analysis can stop on finding an element exclusive to the second set.
+  @inlinable
+  public var stopsOnElementsExclusiveToSecond: Bool
+  { rawValue & Self.secondOnlyMask != 0 }
+  /// Whether analysis can stop on finding an element shared by both sets.
+  @inlinable
+  public var stopsOnSharedElements: Bool
+  { rawValue & Self.sharedMask != 0 }
+}
+
 //===----------------------------------------------------------------------===//
 // MARK: - Sequence.includes(sorted:sortedBy:)
 //-------------------------------------------------------------------------===//
@@ -101,7 +177,7 @@ extension Sequence {
   where T.Element == Element {
     return try !overlap(
       withSorted: other,
-      bailAfterOtherExclusive: true,
+      stoppingFor: .anyExclusiveToSecond,
       sortedBy: areInIncreasingOrder
     ).hasElementsExclusiveToSecond
   }
@@ -133,7 +209,7 @@ extension Sequence where Element: Comparable {
 }
 
 //===----------------------------------------------------------------------===//
-// MARK: - Sequence.overlap(withSorted:sortedBy:)
+// MARK: - Sequence.overlap(withSorted:stoppingFor:sortedBy:)
 //-------------------------------------------------------------------------===//
 
 extension Sequence {
@@ -151,6 +227,36 @@ extension Sequence {
   ///     assert(test2.hasSharedElements)
   ///     assert(test2.hasElementsExclusiveToSecond)
   ///
+  /// When only the existence of specific kinds of overlap needs to be checked,
+  /// an extra argument can be supplied to stop reading the sequences as
+  /// soon as one confirmation has been found.
+  ///
+  ///     let test3 = base.overlap(withSorted: [8, 7, 5, 2, 1],
+  ///                              stoppingFor: .anythingShared, sortedBy: >)
+  ///     assert(test3.hasSharedElements)
+  ///
+  /// As soon as the value `8` is read from both `base` and the argument,
+  /// a shared element has been detected,
+  /// so the call ends early.
+  /// With early returns,
+  /// at most one of the searched-for overlap properties will be `true`;
+  /// all others will be `false`,
+  /// since the call ended before any other criteria could be checked.
+  /// The status of overlap properties outside of the search set are not
+  /// reliable to check.
+  /// For this past example, only the `hasSharedElements` property is
+  /// guaranteed to supply a valid value.
+  ///
+  /// Since triggering an early-end condition sets exactly one of the
+  /// return value's flags among the potentially multiple ones that could
+  /// match the condition,
+  /// calling the return value's `canSatisfy(:)` function may be shorter than
+  /// checking each potential flag individually.
+  ///
+  /// For both the return value and any possible early-end conditions,
+  /// the receiver is considered the first sequence and `other` is
+  /// considered the second sequence.
+  ///
   /// - Precondition: Both the receiver and `other` must be sorted according to
   ///   `areInIncreasingOrder`,
   ///   which must be a strict weak ordering over its arguments.
@@ -158,32 +264,24 @@ extension Sequence {
   ///
   /// - Parameters:
   ///   - other: The sequence that is compared against the receiver.
+  ///   - condition: A specification of set operation result parts that will end
+  ///     this call early if found.
+  ///     If not given,
+  ///     defaults to `.nothing`.
   ///   - areInIncreasingOrder: The sorting criteria.
-  ///   - bailAfterSelfExclusive: Indicate that this function should abort as
-  ///     soon as one element that is exclusive to this sequence is found.
-  ///     If not given, defaults to `false`.
-  ///   - bailAfterShared: Indicate that this function should abort as soon as
-  ///     an element that both sequences share is found.
-  ///     If not given, defaults to `false`.
-  ///   - bailAfterOtherExclusive: Indicate that this function should abort as
-  ///     soon as one element that is exclusive to `other` is found.
-  ///     If not given, defaults to `false`.
-  /// - Returns: A value representing the categories of overlap found.
-  ///   If none of the abort arguments were `true`,
-  ///   or otherwise none of their corresponding categories were found,
-  ///   then all of the category flags from the returned value are accurate.
-  ///   Otherwise,
-  ///   the returned value has exactly one of the flags in the
-  ///   short-circuit subset as `true`,
-  ///   and the flags outside that set may have invalid values.
-  ///   The receiver is considered the first set, and `other` as the second.
+  /// - Returns: The set operation result parts that would be present if
+  ///   these sequence operands were merged ino a single sorted sequence and
+  ///   all the sequences were treated as sets.
+  ///   If at least one of the parts is in the `condition` filter,
+  ///   this function call will end early,
+  ///   and the return value may be a proper subset of the actual result.
+  ///   Call `.canSatisfy(condition)` function on the returned value to check if
+  ///   an early finish happened.
   ///
   /// - Complexity: O(*n*), where `n` is the length of the shorter sequence.
   public func overlap<T: Sequence>(
     withSorted other: T,
-    bailAfterSelfExclusive: Bool = false,
-    bailAfterShared: Bool = false,
-    bailAfterOtherExclusive: Bool = false,
+    stoppingFor condition: OverlapHaltCondition = .nothing,
     sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> OverlapDegree
   where T.Element == Element {
@@ -198,21 +296,21 @@ extension Sequence {
       case let (first?, second?) where try areInIncreasingOrder(first, second):
         // Exclusive to self
         result |= OverlapDegree.firstOnlyMask
-        guard !bailAfterSelfExclusive else { break loop }
+        guard !condition.stopsOnElementsExclusiveToFirst else { break loop }
 
         // Move to the next element in self.
         firstElement = nil
       case let (first?, second?) where try areInIncreasingOrder(second, first):
         // Exclusive to other
         result |= OverlapDegree.secondOnlyMask
-        guard !bailAfterOtherExclusive else { break loop }
+        guard !condition.stopsOnElementsExclusiveToSecond else { break loop }
 
         // Move to the next element in other.
         secondElement = nil
       case (_?, _?):
         // Shared
         result |= OverlapDegree.sharedMask
-        guard !bailAfterShared else { break loop }
+        guard !condition.stopsOnSharedElements else { break loop }
 
         // Iterate to the next element for both sequences.
         firstElement = nil
@@ -249,45 +347,61 @@ extension Sequence where Element: Comparable {
   ///     assert(test2.hasSharedElements)
   ///     assert(test2.hasElementsExclusiveToSecond)
   ///
+  /// When only the existence of specific kinds of overlap needs to be checked,
+  /// an extra argument can be supplied to stop reading the sequences as
+  /// soon as one confirmation has been found.
+  ///
+  ///     let test3 = base.overlap(withSorted: [-1, 1, 2, 4, 7, 8],
+  ///                              stoppingFor: .anythingShared)
+  ///     assert(test3.hasSharedElements)
+  ///
+  /// As soon as the value `1` is read from both `base` and the argument,
+  /// a shared element has been detected,
+  /// so the call ends early.
+  /// With early returns,
+  /// at most one of the searched-for overlap properties will be `true`;
+  /// all others will be `false`,
+  /// since the call ended before any other criteria could be checked.
+  /// The status of overlap properties outside of the search set are not
+  /// reliable to check.
+  /// For this past example, only the `hasSharedElements` property is
+  /// guaranteed to supply a valid value.
+  ///
+  /// Since triggering an early-end condition sets exactly one of the
+  /// return value's flags among the potentially multiple ones that could
+  /// match the condition,
+  /// calling the return value's `canSatisfy(:)` function may be shorter than
+  /// checking each potential flag individually.
+  ///
+  /// For both the return value and any possible early-end conditions,
+  /// the receiver is considered the first sequence and `other` is
+  /// considered the second sequence.
+  ///
   /// - Precondition: Both the receiver and `other` must be sorted.
   ///   At least one of the involved sequences must be finite.
   ///
   /// - Parameters:
   ///   - other: The sequence that is compared against the receiver.
-  ///   - bailAfterSelfExclusive: Indicate that this function should abort as
-  ///     soon as one element that is exclusive to this sequence is found.
-  ///     If not given, defaults to `false`.
-  ///   - bailAfterShared: Indicate that this function should abort as soon as
-  ///     an element that both sequences share is found.
-  ///     If not given, defaults to `false`.
-  ///   - bailAfterOtherExclusive: Indicate that this function should abort as
-  ///     soon as one element that is exclusive to `other` is found.
-  ///     If not given, defaults to `false`.
-  /// - Returns: A value representing the categories of overlap found.
-  ///   If none of the abort arguments were `true`,
-  ///   or otherwise none of their corresponding categories were found,
-  ///   then all of the category flags from the returned value are accurate.
-  ///   Otherwise,
-  ///   the returned value has exactly one of the flags in the
-  ///   short-circuit subset as `true`,
-  ///   and the flags outside that set may have invalid values.
-  ///   The receiver is considered the first set, and `other` as the second.
+  ///   - condition: A specification of set operation result parts that will end
+  ///     this call early if found.
+  ///     If not given,
+  ///     defaults to `.nothing`.
+  /// - Returns: The set operation result parts that would be present if
+  ///   these sequence operands were merged ino a single sorted sequence and
+  ///   all the sequences were treated as sets.
+  ///   If at least one of the parts is in the `condition` filter,
+  ///   this function call will end early,
+  ///   and the return value may be a proper subset of the actual result.
+  ///   Call `.canSatisfy(condition)` function on the returned value to check if
+  ///   an early finish happened.
   ///
   /// - Complexity: O(*n*), where `n` is the length of the shorter sequence.
   @inlinable
   public func overlap<T: Sequence>(
     withSorted other: T,
-    bailAfterSelfExclusive: Bool = false,
-    bailAfterShared: Bool = false,
-    bailAfterOtherExclusive: Bool = false
+    stoppingFor condition: OverlapHaltCondition = .nothing
   ) -> OverlapDegree
   where T.Element == Element {
-    return overlap(
-      withSorted: other,
-      bailAfterSelfExclusive: bailAfterSelfExclusive,
-      bailAfterShared: bailAfterShared,
-      bailAfterOtherExclusive: bailAfterOtherExclusive,
-      sortedBy: <
-    )
+    return overlap(withSorted: other, stoppingFor: condition, sortedBy: <)
   }
 }

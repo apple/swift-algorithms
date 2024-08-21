@@ -11,9 +11,10 @@ The predicate can be omitted to default to the less-than operator.
 
 - ``Swift/Sequence/includes(sorted:sortedBy:)``
 - ``Swift/Sequence/includes(sorted:)``
-- ``Swift/Sequence/overlap(withSorted:bailAfterSelfExclusive:bailAfterShared:bailAfterOtherExclusive:sortedBy:)``
-- ``Swift/Sequence/overlap(withSorted:bailAfterSelfExclusive:bailAfterShared:bailAfterOtherExclusive:)``
+- ``Swift/Sequence/overlap(withSorted:stoppingFor:sortedBy:)``
+- ``Swift/Sequence/overlap(withSorted:stoppingFor:)``
 
 ### Supporting Types
 
 - ``OverlapDegree``
+- ``OverlapHaltCondition``
