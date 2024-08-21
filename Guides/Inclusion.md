@@ -50,7 +50,7 @@ but only if the `Element` type conforms to `Comparable`.
 
 ```swift
 (1...3).includes(sorted: 1..<3)  // true
-(1...3).overlap(sorted: 1..<3).elementsFromOther  // .some(false)
+(1...3).overlap(sorted: 1..<3).hasElementsExclusiveToSecond  // false
 ```
 
 ## Detailed Design
@@ -73,7 +73,7 @@ extension Sequence {
                     bailAfterShared: Bool = false,
             bailAfterOtherExclusive: Bool = false,
       sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
-    ) rethrows -> (elementsFromSelf: Bool?, sharedElements: Bool?, elementsFromOther: Bool?)
+    ) rethrows -> OverlapDegree
     where T : Sequence, Self.Element == T.Element
 }
 
