@@ -181,14 +181,14 @@ final class IncludesTests: XCTestCase {
   }
 
   /// Confirm the example code from `Sequence.includes(sorted:sortedBy:)`.
-  func testFirstDiscussionCode() {
+  func testIncludesWithCustomPredicate() {
     let base = [9, 8, 7, 6, 6, 3, 2, 1, 0]
     XCTAssertTrue(base.includes(sorted: [8, 7, 6, 2, 1], sortedBy: >))
     XCTAssertFalse(base.includes(sorted: [8, 7, 5, 2, 1], sortedBy: >))
   }
 
   /// Confirm the example code from `Sequence.includes(sorted:)`.
-  func testSecondDiscussionCode() {
+  func testIncludesWithComparable() {
     let base = [0, 1, 2, 3, 6, 6, 7, 8, 9]
     XCTAssertTrue(base.includes(sorted: [1, 2, 6, 7, 8]))
     XCTAssertFalse(base.includes(sorted: [1, 2, 5, 7, 8]))
@@ -196,7 +196,7 @@ final class IncludesTests: XCTestCase {
 
   /// Confirm the example code from `Sequence.overlap(withSorted:stoppingFor:`
   /// `sortedBy:)`.
-  func testThirdDiscussionCode() {
+  func testOverlapWithCustomPredicate() {
     let base = [9, 8, 7, 6, 6, 3, 2, 1, 0]
     let test1 = base.overlap(withSorted: [8, 7, 6, 2, 1], sortedBy: >)
     let test2 = base.overlap(withSorted: [8, 7, 5, 2, 1], sortedBy: >)
@@ -213,7 +213,7 @@ final class IncludesTests: XCTestCase {
   }
 
   /// Confirm the example code from `Sequence.overlap(withSorted:stoppingFor:)`.
-  func testFourthDiscussionCode() {
+  func testOverlapWithComparable() {
     let base = [0, 1, 2, 3, 6, 6, 7, 8, 9]
     let test1 = base.overlap(withSorted: [1, 2, 6, 7, 8])
     let test2 = base.overlap(withSorted: [1, 2, 5, 7, 8])
