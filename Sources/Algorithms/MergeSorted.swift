@@ -306,3 +306,118 @@ public func mergeSorted<T: Sequence, U: Sequence>(
 where T.Element == U.Element, T.Element: Comparable {
   return mergeSorted(first, second, sortedBy: <)
 }
+
+//===----------------------------------------------------------------------===//
+// MARK: - MergeSortedSequence
+//-------------------------------------------------------------------------===//
+
+/// A sequence taking some sequences,
+/// all sorted along a predicate,
+/// that vends the spliced-together merged sequence,
+/// where said sequence is also sorted.
+///
+/// - TODO: When Swift supports same-element requirements for
+///   variadic generics, change this type's generic pattern to
+///   accept any number of source iterators.
+@available(macOS 13.0.0, *)
+public struct MergeSortedSequence<First: Sequence, Second: Sequence>
+where First.Element == Second.Element
+{
+  /// The sorting criterion.
+  let areInIncreasingOrder: (Element, Element) throws -> Bool
+  /// The first source sequence.
+  let first: First
+  /// The second source sequence.
+  let second: Second
+
+  public
+  init(
+    _ first: First,
+    _ second: Second,
+    sortedBy areInIncreasingOrder: @escaping (Element, Element) throws -> Bool
+  ) {
+    self.first = first
+    self.second = second
+    self.areInIncreasingOrder = areInIncreasingOrder
+  }
+}
+
+@available(macOS 13.0.0, *)
+extension MergeSortedSequence: Sequence {
+  public func makeIterator() -> MergeSortedIterator<First.Element> {
+    return .init(first.makeIterator(), second.makeIterator(),
+                 areInIncreasingOrder: areInIncreasingOrder)
+  }
+
+  public var underestimatedCount: Int {
+    let result = first.underestimatedCount
+      .addingReportingOverflow(second.underestimatedCount)
+    return result.overflow ? .max : result.partialValue
+  }
+}
+
+@available(macOS 13.0.0, *)
+extension MergeSortedSequence: LazySequenceProtocol
+where First: LazySequenceProtocol, Second: LazySequenceProtocol
+{
+  public var elements: MergeSortedSequence<First.Elements, Second.Elements> {
+    .init(first.elements, second.elements, sortedBy: areInIncreasingOrder)
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// MARK: - MergeSortedIterator
+//-------------------------------------------------------------------------===//
+
+/// An iterator taking some virtual sequences,
+/// all sorted along a predicate,
+/// that vends the spliced-together virtual sequence merger,
+/// where said sequence is also sorted.
+@available(macOS 13.0.0, *)
+public struct MergeSortedIterator<Element> {
+  /// The sorting criterion.
+  let areInIncreasingOrder: (Element, Element) throws -> Bool
+  /// The sources to splice together.
+  var sources: [(latest: Element?, source: any IteratorProtocol<Element>)]
+
+  /// Create an iterator that reads from the two given sources and
+  /// vends their merger,
+  /// assuming all three virtual sequences are sorted according to
+  /// the given predicate.
+  ///
+  /// - TODO: When Swift supports same-element requirements for
+  ///   variadic generics, change this initializer to accept any number of
+  ///   source iterators.
+  init<T: IteratorProtocol<Element>, U: IteratorProtocol<Element>>(
+    _ first: T,
+    _ second: U,
+    areInIncreasingOrder: @escaping (Element, Element) throws -> Bool
+  ) {
+    self.areInIncreasingOrder = areInIncreasingOrder
+    self.sources = [(nil, first), (nil, second)]
+  }
+}
+
+@available(macOS 13.0.0, *)
+extension MergeSortedIterator: IteratorProtocol {
+  /// Advance to the next element, if any. May throw.
+  @usableFromInline
+  mutating func throwingNext() throws -> Element? {
+    for index in sources.indices {
+      sources[index].latest = sources[index].latest
+      ?? sources[index].source.next()
+    }
+    sources.removeAll { $0.latest == nil }
+    guard let indexOfSmallest = try sources.indices.min(by: {
+      try areInIncreasingOrder(sources[$0].latest!, sources[$1].latest!)
+    }) else { return nil }
+    defer { sources[indexOfSmallest].latest = nil }
+
+    return sources[indexOfSmallest].latest
+  }
+
+  @inlinable
+  public mutating func next() -> Element? {
+    return try! throwingNext()
+  }
+}

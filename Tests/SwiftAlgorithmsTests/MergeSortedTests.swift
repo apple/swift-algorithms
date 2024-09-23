@@ -157,6 +157,14 @@ final class MergeSortedTests: XCTestCase {
     XCTAssertEqualSequences(result, [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9])
   }
 
+  /// Test mergers for any number of arguments (one day).
+  @available(macOS 13.0.0, *)
+  func testMoreMergers() {
+    let low = 0..<7, high = 3..<10,
+    result = MergeSortedSequence(low, high, sortedBy: <)
+    XCTAssertEqualSequences(result, [0, 1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9])
+  }
+
   // MARK: - Partition Mergers
 
   /// Check the more-memory version of merging two sorted partitions.
