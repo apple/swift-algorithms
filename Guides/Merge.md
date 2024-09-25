@@ -100,6 +100,15 @@ public func merge<First, Second>(
 ) -> MergedSequence<First, Second, Never>
 where First : Sequence, Second : Sequence, First.Element == Second.Element
 
+/// Given two sorted sequences treated as (multi)sets,
+/// return a sequence that lazily vends the also-sorted result of applying a
+/// given set operation to the sequence operands.
+public func merge<First, Second>(
+  _ first: First, _ second: Second, keeping filter: MergerSubset
+) -> MergedSequence<First, Second, Never>
+where First : Sequence, Second : Sequence, First.Element : Comparable,
+      First.Element == Second.Element
+
 /// Given two sequences treated as (multi)sets, both sorted according to
 /// a given predicate,
 /// eagerly apply a given set operation to the sequences then copy the
@@ -110,15 +119,6 @@ public func merge<First, Second, Result, Fault>(
 ) throws(Fault) -> Result
 where First : Sequence, Second : Sequence, Result : RangeReplaceableCollection,
       Fault : Error, First.Element == Second.Element, Second.Element == Result.Element
-
-/// Given two sorted sequences treated as (multi)sets,
-/// return a sequence that lazily vends the also-sorted result of applying a
-/// given set operation to the sequence operands.
-public func merge<First, Second>(
-  _ first: First, _ second: Second, keeping filter: MergerSubset
-) -> MergedSequence<First, Second, Never>
-where First : Sequence, Second : Sequence, First.Element : Comparable,
-      First.Element == Second.Element
 
 /// Given two sorted sequences treated as (multi)sets,
 /// eagerly apply a given set operation to the sequences then copy the

@@ -144,6 +144,31 @@ where First.Element == Second.Element {
   return .init(first, second, keeping: filter, sortedBy: areInIncreasingOrder)
 }
 
+/// Given two sorted sequences treated as (multi)sets,
+/// return a sequence that lazily vends the also-sorted result of applying a
+/// given set operation to the sequence operands.
+///
+/// For simply merging the sequences, use `.sum` as the operation.
+///
+/// - Precondition: Both `first` and `second` must be sorted.
+///
+/// - Parameters:
+///   - first: The first sequence to merge.
+///   - second: The second sequence to merge.
+///   - filter: The subset of the merged sequence to keep.
+/// - Returns: A lazy sequence for the resulting merge.
+///
+/// - Complexity: O(1).
+@inlinable
+public func merge<First: Sequence, Second: Sequence>(
+  _ first: First,
+  _ second: Second,
+  keeping filter: MergerSubset
+) -> MergedSequence<First, Second, Never>
+where First.Element == Second.Element, Second.Element: Comparable {
+  return merge(first, second, keeping: filter, sortedBy: <)
+}
+
 /// Given two sequences treated as (multi)sets, both sorted according to
 /// a given predicate,
 /// eagerly apply a given set operation to the sequences then copy the
@@ -193,31 +218,6 @@ where First.Element == Second.Element, Second.Element == Result.Element {
 
   return try withoutActuallyEscaping(areInIncreasingOrder,
                                      do: makeResult(compare:))
-}
-
-/// Given two sorted sequences treated as (multi)sets,
-/// return a sequence that lazily vends the also-sorted result of applying a
-/// given set operation to the sequence operands.
-///
-/// For simply merging the sequences, use `.sum` as the operation.
-///
-/// - Precondition: Both `first` and `second` must be sorted.
-///
-/// - Parameters:
-///   - first: The first sequence to merge.
-///   - second: The second sequence to merge.
-///   - filter: The subset of the merged sequence to keep.
-/// - Returns: A lazy sequence for the resulting merge.
-///
-/// - Complexity: O(1).
-@inlinable
-public func merge<First: Sequence, Second: Sequence>(
-  _ first: First,
-  _ second: Second,
-  keeping filter: MergerSubset
-) -> MergedSequence<First, Second, Never>
-where First.Element == Second.Element, Second.Element: Comparable {
-  return merge(first, second, keeping: filter, sortedBy: <)
 }
 
 /// Given two sorted sequences treated as (multi)sets,
