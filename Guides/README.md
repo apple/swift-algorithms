@@ -12,6 +12,7 @@ These guides describe the design and intention behind the APIs included in the `
 
 #### Mutating algorithms
 
+- [`mergePartitions(across:)`, `mergePartitions(across:sortedBy:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/MergedSorted.md): In-place merger of sorted partitions.
 - [`rotate(toStartAt:)`, `rotate(subrange:toStartAt:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Rotate.md): In-place rotation of elements.
 - [`stablePartition(by:)`, `stablePartition(subrange:by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Partition.md): A partition that preserves the relative order of the resulting prefix and suffix.
 

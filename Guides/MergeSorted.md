@@ -91,28 +91,23 @@ extension RangeReplaceableCollection where Self.Element : Comparable {
     @inlinable public init<T, U>(mergeSorted first: T, and second: U, retaining filter: MergerSubset) where T : Sequence, U : Sequence, Self.Element == T.Element, T.Element == U.Element
 }
 
-// Two-partition merging, optimizing for speed.
-
-extension MutableCollection {
-    /// Given a partition point, where each side is sorted according to the given predicate, rearrange the elements until a single sorted run is formed.
-    public mutating func mergeSortedPartitions(across pivot: Index, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows
-}
-
-extension MutableCollection where Self.Element : Comparable {
-    /// Given a partition point, where each side is sorted, rearrange the elements until a single sorted run is formed.
-    @inlinable public mutating func mergeSortedPartitions(across pivot: Index)
-}
-
-// Two-partition merging, optimizing for space.
+// Two-partition merging.
 
 extension MutableCollection where Self : BidirectionalCollection {
-    /// Given a partition point, where each side is sorted according to the given predicate, rearrange the elements until a single sorted run is formed, using minimal scratch memory.
-    public mutating func mergeSortedPartitionsInPlace(across pivot: Index, sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool) rethrows
+    /// Assuming that both this collection's slice before the given index and
+    /// the slice at and past that index are both sorted according to
+    /// the given predicate,
+    /// rearrange the slices' elements until the collection as
+    /// a whole is sorted according to the predicate.
+    public mutating func mergePartitions<Fault>(across pivot: Index, sortedBy areInIncreasingOrder: (Element, Element) throws(Fault) -> Bool) throws(Fault) where Fault : Error
 }
 
 extension MutableCollection where Self : BidirectionalCollection, Self.Element : Comparable {
-    /// Given a partition point, where each side is sorted, rearrange the elements until a single sorted run is formed, using minimal scratch memory.
-    @inlinable public mutating func mergeSortedPartitionsInPlace(across pivot: Index)
+    /// Assuming that both this collection's slice before the given index and
+    /// the slice at and past that index are both sorted,
+    /// rearrange the slices' elements until the collection as
+    /// a whole is sorted.
+    @inlinable public mutating func mergePartitions(across pivot: Index)
 }
 ```
 
@@ -160,11 +155,10 @@ The merges via:
 
 - The free functions
 - The initializers
-- The speed-optimized partition-merge
 
 Operate in **O(** _n_ `+` _m_ **)** for both space and time,
 where *n* and *m* are the lengths of the two operand sequences/partitions.
-The space-optimized partition merge for a collection of length *n* operates in
+A partition merge for a collection of length *n* operates in
 **O(** 1 **)** for space,
 **O(** _n_ **)** for time when the collection is not random-access,
 and *???* for time in random-access collections.

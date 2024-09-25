@@ -18,8 +18,6 @@ then generate the result of applying a set operation.
 - ``mergeSortedSets(_:_:retaining:)``
 - ``Swift/MutableCollection/mergeSortedPartitions(across:sortedBy:)``
 - ``Swift/MutableCollection/mergeSortedPartitions(across:)``
-- ``Swift/MutableCollection/mergeSortedPartitionsInPlace(across:sortedBy:)``
-- ``Swift/MutableCollection/mergeSortedPartitionsInPlace(across:)``
 
 ### Supporting Types
 
