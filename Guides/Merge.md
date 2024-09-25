@@ -14,7 +14,7 @@ If the sequences are sorted with something besides the less-than operator (`<`),
 then a predicate can be supplied:
 
 ```swift
-let merged = merge([10, 4, 0, 0, -3], [20, 6, 1, -1, -5], keeping: .sum, sortedBy: >)
+let merged = lazilyMerge([10, 4, 0, 0, -3], [20, 6, 1, -1, -5], keeping: .sum, sortedBy: >)
 print(Array(merged))
 // [20, 10, 6, 4, 1, 0, 0, -1, -3, -5]
 ```
@@ -28,10 +28,10 @@ so applying operations can be done in-line during merging:
 
 ```swift
 let first = [0, 1, 1, 2, 5, 10], second = [-1, 0, 1, 2, 2, 7, 10, 20]
-print(merge(first, second, into: Array.self, keeping: .union))
-print(merge(first, second, into: Array.self, keeping: .intersection))
-print(merge(first, second, into: Array.self, keeping: .secondWithoutFirst))
-print(merge(first, second, into: Array.self, keeping: .sum))  // Standard merge!
+print(merge(first, second, keeping: .union))
+print(merge(first, second, keeping: .intersection))
+print(merge(first, second, keeping: .secondWithoutFirst))
+print(merge(first, second, keeping: .sum))  // Standard merge!
 /*
 [-1, 0, 1, 1, 2, 2, 5, 7, 10, 20]
 [0, 1, 2, 10]
@@ -94,7 +94,7 @@ extension MutableCollection where Self : BidirectionalCollection, Self.Element :
 /// a given predicate,
 /// return a sequence that lazily vends the also-sorted result of applying a
 /// given set operation to the sequence operands.
-public func merge<First, Second>(
+public func lazilyMerge<First, Second>(
   _ first: First, _ second: Second, keeping filter: MergerSubset,
   sortedBy areInIncreasingOrder: @escaping (First.Element, Second.Element) -> Bool
 ) -> MergedSequence<First, Second, Never>
@@ -103,32 +103,29 @@ where First : Sequence, Second : Sequence, First.Element == Second.Element
 /// Given two sorted sequences treated as (multi)sets,
 /// return a sequence that lazily vends the also-sorted result of applying a
 /// given set operation to the sequence operands.
-public func merge<First, Second>(
+public func lazilyMerge<First, Second>(
   _ first: First, _ second: Second, keeping filter: MergerSubset
 ) -> MergedSequence<First, Second, Never>
 where First : Sequence, Second : Sequence, First.Element : Comparable,
       First.Element == Second.Element
 
-/// Given two sequences treated as (multi)sets, both sorted according to
-/// a given predicate,
-/// eagerly apply a given set operation to the sequences then copy the
-/// also-sorted result into a collection of a given type.
-public func merge<First, Second, Result, Fault>(
-  _ first: First, _ second: Second, into type: Result.Type, keeping filter: MergerSubset,
+/// Returns a sorted array containing the result of the given set operation
+/// applied to the given sorted sequences,
+/// where sorting is determined by the given predicate.
+public func merge<First, Second, Fault>(
+  _ first: First, _ second: Second, keeping filter: MergerSubset,
   sortedBy areInIncreasingOrder: (First.Element, Second.Element) throws(Fault) -> Bool
-) throws(Fault) -> Result
-where First : Sequence, Second : Sequence, Result : RangeReplaceableCollection,
-      Fault : Error, First.Element == Second.Element, Second.Element == Result.Element
+) throws(Fault) -> [Second.Element]
+where First : Sequence, Second : Sequence,
+      Fault : Error, First.Element == Second.Element
 
-/// Given two sorted sequences treated as (multi)sets,
-/// eagerly apply a given set operation to the sequences then copy the
-/// also-sorted result into a collection of a given type.
-public func merge<First, Second, Result>(
-  _ first: First, _ second: Second, into type: Result.Type, keeping filter: MergerSubset
-) -> Result
-where First : Sequence, Second : Sequence, Result : RangeReplaceableCollection,
-      First.Element : Comparable, First.Element == Second.Element,
-      Second.Element == Result.Element
+/// Returns a sorted array containing the result of the given set operation
+/// applied to the given sorted sequences.
+public func merge<First, Second>(
+  _ first: First, _ second: Second, keeping filter: MergerSubset
+) -> [Second.Element]
+where First : Sequence, Second : Sequence,
+      First.Element : Comparable, First.Element == Second.Element
 ```
 
 Target subsets are described by a new type.

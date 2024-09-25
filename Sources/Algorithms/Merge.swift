@@ -133,7 +133,7 @@ extension MergerSubset {
 /// - Returns: A lazy sequence for the resulting merge.
 ///
 /// - Complexity: O(1).
-public func merge<First: Sequence, Second: Sequence>(
+public func lazilyMerge<First: Sequence, Second: Sequence>(
   _ first: First,
   _ second: Second,
   keeping filter: MergerSubset,
@@ -160,13 +160,13 @@ where First.Element == Second.Element {
 ///
 /// - Complexity: O(1).
 @inlinable
-public func merge<First: Sequence, Second: Sequence>(
+public func lazilyMerge<First: Sequence, Second: Sequence>(
   _ first: First,
   _ second: Second,
   keeping filter: MergerSubset
 ) -> MergedSequence<First, Second, Never>
 where First.Element == Second.Element, Second.Element: Comparable {
-  return merge(first, second, keeping: filter, sortedBy: <)
+  return lazilyMerge(first, second, keeping: filter, sortedBy: <)
 }
 
 /// Given two sequences treated as (multi)sets, both sorted according to
@@ -192,8 +192,9 @@ where First.Element == Second.Element, Second.Element: Comparable {
 ///
 /// - Complexity:O(`n` + `m`),
 ///   where *n* and *m* are the lengths of `first` and `second`.
-public func merge<First: Sequence, Second: Sequence,
-                  Result: RangeReplaceableCollection, Fault: Error>(
+@usableFromInline
+func merge<First: Sequence, Second: Sequence,
+           Result: RangeReplaceableCollection, Fault: Error>(
   _ first: First,
   _ second: Second,
   into type: Result.Type,
@@ -220,9 +221,41 @@ where First.Element == Second.Element, Second.Element == Result.Element {
                                      do: makeResult(compare:))
 }
 
-/// Given two sorted sequences treated as (multi)sets,
-/// eagerly apply a given set operation to the sequences then copy the
-/// also-sorted result into a collection of a given type.
+/// Returns a sorted array containing the result of the given set operation
+/// applied to the given sorted sequences,
+/// where sorting is determined by the given predicate.
+///
+/// For simply merging the sequences, use `.sum` as the operation.
+///
+/// - Precondition: Both `first` and `second` must be sorted according to
+///   `areInIncreasingOrder`.
+///   Said predicate must model a strict weak ordering over its arguments.
+///   Both `first` and `second` must be finite.
+///
+/// - Parameters:
+///   - first: The first sequence to merge.
+///   - second: The second sequence to merge.
+///   - filter: The subset of the merged sequence to keep.
+///   - areInIncreasingOrder: The function expressing the sorting criterion.
+/// - Returns: The resulting merge stored in an array.
+///
+/// - Complexity:O(`n` + `m`),
+///   where *n* and *m* are the lengths of `first` and `second`.
+@inlinable
+public func merge<First: Sequence, Second: Sequence, Fault: Error>(
+  _ first: First,
+  _ second: Second,
+  keeping filter: MergerSubset,
+  sortedBy areInIncreasingOrder: (First.Element, Second.Element) throws(Fault)
+                                 -> Bool
+) throws(Fault) -> [Second.Element]
+where First.Element == Second.Element {
+  return try merge(first, second, into: Array.self, keeping: filter,
+                   sortedBy: areInIncreasingOrder)
+}
+
+/// Returns a sorted array containing the result of the given set operation
+/// applied to the given sorted sequences.
 ///
 /// For simply merging the sequences, use `.sum` as the operation.
 ///
@@ -232,24 +265,19 @@ where First.Element == Second.Element, Second.Element == Result.Element {
 /// - Parameters:
 ///   - first: The first sequence to merge.
 ///   - second: The second sequence to merge.
-///   - type: A marker specifying the type of collection for
-///     storing the result.
 ///   - filter: The subset of the merged sequence to keep.
-/// - Returns: The resulting merge stored in a collection of the given `type`.
+/// - Returns: The resulting merge stored in an array.
 ///
 /// - Complexity:O(`n` + `m`),
 ///   where *n* and *m* are the lengths of `first` and `second`.
 @inlinable
-public func merge<First: Sequence, Second: Sequence,
-                  Result: RangeReplaceableCollection>(
+public func merge<First: Sequence, Second: Sequence>(
   _ first: First,
   _ second: Second,
-  into type: Result.Type,
   keeping filter: MergerSubset
-) -> Result
-where First.Element == Second.Element, Second.Element == Result.Element,
-      Result.Element: Comparable {
-  return merge(first, second, into: Result.self, keeping: filter, sortedBy: <)
+) -> [Second.Element]
+where First.Element == Second.Element, First.Element: Comparable {
+  return merge(first, second, keeping: filter, sortedBy: <)
 }
 
 //===----------------------------------------------------------------------===//

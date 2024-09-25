@@ -149,12 +149,12 @@ final class MergeTests: XCTestCase {
 
   /// Check the lazily-generated subset sequences.
   func testLazySetMergers() {
-    mergerTests(converter: { merge($0, $1, keeping: $2) })
+    mergerTests(converter: { lazilyMerge($0, $1, keeping: $2) })
   }
 
   /// Check the eagerly-generated subset sequences.
   func testEagerSetMergers() {
-    mergerTests(converter: { merge($0, $1, into: Array.self, keeping: $2) })
+    mergerTests(converter: { merge($0, $1, keeping: $2) })
   }
 
   // MARK: - Sample Code
@@ -163,24 +163,20 @@ final class MergeTests: XCTestCase {
   func testSampleCode() {
     // From the guide.
     do {
-      let merged = merge([10, 4, 0, 0, -3], [20, 6, 1, -1, -5], keeping: .sum,
-                         sortedBy: >)
+      let merged = lazilyMerge([10, 4, 0, 0, -3], [20, 6, 1, -1, -5],
+                               keeping: .sum, sortedBy: >)
       XCTAssertEqualSequences(merged, [20, 10, 6, 4, 1, 0, 0, -1, -3, -5])
     }
 
     do {
       let first = [0, 1, 1, 2, 5, 10], second = [-1, 0, 1, 2, 2, 7, 10, 20]
-      XCTAssertEqualSequences(merge(first, second, into: Array.self,
-                                    keeping: .union),
+      XCTAssertEqualSequences(merge(first, second, keeping: .union),
                               [-1, 0, 1, 1, 2, 2, 5, 7, 10, 20])
-      XCTAssertEqualSequences(merge(first, second, into: Array.self,
-                                    keeping: .intersection),
+      XCTAssertEqualSequences(merge(first, second, keeping: .intersection),
                               [0, 1, 2, 10])
-      XCTAssertEqualSequences(merge(first, second, into: Array.self,
-                                    keeping: .secondWithoutFirst),
+      XCTAssertEqualSequences(merge(first, second, keeping: .secondWithoutFirst),
                               [-1, 2, 7, 20])
-      XCTAssertEqualSequences(merge(first, second, into: Array.self,
-                                    keeping: .sum),
+      XCTAssertEqualSequences(merge(first, second, keeping: .sum),
                               [-1, 0, 0, 1, 1, 1, 2, 2, 2, 5, 7, 10, 10, 20])
     }
   }
