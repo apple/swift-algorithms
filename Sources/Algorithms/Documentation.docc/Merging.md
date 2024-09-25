@@ -8,19 +8,15 @@ then generate the result of applying a set operation.
 
 ### Merging Sorted Sequences
 
-- ``Swift/RangeReplaceableCollection/init(mergeSorted:and:sortedBy:)``
-- ``Swift/RangeReplaceableCollection/init(mergeSorted:and:)``
-- ``Swift/RangeReplaceableCollection/init(mergeSorted:and:retaining:sortedBy:)``
-- ``Swift/RangeReplaceableCollection/init(mergeSorted:and:retaining:)``
-- ``mergeSorted(_:_:sortedBy:)``
-- ``mergeSorted(_:_:)``
-- ``mergeSortedSets(_:_:retaining:sortedBy:)``
-- ``mergeSortedSets(_:_:retaining:)``
-- ``Swift/MutableCollection/mergeSortedPartitions(across:sortedBy:)``
-- ``Swift/MutableCollection/mergeSortedPartitions(across:)``
+- ``merge(_:_:keeping:sortedBy)``
+- ``merge(_:_:into:keeping:sortedBy)``
+- ``merge(_:_:keeping:)``
+- ``merge(_:_:into:keeping:)``
+- ``Swift/MutableCollection/mergePartitions(across:sortedBy:)``
+- ``Swift/MutableCollection/mergePartitions(across:)``
 
 ### Supporting Types
 
 - ``MergerSubset``
-- ``MergeSortedSetsSequence``
-- ``MergeSortedSetsIterator``
+- ``MergedSequence``
+- ``MergingIterator``
