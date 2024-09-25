@@ -97,7 +97,7 @@ extension MutableCollection where Self : BidirectionalCollection, Self.Element :
 public func lazilyMerge<First, Second>(
   _ first: First, _ second: Second, keeping filter: MergerSubset,
   sortedBy areInIncreasingOrder: @escaping (First.Element, Second.Element) -> Bool
-) -> MergedSequence<First, Second, Never>
+) -> MergedSequence<First, Second>
 where First : Sequence, Second : Sequence, First.Element == Second.Element
 
 /// Given two sorted sequences treated as (multi)sets,
@@ -105,7 +105,7 @@ where First : Sequence, Second : Sequence, First.Element == Second.Element
 /// given set operation to the sequence operands.
 public func lazilyMerge<First, Second>(
   _ first: First, _ second: Second, keeping filter: MergerSubset
-) -> MergedSequence<First, Second, Never>
+) -> MergedSequence<First, Second>
 where First : Sequence, Second : Sequence, First.Element : Comparable,
       First.Element == Second.Element
 

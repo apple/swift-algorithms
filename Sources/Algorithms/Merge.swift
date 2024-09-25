@@ -139,7 +139,7 @@ public func lazilyMerge<First: Sequence, Second: Sequence>(
   keeping filter: MergerSubset,
   sortedBy areInIncreasingOrder: @escaping (First.Element, Second.Element)
                                            -> Bool
-) -> MergedSequence<First, Second, Never>
+) -> MergedSequence<First, Second>
 where First.Element == Second.Element {
   return .init(first, second, keeping: filter, sortedBy: areInIncreasingOrder)
 }
@@ -164,7 +164,7 @@ public func lazilyMerge<First: Sequence, Second: Sequence>(
   _ first: First,
   _ second: Second,
   keeping filter: MergerSubset
-) -> MergedSequence<First, Second, Never>
+) -> MergedSequence<First, Second>
 where First.Element == Second.Element, Second.Element: Comparable {
   return lazilyMerge(first, second, keeping: filter, sortedBy: <)
 }
@@ -207,8 +207,8 @@ where First.Element == Second.Element, Second.Element == Result.Element {
     compare: @escaping (First.Element, Second.Element) throws(Fault) -> Bool
   ) throws(Fault) -> Result {
     var result = Result()
-    let sequence = MergedSequence(first, second, keeping: filter,
-                                  sortedBy: compare)
+    let sequence = _MergedSequence(first, second, keeping: filter,
+                                   sortedBy: compare)
     var iterator = sequence.makeIterator()
     result.reserveCapacity(sequence.underestimatedCount)
     while let element = try iterator.throwingNext() {
@@ -288,7 +288,15 @@ where First.Element == Second.Element, First.Element: Comparable {
 /// where both sequences' elements are sorted according to some predicate,
 /// and emits a sorted merger,
 /// excluding any elements barred by a set operation.
-public struct MergedSequence<
+public typealias MergedSequence<First, Second>
+  = _MergedSequence<First, Second, Never>
+  where First: Sequence, Second: Sequence, First.Element == Second.Element
+
+/// The implementation for `MergedSequence`.
+/// The public face of that type does not need an otherwise
+/// unused error type declared,
+/// so this type is needed to provide a way to hide the (`Never`) error type.
+public struct _MergedSequence<
   First: Sequence,
   Second: Sequence,
   Fault: Error
@@ -320,7 +328,7 @@ public struct MergedSequence<
   }
 }
 
-extension MergedSequence: Sequence {
+extension _MergedSequence: Sequence {
   public func makeIterator(
   ) -> MergingIterator<First.Iterator, Second.Iterator, Fault> {
     return .init(base1.makeIterator(), base2.makeIterator(),
@@ -335,7 +343,7 @@ extension MergedSequence: Sequence {
   }
 }
 
-extension MergedSequence: LazySequenceProtocol {}
+extension _MergedSequence: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // MARK: - MergingIterator
