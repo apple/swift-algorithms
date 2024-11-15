@@ -15,57 +15,63 @@ import Algorithms
 final class CombinationsTests: XCTestCase {
   func testCount() {
     let c = "ABCD"
-    
-    let c0 = c.combinations(ofCount: 0).count
-    XCTAssertEqual(c0, 1)
-    
-    let c1 = c.combinations(ofCount: 1).count
-    XCTAssertEqual(c1, 4)
-    
-    let c2 = c.combinations(ofCount: 2).count
-    XCTAssertEqual(c2, 6)
-    
-    let c3 = c.combinations(ofCount: 3).count
-    XCTAssertEqual(c3, 4)
-    
-    let c4 = c.combinations(ofCount: 4).count
-    XCTAssertEqual(c4, 1)
-    
-    let c5 = c.combinations(ofCount: 0...0).count
-    XCTAssertEqual(c5, 1)
-    
-    let c6 = c.combinations(ofCount: 1...1).count
-    XCTAssertEqual(c6, 4)
-    
-    let c7 = c.combinations(ofCount: 1...2).count
-    XCTAssertEqual(c7, 10)
-    
-    let c8 = c.combinations(ofCount: 1...3).count
-    XCTAssertEqual(c8, 14)
-    
-    let c9 = c.combinations(ofCount: 2...4).count
-    XCTAssertEqual(c9, 11)
+
+    /// XCTAsserts that `x`'s `count` and `underestimatedCount` are both `l` at
+    /// the given `file` and `line`.
+    func check(
+      _ x: CombinationsSequence<String>, countsAre l: Int,
+      file: StaticString, line: UInt)
+    {
+      XCTAssertEqual(x.count, l, "unexpected count", file: file, line: line)
+      XCTAssertEqual(
+        x.underestimatedCount, l, "unexpected underestimatedCount",
+        file: file, line: line)
+    }
+
+    /// XCTAsserts that the `count` and `underestimatedCount` of
+    /// `c.combinations(ofCount: l)` are both `n` at the given `file` and
+    /// `line`.
+    func check(
+      cHas n: Int,
+      combinationsOfLength l: Int,
+      file: StaticString = #filePath, line: UInt = #line)
+    {
+      check(c.combinations(ofCount: l), countsAre: n, file: file, line: line)
+    }
+
+    /// XCTAsserts that the `count` and `underestimatedCount` of
+    /// `c.combinations(ofCount: l)` are both `n` at the given `file` and
+    /// `line`.
+    func check<R: RangeExpression>(
+      cHas n: Int,
+      combinationsOfLengths l: R,
+      file: StaticString = #filePath, line: UInt = #line) where R.Bound == Int
+    {
+      check(c.combinations(ofCount: l), countsAre: n, file: file, line: line)
+    }
+
+    check(cHas: 1, combinationsOfLength: 0)
+    check(cHas: 4, combinationsOfLength: 1)
+    check(cHas: 6, combinationsOfLength: 2)
+    check(cHas: 1, combinationsOfLength: 4)
+
+    check(cHas: 1, combinationsOfLengths: 0...0)
+    check(cHas: 4, combinationsOfLengths: 1...1)
+    check(cHas: 10, combinationsOfLengths: 1...2)
+    check(cHas: 14, combinationsOfLengths: 1...3)
+    check(cHas: 11, combinationsOfLengths: 2...4)
+
+    // `k` greater than element count results in same number of combinations
+    check(cHas: 5, combinationsOfLengths: 3...10)
     
     // `k` greater than element count results in same number of combinations
-    let c10 = c.combinations(ofCount: 3...10).count
-    XCTAssertEqual(c10, 5)
-    
-    // `k` greater than element count results in same number of combinations
-    let c11 = c.combinations(ofCount: 4...10).count
-    XCTAssertEqual(c11, 1)
+    check(cHas: 1, combinationsOfLengths: 4...10)
     
     // `k` entirely greater than element count results in no combinations
-    let c12 = c.combinations(ofCount: 5...10).count
-    XCTAssertEqual(c12, 0)
+    check(cHas: 0, combinationsOfLengths: 5...10)
     
-    let c13 = c.combinations(ofCount: 0...).count
-    XCTAssertEqual(c13, 16)
-    
-    let c14 = c.combinations(ofCount: ...3).count
-    XCTAssertEqual(c14, 15)
-    
-    let c15 = c.combinations(ofCount: 0...).count
-    XCTAssertEqual(c15, 16)
+    check(cHas: 16, combinationsOfLengths: 0...)
+    check(cHas: 15, combinationsOfLengths: ...3)
   }
   
   func testCombinations() {

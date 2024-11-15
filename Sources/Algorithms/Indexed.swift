@@ -94,6 +94,10 @@ extension Collection {
   /// Returns a collection of pairs *(i, x)*, where *i* represents an index of
   /// the collection, and *x* represents an element.
   ///
+  /// The `indexed()` method is similar to the standard library's `enumerated()`
+  /// method, but provides the index with each element instead of a zero-based
+  /// counter.
+  ///
   /// This example iterates over the indices and elements of a set, building an
   /// array consisting of indices of names with five or fewer letters.
   ///
@@ -105,7 +109,7 @@ extension Collection {
   ///         }
   ///     }
   ///
-  /// Returns: A collection of paired indices and elements of this collection.
+  /// - Returns: A collection of paired indices and elements of this collection.
   @inlinable
   public func indexed() -> IndexedCollection<Self> {
     IndexedCollection(base: self)

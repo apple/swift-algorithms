@@ -32,7 +32,7 @@ extension Collection {
     while predicate: (Element) throws -> Bool
   ) rethrows -> SubSequence {
     let start = try endOfPrefix(while: predicate)
-    return self[start...]
+    return self[start..<endIndex]
   }
 }
 
@@ -61,8 +61,8 @@ extension Collection where Self: RangeReplaceableCollection {
   public mutating func trimPrefix(
     while predicate: (Element) throws -> Bool
   ) rethrows {
-    let end = try endOfPrefix(while: predicate)
-    removeSubrange(startIndex..<end)
+    let startOfResult = try endOfPrefix(while: predicate)
+    removeSubrange(startIndex..<startOfResult)
   }
 }
 
@@ -135,7 +135,7 @@ extension BidirectionalCollection {
     while predicate: (Element) throws -> Bool
   ) rethrows -> SubSequence {
     let end = try startOfSuffix(while: predicate)
-    return self[..<end]
+    return self[startIndex..<end]
   }
 }
 
@@ -188,8 +188,8 @@ extension BidirectionalCollection where Self: RangeReplaceableCollection {
   public mutating func trimSuffix(
     while predicate: (Element) throws -> Bool
   ) rethrows {
-    let start = try startOfSuffix(while: predicate)
-    removeSubrange(start..<endIndex)
+    let endOfResult = try startOfSuffix(while: predicate)
+    removeSubrange(endOfResult..<endIndex)
   }
 }
 

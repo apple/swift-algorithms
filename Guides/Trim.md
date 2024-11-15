@@ -3,8 +3,8 @@
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/Trim.swift) |
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/TrimTests.swift)]
 
-Returns a `SubSequence` formed by discarding all elements at the start and end 
-of the collection which satisfy the given predicate.
+A group of methods that return the `SubSequence` formed by discarding elements 
+at the start and/or end of the collection which satisfy the given predicate.
 
 This example uses `trimming(while:)` to get a substring without the white space 
 at the beginning and end of the string.
@@ -17,24 +17,44 @@ let results = [2, 10, 11, 15, 20, 21, 100].trimming(while: { $0.isMultiple(of: 2
 print(results) // [11, 15, 20, 21]
 ```
 
+The `Algorithms` library also includes methods that trim from each end, 
+as well as mutating versions of all three methods.
+
 ## Detailed Design
 
-A new method is added to `BidirectionalCollection`:
+New methods are added to `Collection` and `BidirectionalCollection`:
 
 ```swift
+extension Collection {
+    func trimmingPrefix(while predicate: (Element) throws -> Bool) rethrows -> SubSequence
+}
+
 extension BidirectionalCollection {
-    public func trimming(while predicate: (Element) throws -> Bool) rethrows -> SubSequence
+    func trimmingSuffix(while predicate: (Element) throws -> Bool) rethrows -> SubSequence
+
+    func trimming(while predicate: (Element) throws -> Bool) rethrows -> SubSequence
+}
+
+extension Collection where Self: RangeReplaceableCollection {
+    mutating func trimPrefix(while predicate: (Element) throws -> Bool) rethrows
+}
+
+extension BidirectionalCollection where Self: RangeReplaceableCollection {
+    mutating func trimSuffix(while predicate: (Element) throws -> Bool) rethrows
+
+    mutating func trim(while predicate: (Element) throws -> Bool) rethrows
 }
 ```
 
-This method requires `BidirectionalCollection` for an efficient implementation 
-which visits as few elements as possible.
+There are also overloads of the mutating methods when `Self == Self.SubSequence`,
+for non-range-replaceable self-slicing types.
 
-A less-efficient implementation is _possible_ for any `Collection`, which would 
-involve always traversing the entire collection. This implementation is not 
-provided, as it would mean developers of generic algorithms who forget to add
-the `BidirectionalCollection` constraint will receive that inefficient
-implementation:
+Though the `trimming` and `trimmingSuffix` methods are declared on
+`BidirectionalCollection`, a less-efficient implementation is _possible_ for
+any `Collection`, which would involve always traversing the entire collection.
+This implementation is not provided, as it would mean developers of generic
+algorithms who forget to add the `BidirectionalCollection` constraint will 
+receive that inefficient implementation:
 
 ```swift
 func myAlgorithm<Input>(input: Input) where Input: Collection {
@@ -50,28 +70,29 @@ Swift provides the `BidirectionalCollection` protocol for marking types which
 support reverse traversal, and generic types and algorithms which want to make 
 use of that should add it to their constraints.
 
-### >= 0.3.0
+#### Supporting Methods
 
-In `v0.3.0` new methods are added to allow discarding all the elements matching 
-the predicate at the beginning (prefix) or at the ending (suffix) of the 
-collection.
-- `trimmingSuffix(while:)` can only be run on collections conforming to the 
-`BidirectionalCollection` protocol.  
-- `trimmingPrefix(while:)` can be run also on collections conforming to the 
-`Collection` protocol.
+The `endOfPrefix(while:)` and `startOfSuffix(while:)` methods are used
+in the implementation of the trimming methods described above. As these
+supporting methods are independently useful, they are included in the library 
+as well.
 
 ```swift
-let myString = "   hello, world  "
-print(myString.trimmingPrefix(while: \.isWhitespace)) // "hello, world   "
+extension Collection {
+  /// Returns the exclusive upper bound of the prefix of elements that satisfy
+  /// the predicate.
+  func endOfPrefix(
+    while predicate: (Element) throws -> Bool
+  ) rethrows -> Index
+}
 
-print(myString.trimmingSuffix(while: \.isWhitespace)) // "   hello, world"
-```
-Also mutating variants for all the methods already existing and the new ones are 
-added.
-```swift
-var myString = "   hello, world  "
-myString.trim(while: \.isWhitespace)
-print(myString) // "hello, world"
+extension BidirectionalCollection {
+  /// Returns the inclusive lower bound of the suffix of elements that satisfy
+  /// the predicate.
+  func startOfSuffix(
+    while predicate: (Element) throws -> Bool
+  ) rethrows -> Index
+}
 ```
 
 ### Complexity

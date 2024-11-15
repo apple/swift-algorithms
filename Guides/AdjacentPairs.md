@@ -5,9 +5,6 @@
  
 Lazily iterates over tuples of adjacent elements.
 
-This operation is available for any sequence by calling the `adjacentPairs()`
-method.
-
 ```swift
 let numbers = (1...5)
 let pairs = numbers.adjacentPairs()

@@ -78,6 +78,10 @@ public struct CombinationsSequence<Base: Collection> {
       binomial(n: n, k: $0)
     }.reduce(0, +)
   }
+
+  /// The total number of combinations.
+  @inlinable
+  public var underestimatedCount: Int { count }
 }
 
 extension CombinationsSequence: Sequence {
@@ -289,8 +293,8 @@ extension Collection {
   /// - Parameter k: The number of elements to include in each combination.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
-  /// is the number of elements in the base collection, since
-  /// `CombinationsSequence` accesses the `count` of the base collection.
+  ///   is the number of elements in the base collection, since
+  ///   `CombinationsSequence` accesses the `count` of the base collection.
   @inlinable
   public func combinations(ofCount k: Int) -> CombinationsSequence<Self> {
     precondition(k >= 0, "Can't have combinations with a negative number of elements.")
