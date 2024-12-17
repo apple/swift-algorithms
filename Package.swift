@@ -27,7 +27,8 @@ let package = Package(
             name: "Algorithms",
             dependencies: [
               .product(name: "RealModule", package: "swift-numerics"),
-            ]),
+            ],
+            exclude: ["Documentation.docc"]),
         .testTarget(
             name: "SwiftAlgorithmsTests",
             dependencies: ["Algorithms"]),
