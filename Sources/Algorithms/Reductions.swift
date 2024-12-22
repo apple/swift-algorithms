@@ -112,13 +112,16 @@ extension Sequence {
   ///
   /// - Complexity: O(_n_), where _n_ is the length of the sequence.
   @inlinable
-  public func reductions<Result>(
+  public func reductions<Result, E: Error>(
     _ initial: Result,
-    _ transform: (Result, Element) throws -> Result
-  ) rethrows -> [Result] {
-    try reductions(into: initial) { result, element in
+    _ transform: (Result, Element) throws(E) -> Result
+  ) throws(E) -> [Result] {
+    // An anonymous closure is inferred as `throws(any Error)`, so we give it
+    // the correct type here.
+    let reducer: (inout Result, Element) throws(E) -> Void = { result, element in
       result = try transform(result, element)
     }
+    return try reductions(into: initial, reducer)
   }
 
   /// Returns an array containing the accumulated results of combining the
@@ -156,11 +159,10 @@ extension Sequence {
   ///
   /// - Complexity: O(_n_), where _n_ is the length of the sequence.
   @inlinable
-  public func reductions<Result>(
+  public func reductions<Result, E: Error>(
     into initial: Result,
-    _ transform: (inout Result, Element) throws -> Void
-  ) rethrows -> [Result] {
-
+    _ transform: (inout Result, Element) throws(E) -> Void
+  ) throws(E) -> [Result] {
     var output = [Result]()
     output.reserveCapacity(underestimatedCount + 1)
     output.append(initial)
@@ -415,9 +417,9 @@ extension Sequence {
   ///
   /// - Complexity: O(_n_), where _n_ is the length of the sequence.
   @inlinable
-  public func reductions(
-    _ transform: (Element, Element) throws -> Element
-  ) rethrows -> [Element] {
+  public func reductions<E: Error>(
+    _ transform: (Element, Element) throws(E) -> Element
+  ) throws(E) -> [Element] {
     var iterator = makeIterator()
     guard let initial = iterator.next() else { return [] }
     return try IteratorSequence(iterator).reductions(initial, transform)
@@ -582,19 +584,19 @@ extension LazySequenceProtocol {
 extension Sequence {
   @available(*, deprecated, message: "Use reductions(_:_:) instead.")
   @inlinable
-  public func scan<Result>(
+  public func scan<Result, E: Error>(
     _ initial: Result,
-    _ transform: (Result, Element) throws -> Result
-  ) rethrows -> [Result] {
+    _ transform: (Result, Element) throws(E) -> Result
+  ) throws(E) -> [Result] {
     try reductions(initial, transform)
   }
 
   @available(*, deprecated, message: "Use reductions(into:_:) instead.")
   @inlinable
-  public func scan<Result>(
+  public func scan<Result, E: Error>(
     into initial: Result,
-    _ transform: (inout Result, Element) throws -> Void
-  ) rethrows -> [Result] {
+    _ transform: (inout Result, Element) throws(E) -> Void
+  ) throws(E) -> [Result] {
     try reductions(into: initial, transform)
   }
 }
@@ -612,9 +614,9 @@ extension LazySequenceProtocol {
 extension Sequence {
   @available(*, deprecated, message: "Use reductions(_:) instead.")
   @inlinable
-  public func scan(
-    _ transform: (Element, Element) throws -> Element
-  ) rethrows -> [Element] {
+  public func scan<E: Error>(
+    _ transform: (Element, Element) throws(E) -> Element
+  ) throws(E) -> [Element] {
     try reductions(transform)
   }
 }

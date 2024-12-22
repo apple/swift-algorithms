@@ -456,9 +456,9 @@ extension Collection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
   @inlinable
-  public func chunked(
-    by belongInSameGroup: (Element, Element) throws -> Bool
-  ) rethrows -> [SubSequence] {
+  public func chunked<E: Error>(
+    by belongInSameGroup: (Element, Element) throws(E) -> Bool
+  ) throws(E) -> [SubSequence] {
     guard !isEmpty else { return [] }
     var result: [SubSequence] = []
     
@@ -489,9 +489,9 @@ extension Collection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
   @inlinable
-  public func chunked<Subject: Equatable>(
-    on projection: (Element) throws -> Subject
-  ) rethrows -> [(Subject, SubSequence)] {
+  public func chunked<Subject: Equatable, E: Error>(
+    on projection: (Element) throws(E) -> Subject
+  ) throws(E) -> [(Subject, SubSequence)] {
     guard !isEmpty else { return [] }
     var result: [(Subject, SubSequence)] = []
     

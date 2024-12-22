@@ -19,7 +19,15 @@ extension Sequence {
   /// - Returns: A dictionary containing grouped elements of self, keyed by
   ///     the keys derived by the `keyForValue` closure.
   @inlinable
-  public func grouped<GroupKey>(by keyForValue: (Element) throws -> GroupKey) rethrows -> [GroupKey: [Element]] {
-    try Dictionary(grouping: self, by: keyForValue)
+  public func grouped<GroupKey, E: Error>(
+    by keyForValue: (Element) throws(E) -> GroupKey
+  ) throws(E) -> [GroupKey: [Element]] {
+    do {
+      // This stdlib Dictionary initializer doesn't use typed errors,
+      // so we need to catch and cast any thrown error to our expected type.
+      return try Dictionary(grouping: self, by: keyForValue)
+    } catch {
+      throw error as! E
+    }
   }
 }

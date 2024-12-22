@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:6.0
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the Swift Algorithms open source project
@@ -11,6 +11,13 @@
 //===----------------------------------------------------------------------===//
 
 import PackageDescription
+
+let availabilityDefinition = PackageDescription.SwiftSetting.unsafeFlags([
+    "-Xfrontend",
+    "-define-availability",
+    "-Xfrontend",
+    "SwiftStdlib 5.7:macOS 13.0, iOS 16.0, watchOS 9.0, tvOS 16.0",
+])
 
 let package = Package(
     name: "swift-algorithms",
@@ -27,7 +34,8 @@ let package = Package(
             name: "Algorithms",
             dependencies: [
               .product(name: "RealModule", package: "swift-numerics"),
-            ]),
+            ],
+            swiftSettings: [availabilityDefinition]),
         .testTarget(
             name: "SwiftAlgorithmsTests",
             dependencies: ["Algorithms"]),

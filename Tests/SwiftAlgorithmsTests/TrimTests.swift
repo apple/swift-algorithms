@@ -75,9 +75,10 @@ final class TrimTests: XCTestCase {
   }
   
   // Self == Self.Subsequence
-  func testTrimPrefixNoAmbiguity() {
+  func testTrimPrefixNoAmbiguity() throws {
     var values = [2, 10, 12, 15, 20, 100] as ArraySlice
-    values.trimPrefix { $0.isMultiple(of: 2) }
+    // FIXME: `trimPrefix` in the _StringProcessing module always `throws`
+    try values.trimPrefix { $0.isMultiple(of: 2) }
     XCTAssertEqual(values, [15, 20, 100])
   }
   

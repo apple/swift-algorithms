@@ -22,11 +22,11 @@ extension MutableCollection {
   /// - Precondition:
   ///   `n == distance(from: range.lowerBound, to: range.upperBound)`
   @inlinable
-  internal mutating func stablePartition(
+  internal mutating func stablePartition<E: Error>(
     count n: Int,
     subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws -> Bool
-  ) rethrows -> Index {
+    by belongsInSecondPartition: (Element) throws(E) -> Bool
+  ) throws(E) -> Index {
     if n == 0 { return subrange.lowerBound }
     if n == 1 {
       return try belongsInSecondPartition(self[subrange.lowerBound])
@@ -58,10 +58,10 @@ extension MutableCollection {
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
   @inlinable
-  public mutating func stablePartition(
+  public mutating func stablePartition<E: Error>(
     subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws-> Bool
-  ) rethrows -> Index {
+    by belongsInSecondPartition: (Element) throws(E) -> Bool
+  ) throws(E) -> Index {
     try stablePartition(
       count: distance(from: subrange.lowerBound, to: subrange.upperBound),
       subrange: subrange,
@@ -78,9 +78,9 @@ extension MutableCollection {
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
   @inlinable
-  public mutating func stablePartition(
-    by belongsInSecondPartition: (Element) throws-> Bool
-  ) rethrows -> Index {
+  public mutating func stablePartition<E: Error>(
+    by belongsInSecondPartition: (Element) throws(E) -> Bool
+  ) throws(E) -> Index {
     try stablePartition(
       subrange: startIndex..<endIndex,
       by: belongsInSecondPartition)
@@ -97,14 +97,22 @@ extension MutableCollection {
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
   @inlinable
-  public mutating func partition(
+  public mutating func partition<E: Error>(
     subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws -> Bool
-  ) rethrows -> Index {
+    by belongsInSecondPartition: (Element) throws(E) -> Bool
+  ) throws(E) -> Index {
     // This version of `partition(subrange:)` is half stable; the elements in
     // the first partition retain their original relative order.
-    guard var i = try self[subrange].firstIndex(where: belongsInSecondPartition)
-      else { return subrange.upperBound }
+    var i: Index
+    do {
+      // The stdlib `firstIndex(where:)` method doesn't use typed errors,
+      // so we need to catch and cast any thrown error to our expected type.
+      guard let firstI = try self[subrange].firstIndex(where: belongsInSecondPartition)
+        else { return subrange.upperBound }
+      i = firstI
+    } catch {
+      throw error as! E
+    }
     
     var j = index(after: i)
     while j != subrange.upperBound {
@@ -125,10 +133,10 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
   @inlinable
-  public mutating func partition(
+  public mutating func partition<E: Error>(
     subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws -> Bool
-  ) rethrows -> Index {
+    by belongsInSecondPartition: (Element) throws(E) -> Bool
+  ) throws(E) -> Index {
     var lo = subrange.lowerBound
     var hi = subrange.upperBound
 
@@ -185,9 +193,9 @@ extension Collection {
   /// - Complexity: O(log *n*), where *n* is the length of this collection if
   ///   the collection conforms to `RandomAccessCollection`, otherwise O(*n*).
   @inlinable
-  public func partitioningIndex(
-    where belongsInSecondPartition: (Element) throws -> Bool
-  ) rethrows -> Index {
+  public func partitioningIndex<E: Error>(
+    where belongsInSecondPartition: (Element) throws(E) -> Bool
+  ) throws(E) -> Index {
     var n = count
     var l = startIndex
     
@@ -236,9 +244,9 @@ extension Sequence {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   @inlinable
-  public func partitioned(
-    by predicate: (Element) throws -> Bool
-  ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
+  public func partitioned<E: Error>(
+    by predicate: (Element) throws(E) -> Bool
+  ) throws(E) -> (falseElements: [Element], trueElements: [Element]) {
     var lhs = [Element]()
     var rhs = [Element]()
     
@@ -281,9 +289,9 @@ extension Collection {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
-  public func partitioned(
-    by predicate: (Element) throws -> Bool
-  ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
+  public func partitioned<E: Error>(
+    by predicate: (Element) throws(E) -> Bool
+  ) throws(E) -> (falseElements: [Element], trueElements: [Element]) {
     guard !self.isEmpty else {
       return ([], [])
     }
@@ -300,40 +308,47 @@ extension Collection {
     // We will use this to partition the single array into two.
     var midPoint: Int = 0
     
-    let elements = try [Element](
-      unsafeUninitializedCapacity: count,
-      initializingWith: { buffer, initializedCount in
-        var lhs = buffer.baseAddress!
-        var rhs = lhs + buffer.count
-        do {
-          for element in self {
-            if try predicate(element) {
-              rhs -= 1
-              rhs.initialize(to: element)
-            } else {
-              lhs.initialize(to: element)
-              lhs += 1
+    let elements: [Element]
+    do {
+      // This stdlib `Array` initializer doesn't use typed errors,
+      // so we need to catch and cast any thrown error to our expected type.
+      elements = try Array(
+        unsafeUninitializedCapacity: count,
+        initializingWith: { buffer, initializedCount in
+          var lhs = buffer.baseAddress!
+          var rhs = lhs + buffer.count
+          do {
+            for element in self {
+              if try predicate(element) {
+                rhs -= 1
+                rhs.initialize(to: element)
+              } else {
+                lhs.initialize(to: element)
+                lhs += 1
+              }
             }
+            
+            precondition(lhs == rhs, """
+              Collection's `count` differed from the number of elements iterated.
+              """
+            )
+            
+            let rhsIndex = rhs - buffer.baseAddress!
+            buffer[rhsIndex...].reverse()
+            initializedCount = buffer.count
+            
+            midPoint = rhsIndex
+          } catch {
+            let lhsCount = lhs - buffer.baseAddress!
+            let rhsCount = (buffer.baseAddress! + buffer.count) - rhs
+            buffer.baseAddress!.deinitialize(count: lhsCount)
+            rhs.deinitialize(count: rhsCount)
+            throw error
           }
-          
-          precondition(lhs == rhs, """
-            Collection's `count` differed from the number of elements iterated.
-            """
-          )
-          
-          let rhsIndex = rhs - buffer.baseAddress!
-          buffer[rhsIndex...].reverse()
-          initializedCount = buffer.count
-          
-          midPoint = rhsIndex
-        } catch {
-          let lhsCount = lhs - buffer.baseAddress!
-          let rhsCount = (buffer.baseAddress! + buffer.count) - rhs
-          buffer.baseAddress!.deinitialize(count: lhsCount)
-          rhs.deinitialize(count: rhsCount)
-          throw error
-        }
-      })
+        })
+    } catch {
+      throw error as! E
+    }
     
     let lhs = elements[..<midPoint]
     let rhs = elements[midPoint...]

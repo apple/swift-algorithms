@@ -112,9 +112,9 @@ extension Sequence {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   @inlinable
-  public func uniqued<Subject: Hashable>(
-    on projection: (Element) throws -> Subject
-  ) rethrows -> [Element] {
+  public func uniqued<Subject: Hashable, E: Error>(
+    on projection: (Element) throws(E) -> Subject
+  ) throws(E) -> [Element] {
     var seen: Set<Subject> = []
     var result: [Element] = []
     for element in self {

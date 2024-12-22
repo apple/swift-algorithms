@@ -355,9 +355,9 @@ extension Sequence where Element: Sequence {
   }
   
   @inlinable
-  internal func _joined(
-    by update: (inout [Element.Element], Element, Element) throws -> Void
-  ) rethrows -> [Element.Element] {
+  internal func _joined<E: Error>(
+    by update: (inout [Element.Element], Element, Element) throws(E) -> Void
+  ) throws(E) -> [Element.Element] {
     var iterator = makeIterator()
     guard let first = iterator.next() else { return [] }
     
@@ -381,10 +381,14 @@ extension Sequence where Element: Sequence {
   ///     }
   ///     // 1, 2, 6, 3, 4, 20, 5, 6
   @inlinable
-  public func joined(
-    by separator: (Element, Element) throws -> Element.Element
-  ) rethrows -> [Element.Element] {
-    try _joined(by: { $0.append(try separator($1, $2)) })
+  public func joined<E: Error>(
+    by separator: (Element, Element) throws(E) -> Element.Element
+  ) throws(E) -> [Element.Element] {
+    // An anonymous closure is inferred as `throws(any Error)`, so we give it
+    // the correct type here.
+    let joiner: (inout [Element.Element], Element, Element) throws(E) -> Void
+      = { $0.append(try separator($1, $2)) }
+    return try _joined(by: joiner)
   }
   
   /// Returns the concatenation of the elements in this sequence of sequences,
@@ -395,12 +399,16 @@ extension Sequence where Element: Sequence {
   ///     }
   ///     // 1, 2, 200, 300, 3, 4, 400, 500, 5, 6
   @inlinable
-  public func joined<Separator>(
-    by separator: (Element, Element) throws -> Separator
-  ) rethrows -> [Element.Element]
+  public func joined<Separator, E: Error>(
+    by separator: (Element, Element) throws(E) -> Separator
+  ) throws(E) -> [Element.Element]
     where Separator: Sequence, Separator.Element == Element.Element
   {
-    try _joined(by: { $0.append(contentsOf: try separator($1, $2)) })
+    // An anonymous closure is inferred as `throws(any Error)`, so we give it
+    // the correct type here.
+    let joiner: (inout [Element.Element], Element, Element) throws(E) -> Void
+      = { $0.append(contentsOf: try separator($1, $2)) }
+    return try _joined(by: joiner)
   }
 }
 

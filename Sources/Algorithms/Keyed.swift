@@ -19,10 +19,13 @@ extension Sequence {
   /// - Parameters:
   ///   - keyForValue: A closure that returns a key for each element in `self`.
   @inlinable
-  public func keyed<Key>(
-    by keyForValue: (Element) throws -> Key
-  ) rethrows -> [Key: Element] {
-    return try self.keyed(by: keyForValue, resolvingConflictsWith: { _, old, new in new })
+  public func keyed<Key, E: Error>(
+    by keyForValue: (Element) throws(E) -> Key
+  ) throws(E) -> [Key: Element] {
+    // An anonymous closure is inferred as `throws(any Error)`, so we give it
+    // the correct type here.
+    let resolve: (Key, Element, Element) throws(E) -> Element = { _, _, new in new }
+    return try self.keyed(by: keyForValue, resolvingConflictsWith: resolve)
   }
 
   /// Creates a new Dictionary from the elements of `self`, keyed by the
@@ -39,10 +42,10 @@ extension Sequence {
   ///     keys that are encountered. The closure returns the desired value for
   ///     the final dictionary.
   @inlinable
-  public func keyed<Key>(
-    by keyForValue: (Element) throws -> Key,
-    resolvingConflictsWith resolve: (Key, Element, Element) throws -> Element
-  ) rethrows -> [Key: Element] {
+  public func keyed<Key, E: Error>(
+    by keyForValue: (Element) throws(E) -> Key,
+    resolvingConflictsWith resolve: (Key, Element, Element) throws(E) -> Element
+  ) throws(E) -> [Key: Element] {
     var result = [Key: Element]()
 
     for element in self {

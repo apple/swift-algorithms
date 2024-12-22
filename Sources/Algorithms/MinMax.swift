@@ -12,10 +12,10 @@
 extension Sequence {
   /// Implementation for min(count:areInIncreasingOrder:)
   @inlinable
-  internal func _minImplementation(
+  internal func _minImplementation<E: Error>(
     count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> [Element] {
+    sortedBy areInIncreasingOrder: (Element, Element) throws(E) -> Bool
+  ) throws(E) -> [Element] {
     var iterator = makeIterator()
     
     var result: [Element] = []
@@ -23,14 +23,22 @@ extension Sequence {
     while result.count < count, let e = iterator.next() {
       result.append(e)
     }
-    try result.sort(by: areInIncreasingOrder)
+    do {
+      // The stdlib `sort(by:)` method doesn't use typed errors,
+      // so we need to catch and cast any thrown error to our expected type.
+      try result.sort(by: areInIncreasingOrder)
+    } catch {
+      throw error as! E
+    }
     
     while let e = iterator.next() {
       // To be part of `result`, `e` must be strictly less than `result.last`.
       guard try areInIncreasingOrder(e, result.last!) else { continue }
       result.removeLast()
-      let insertionIndex =
-        try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
+      // An anonymous closure is inferred as `throws(any Error)`, so we give it
+      // the correct type here.
+      let pred: (Element) throws(E) -> Bool = { try areInIncreasingOrder(e, $0) }
+      let insertionIndex = try result.partitioningIndex(where: pred)
       result.insert(e, at: insertionIndex)
     }
 
@@ -39,10 +47,10 @@ extension Sequence {
   
   /// Implementation for max(count:areInIncreasingOrder:)
   @inlinable
-  internal func _maxImplementation(
+  internal func _maxImplementation<E: Error>(
     count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> [Element] {
+    sortedBy areInIncreasingOrder: (Element, Element) throws(E) -> Bool
+  ) throws(E) -> [Element] {
     var iterator = makeIterator()
     
     var result: [Element] = []
@@ -50,13 +58,21 @@ extension Sequence {
     while result.count < count, let e = iterator.next() {
       result.append(e)
     }
-    try result.sort(by: areInIncreasingOrder)
+    do {
+      // The stdlib `sort(by:)` method doesn't use typed errors,
+      // so we need to catch and cast any thrown error to our expected type.
+      try result.sort(by: areInIncreasingOrder)
+    } catch {
+      throw error as! E
+    }
     
     while let e = iterator.next() {
       // To be part of `result`, `e` must be greater/equal to `result.first`.
       guard try !areInIncreasingOrder(e, result.first!) else { continue }
-      let insertionIndex =
-        try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
+      // An anonymous closure is inferred as `throws(any Error)`, so we give it
+      // the correct type here.
+      let pred: (Element) throws(E) -> Bool = { try areInIncreasingOrder(e, $0) }
+      let insertionIndex = try result.partitioningIndex(where: pred)
 
       assert(insertionIndex > 0)
       // Inserting `e` and then removing the first element (or vice versa)
@@ -101,10 +117,10 @@ extension Sequence {
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   sequence and *k* is `count`.
   @inlinable
-  public func min(
+  public func min<E: Error>(
     count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> [Element] {
+    sortedBy areInIncreasingOrder: (Element, Element) throws(E) -> Bool
+  ) throws(E) -> [Element] {
     precondition(count >= 0, """
       Cannot find a minimum with a negative count of elements!
       """
@@ -146,10 +162,10 @@ extension Sequence {
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   sequence and *k* is `count`.
   @inlinable
-  public func max(
+  public func max<E: Error>(
     count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> [Element] {
+    sortedBy areInIncreasingOrder: (Element, Element) throws(E) -> Bool
+  ) throws(E) -> [Element] {
     precondition(count >= 0, """
       Cannot find a maximum with a negative count of elements!
       """
@@ -247,10 +263,10 @@ extension Collection {
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   collection and *k* is `count`.
   @inlinable
-  public func min(
+  public func min<E: Error>(
     count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> [Element] {
+    sortedBy areInIncreasingOrder: (Element, Element) throws(E) -> Bool
+  ) throws(E) -> [Element] {
     precondition(count >= 0, """
       Cannot find a minimum with a negative count of elements!
       """
@@ -267,7 +283,13 @@ extension Collection {
     // If we're attempting to prefix more than 10% of the collection, it's
     // faster to sort everything.
     guard prefixCount < (self.count / 10) else {
-      return Array(try sorted(by: areInIncreasingOrder).prefix(prefixCount))
+      do {
+        // The stdlib `sorted(by:)` method doesn't use typed errors,
+        // so we need to catch and cast any thrown error to our expected type.
+        return Array(try sorted(by: areInIncreasingOrder).prefix(prefixCount))
+      } catch {
+        throw error as! E
+      }
     }
     
     return try _minImplementation(count: count, sortedBy: areInIncreasingOrder)
@@ -301,10 +323,10 @@ extension Collection {
   /// - Complexity: O(*k* log *k* + *nk*), where *n* is the length of the
   ///   collection and *k* is `count`.
   @inlinable
-  public func max(
+  public func max<E: Error>(
     count: Int,
-    sortedBy areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> [Element] {
+    sortedBy areInIncreasingOrder: (Element, Element) throws(E) -> Bool
+  ) throws(E) -> [Element] {
     precondition(count >= 0, """
       Cannot find a maximum with a negative count of elements!
       """
@@ -321,7 +343,13 @@ extension Collection {
     // If we're attempting to prefix more than 10% of the collection, it's
     // faster to sort everything.
     guard suffixCount < (self.count / 10) else {
-      return Array(try sorted(by: areInIncreasingOrder).suffix(suffixCount))
+      do {
+        // The stdlib `sorted(by:)` method doesn't use typed errors,
+        // so we need to catch and cast any thrown error to our expected type.
+        return Array(try sorted(by: areInIncreasingOrder).suffix(suffixCount))
+      } catch {
+        throw error as! E
+      }
     }
 
     return try _maxImplementation(count: count, sortedBy: areInIncreasingOrder)
@@ -427,9 +455,9 @@ extension Sequence {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   @inlinable
-  public func minAndMax(
-    by areInIncreasingOrder: (Element, Element) throws -> Bool
-  ) rethrows -> (min: Element, max: Element)? {
+  public func minAndMax<E: Error>(
+    by areInIncreasingOrder: (Element, Element) throws(E) -> Bool
+  ) throws(E) -> (min: Element, max: Element)? {
     // Check short sequences.
     var iterator = makeIterator()
     guard var lowest = iterator.next() else { return nil }

@@ -26,11 +26,10 @@ extension Collection {
   ///   omitted from the resulting slice.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  ///
   @inlinable
-  public func trimmingPrefix(
-    while predicate: (Element) throws -> Bool
-  ) rethrows -> SubSequence {
+  public func trimmingPrefix<E: Error>(
+    while predicate: (Element) throws(E) -> Bool
+  ) throws(E) -> SubSequence {
     let start = try endOfPrefix(while: predicate)
     return self[start..<endIndex]
   }
@@ -55,12 +54,11 @@ extension Collection where Self: RangeReplaceableCollection {
   ///   removed from the string.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  ///
   @inlinable
   @_disfavoredOverload
-  public mutating func trimPrefix(
-    while predicate: (Element) throws -> Bool
-  ) rethrows {
+  public mutating func trimPrefix<E: Error>(
+    while predicate: (Element) throws(E) -> Bool
+  ) throws(E) {
     let startOfResult = try endOfPrefix(while: predicate)
     removeSubrange(startIndex..<startOfResult)
   }
@@ -81,12 +79,12 @@ extension Collection where Self == Self.SubSequence {
   ///   be removed from the string.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  ///
   @inlinable
-  public mutating func trimPrefix(
-    while predicate: (Element) throws -> Bool
-  ) rethrows {
-    self = try trimmingPrefix(while: predicate)
+  public mutating func trimPrefix<E: Error>(
+    while predicate: (Element) throws(E) -> Bool
+  ) throws(E) {
+    let start = try endOfPrefix(while: predicate)
+    self = self[start..<endIndex]
   }
 }
 
@@ -108,12 +106,12 @@ extension BidirectionalCollection {
   ///   omitted from the resulting slice.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  ///
   @inlinable
-  public func trimming(
-    while predicate: (Element) throws -> Bool
-  ) rethrows -> SubSequence {
-    try trimmingPrefix(while: predicate).trimmingSuffix(while: predicate)
+  public func trimming<E: Error>(
+    while predicate: (Element) throws(E) -> Bool
+  ) throws(E) -> SubSequence {
+    let start = try endOfPrefix(while: predicate)
+    return try self[start..<endIndex].trimmingSuffix(while: predicate)
   }
   
   /// Returns a `SubSequence` formed by discarding all elements at the end of
@@ -129,11 +127,10 @@ extension BidirectionalCollection {
   ///   omitted from the resulting slice.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  ///
   @inlinable
-  public func trimmingSuffix(
-    while predicate: (Element) throws -> Bool
-  ) rethrows -> SubSequence {
+  public func trimmingSuffix<E: Error>(
+    while predicate: (Element) throws(E) -> Bool
+  ) throws(E) -> SubSequence {
     let end = try startOfSuffix(while: predicate)
     return self[startIndex..<end]
   }
@@ -158,14 +155,14 @@ extension BidirectionalCollection where Self: RangeReplaceableCollection {
   ///   removed from the string.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  ///
   @inlinable
   @_disfavoredOverload
-  public mutating func trim(
-    while predicate: (Element) throws -> Bool
-  ) rethrows {
+  public mutating func trim<E: Error>(
+    while predicate: (Element) throws(E) -> Bool
+  ) throws(E) {
+    let start = try endOfPrefix(while: predicate)
+    self.removeSubrange(startIndex..<start)
     try trimSuffix(while: predicate)
-    try trimPrefix(while: predicate)
   }
   
   /// Mutates a `BidirectionalCollection` by discarding all elements at the end
@@ -182,12 +179,11 @@ extension BidirectionalCollection where Self: RangeReplaceableCollection {
   ///   removed from the string.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  ///
   @inlinable
   @_disfavoredOverload
-  public mutating func trimSuffix(
-    while predicate: (Element) throws -> Bool
-  ) rethrows {
+  public mutating func trimSuffix<E: Error>(
+    while predicate: (Element) throws(E) -> Bool
+  ) throws(E) {
     let endOfResult = try startOfSuffix(while: predicate)
     removeSubrange(endOfResult..<endIndex)
   }
@@ -208,11 +204,10 @@ extension BidirectionalCollection where Self == Self.SubSequence {
   ///   removed from the string.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  ///
   @inlinable
-  public mutating func trim(
-    while predicate: (Element) throws -> Bool
-  ) rethrows {
+  public mutating func trim<E: Error>(
+    while predicate: (Element) throws(E) -> Bool
+  ) throws(E) {
     self = try trimming(while: predicate)
   }
 
@@ -230,11 +225,10 @@ extension BidirectionalCollection where Self == Self.SubSequence {
   ///   removed from the string.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
-  ///
   @inlinable
-  public mutating func trimSuffix(
-    while predicate: (Element) throws -> Bool
-  ) rethrows {
+  public mutating func trimSuffix<E: Error>(
+    while predicate: (Element) throws(E) -> Bool
+  ) throws(E) {
     self = try trimmingSuffix(while: predicate)
   }
 }
