@@ -13,7 +13,7 @@ import XCTest
 import Algorithms
 
 final class GroupedTests: XCTestCase {
-  private class SampleError: Error {}
+  private final class SampleError: Error {}
 
   // Based on https://github.com/apple/swift/blob/4d1d8a9de5ebc132a17aee9fc267461facf89bf8/validation-test/stdlib/Dictionary.swift#L1974-L1988
 

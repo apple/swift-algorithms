@@ -16,7 +16,7 @@ func validateRandomSamples<S: Sequence>(
   _ samples: [Int: Int],
   elements: S,
   expectedValue: Int,
-  file: StaticString = #file, line: UInt = #line
+  file: StaticString = (#file), line: UInt = #line
 ) where S.Element == Int {
   let expectedRange = ((expectedValue / 3) * 2) ... ((expectedValue / 3) * 4)
   XCTAssertEqualSequences(samples.keys.sorted(), elements,

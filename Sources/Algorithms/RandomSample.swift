@@ -10,8 +10,35 @@
 //===----------------------------------------------------------------------===//
 
 // For log(_:) and root(_:_:)
+#if ALGORITHMS_DARWIN_ONLY
+internal import Darwin
+
+extension Double {
+  @_transparent
+  internal static func root(_ x: Double, _ n: Int) -> Double {
+    guard x >= 0 || n % 2 != 0 else { return .nan }
+    if n == 3 { return cbrt(x) }
+    return Double(signOf: x, magnitudeOf: pow(x.magnitude, 1/Double(n)))
+  }
+
+  @_transparent
+  internal static func log(_ x: Double) -> Double {
+    Darwin.log(x)
+  }
+
+  @_transparent
+  internal static func log(onePlus x: Double) -> Double {
+    Darwin.log1p(x)
+  }
+}
+#elseif swift(>=5.11)
+internal import RealModule
+#elseif swift(>=5.10)
+import RealModule
+#else
 @_implementationOnly
 import RealModule
+#endif
 
 //===----------------------------------------------------------------------===//
 // randomStableSample(count:)

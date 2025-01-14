@@ -9,7 +9,7 @@ collection until predicate returns `false` and skipping the remaining elements.
 This example uses `suffix(while: )` to iterate through collection of integers 
 from the end until the predicate returns false, in this case when `$0 <= 5`
 ```swift
-(0...10).suffix(while: { $0 > 5 } // == [6,7,8,9,10]
+(0...10).suffix(while: { $0 > 5 }) // == [6,7,8,9,10]
 ```
 
 ## Detailed Design
