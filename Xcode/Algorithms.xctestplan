@@ -1,0 +1,32 @@
+{
+  "configurations" : [
+    {
+      "id" : "CF37E70B-D810-4CF2-AB41-571BAFF72572",
+      "name" : "Default",
+      "options" : {
+
+      }
+    },
+    {
+      "id" : "33436295-E24E-439B-9B8E-4602E0A6C8BB",
+      "name" : "TSan",
+      "options" : {
+        "threadSanitizerEnabled" : true
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Algorithms.xcodeproj",
+        "identifier" : "7D489E4629CE969D00499B21",
+        "name" : "AlgorithmsTests"
+      }
+    }
+  ],
+  "version" : 1
+}
