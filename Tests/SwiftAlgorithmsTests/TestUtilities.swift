@@ -78,7 +78,7 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
   _ message: @autoclosure () -> String = "",
-  file: StaticString = #file, line: UInt = #line
+  file: StaticString = (#file), line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
   try XCTAssertEqualSequences(expression1(), expression2(), by: ==,
     message(), file: file, line: line)
@@ -88,7 +88,7 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
 func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
-  file: StaticString = #file, line: UInt = #line
+  file: StaticString = (#file), line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
   var s1 = Array(try expression1())
   var missing: [S1.Element] = []
@@ -116,7 +116,7 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression2: @autoclosure () throws -> S2,
   by areEquivalent: (S1.Element, S1.Element) -> Bool,
   _ message: @autoclosure () -> String = "",
-  file: StaticString = #file, line: UInt = #line
+  file: StaticString = (#file), line: UInt = #line
 ) rethrows where S1.Element == S2.Element {
 
   func fail(_ reason: String) {
@@ -153,7 +153,7 @@ func XCTAssertEqualCollections<C1: Collection, C2: Collection>(
   _ expression1: @autoclosure () throws -> C1,
   _ expression2: @autoclosure () throws -> C2,
   _ message: @autoclosure () -> String = "",
-  file: StaticString = #file, line: UInt = #line
+  file: StaticString = (#file), line: UInt = #line
 ) rethrows where C1.Element: Equatable, C1.Element == C2.Element {
   let c1 = try expression1()
   let c2 = try expression2()
