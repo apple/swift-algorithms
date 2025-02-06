@@ -26,7 +26,9 @@ extension Sequence {
   public func keyed<Key>(
     by keyForValue: (Element) throws -> Key
   ) rethrows -> [Key: Element] {
-    try self.keyed(by: keyForValue, resolvingConflictsWith: { _, old, new in new })
+    try self.reduce(into: [:]) { result, element in
+      try result[keyForValue(element)] = element
+    }
   }
 
   /// Creates a new dictionary keyed by the result of the first closure, using
