@@ -198,16 +198,17 @@ extension StridingCollection: Collection {
     limitedBy limit: Index
   ) -> Index? {
     if limit < i {
-      if let idx = base.index(
-        i.base,
-        offsetBy: n * stride,
-        limitedBy: base.endIndex
-      ) {
-        return Index(idx)
-      } else {
+      guard
+        let idx = base.index(
+          i.base,
+          offsetBy: n * stride,
+          limitedBy: base.endIndex
+        )
+      else {
         assert(distance(from: i, to: endIndex) == n, "Advancing past end index")
         return endIndex
       }
+      return Index(idx)
     } else if let idx = base.index(
       i.base,
       offsetBy: n * stride,

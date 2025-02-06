@@ -550,11 +550,10 @@ extension Collection where Element: Hashable {
   public func uniquePermutations(ofCount k: Int? = nil)
     -> UniquePermutationsSequence<Self>
   {
-    if let k = k {
-      return UniquePermutationsSequence(self, k..<(k + 1))
-    } else {
+    guard let k = k else {
       return UniquePermutationsSequence(self)
     }
+    return UniquePermutationsSequence(self, k..<(k + 1))
   }
 
   /// Returns a collection of the unique permutations of this sequence with

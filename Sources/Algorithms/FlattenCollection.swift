@@ -69,14 +69,13 @@ extension FlattenCollection: Collection {
     outer: Base.Index,
     inner: Base.Element.Index
   ) -> Index {
-    if inner == base[outer].endIndex {
-      let outer = base[base.index(after: outer)...]
-        .endOfPrefix(while: { $0.isEmpty })
-      let inner = outer == base.endIndex ? nil : base[outer].startIndex
-      return Index(outer: outer, inner: inner)
-    } else {
+    guard inner == base[outer].endIndex else {
       return Index(outer: outer, inner: inner)
     }
+    let outer = base[base.index(after: outer)...]
+      .endOfPrefix(while: { $0.isEmpty })
+    let inner = outer == base.endIndex ? nil : base[outer].startIndex
+    return Index(outer: outer, inner: inner)
   }
 
   @inlinable
@@ -160,14 +159,13 @@ extension FlattenCollection: Collection {
     assert(limit >= index)
 
     if index.outer == limit.outer {
-      if let indexInner = index.inner, let limitInner = limit.inner {
-        return base[index.outer]
-          .index(indexInner, offsetBy: distance, limitedBy: limitInner)
-          .map { inner in Index(outer: index.outer, inner: inner) }
-      } else {
+      guard let indexInner = index.inner, let limitInner = limit.inner else {
         // `index` and `limit` are both `endIndex`
         return nil
       }
+      return base[index.outer]
+        .index(indexInner, offsetBy: distance, limitedBy: limitInner)
+        .map { inner in Index(outer: index.outer, inner: inner) }
     }
 
     // `index <= limit` and `index.outer != limit.outer`, so `index != endIndex`
@@ -200,17 +198,16 @@ extension FlattenCollection: Collection {
       base.formIndex(after: &outer)
     }
 
-    if let limitInner = limit.inner {
-      let element = base[outer]
-      return element.index(
-        element.startIndex,
-        offsetBy: remainder,
-        limitedBy: limitInner
-      )
-      .map { inner in Index(outer: outer, inner: inner) }
-    } else {
+    guard let limitInner = limit.inner else {
       return nil
     }
+    let element = base[outer]
+    return element.index(
+      element.startIndex,
+      offsetBy: remainder,
+      limitedBy: limitInner
+    )
+    .map { inner in Index(outer: outer, inner: inner) }
   }
 
   @inlinable
@@ -221,14 +218,13 @@ extension FlattenCollection: Collection {
     assert(limit <= index)
 
     if index.outer == limit.outer {
-      if let indexInner = index.inner, let limitInner = limit.inner {
-        return base[index.outer]
-          .index(indexInner, offsetBy: -distance, limitedBy: limitInner)
-          .map { inner in Index(outer: index.outer, inner: inner) }
-      } else {
+      guard let indexInner = index.inner, let limitInner = limit.inner else {
         // `index` and `limit` are both `endIndex`
         return nil
       }
+      return base[index.outer]
+        .index(indexInner, offsetBy: -distance, limitedBy: limitInner)
+        .map { inner in Index(outer: index.outer, inner: inner) }
     }
 
     var remainder = distance

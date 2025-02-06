@@ -77,11 +77,10 @@ extension Product2Sequence: Sequence {
       else { return nil }
 
       i2 = base2.makeIterator()
-      if let element2 = i2.next() {
-        return (element1, element2)
-      } else {
+      guard let element2 = i2.next() else {
         return nil
       }
+      return (element1, element2)
     }
   }
 
@@ -406,12 +405,12 @@ extension Product2Sequence: Collection where Base1: Collection {
       //                    ^
       //                   i.i2
 
-      if let i1 = base1.index(previousI1, offsetBy: -(base1Distance - 1), limitedBy: limit.i1) {
-        let index = Index(i1: i1, i2: base2.startIndex)
-        return index < limit ? nil : index
-      } else {
+      guard let i1 = base1.index(previousI1, offsetBy: -(base1Distance - 1), limitedBy: limit.i1)
+      else {
         return nil
       }
+      let index = Index(i1: i1, i2: base2.startIndex)
+      return index < limit ? nil : index
     }
 
     guard let i1 = base1.index(previousI1, offsetBy: -base1Distance, limitedBy: limit.i1)
@@ -430,13 +429,12 @@ where Base1: BidirectionalCollection, Base2: BidirectionalCollection {
     precondition(
       i != startIndex,
       "Can't move before startIndex")
-    if i.i2 == base2.startIndex {
-      return Index(
-        i1: base1.index(before: i.i1),
-        i2: base2.index(before: base2.endIndex))
-    } else {
+    guard i.i2 == base2.startIndex else {
       return Index(i1: i.i1, i2: base2.index(before: i.i2))
     }
+    return Index(
+      i1: base1.index(before: i.i1),
+      i2: base2.index(before: base2.endIndex))
   }
 }
 

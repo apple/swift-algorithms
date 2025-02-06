@@ -94,11 +94,10 @@ extension WindowsOfCountCollection: Collection {
 
   @inlinable
   public var startIndex: Index {
-    if let upperBound = endOfFirstWindow {
-      return Index(lowerBound: base.startIndex, upperBound: upperBound)
-    } else {
+    guard let upperBound = endOfFirstWindow else {
       return endIndex
     }
+    return Index(lowerBound: base.startIndex, upperBound: upperBound)
   }
 
   @inlinable
@@ -340,17 +339,16 @@ where Base: BidirectionalCollection {
   @inlinable
   public func index(before index: Index) -> Index {
     precondition(index != startIndex, "Incrementing past start index")
-    if index == endIndex {
-      return Index(
-        lowerBound: base.index(index.lowerBound, offsetBy: -windowSize),
-        upperBound: index.upperBound
-      )
-    } else {
+    guard index == endIndex else {
       return Index(
         lowerBound: base.index(before: index.lowerBound),
         upperBound: base.index(before: index.upperBound)
       )
     }
+    return Index(
+      lowerBound: base.index(index.lowerBound, offsetBy: -windowSize),
+      upperBound: index.upperBound
+    )
   }
 }
 

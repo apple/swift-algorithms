@@ -191,15 +191,14 @@ extension Chain2Sequence: Collection where Base1: Collection, Base2: Collection 
         .map(Index.init(first:))
 
     case let (.first(i), .second(limit)):
-      if let j = base1.index(i, offsetBy: distance, limitedBy: base1.endIndex) {
-        // the offset stays within the bounds of `base1`
-        return normalizeIndex(j)
-      } else {
+      guard let j = base1.index(i, offsetBy: distance, limitedBy: base1.endIndex) else {
         // the offset overflows the bounds of `base1` by `n - d`
         let d = base1.distance(from: i, to: base1.endIndex)
         return base2.index(base2.startIndex, offsetBy: distance - d, limitedBy: limit)
           .map(Index.init(second:))
       }
+      // the offset stays within the bounds of `base1`
+      return normalizeIndex(j)
 
     case (.second, .first):
       // impossible because `limit >= i`
@@ -228,15 +227,14 @@ extension Chain2Sequence: Collection where Base1: Collection, Base2: Collection 
       fatalError()
 
     case let (.second(i), .first(limit)):
-      if let j = base2.index(i, offsetBy: -distance, limitedBy: base2.startIndex) {
-        // the offset stays within the bounds of `base2`
-        return Index(second: j)
-      } else {
+      guard let j = base2.index(i, offsetBy: -distance, limitedBy: base2.startIndex) else {
         // the offset overflows the bounds of `base2` by `n - d`
         let d = base2.distance(from: base2.startIndex, to: i)
         return base1.index(base1.endIndex, offsetBy: -(distance - d), limitedBy: limit)
           .map(Index.init(first:))
       }
+      // the offset stays within the bounds of `base2`
+      return Index(second: j)
 
     case let (.second(i), .second(limit)):
       // `limit` is relevant, so `base1` cannot be reached
