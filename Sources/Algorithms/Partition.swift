@@ -56,6 +56,10 @@ extension MutableCollection {
   ///   - belongsInSecondPartition: A predicate used to partition the
   ///     collection. All elements satisfying this predicate are ordered after
   ///     all elements not satisfying it.
+  /// - Returns: The pivot index `p`, which is the index of the first element
+  ///   in the reordered collection that matches `belongsInSecondPartition`.
+  ///   If no elements in the collection match `belongsInSecondPartition`, the
+  ///   returned index is equal to the collection's `endIndex`.
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
   @inlinable
@@ -76,6 +80,10 @@ extension MutableCollection {
   /// - Parameter belongsInSecondPartition: A predicate used to partition the
   ///   collection. All elements satisfying this predicate are ordered after
   ///   all elements not satisfying it.
+  /// - Returns: The pivot index `p`, which is the index of the first element
+  ///   in the reordered collection that matches `belongsInSecondPartition`.
+  ///   If no elements in the collection match `belongsInSecondPartition`, the
+  ///   returned index is equal to the collection's `endIndex`.
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
   @inlinable
@@ -93,8 +101,24 @@ extension MutableCollection {
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection {
-  /// Moves all elements satisfying `isSuffixElement` into a suffix of the
+  /// Moves all elements satisfying the given closure into a suffix of the
   /// collection, returning the start position of the resulting suffix.
+  ///
+  /// After partitioning a collection, there is a pivot index `p` where no
+  /// element before `p` satisfies the `belongsInSecondPartition` predicate and
+  /// every element at or after `p` satisfies `belongsInSecondPartition`. This
+  /// operation isn't guaranteed to be stable, so the relative ordering of
+  /// elements within the partitions might change.
+  ///
+  /// - Parameters:
+  ///   - subrange: The range of elements within this collection to partition.
+  ///   - belongsInSecondPartition: A predicate used to partition the
+  ///     collection. All elements satisfying this predicate are ordered after
+  ///     all elements not satisfying it.
+  /// - Returns: The pivot index `p`, which is the index of the first element
+  ///   in the reordered collection that matches `belongsInSecondPartition`.
+  ///   If no elements in the collection match `belongsInSecondPartition`, the
+  ///   returned index is equal to the collection's `endIndex`.
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
   @inlinable
@@ -121,8 +145,24 @@ extension MutableCollection {
 }
 
 extension MutableCollection where Self: BidirectionalCollection {
-  /// Moves all elements satisfying `isSuffixElement` into a suffix of the
+  /// Moves all elements satisfying the given closure into a suffix of the
   /// collection, returning the start position of the resulting suffix.
+  ///
+  /// After partitioning a collection, there is a pivot index `p` where no
+  /// element before `p` satisfies the `belongsInSecondPartition` predicate and
+  /// every element at or after `p` satisfies `belongsInSecondPartition`. This
+  /// operation isn't guaranteed to be stable, so the relative ordering of
+  /// elements within the partitions might change.
+  ///
+  /// - Parameters:
+  ///   - subrange: The range of elements within this collection to partition.
+  ///   - belongsInSecondPartition: A predicate used to partition the
+  ///     collection. All elements satisfying this predicate are ordered after
+  ///     all elements not satisfying it.
+  /// - Returns: The pivot index `p`, which is the index of the first element
+  ///   in the reordered collection that matches `belongsInSecondPartition`.
+  ///   If no elements in the collection match `belongsInSecondPartition`, the
+  ///   returned index is equal to the collection's `endIndex`.
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
   @inlinable
@@ -225,15 +265,14 @@ extension Sequence {
   ///     // Prints "["Kim", "Karl"]"
   ///
   /// - Parameter predicate: A closure that takes an element of the sequence as
-  /// its argument and returns a Boolean value indicating whether the element
-  /// should be included in the second returned array. Otherwise, the element
-  /// will appear in the first returned array.
-  ///
+  ///   its argument and returns a Boolean value indicating whether the element
+  ///   should be included in the second returned array. Otherwise, the element
+  ///   will appear in the first returned array.
   /// - Returns: Two arrays with all of the elements of the receiver. The
-  /// first array contains all the elements that `predicate` didn’t allow, and
-  /// the second array contains all the elements that `predicate` allowed. The
-  /// order of the elements in the arrays matches the order of the elements in
-  /// the original sequence.
+  ///   first array contains all the elements that `predicate` didn’t allow, and
+  ///   the second array contains all the elements that `predicate` allowed. The
+  ///   order of the elements in the arrays matches the order of the elements in
+  ///   the original sequence.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   @inlinable
@@ -270,15 +309,14 @@ extension Collection {
   ///     // Prints "["Kim", "Karl"]"
   ///
   /// - Parameter predicate: A closure that takes an element of the collection
-  /// as its argument and returns a Boolean value indicating whether the element
-  /// should be included in the second returned array. Otherwise, the element
-  /// will appear in the first returned array.
-  ///
+  ///   as its argument and returns a Boolean value indicating whether the
+  ///   element should be included in the second returned array. Otherwise, the
+  ///   element will appear in the first returned array.
   /// - Returns: Two arrays with all of the elements of the receiver. The
-  /// first array contains all the elements that `predicate` didn’t allow, and
-  /// the second array contains all the elements that `predicate` allowed. The
-  /// order of the elements in the arrays matches the order of the elements in
-  /// the original collection.
+  ///   first array contains all the elements that `predicate` didn’t allow, and
+  ///   the second array contains all the elements that `predicate` allowed. The
+  ///   order of the elements in the arrays matches the order of the elements in
+  ///   the original collection.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable

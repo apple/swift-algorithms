@@ -408,7 +408,10 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
   /// the given predicate.
   ///
   /// - Parameter belongInSameGroup: A closure that takes two adjacent elements
-  /// of the sequence and returns whether or not they belong in the same group.
+  ///   of the sequence and returns whether or not they belong in the same
+  ///   group.
+  /// - Returns: A collection of subsequences, with every pairwise group of
+  ///   elements in each chunk returning `true` for `belongInSameGroup`.
   ///
   /// - Complexity: O(*n*), because the start index is pre-computed.
   @inlinable
@@ -425,8 +428,10 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
   /// grouping elements that project to equal values.
   ///
   /// - Parameter projection: A closure that takes an element in the sequence
-  /// and returns an `Equatable` value that can be used to determine if adjacent
-  /// elements belong in the same group.
+  ///   and returns an `Equatable` value that can be used to determine if
+  ///   adjacent elements belong in the same group.
+  /// - Returns: A collection of subsequences, with every element in each chunk
+  ///   returning the same value for `projection`.
   ///
   /// - Complexity: O(*n*), because the start index is pre-computed.
   @inlinable
@@ -448,8 +453,10 @@ extension Collection {
   /// given predicate.
   ///
   /// - Parameter belongInSameGroup: A closure that takes two adjacent elements
-  /// of the collection and returns whether or not they belong in the same
-  /// group.
+  ///   of the collection and returns whether or not they belong in the same
+  ///   group.
+  /// - Returns: A collection of subsequences, with every pairwise group of
+  ///   elements in each chunk returning `true` for `belongInSameGroup`.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
   @inlinable
@@ -481,8 +488,10 @@ extension Collection {
   /// grouping elements that project to equal values.
   ///
   /// - Parameter projection: A closure that takes an element in the collection
-  /// and returns an `Equatable` value that can be used to determine if adjacent
-  /// elements belong in the same group.
+  ///   and returns an `Equatable` value that can be used to determine if
+  ///   adjacent elements belong in the same group.
+  /// - Returns: A collection of subsequences, with every element in each chunk
+  ///   returning the same value for `projection`.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
   @inlinable

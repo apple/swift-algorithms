@@ -457,7 +457,6 @@ where Base1.Index: Hashable, Base2.Index: Hashable {}
 /// element of the tuple is from the first collection and the second element is
 /// from the second collection.
 ///
-///
 ///     let numbers = 1...3
 ///     let colors = ["cerise", "puce", "heliotrope"]
 ///     for (number, color) in product(numbers, colors) {
@@ -481,6 +480,8 @@ where Base1.Index: Hashable, Base2.Index: Hashable {}
 /// - Parameters:
 ///   - s1: The first sequence to iterate over.
 ///   - s2: The second sequence to iterate over.
+/// - Returns: A sequence of tuples, with every combination of the elements
+///   of `s1` and `s2`, in order.
 ///
 /// - Complexity: O(1)
 @inlinable

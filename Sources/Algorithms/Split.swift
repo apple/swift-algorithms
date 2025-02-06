@@ -219,7 +219,7 @@ extension LazySequenceProtocol {
   ///     satisfying the `isSeparator` predicate and for each element at the
   ///     start or end of the sequence satisfying the `isSeparator`
   ///     predicate. The default value is `true`.
-  ///   - whereSeparator: A closure that takes an element as an argument and
+  ///   - isSeparator: A closure that takes an element as an argument and
   ///     returns a Boolean value indicating whether the sequence should be
   ///     split at that element.
   /// - Returns: A lazy sequence of subsequences, split from this sequence's
@@ -634,7 +634,7 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
   ///     satisfying the `isSeparator` predicate and for each element at the
   ///     start or end of the collection satisfying the `isSeparator`
   ///     predicate. The default value is `true`.
-  ///   - whereSeparator: A closure that takes an element as an argument and
+  ///   - isSeparator: A closure that takes an element as an argument and
   ///     returns a Boolean value indicating whether the collection should be
   ///     split at that element.
   /// - Returns: A lazy collection of subsequences, split from this collection's

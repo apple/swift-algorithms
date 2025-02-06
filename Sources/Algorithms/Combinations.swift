@@ -256,6 +256,8 @@ extension Collection {
   ///
   /// - Parameter kRange: The range of numbers of elements to include in each
   ///   combination.
+  /// - Returns: A sequence of the combinations of this collection's
+  ///   elements, for all sizes in `kRange`, from smallest to largest.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
   ///   is the number of elements in the base collection, since
@@ -292,6 +294,8 @@ extension Collection {
   /// the resulting sequence has no elements.
   ///
   /// - Parameter k: The number of elements to include in each combination.
+  /// - Returns: A sequence of the combinations of this collection's
+  ///   elements.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
   ///   is the number of elements in the base collection, since

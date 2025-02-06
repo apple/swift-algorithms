@@ -322,6 +322,8 @@ extension Collection {
   ///   clamped to the number of elements in this collection. Passing a range
   ///   covering sizes greater than the number of elements in this collection
   ///   results in an empty sequence.
+  /// - Returns: A sequence of the permutations of this collection's elements,
+  ///   for all sizes in `kRange`, from smallest to largest.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
   ///   is the number of elements in the base collection, since
@@ -378,6 +380,7 @@ extension Collection {
   ///   If `k` is `nil`, the resulting sequence represents permutations of this
   ///   entire collection. If `k` is greater than the number of elements in
   ///   this collection, the resulting sequence is empty.
+  /// - Returns: A sequence of the permutations of this collection's elements.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
   ///   is the number of elements in the base collection, since
@@ -538,6 +541,8 @@ extension Collection where Element: Hashable {
   ///   If `k` is `nil`, the resulting sequence represents permutations of this
   ///   entire collection. If `k` is greater than the number of elements in
   ///   this collection, the resulting sequence is empty.
+  /// - Returns: A sequence of the unique permutations of this collection's
+  ///   elements.
   ///
   /// - Complexity: O(*n*), where *n* is the number of elements in this
   ///   collection.
@@ -578,6 +583,8 @@ extension Collection where Element: Hashable {
   ///   clamped to the number of elements in this collection. Passing a range
   ///   covering sizes greater than the number of elements in this collection
   ///   results in an empty sequence.
+  /// - Returns: A sequence of the unique permutations of this collection's
+  ///   elements, for all sizes in `kRange`, from smallest to largest.
   ///
   /// - Complexity: O(*n*), where *n* is the number of elements in this
   ///   collection.
