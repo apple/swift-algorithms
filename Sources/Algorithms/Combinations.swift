@@ -102,7 +102,7 @@ extension CombinationsSequence: Sequence {
     /// Whether or not iteration is finished (`kRange` is empty)
     @inlinable
     internal var isFinished: Bool {
-      return kRange.isEmpty
+      kRange.isEmpty
     }
 
     @usableFromInline

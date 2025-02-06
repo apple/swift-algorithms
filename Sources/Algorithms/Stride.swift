@@ -15,7 +15,7 @@
 
 extension Sequence {
   /// Returns a sequence stepping through the elements every `step` starting at
-  /// the first value. Any remainders of the stride will be trimmed.
+  /// the first value.
   ///
   ///     (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
   ///     (0...10).striding(by: 3) // == [0, 3, 6, 9]
@@ -24,8 +24,9 @@ extension Sequence {
   ///   striding `step`.
   ///
   /// - Parameter step: The amount to step with each iteration.
-  /// - Returns: Returns a sequence for stepping through the elements by the
-  ///   specified amount.
+  /// - Returns: A sequence for stepping through the elements by the specified
+  ///   amount. Any remaining elements after the last multiple of the stride
+  ///   are omitted.
   @inlinable
   public func striding(by step: Int) -> StridingSequence<Self> {
     StridingSequence(base: self, stride: step)
@@ -34,18 +35,18 @@ extension Sequence {
 
 extension Collection {
   /// Returns a sequence stepping through the elements every `step` starting at
-  /// the first value. Any remainders of the stride will be trimmed.
+  /// the first value.
   ///
   ///     (0...10).striding(by: 2) // == [0, 2, 4, 6, 8, 10]
   ///     (0...10).striding(by: 3) // == [0, 3, 6, 9]
   ///
-  /// - Complexity: O(1). Access to successive values is O(1) if the collection
-  ///   conforms to `RandomAccessCollection`; otherwise, O(_k_), where _k_ is
-  ///   the striding `step`.
+  /// - Complexity: O(1). Access to successive values is O(k) where _k_ is the
+  ///   striding `step`.
   ///
   /// - Parameter step: The amount to step with each iteration.
-  /// - Returns: Returns a collection for stepping through the elements by the
-  ///   specified amount.
+  /// - Returns: A sequence for stepping through the elements by the specified
+  ///   amount. Any remaining elements after the last multiple of the stride
+  ///   are omitted.
   @inlinable
   public func striding(by step: Int) -> StridingCollection<Self> {
     StridingCollection(base: self, stride: step)

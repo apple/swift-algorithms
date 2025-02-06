@@ -44,7 +44,7 @@ extension Chain2Sequence: Sequence {
 
     @inlinable
     public mutating func next() -> Base1.Element? {
-      return iterator1.next() ?? iterator2.next()
+      iterator1.next() ?? iterator2.next()
     }
   }
 

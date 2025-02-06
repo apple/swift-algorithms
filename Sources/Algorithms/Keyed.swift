@@ -10,11 +10,11 @@
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
-  /// Creates a new Dictionary from the elements of `self`, keyed by the
-  /// results returned by the given `keyForValue` closure.
+  /// Creates a new dictionary keyed by the result of the given closure, using
+  /// the latest element for any duplicate keys.
   ///
-  /// If the key derived for a new element collides with an existing key from a previous element,
-  /// the latest value will be kept.
+  /// If the key derived for a new element collides with an existing key from a
+  /// previous element, the latest value will be kept.
   ///
   /// - Parameters:
   ///   - keyForValue: A closure that returns a key for each element in `self`.
@@ -22,16 +22,17 @@ extension Sequence {
   public func keyed<Key>(
     by keyForValue: (Element) throws -> Key
   ) rethrows -> [Key: Element] {
-    return try self.keyed(by: keyForValue, resolvingConflictsWith: { _, old, new in new })
+    try self.keyed(by: keyForValue, resolvingConflictsWith: { _, old, new in new })
   }
 
-  /// Creates a new Dictionary from the elements of `self`, keyed by the
-  /// results returned by the given `keyForValue` closure. As the dictionary is
-  /// built, the initializer calls the `resolve` closure with the current and
-  /// new values for any duplicate keys. Pass a closure as `resolve` that
-  /// returns the value to use in the resulting dictionary: The closure can
-  /// choose between the two values, combine them to produce a new value, or
-  /// even throw an error.
+  /// Creates a new dictionary keyed by the result of the first closure, using
+  /// the second closure to resolve the ambiguity for any duplicate keys.
+  ///
+  /// As the dictionary is built, the initializer calls the `resolve` closure
+  /// with the current and new values for any duplicate keys. Pass a closure as
+  /// `resolve` that returns the value to use for that key in the resulting
+  /// dictionary. The closure can choose between the two values, combine them to
+  /// produce a new value, or even throw an error.
   ///
   /// - Parameters:
   ///   - keyForValue: A closure that returns a key for each element in `self`.
@@ -43,7 +44,7 @@ extension Sequence {
     by keyForValue: (Element) throws -> Key,
     resolvingConflictsWith resolve: (Key, Element, Element) throws -> Element
   ) rethrows -> [Key: Element] {
-    var result = [Key: Element]()
+    var result: [Key: Element] = [:]
 
     for element in self {
       let key = try keyForValue(element)

@@ -15,8 +15,10 @@
 
 extension MutableCollection where Self: BidirectionalCollection {
   /// Reverses the elements of the collection, moving from each end until
-  /// `limit` is reached from either direction. The returned indices are the
-  /// start and end of the range of unreversed elements.
+  /// `limit` is reached from either direction.
+  ///
+  /// The returned indices are the start and end of the range of unreversed
+  /// elements.
   ///
   ///     Input:
   ///     [a b c d e f g h i j k l m n o p]
@@ -28,7 +30,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///           lower           upper
   ///
   /// - Postcondition: For returned indices `(lower, upper)`:
-  ///   `lower == limit || upper == limit`
+  ///   `lower == limit || upper == limit`.
   @inlinable
   @discardableResult
   internal mutating func _reverse(
@@ -75,8 +77,10 @@ extension MutableCollection where Self: BidirectionalCollection {
 
 extension MutableCollection {
   /// Swaps the elements of the two given subranges, up to the upper bound of
-  /// the smaller subrange. The returned indices are the ends of the two ranges
-  /// that were actually swapped.
+  /// the smaller subrange.
+  ///
+  /// The returned indices are the ends of the two ranges that were actually
+  /// swapped.
   ///
   ///     Input:
   ///     [a b c d e f g h i j k l m n o p]

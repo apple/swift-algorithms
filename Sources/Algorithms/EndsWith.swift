@@ -44,7 +44,7 @@ extension BidirectionalCollection where Element: Equatable {
   public func ends<PossibleSuffix: BidirectionalCollection>(
     with possibleSuffix: PossibleSuffix
   ) -> Bool where PossibleSuffix.Element == Element {
-    return self.ends(with: possibleSuffix, by: ==)
+    self.ends(with: possibleSuffix, by: ==)
   }
 }
 

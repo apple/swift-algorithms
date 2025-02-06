@@ -161,7 +161,7 @@ extension Sequence {
     _ transform: (inout Result, Element) throws -> Void
   ) rethrows -> [Result] {
 
-    var output = [Result]()
+    var output: [Result] = []
     output.reserveCapacity(underestimatedCount + 1)
     output.append(initial)
 

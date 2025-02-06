@@ -10,7 +10,7 @@
 //===----------------------------------------------------------------------===//
 
 extension Sequence {
-  /// Implementation for min(count:areInIncreasingOrder:)
+  // Implementation for min(count:areInIncreasingOrder:)
   @inlinable
   internal func _minImplementation(
     count: Int,
@@ -37,7 +37,7 @@ extension Sequence {
     return result
   }
 
-  /// Implementation for max(count:areInIncreasingOrder:)
+  // Implementation for max(count:areInIncreasingOrder:)
   @inlinable
   internal func _maxImplementation(
     count: Int,

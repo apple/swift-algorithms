@@ -240,8 +240,8 @@ extension Sequence {
   public func partitioned(
     by predicate: (Element) throws -> Bool
   ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
-    var lhs = [Element]()
-    var rhs = [Element]()
+    var lhs: [Element] = []
+    var rhs: [Element] = []
 
     for element in self {
       if try predicate(element) {
