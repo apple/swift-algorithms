@@ -15,7 +15,6 @@
 
 extension BidirectionalCollection where Element: Equatable {
 
-
   /// Returns a Boolean value indicating whether the final elements of the
   /// collection are the same as the elements in another collection.
   ///
@@ -81,4 +80,3 @@ extension BidirectionalCollection {
     try self.reversed().starts(with: possibleSuffix.reversed(), by: areEquivalent)
   }
 }
-

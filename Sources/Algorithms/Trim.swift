@@ -115,7 +115,7 @@ extension BidirectionalCollection {
   ) rethrows -> SubSequence {
     try trimmingPrefix(while: predicate).trimmingSuffix(while: predicate)
   }
-  
+
   /// Returns a `SubSequence` formed by discarding all elements at the end of
   /// the collection which satisfy the given predicate.
   ///
@@ -167,7 +167,7 @@ extension BidirectionalCollection where Self: RangeReplaceableCollection {
     try trimSuffix(while: predicate)
     try trimPrefix(while: predicate)
   }
-  
+
   /// Mutates a `BidirectionalCollection` by discarding all elements at the end
   /// of it which satisfy the given predicate.
   ///

@@ -43,7 +43,7 @@ extension MutableCollection where Self: BidirectionalCollection {
     }
     return (lower, upper)
   }
-  
+
   /// Reverses the elements within the given subrange.
   ///
   /// This example reverses the numbers within the subrange at the start of the
@@ -100,15 +100,14 @@ extension MutableCollection {
   ) -> (Index, Index) {
     assert(!lhs.isEmpty)
     assert(!rhs.isEmpty)
-    
+
     var p = lhs.lowerBound
     var q = rhs.lowerBound
     repeat {
       swapAt(p, q)
       formIndex(after: &p)
       formIndex(after: &q)
-    }
-      while p != lhs.upperBound && q != rhs.upperBound
+    } while p != lhs.upperBound && q != rhs.upperBound
     return (p, q)
   }
 
@@ -139,13 +138,14 @@ extension MutableCollection {
     subrange: Range<Index>,
     toStartAt newStart: Index
   ) -> Index {
-    var m = newStart, s = subrange.lowerBound
+    var m = newStart
+    var s = subrange.lowerBound
     let e = subrange.upperBound
-    
+
     // Handle the trivial cases
     if s == m { return e }
     if m == e { return s }
-    
+
     // We have two regions of possibly-unequal length that need to be exchanged.
     // The return value of this method is going to be the position following
     // that of the element that is currently last (element j).
@@ -154,7 +154,7 @@ extension MutableCollection {
     //   ^             ^     ^        ^     ^             ^
     //   s             m     e        s     m             e
     //
-    var ret = e // start with a known incorrect result.
+    var ret = e  // start with a known incorrect result.
     while true {
       // Exchange the leading elements of each region (up to the length of the
       // shorter region).
@@ -166,7 +166,7 @@ extension MutableCollection {
       //   s    s1       m    m1/e       s   s1/m   m1      e
       //
       let (s1, m1) = _swapNonemptySubrangePrefixes(s..<m, m..<e)
-      
+
       if m1 == e {
         // Left-hand case: we have moved element j into position. If we haven't
         // already, we can capture the return value which is in s1.
@@ -175,11 +175,11 @@ extension MutableCollection {
         // once the return value is known. I'm not sure it's a worthwhile
         // optimization, though.
         if ret == e { ret = s1 }
-        
+
         // If both regions were the same size, we're done.
         if s1 == m { break }
       }
-      
+
       // Now we have a smaller problem that is also a rotation, so we can adjust
       // our bounds and repeat.
       //
@@ -189,10 +189,10 @@ extension MutableCollection {
       s = s1
       if s == m { m = m1 }
     }
-    
+
     return ret
   }
-  
+
   /// Rotates the elements of this collection so that the element at the
   /// specified index becomes the start of the collection.
   ///

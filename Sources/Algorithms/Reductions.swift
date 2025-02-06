@@ -249,7 +249,7 @@ extension ExclusiveReductionsSequence: Collection where Base: Collection {
       case base(Base.Index, Result)
       case end
     }
-    
+
     @usableFromInline
     internal let representation: Representation
 
@@ -257,7 +257,7 @@ extension ExclusiveReductionsSequence: Collection where Base: Collection {
     internal init(_ representation: Representation) {
       self.representation = representation
     }
-    
+
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
       switch (lhs.representation, rhs.representation) {
@@ -269,7 +269,7 @@ extension ExclusiveReductionsSequence: Collection where Base: Collection {
         return false
       }
     }
-    
+
     @inlinable
     public static func < (lhs: Self, rhs: Self) -> Bool {
       switch (lhs.representation, rhs.representation) {
@@ -334,11 +334,10 @@ extension ExclusiveReductionsSequence: Collection where Base: Collection {
 extension ExclusiveReductionsSequence: LazySequenceProtocol {}
 
 extension ExclusiveReductionsSequence: LazyCollectionProtocol
-  where Base: Collection {}
+where Base: Collection {}
 
 extension ExclusiveReductionsSequence.Index: Hashable
-  where Base.Index: Hashable
-{
+where Base.Index: Hashable {
   @inlinable
   public func hash(into hasher: inout Hasher) {
     switch representation {
@@ -483,7 +482,7 @@ extension InclusiveReductionsSequence: Collection where Base: Collection {
   public struct Index: Comparable {
     @usableFromInline
     internal let base: Base.Index
-    
+
     @usableFromInline
     internal let result: Element?
 
@@ -497,7 +496,7 @@ extension InclusiveReductionsSequence: Collection where Base: Collection {
     public static func < (lhs: Self, rhs: Self) -> Bool {
       lhs.base < rhs.base
     }
-    
+
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.base == rhs.base
@@ -519,7 +518,7 @@ extension InclusiveReductionsSequence: Collection where Base: Collection {
     guard let result = index.result else {
       fatalError("Can't subscript using endIndex")
     }
-    
+
     return result
   }
 
@@ -528,12 +527,13 @@ extension InclusiveReductionsSequence: Collection where Base: Collection {
     guard let result = index.result else {
       fatalError("Can't advance past endIndex")
     }
-    
+
     let index = base.index(after: index.base)
-    let nextResult = index == base.endIndex
+    let nextResult =
+      index == base.endIndex
       ? nil
       : transform(result, base[index])
-    
+
     return Index(base: index, result: nextResult)
   }
 
@@ -546,11 +546,10 @@ extension InclusiveReductionsSequence: Collection where Base: Collection {
 extension InclusiveReductionsSequence: LazySequenceProtocol {}
 
 extension InclusiveReductionsSequence: LazyCollectionProtocol
-  where Base: Collection {}
+where Base: Collection {}
 
 extension InclusiveReductionsSequence.Index: Hashable
-  where Base.Index: Hashable
-{
+where Base.Index: Hashable {
   @inlinable
   public func hash(into hasher: inout Hasher) {
     hasher.combine(base)

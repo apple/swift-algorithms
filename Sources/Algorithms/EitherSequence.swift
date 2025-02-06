@@ -57,8 +57,7 @@ extension Either: Comparable where Left: Comparable, Right: Comparable {
 /// A sequence that has one of the two specified types.
 @usableFromInline
 internal enum EitherSequence<Left: Sequence, Right: Sequence>
-  where Left.Element == Right.Element
-{
+where Left.Element == Right.Element {
   case left(Left)
   case right(Right)
 }
@@ -68,16 +67,16 @@ extension EitherSequence: Sequence {
   internal struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var left: Left.Iterator?
-    
+
     @usableFromInline
     internal var right: Right.Iterator?
-    
+
     @inlinable
     internal mutating func next() -> Left.Element? {
       left?.next() ?? right?.next()
     }
   }
-  
+
   @usableFromInline
   internal func makeIterator() -> Iterator {
     switch self {
@@ -90,8 +89,7 @@ extension EitherSequence: Sequence {
 }
 
 extension EitherSequence: Collection
-  where Left: Collection, Right: Collection, Left.Element == Right.Element
-{
+where Left: Collection, Right: Collection, Left.Element == Right.Element {
   @usableFromInline
   internal typealias Index = Either<Left.Index, Right.Index>
 
@@ -129,7 +127,7 @@ extension EitherSequence: Collection
 
   @inlinable
   internal func index(after i: Index) -> Index {
-    switch (self,i) {
+    switch (self, i) {
     case let (.left(s), .left(i)):
       return .left(s.index(after: i))
     case let (.right(s), .right(i)):
@@ -181,8 +179,7 @@ extension EitherSequence: Collection
 }
 
 extension EitherSequence: BidirectionalCollection
-  where Left: BidirectionalCollection, Right: BidirectionalCollection
-{
+where Left: BidirectionalCollection, Right: BidirectionalCollection {
   @inlinable
   internal func index(before i: Index) -> Index {
     switch (self, i) {
@@ -197,4 +194,4 @@ extension EitherSequence: BidirectionalCollection
 }
 
 extension EitherSequence: RandomAccessCollection
-  where Left: RandomAccessCollection, Right: RandomAccessCollection {}
+where Left: RandomAccessCollection, Right: RandomAccessCollection {}

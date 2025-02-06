@@ -12,11 +12,11 @@
 /// A `Sequence` that iterates over every non-nil element from the original
 /// `Sequence`.
 public struct CompactedSequence<Base: Sequence, Element>: Sequence
-  where Base.Element == Element? {
+where Base.Element == Element? {
 
   @usableFromInline
   let base: Base
-  
+
   @inlinable
   init(base: Base) {
     self.base = base
@@ -25,12 +25,12 @@ public struct CompactedSequence<Base: Sequence, Element>: Sequence
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     var base: Base.Iterator
-    
+
     @inlinable
     init(base: Base.Iterator) {
       self.base = base
     }
-    
+
     @inlinable
     public mutating func next() -> Element? {
       while let wrapped = base.next() {
@@ -68,7 +68,7 @@ extension Sequence {
   /// Complexity: O(1)
   @inlinable
   public func compacted<Unwrapped>() -> CompactedSequence<Self, Unwrapped>
-    where Element == Unwrapped? {
+  where Element == Unwrapped? {
     CompactedSequence(base: self)
   }
 }
@@ -76,74 +76,77 @@ extension Sequence {
 /// A `Collection` that iterates over every non-nil element from the original
 /// `Collection`.
 public struct CompactedCollection<Base: Collection, Element>: Collection
-  where Base.Element == Element? {
+where Base.Element == Element? {
 
   @usableFromInline
   let base: Base
-  
+
   @inlinable
   init(base: Base) {
     self.base = base
     let idx = base.firstIndex(where: { $0 != nil }) ?? base.endIndex
     self.startIndex = Index(base: idx)
   }
-  
+
   public struct Index {
     @usableFromInline
     let base: Base.Index
-    
+
     @inlinable
     init(base: Base.Index) {
       self.base = base
     }
   }
-  
+
   public var startIndex: Index
-  
+
   @inlinable
   public var endIndex: Index { Index(base: base.endIndex) }
-  
+
   @inlinable
   public subscript(position: Index) -> Element {
     base[position.base]!
   }
-  
+
   @inlinable
   public func index(after i: Index) -> Index {
     precondition(i != endIndex, "Index out of bounds")
-    
+
     let baseIdx = base.index(after: i.base)
     guard let idx = base[baseIdx...].firstIndex(where: { $0 != nil })
-      else { return endIndex }
+    else { return endIndex }
     return Index(base: idx)
   }
 }
 
 extension CompactedCollection: BidirectionalCollection
-  where Base: BidirectionalCollection {
+where Base: BidirectionalCollection {
 
   @inlinable
   public func index(before i: Index) -> Index {
     precondition(i != startIndex, "Index out of bounds")
-    
-    guard let idx =
-            base[startIndex.base..<i.base]
-                .lastIndex(where: { $0 != nil })
-      else { fatalError("Index out of bounds") }
+
+    guard
+      let idx =
+        base[startIndex.base..<i.base]
+        .lastIndex(where: { $0 != nil })
+    else { fatalError("Index out of bounds") }
     return Index(base: idx)
   }
 }
 
-extension CompactedCollection.Index: Comparable {  
+extension CompactedCollection.Index: Comparable {
   @inlinable
-  public static func < (lhs: CompactedCollection.Index,
-                        rhs: CompactedCollection.Index) -> Bool {
+  public static func < (
+    lhs: CompactedCollection.Index,
+    rhs: CompactedCollection.Index
+  ) -> Bool {
     lhs.base < rhs.base
   }
 }
 
 extension CompactedCollection.Index: Hashable
-  where Base.Index: Hashable {}
+where Base.Index: Hashable {}
 
 extension Collection {
   /// Returns a new `Collection` that iterates over every non-nil element from
@@ -167,8 +170,7 @@ extension Collection {
   /// original `Collection`.
   @inlinable
   public func compacted<Unwrapped>() -> CompactedCollection<Self, Unwrapped>
-    where Element == Unwrapped?
-  {
+  where Element == Unwrapped? {
     CompactedCollection(base: self)
   }
 }
@@ -178,7 +180,7 @@ extension Collection {
 //===----------------------------------------------------------------------===//
 
 extension CompactedSequence: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 extension CompactedCollection: LazySequenceProtocol, LazyCollectionProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}

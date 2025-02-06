@@ -33,8 +33,9 @@ extension MutableCollection {
         ? subrange.lowerBound
         : subrange.upperBound
     }
-    
-    let h = n / 2, i = index(subrange.lowerBound, offsetBy: h)
+
+    let h = n / 2
+    let i = index(subrange.lowerBound, offsetBy: h)
     let j = try stablePartition(
       count: h,
       subrange: subrange.lowerBound..<i,
@@ -45,7 +46,7 @@ extension MutableCollection {
       by: belongsInSecondPartition)
     return rotate(subrange: j..<k, toStartAt: i)
   }
-  
+
   /// Moves all elements satisfying the given predicate into a suffix of the
   /// given range, preserving the relative order of the elements in both
   /// partitions, and returns the start of the resulting suffix.
@@ -60,14 +61,14 @@ extension MutableCollection {
   @inlinable
   public mutating func stablePartition(
     subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws-> Bool
+    by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     try stablePartition(
       count: distance(from: subrange.lowerBound, to: subrange.upperBound),
       subrange: subrange,
       by: belongsInSecondPartition)
   }
-  
+
   /// Moves all elements satisfying the given predicate into a suffix of this
   /// collection, preserving the relative order of the elements in both
   /// partitions, and returns the start of the resulting suffix.
@@ -79,7 +80,7 @@ extension MutableCollection {
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
   @inlinable
   public mutating func stablePartition(
-    by belongsInSecondPartition: (Element) throws-> Bool
+    by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     try stablePartition(
       subrange: startIndex..<endIndex,
@@ -104,8 +105,8 @@ extension MutableCollection {
     // This version of `partition(subrange:)` is half stable; the elements in
     // the first partition retain their original relative order.
     guard var i = try self[subrange].firstIndex(where: belongsInSecondPartition)
-      else { return subrange.upperBound }
-    
+    else { return subrange.upperBound }
+
     var j = index(after: i)
     while j != subrange.upperBound {
       if try !belongsInSecondPartition(self[j]) {
@@ -114,7 +115,7 @@ extension MutableCollection {
       }
       formIndex(after: &j)
     }
-    
+
     return i
   }
 }
@@ -190,7 +191,7 @@ extension Collection {
   ) rethrows -> Index {
     var n = count
     var l = startIndex
-    
+
     while n > 0 {
       let half = n / 2
       let mid = index(l, offsetBy: half)
@@ -241,7 +242,7 @@ extension Sequence {
   ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
     var lhs = [Element]()
     var rhs = [Element]()
-    
+
     for element in self {
       if try predicate(element) {
         rhs.append(element)
@@ -249,7 +250,7 @@ extension Sequence {
         lhs.append(element)
       }
     }
-    
+
     return (lhs, rhs)
   }
 }
@@ -287,19 +288,19 @@ extension Collection {
     guard !self.isEmpty else {
       return ([], [])
     }
-    
+
     // Since collections have known sizes, we can allocate one array of size
     // `self.count`, then insert items at the beginning or end of that contiguous
     // block. This way, we don’t have to do any dynamic array resizing. Since we
     // insert the right elements on the right side in reverse order, we need to
     // reverse them back to the original order at the end.
-    
+
     let count = self.count
-    
+
     // Inside of the `initializer` closure, we set what the actual mid-point is.
     // We will use this to partition the single array into two.
     var midPoint: Int = 0
-    
+
     let elements = try [Element](
       unsafeUninitializedCapacity: count,
       initializingWith: { buffer, initializedCount in
@@ -315,16 +316,18 @@ extension Collection {
               lhs += 1
             }
           }
-          
-          precondition(lhs == rhs, """
+
+          precondition(
+            lhs == rhs,
+            """
             Collection's `count` differed from the number of elements iterated.
             """
           )
-          
+
           let rhsIndex = rhs - buffer.baseAddress!
           buffer[rhsIndex...].reverse()
           initializedCount = buffer.count
-          
+
           midPoint = rhsIndex
         } catch {
           let lhsCount = lhs - buffer.baseAddress!
@@ -334,7 +337,7 @@ extension Collection {
           throw error
         }
       })
-    
+
     let lhs = elements[..<midPoint]
     let rhs = elements[midPoint...]
     return (

@@ -16,15 +16,17 @@
 /// A sequence that presents the elements of a base sequence of sequences
 /// concatenated using a given separator.
 public struct JoinedBySequence<Base: Sequence, Separator: Sequence>
-  where Base.Element: Sequence, Base.Element.Element == Separator.Element
-{
+where Base.Element: Sequence, Base.Element.Element == Separator.Element {
   @usableFromInline
-  internal typealias Inner = FlattenSequence<InterspersedSequence<
-    LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>>>
-  
+  internal typealias Inner = FlattenSequence<
+    InterspersedSequence<
+      LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>
+    >
+  >
+
   @usableFromInline
   internal let inner: Inner
-  
+
   @inlinable
   internal init(base: Base, separator: Separator) {
     self.inner = base.lazy
@@ -38,18 +40,18 @@ extension JoinedBySequence: Sequence {
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var inner: Inner.Iterator
-    
+
     @inlinable
     internal init(inner: Inner.Iterator) {
       self.inner = inner
     }
-    
+
     @inlinable
     public mutating func next() -> Base.Element.Element? {
       inner.next()
     }
   }
-  
+
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(inner: inner.makeIterator())
@@ -57,7 +59,7 @@ extension JoinedBySequence: Sequence {
 }
 
 extension JoinedBySequence: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // JoinedByClosureSequence
@@ -67,15 +69,17 @@ extension JoinedBySequence: LazySequenceProtocol
 /// concatenated using a given separator that depends on the sequences right
 /// before and after it.
 public struct JoinedByClosureSequence<Base: Sequence, Separator: Sequence>
-  where Base.Element: Sequence, Base.Element.Element == Separator.Element
-{
+where Base.Element: Sequence, Base.Element.Element == Separator.Element {
   @usableFromInline
-  internal typealias Inner = FlattenSequence<InterspersedMapSequence<
-    Base, EitherSequence<Base.Element, Separator>>>
-  
+  internal typealias Inner = FlattenSequence<
+    InterspersedMapSequence<
+      Base, EitherSequence<Base.Element, Separator>
+    >
+  >
+
   @usableFromInline
   internal let inner: Inner
-  
+
   @inlinable
   internal init(
     base: Base,
@@ -84,7 +88,8 @@ public struct JoinedByClosureSequence<Base: Sequence, Separator: Sequence>
     self.inner = base.lazy
       .interspersedMap(
         EitherSequence.left,
-        with: { EitherSequence.right(separator($0, $1)) })
+        with: { EitherSequence.right(separator($0, $1)) }
+      )
       .joined()
   }
 }
@@ -93,18 +98,18 @@ extension JoinedByClosureSequence: Sequence {
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal var inner: Inner.Iterator
-    
+
     @inlinable
     internal init(inner: Inner.Iterator) {
       self.inner = inner
     }
-    
+
     @inlinable
     public mutating func next() -> Base.Element.Element? {
       inner.next()
     }
   }
-  
+
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(inner: inner.makeIterator())
@@ -120,15 +125,17 @@ extension JoinedByClosureSequence: LazySequenceProtocol {}
 /// A collection that presents the elements of a base collection of collections
 /// concatenated using a given separator.
 public struct JoinedByCollection<Base: Collection, Separator: Collection>
-  where Base.Element: Collection, Base.Element.Element == Separator.Element
-{
+where Base.Element: Collection, Base.Element.Element == Separator.Element {
   @usableFromInline
-  internal typealias Inner = FlattenCollection<InterspersedSequence<
-    LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>>>
-  
+  internal typealias Inner = FlattenCollection<
+    InterspersedSequence<
+      LazyMapSequence<Base, EitherSequence<Base.Element, Separator>>
+    >
+  >
+
   @usableFromInline
   internal let inner: Inner
-  
+
   @inlinable
   internal init(base: Base, separator: Separator) {
     self.inner = base.lazy
@@ -142,48 +149,48 @@ extension JoinedByCollection: Collection {
   public struct Index: Comparable {
     @usableFromInline
     internal let inner: Inner.Index
-    
+
     @inlinable
     internal init(_ inner: Inner.Index) {
       self.inner = inner
     }
-    
+
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.inner == rhs.inner
     }
-    
+
     @inlinable
     public static func < (lhs: Self, rhs: Self) -> Bool {
       lhs.inner < rhs.inner
     }
   }
-  
+
   @inlinable
   public var startIndex: Index {
     Index(inner.startIndex)
   }
-  
+
   @inlinable
   public var endIndex: Index {
     Index(inner.endIndex)
   }
-  
+
   @inlinable
   public func index(after index: Index) -> Index {
     Index(inner.index(after: index.inner))
   }
-  
+
   @inlinable
   public subscript(position: Index) -> Base.Element.Element {
     inner[position.inner]
   }
-  
+
   @inlinable
   public func index(_ index: Index, offsetBy distance: Int) -> Index {
     Index(inner.index(index.inner, offsetBy: distance))
   }
-  
+
   @inlinable
   public func index(
     _ index: Index,
@@ -193,7 +200,7 @@ extension JoinedByCollection: Collection {
     inner.index(index.inner, offsetBy: distance, limitedBy: limit.inner)
       .map(Index.init)
   }
-  
+
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     inner.distance(from: start.inner, to: end.inner)
@@ -201,9 +208,10 @@ extension JoinedByCollection: Collection {
 }
 
 extension JoinedByCollection: BidirectionalCollection
-  where Base: BidirectionalCollection,
-        Base.Element: BidirectionalCollection,
-        Separator: BidirectionalCollection
+where
+  Base: BidirectionalCollection,
+  Base.Element: BidirectionalCollection,
+  Separator: BidirectionalCollection
 {
   @inlinable
   public func index(before index: Index) -> Index {
@@ -212,7 +220,7 @@ extension JoinedByCollection: BidirectionalCollection
 }
 
 extension JoinedByCollection: LazySequenceProtocol, LazyCollectionProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // JoinedByClosureCollection
@@ -222,15 +230,17 @@ extension JoinedByCollection: LazySequenceProtocol, LazyCollectionProtocol
 /// concatenated using a given separator that depends on the collections right
 /// before and after it.
 public struct JoinedByClosureCollection<Base: Collection, Separator: Collection>
-  where Base.Element: Collection, Base.Element.Element == Separator.Element
-{
+where Base.Element: Collection, Base.Element.Element == Separator.Element {
   @usableFromInline
-  internal typealias Inner = FlattenCollection<InterspersedMapSequence<
-    Base, EitherSequence<Base.Element, Separator>>>
-  
+  internal typealias Inner = FlattenCollection<
+    InterspersedMapSequence<
+      Base, EitherSequence<Base.Element, Separator>
+    >
+  >
+
   @usableFromInline
   internal let inner: Inner
-  
+
   @inlinable
   internal init(
     base: Base,
@@ -239,7 +249,8 @@ public struct JoinedByClosureCollection<Base: Collection, Separator: Collection>
     self.inner = base.lazy
       .interspersedMap(
         EitherSequence.left,
-        with: { EitherSequence.right(separator($0, $1)) })
+        with: { EitherSequence.right(separator($0, $1)) }
+      )
       .joined()
   }
 }
@@ -248,48 +259,48 @@ extension JoinedByClosureCollection: Collection {
   public struct Index: Comparable {
     @usableFromInline
     internal let inner: Inner.Index
-    
+
     @inlinable
     internal init(_ inner: Inner.Index) {
       self.inner = inner
     }
-    
+
     @inlinable
     public static func == (lhs: Self, rhs: Self) -> Bool {
       lhs.inner == rhs.inner
     }
-    
+
     @inlinable
     public static func < (lhs: Self, rhs: Self) -> Bool {
       lhs.inner < rhs.inner
     }
   }
-  
+
   @inlinable
   public var startIndex: Index {
     Index(inner.startIndex)
   }
-  
+
   @inlinable
   public var endIndex: Index {
     Index(inner.endIndex)
   }
-  
+
   @inlinable
   public func index(after index: Index) -> Index {
     Index(inner.index(after: index.inner))
   }
-  
+
   @inlinable
   public subscript(position: Index) -> Base.Element.Element {
     inner[position.inner]
   }
-  
+
   @inlinable
   public func index(_ index: Index, offsetBy distance: Int) -> Index {
     Index(inner.index(index.inner, offsetBy: distance))
   }
-  
+
   @inlinable
   public func index(
     _ index: Index,
@@ -299,7 +310,7 @@ extension JoinedByClosureCollection: Collection {
     inner.index(index.inner, offsetBy: distance, limitedBy: limit.inner)
       .map(Index.init)
   }
-  
+
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     inner.distance(from: start.inner, to: end.inner)
@@ -307,9 +318,10 @@ extension JoinedByClosureCollection: Collection {
 }
 
 extension JoinedByClosureCollection: BidirectionalCollection
-  where Base: BidirectionalCollection,
-        Base.Element: BidirectionalCollection,
-        Separator: BidirectionalCollection
+where
+  Base: BidirectionalCollection,
+  Base.Element: BidirectionalCollection,
+  Separator: BidirectionalCollection
 {
   @inlinable
   public func index(before index: Index) -> Index {
@@ -337,7 +349,7 @@ extension Sequence where Element: Sequence {
   {
     joined(by: CollectionOfOne(separator))
   }
-  
+
   /// Returns the concatenation of the elements in this sequence of sequences,
   /// inserting the given separator between each sequence.
   ///
@@ -349,30 +361,29 @@ extension Sequence where Element: Sequence {
   public func joined<Separator>(
     by separator: Separator
   ) -> JoinedBySequence<Self, Separator>
-    where Separator: Collection, Separator.Element == Element.Element
-  {
+  where Separator: Collection, Separator.Element == Element.Element {
     JoinedBySequence(base: self, separator: separator)
   }
-  
+
   @inlinable
   internal func _joined(
     by update: (inout [Element.Element], Element, Element) throws -> Void
   ) rethrows -> [Element.Element] {
     var iterator = makeIterator()
     guard let first = iterator.next() else { return [] }
-    
+
     var result = Array(first)
     var previous = first
-    
+
     while let next = iterator.next() {
       try update(&result, previous, next)
       result.append(contentsOf: next)
       previous = next
     }
-    
+
     return result
   }
-  
+
   /// Returns the concatenation of the elements in this sequence of sequences,
   /// inserting the separator produced by the closure between each sequence.
   ///
@@ -386,7 +397,7 @@ extension Sequence where Element: Sequence {
   ) rethrows -> [Element.Element] {
     try _joined(by: { $0.append(try separator($1, $2)) })
   }
-  
+
   /// Returns the concatenation of the elements in this sequence of sequences,
   /// inserting the separator produced by the closure between each sequence.
   ///
@@ -398,8 +409,7 @@ extension Sequence where Element: Sequence {
   public func joined<Separator>(
     by separator: (Element, Element) throws -> Separator
   ) rethrows -> [Element.Element]
-    where Separator: Sequence, Separator.Element == Element.Element
-  {
+  where Separator: Sequence, Separator.Element == Element.Element {
     try _joined(by: { $0.append(contentsOf: try separator($1, $2)) })
   }
 }
@@ -417,7 +427,7 @@ extension LazySequenceProtocol where Element: Sequence {
   ) -> JoinedByClosureSequence<Elements, CollectionOfOne<Element.Element>> {
     joined(by: { CollectionOfOne(separator($0, $1)) })
   }
-  
+
   /// Returns the concatenation of the elements in this sequence of sequences,
   /// inserting the separator produced by the closure between each sequence.
   @inlinable
@@ -446,7 +456,7 @@ extension Collection where Element: Collection {
   {
     joined(by: CollectionOfOne(separator))
   }
-  
+
   /// Returns the concatenation of the elements in this collection of
   /// collections, inserting the given separator between each collection.
   ///
@@ -476,7 +486,7 @@ extension LazySequenceProtocol where Elements: Collection, Element: Collection {
   ) -> JoinedByClosureCollection<Elements, CollectionOfOne<Element.Element>> {
     joined(by: { CollectionOfOne(separator($0, $1)) })
   }
-  
+
   /// Returns the concatenation of the elements in this collection of
   /// collections, inserting the separator produced by the closure between each
   /// sequence.

@@ -19,7 +19,9 @@ extension Sequence {
   /// - Returns: A dictionary containing grouped elements of self, keyed by
   ///     the keys derived by the `keyForValue` closure.
   @inlinable
-  public func grouped<GroupKey>(by keyForValue: (Element) throws -> GroupKey) rethrows -> [GroupKey: [Element]] {
+  public func grouped<GroupKey>(by keyForValue: (Element) throws -> GroupKey) rethrows -> [GroupKey:
+    [Element]]
+  {
     try Dictionary(grouping: self, by: keyForValue)
   }
 }

@@ -86,7 +86,7 @@ extension SplitSequence: Sequence {
       self.omittingEmptySubsequences = omittingEmptySubsequences
     }
   }
-  
+
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(
@@ -659,8 +659,7 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
 }
 
 extension LazySequenceProtocol
-  where Self: Collection, Elements: Collection, Element: Equatable
-{
+where Self: Collection, Elements: Collection, Element: Equatable {
   /// Lazily returns the longest possible subsequences of the collection, in
   /// order, around elements equal to the given element.
   ///
