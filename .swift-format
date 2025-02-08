@@ -11,7 +11,7 @@
   "lineBreakBeforeControlFlowKeywords" : false,
   "lineBreakBeforeEachArgument" : false,
   "lineBreakBeforeEachGenericRequirement" : false,
-  "lineLength" : 100,
+  "lineLength" : 80,
   "maximumBlankLines" : 1,
   "multiElementCollectionTrailingCommas" : true,
   "noAssignmentInExpressions" : {
@@ -33,7 +33,7 @@
     "FullyIndirectEnum" : true,
     "GroupNumericLiterals" : true,
     "IdentifiersMustBeASCII" : true,
-    "NeverForceUnwrap" : false,
+    "NeverForceUnwrap" : true,
     "NeverUseForceTry" : true,
     "NeverUseImplicitlyUnwrappedOptionals" : true,
     "NoAccessLevelOnExtensionDeclaration" : true,
@@ -56,7 +56,7 @@
     "TypeNamesShouldBeCapitalized" : true,
     "UseEarlyExits" : false,
     "UseExplicitNilCheckInConditions" : true,
-    "UseLetInEveryBoundCaseVariable" : false,
+    "UseLetInEveryBoundCaseVariable" : true,
     "UseShorthandTypeNames" : true,
     "UseSingleLinePropertyGetter" : true,
     "UseSynthesizedInitializer" : true,
@@ -64,7 +64,7 @@
     "UseWhereClausesInForLoops" : false,
     "ValidateDocumentationComments" : true
   },
-  "spacesBeforeEndOfLineComments": 2,
+  "spacesBeforeEndOfLineComments" : 2,
   "spacesAroundRangeFormationOperators" : false,
   "tabWidth" : 2,
   "version" : 1

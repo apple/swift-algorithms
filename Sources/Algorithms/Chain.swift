@@ -54,7 +54,8 @@ extension Chain2Sequence: Sequence {
   }
 }
 
-extension Chain2Sequence: Collection where Base1: Collection, Base2: Collection {
+extension Chain2Sequence: Collection
+where Base1: Collection, Base2: Collection {
   /// A position in a `Chain2Sequence` instance.
   public struct Index: Comparable {
     // The internal index representation, which can either be an index of the
@@ -191,10 +192,14 @@ extension Chain2Sequence: Collection where Base1: Collection, Base2: Collection 
         .map(Index.init(first:))
 
     case let (.first(i), .second(limit)):
-      guard let j = base1.index(i, offsetBy: distance, limitedBy: base1.endIndex) else {
+      guard
+        let j = base1.index(i, offsetBy: distance, limitedBy: base1.endIndex)
+      else {
         // the offset overflows the bounds of `base1` by `n - d`
         let d = base1.distance(from: i, to: base1.endIndex)
-        return base2.index(base2.startIndex, offsetBy: distance - d, limitedBy: limit)
+        return
+          base2
+          .index(base2.startIndex, offsetBy: distance - d, limitedBy: limit)
           .map(Index.init(second:))
       }
       // the offset stays within the bounds of `base1`
@@ -227,10 +232,14 @@ extension Chain2Sequence: Collection where Base1: Collection, Base2: Collection 
       fatalError()
 
     case let (.second(i), .first(limit)):
-      guard let j = base2.index(i, offsetBy: -distance, limitedBy: base2.startIndex) else {
+      guard
+        let j = base2.index(i, offsetBy: -distance, limitedBy: base2.startIndex)
+      else {
         // the offset overflows the bounds of `base2` by `n - d`
         let d = base2.distance(from: base2.startIndex, to: i)
-        return base1.index(base1.endIndex, offsetBy: -(distance - d), limitedBy: limit)
+        return
+          base1
+          .index(base1.endIndex, offsetBy: -(distance - d), limitedBy: limit)
           .map(Index.init(first:))
       }
       // the offset stays within the bounds of `base2`

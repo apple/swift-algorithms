@@ -62,7 +62,8 @@ public struct WindowsOfCountCollection<Base: Collection> {
     self.base = base
     self.windowSize = windowSize
     self.endOfFirstWindow =
-      base.index(base.startIndex, offsetBy: windowSize, limitedBy: base.endIndex)
+      base
+      .index(base.startIndex, offsetBy: windowSize, limitedBy: base.endIndex)
   }
 }
 
@@ -338,17 +339,16 @@ extension WindowsOfCountCollection: BidirectionalCollection
 where Base: BidirectionalCollection {
   @inlinable
   public func index(before index: Index) -> Index {
-    precondition(index != startIndex, "Incrementing past start index")
-    guard index == endIndex else {
+    precondition(index != startIndex, "Decrementing past start index")
+    if index == endIndex {
+      return Index(
+        lowerBound: base.index(index.lowerBound, offsetBy: -windowSize),
+        upperBound: index.upperBound)
+    } else {
       return Index(
         lowerBound: base.index(before: index.lowerBound),
-        upperBound: base.index(before: index.upperBound)
-      )
+        upperBound: base.index(before: index.upperBound))
     }
-    return Index(
-      lowerBound: base.index(index.lowerBound, offsetBy: -windowSize),
-      upperBound: index.upperBound
-    )
   }
 }
 

@@ -246,21 +246,26 @@ extension EvenlyChunkedCollection {
   /// Returns the index in the base collection of the end of the chunk starting
   /// at the given index.
   @inlinable
-  internal func endOfChunk(startingAt start: Base.Index, offset: Int) -> Base.Index {
+  internal func endOfChunk(startingAt start: Base.Index, offset: Int)
+    -> Base.Index
+  {
     base.index(start, offsetBy: sizeOfChunk(offset: offset))
   }
 
   /// Returns the index in the base collection of the start of the chunk ending
   /// at the given index.
   @inlinable
-  internal func startOfChunk(endingAt end: Base.Index, offset: Int) -> Base.Index {
+  internal func startOfChunk(endingAt end: Base.Index, offset: Int)
+    -> Base.Index
+  {
     base.index(end, offsetBy: -sizeOfChunk(offset: offset))
   }
 
   /// Returns the index that corresponds to the chunk that starts at the given
   /// base index.
   @inlinable
-  internal func indexOfChunk(startingAt start: Base.Index, offset: Int) -> Index {
+  internal func indexOfChunk(startingAt start: Base.Index, offset: Int) -> Index
+  {
     guard offset != numberOfChunks else { return endIndex }
     let end = endOfChunk(startingAt: start, offset: offset)
     return Index(start..<end, offset: offset)
@@ -360,7 +365,11 @@ extension EvenlyChunkedCollection: Collection {
   }
 
   @inlinable
-  public func index(_ i: Index, offsetBy distance: Int, limitedBy limit: Index) -> Index? {
+  public func index(
+    _ i: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
+  ) -> Index? {
     if distance >= 0 {
       if (0..<distance).contains(self.distance(from: i, to: limit)) {
         return nil
@@ -654,11 +663,11 @@ extension ChunksOfCountCollection {
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     let distance =
-      base.distance(
-        from: start.baseRange.lowerBound,
-        to: end.baseRange.lowerBound)
+      base
+      .distance(from: start.baseRange.lowerBound, to: end.baseRange.lowerBound)
     let (quotient, remainder) =
-      distance.quotientAndRemainder(dividingBy: chunkCount)
+      distance
+      .quotientAndRemainder(dividingBy: chunkCount)
     return quotient + remainder.signum()
   }
 
@@ -708,9 +717,12 @@ extension ChunksOfCountCollection {
     assert(distance > 0)
 
     return makeOffsetIndex(
-      from: i, baseBound: base.endIndex,
-      distance: distance, baseDistance: distance * chunkCount,
-      limit: limit, by: >
+      from: i,
+      baseBound: base.endIndex,
+      distance: distance,
+      baseDistance: distance * chunkCount,
+      limit: limit,
+      by: >
     )
   }
 
@@ -737,12 +749,14 @@ extension ChunksOfCountCollection {
     _ i: Index, offsetBy distance: Int, limit: Index? = nil
   ) -> Index? {
     assert(distance < 0)
-    let baseDistance =
-      computeOffsetBackwardBaseDistance(i, distance)
+    let baseDistance = computeOffsetBackwardBaseDistance(i, distance)
     return makeOffsetIndex(
-      from: i, baseBound: base.startIndex,
-      distance: distance, baseDistance: baseDistance,
-      limit: limit, by: <
+      from: i,
+      baseBound: base.startIndex,
+      distance: distance,
+      baseDistance: baseDistance,
+      limit: limit,
+      by: <
     )
   }
 
@@ -753,9 +767,9 @@ extension ChunksOfCountCollection {
     limit: Index?, by limitFn: (Base.Index, Base.Index) -> Bool
   ) -> Index? {
     let baseIdx = base.index(
-      i.baseRange.lowerBound, offsetBy: baseDistance,
-      limitedBy: baseBound
-    )
+      i.baseRange.lowerBound,
+      offsetBy: baseDistance,
+      limitedBy: baseBound)
 
     if let limit = limit {
       if baseIdx == nil {
@@ -785,8 +799,10 @@ extension ChunksOfCountCollection {
     let baseStartIdx = baseIdx ?? baseBound
     let baseEndIdx =
       base.index(
-        baseStartIdx, offsetBy: chunkCount, limitedBy: base.endIndex
-      ) ?? base.endIndex
+        baseStartIdx,
+        offsetBy: chunkCount,
+        limitedBy: base.endIndex)
+      ?? base.endIndex
 
     return Index(_baseRange: baseStartIdx..<baseEndIdx)
   }
@@ -884,7 +900,8 @@ extension Collection {
   @inlinable
   public func evenlyChunked(in count: Int) -> EvenlyChunkedCollection<Self> {
     precondition(count >= 0, "Can't divide into a negative number of chunks")
-    precondition(count > 0 || isEmpty, "Can't divide a non-empty collection into 0 chunks")
+    precondition(
+      count > 0 || isEmpty, "Can't divide a non-empty collection into 0 chunks")
     return EvenlyChunkedCollection(base: self, numberOfChunks: count)
   }
 }

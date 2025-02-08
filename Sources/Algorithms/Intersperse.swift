@@ -208,7 +208,9 @@ extension InterspersedSequence: Collection where Base: Collection {
     assert(distance >= 0)
     assert(limit >= index)
 
-    switch (index.representation, limit.representation, distance.isMultiple(of: 2)) {
+    switch (
+      index.representation, limit.representation, distance.isMultiple(of: 2)
+    ) {
     case let (.element(index), .element(limit), true),
       let (.separator(next: index), .element(limit), false):
       return base.index(index, offsetBy: distance / 2, limitedBy: limit)
@@ -235,13 +237,17 @@ extension InterspersedSequence: Collection where Base: Collection {
     assert(distance >= 0)
     assert(limit <= index)
 
-    switch (index.representation, limit.representation, distance.isMultiple(of: 2)) {
+    switch (
+      index.representation, limit.representation, distance.isMultiple(of: 2)
+    ) {
     case let (.element(index), .element(limit), true),
       let (.element(index), .separator(next: limit), true),
       let (.separator(next: index), .element(limit), false),
       let (.separator(next: index), .separator(next: limit), false):
-      return base.index(index, offsetBy: -((distance + 1) / 2), limitedBy: limit)
-        .map { .element($0) }
+      return base.index(
+        index, offsetBy: -((distance + 1) / 2), limitedBy: limit
+      )
+      .map { .element($0) }
 
     case let (.element(index), .separator(next: limit), false),
       let (.separator(next: index), .separator(next: limit), true):
@@ -368,11 +374,11 @@ extension InterspersedMapSequence: Collection where Base: Collection {
     }
 
     @usableFromInline
-    internal let representation: Representation
+    internal let base: Representation
 
     @inlinable
     internal init(representation: Representation) {
-      self.representation = representation
+      self.base = representation
     }
 
     @inlinable
@@ -381,13 +387,16 @@ extension InterspersedMapSequence: Collection where Base: Collection {
     }
 
     @inlinable
-    internal static func separator(previous: Base.Index, next: Base.Index) -> Self {
+    internal static func separator(
+      previous: Base.Index,
+      next: Base.Index
+    ) -> Self {
       Self(representation: .separator(previous: previous, next: next))
     }
 
     @inlinable
     internal static func == (lhs: Self, rhs: Self) -> Bool {
-      switch (lhs.representation, rhs.representation) {
+      switch (lhs.base, rhs.base) {
       case let (.element(lhs), .element(rhs)),
         let (.separator(_, next: lhs), .separator(_, next: rhs)):
         return lhs == rhs
@@ -398,7 +407,7 @@ extension InterspersedMapSequence: Collection where Base: Collection {
 
     @inlinable
     internal static func < (lhs: Self, rhs: Self) -> Bool {
-      switch (lhs.representation, rhs.representation) {
+      switch (lhs.base, rhs.base) {
       case let (.element(lhs), .element(rhs)),
         let (.separator(_, next: lhs), .separator(_, next: rhs)),
         let (.element(lhs), .separator(_, next: rhs)),
@@ -420,7 +429,7 @@ extension InterspersedMapSequence: Collection where Base: Collection {
 
   @inlinable
   internal func index(after index: Index) -> Index {
-    switch index.representation {
+    switch index.base {
     case .element(let index):
       let next = base.index(after: index)
       return .separator(previous: index, next: next)
@@ -431,7 +440,7 @@ extension InterspersedMapSequence: Collection where Base: Collection {
 
   @inlinable
   internal subscript(position: Index) -> Result {
-    switch position.representation {
+    switch position.base {
     case .element(let index):
       return transform(base[index])
     case let .separator(previous, next):
@@ -441,7 +450,7 @@ extension InterspersedMapSequence: Collection where Base: Collection {
 
   @inlinable
   internal func distance(from start: Index, to end: Index) -> Int {
-    switch (start.representation, end.representation) {
+    switch (start.base, end.base) {
     case let (.element(lhs), .element(rhs)),
       let (.separator(_, next: lhs), .separator(_, next: rhs)):
       return 2 * base.distance(from: lhs, to: rhs)
@@ -501,7 +510,7 @@ extension InterspersedMapSequence: Collection where Base: Collection {
     assert(distance > 0)
     assert(limit >= index)
 
-    switch (index.representation, limit.representation, distance.isMultiple(of: 2)) {
+    switch (index.base, limit.base, distance.isMultiple(of: 2)) {
     case let (.element(index), .element(limit), true),
       let (.separator(_, next: index), .element(limit), false):
       return base.index(index, offsetBy: distance / 2, limitedBy: limit)
@@ -534,12 +543,14 @@ extension InterspersedMapSequence: Collection where Base: Collection {
     assert(distance > 0)
     assert(limit <= index)
 
-    switch (index.representation, limit.representation, distance.isMultiple(of: 2)) {
+    switch (index.base, limit.base, distance.isMultiple(of: 2)) {
     case let (.element(index), .element(limit), true),
       let (.element(index), .separator(_, next: limit), true),
       let (.separator(_, next: index), .element(limit), false),
       let (.separator(_, next: index), .separator(_, next: limit), false):
-      return base.index(index, offsetBy: -((distance + 1) / 2), limitedBy: limit)
+      return
+        base
+        .index(index, offsetBy: -((distance + 1) / 2), limitedBy: limit)
         .map { .element($0) }
 
     case let (.element(index), .separator(_, next: limit), false),
@@ -563,7 +574,7 @@ extension InterspersedMapSequence: BidirectionalCollection
 where Base: BidirectionalCollection {
   @inlinable
   internal func index(before index: Index) -> Index {
-    switch index.representation {
+    switch index.base {
     case .element(let index):
       let previous = base.index(before: index)
       return .separator(previous: previous, next: index)
@@ -578,7 +589,7 @@ extension InterspersedMapSequence.Index: Hashable
 where Base.Index: Hashable {
   @inlinable
   internal func hash(into hasher: inout Hasher) {
-    switch representation {
+    switch base {
     case .element(let base):
       hasher.combine(false)
       hasher.combine(base)

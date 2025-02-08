@@ -264,7 +264,10 @@ extension Product2Sequence: Collection where Base1: Collection {
         .map { i2 in Index(i1: i.i1, i2: i2) }
     }
 
-    if let i2 = base2.index(i.i2, offsetBy: distance, limitedBy: base2.endIndex) {
+    if let i2 =
+      base2
+      .index(i.i2, offsetBy: distance, limitedBy: base2.endIndex)
+    {
       // `distance` does not overflow `base2[i.i2...]`.
       //
       //             i.i2         i2
@@ -289,11 +292,16 @@ extension Product2Sequence: Collection where Base1: Collection {
       //                            ^
       //                         limit.i2
 
-      return base2.index(base2.startIndex, offsetBy: remaining, limitedBy: limit.i2)
+      return
+        base2
+        .index(base2.startIndex, offsetBy: remaining, limitedBy: limit.i2)
         .map { i2 in Index(i1: nextI1, i2: i2) }
     }
 
-    if let i2 = base2.index(base2.startIndex, offsetBy: remaining, limitedBy: i.i2) {
+    if let i2 =
+      base2
+      .index(base2.startIndex, offsetBy: remaining, limitedBy: i.i2)
+    {
       // `remaining` does not overflow `base2[..<i.i2]`.
       //
       //                           i.i2
@@ -312,14 +320,17 @@ extension Product2Sequence: Collection where Base1: Collection {
     let base2Count = prefixCount + suffixCount
     let base1Distance = remaining / base2Count
 
-    guard let i1 = base1.index(nextI1, offsetBy: base1Distance, limitedBy: limit.i1)
+    guard
+      let i1 = base1.index(nextI1, offsetBy: base1Distance, limitedBy: limit.i1)
     else { return nil }
 
     // The distance from `base2.startIndex` to the target.
     let base2Distance = remaining % base2Count
 
     let base2Limit = limit.i1 == i1 ? limit.i2 : base2.endIndex
-    return base2.index(base2.startIndex, offsetBy: base2Distance, limitedBy: base2Limit)
+    return
+      base2
+      .index(base2.startIndex, offsetBy: base2Distance, limitedBy: base2Limit)
       .map { i2 in Index(i1: i1, i2: i2) }
   }
 
@@ -341,7 +352,10 @@ extension Product2Sequence: Collection where Base1: Collection {
         .map { i2 in Index(i1: i.i1, i2: i2) }
     }
 
-    if let i2 = base2.index(i.i2, offsetBy: -distance, limitedBy: base2.startIndex) {
+    if let i2 =
+      base2
+      .index(i.i2, offsetBy: -distance, limitedBy: base2.startIndex)
+    {
       // `distance` does not underflow `base2[..<i.i2]`.
       //
       //              i2         i.i2
@@ -366,11 +380,16 @@ extension Product2Sequence: Collection where Base1: Collection {
       //                                ^
       //                               i.i2
 
-      return base2.index(base2.endIndex, offsetBy: -remaining, limitedBy: limit.i2)
+      return
+        base2
+        .index(base2.endIndex, offsetBy: -remaining, limitedBy: limit.i2)
         .map { i2 in Index(i1: previousI1, i2: i2) }
     }
 
-    if let i2 = base2.index(base2.endIndex, offsetBy: -remaining, limitedBy: i.i2) {
+    if let i2 =
+      base2
+      .index(base2.endIndex, offsetBy: -remaining, limitedBy: i.i2)
+    {
       // `remaining` does not underflow `base2[i.i2...]`.
       //
       //                                i2
@@ -405,7 +424,11 @@ extension Product2Sequence: Collection where Base1: Collection {
       //                    ^
       //                   i.i2
 
-      guard let i1 = base1.index(previousI1, offsetBy: -(base1Distance - 1), limitedBy: limit.i1)
+      guard
+        let i1 = base1.index(
+          previousI1,
+          offsetBy: -(base1Distance - 1),
+          limitedBy: limit.i1)
       else {
         return nil
       }
@@ -413,11 +436,16 @@ extension Product2Sequence: Collection where Base1: Collection {
       return index < limit ? nil : index
     }
 
-    guard let i1 = base1.index(previousI1, offsetBy: -base1Distance, limitedBy: limit.i1)
+    guard
+      let i1 =
+        base1
+        .index(previousI1, offsetBy: -base1Distance, limitedBy: limit.i1)
     else { return nil }
 
     let base2Limit = limit.i1 == i1 ? limit.i2 : base2.startIndex
-    return base2.index(base2.endIndex, offsetBy: -base2Distance, limitedBy: base2Limit)
+    return
+      base2
+      .index(base2.endIndex, offsetBy: -base2Distance, limitedBy: base2Limit)
       .map { i2 in Index(i1: i1, i2: i2) }
   }
 }

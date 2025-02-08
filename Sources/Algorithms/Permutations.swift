@@ -187,7 +187,9 @@ extension PermutationsSequence: Sequence {
       let edge = countToChoose - 1
 
       // Find first index greater than the one at `edge`.
-      if let i = indexes[countToChoose...].firstIndex(where: { indexes[edge] < $0 }) {
+      if let i = indexes[countToChoose...]
+        .firstIndex(where: { indexes[edge] < $0 })
+      {
         indexes.swapAt(edge, i)
       } else {
         indexes.reverse(subrange: countToChoose..<indexes.endIndex)
@@ -195,7 +197,8 @@ extension PermutationsSequence: Sequence {
         // Find last increasing pair below `edge`.
         // TODO: This could be indexes[..<edge].adjacentPairs().lastIndex(where: ...)
         var lastAscent = edge - 1
-        while lastAscent >= 0 && indexes[lastAscent] >= indexes[lastAscent + 1] {
+        while lastAscent >= 0 && indexes[lastAscent] >= indexes[lastAscent + 1]
+        {
           lastAscent -= 1
         }
         if lastAscent < 0 {
@@ -203,7 +206,9 @@ extension PermutationsSequence: Sequence {
         }
 
         // Find rightmost index less than that at `lastAscent`.
-        if let i = indexes[lastAscent...].lastIndex(where: { indexes[lastAscent] < $0 }) {
+        if let i = indexes[lastAscent...]
+          .lastIndex(where: { indexes[lastAscent] < $0 })
+        {
           indexes.swapAt(lastAscent, i)
         }
         indexes.reverse(subrange: (lastAscent + 1)..<indexes.endIndex)
@@ -386,7 +391,9 @@ extension Collection {
   ///   is the number of elements in the base collection, since
   ///   `PermutationsSequence` accesses the `count` of the base collection.
   @inlinable
-  public func permutations(ofCount k: Int? = nil) -> PermutationsSequence<Self> {
+  public func permutations(
+    ofCount k: Int? = nil
+  ) -> PermutationsSequence<Self> {
     precondition(
       k ?? 0 >= 0,
       "Can't have permutations with a negative number of elements.")
@@ -420,7 +427,9 @@ extension UniquePermutationsSequence where Base.Element: Hashable {
   internal static func _indexes(_ base: Base) -> [Base.Index] {
     let firstIndexesAndCountsByElement = Dictionary(
       base.indices.lazy.map { (base[$0], ($0, 1)) },
-      uniquingKeysWith: { indexAndCount, _ in (indexAndCount.0, indexAndCount.1 + 1) })
+      uniquingKeysWith: { indexAndCount, _ in
+        (indexAndCount.0, indexAndCount.1 + 1)
+      })
 
     return firstIndexesAndCountsByElement
       .values.sorted(by: { $0.0 < $1.0 })
@@ -462,7 +471,8 @@ extension UniquePermutationsSequence: Sequence {
     internal var initial = true
 
     @inlinable
-    internal init(_ elements: Base, indexes: [Base.Index], lengths: Range<Int>) {
+    internal init(_ elements: Base, indexes: [Base.Index], lengths: Range<Int>)
+    {
       self.base = elements
       self.indexes = indexes
       self.lengths = lengths

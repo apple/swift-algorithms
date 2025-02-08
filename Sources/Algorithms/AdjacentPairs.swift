@@ -239,9 +239,11 @@ extension AdjacentPairsCollection: Collection {
     assert(distance > 0)
     assert(limit > i)
 
-    guard let newFirst = base.index(i.second, offsetBy: distance - 1, limitedBy: limit.first),
-      newFirst != base.endIndex
+    let newFirst = base.index(
+      i.second, offsetBy: distance - 1, limitedBy: limit.first)
+    guard let newFirst, newFirst != base.endIndex
     else { return nil }
+
     let newSecond = base.index(after: newFirst)
 
     precondition(newSecond <= base.endIndex, "Can't advance beyond endIndex")
@@ -258,12 +260,11 @@ extension AdjacentPairsCollection: Collection {
     assert(limit < i)
 
     let offset = i == endIndex ? 0 : 1
-    guard
-      let newSecond = base.index(
-        i.first,
-        offsetBy: -(distance - offset),
-        limitedBy: limit.second)
+    let newSecond = base.index(
+      i.first, offsetBy: -(distance - offset), limitedBy: limit.second)
+    guard let newSecond
     else { return nil }
+
     let newFirst = base.index(newSecond, offsetBy: -1)
     precondition(newFirst >= base.startIndex, "Can't move before startIndex")
     return Index(first: newFirst, second: newSecond)

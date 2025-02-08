@@ -302,7 +302,8 @@ extension Collection {
   ///   `CombinationsSequence` accesses the `count` of the base collection.
   @inlinable
   public func combinations(ofCount k: Int) -> CombinationsSequence<Self> {
-    precondition(k >= 0, "Can't have combinations with a negative number of elements.")
+    precondition(
+      k >= 0, "Can't have combinations with a negative number of elements.")
     return CombinationsSequence(self, k: k)
   }
 }
