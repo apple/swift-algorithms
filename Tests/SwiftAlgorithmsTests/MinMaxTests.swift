@@ -17,26 +17,26 @@ final class SortedPrefixTests: XCTestCase {
     // Replacement at start and end
     let input = [10, 11, 12, 1, 13, 2, 14, 3, 4, 5, 6, 0, 7, 8, 9]
     let min = input.min(count: 5)
-    XCTAssertEqualSequences(min, 0..<5)
+    expectEqualSequences(min, 0..<5)
 
     // Stability with all equal values
     let maxZeroes = Array(repeating: 0, count: 100)
       .enumerated()
       .max(count: 5, sortedBy: { $0.element < $1.element })
-    XCTAssertEqualSequences(maxZeroes.map { $0.offset }, 95..<100)
+    expectEqualSequences(maxZeroes.map { $0.offset }, 95..<100)
   }
 
   func testMaxCount() {
     // Replacement at start and end
     let input = [0, 11, 12, 1, 13, 2, 14, 3, 4, 5, 6, 7, 8, 9, 10]
     let max = input.max(count: 5)
-    XCTAssertEqualSequences(max, 10..<15)
+    expectEqualSequences(max, 10..<15)
 
     // Stability with all equal values
     let maxZeroes = Array(repeating: 0, count: 100)
       .enumerated()
       .max(count: 5, sortedBy: { $0.element < $1.element })
-    XCTAssertEqualSequences(maxZeroes.map { $0.offset }, 95..<100)
+    expectEqualSequences(maxZeroes.map { $0.offset }, 95..<100)
   }
 
   func testEmpty() {
@@ -52,11 +52,11 @@ final class SortedPrefixTests: XCTestCase {
     let input = (1...100).shuffled().interspersed(with: 50)
     let seq = AnySequence(input)
 
-    XCTAssertEqualSequences(seq.min(count: 0), [])
-    XCTAssertEqualSequences(seq.min(count: 5), 1...5)
+    expectEqualSequences(seq.min(count: 0), [])
+    expectEqualSequences(seq.min(count: 5), 1...5)
 
-    XCTAssertEqualSequences(seq.max(count: 0), [])
-    XCTAssertEqualSequences(seq.max(count: 5), 96...100)
+    expectEqualSequences(seq.max(count: 0), [])
+    expectEqualSequences(seq.max(count: 5), 96...100)
   }
 
   func testSortedPrefixComparable() {
@@ -64,7 +64,7 @@ final class SortedPrefixTests: XCTestCase {
 
     XCTAssertEqual(array.min(count: 0), [])
     XCTAssertEqual(array.min(count: 1), [1])
-    XCTAssertEqualSequences(array.min(count: 5), array.sorted().prefix(5))
+    expectEqualSequences(array.min(count: 5), array.sorted().prefix(5))
     XCTAssertEqual(array.min(count: 10), array.sorted())
   }
 
@@ -83,20 +83,20 @@ final class SortedPrefixTests: XCTestCase {
     XCTAssertEqual(input.min(count: 1, sortedBy: <), [range.lowerBound])
     XCTAssertEqual(input.min(count: 1, sortedBy: >), [range.upperBound])
 
-    XCTAssertEqualSequences(input.min(count: 5, sortedBy: <), range.prefix(5))
-    XCTAssertEqualSequences(
+    expectEqualSequences(input.min(count: 5, sortedBy: <), range.prefix(5))
+    expectEqualSequences(
       input.min(count: 5, sortedBy: >),
       range.suffix(5).reversed())
 
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       input.min(count: 500, sortedBy: <),
       range.prefix(500))
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       input.min(count: 500, sortedBy: >),
       range.suffix(500).reversed())
 
-    XCTAssertEqualSequences(input.min(count: 1000, sortedBy: <), range)
-    XCTAssertEqualSequences(
+    expectEqualSequences(input.min(count: 1000, sortedBy: <), range)
+    expectEqualSequences(
       input.min(count: 1000, sortedBy: >),
       range.reversed())
   }
@@ -111,20 +111,20 @@ final class SortedPrefixTests: XCTestCase {
     XCTAssertEqual(input.max(count: 1, sortedBy: <), [range.upperBound])
     XCTAssertEqual(input.max(count: 1, sortedBy: >), [range.lowerBound])
 
-    XCTAssertEqualSequences(input.max(count: 5, sortedBy: <), range.suffix(5))
-    XCTAssertEqualSequences(
+    expectEqualSequences(input.max(count: 5, sortedBy: <), range.suffix(5))
+    expectEqualSequences(
       input.max(count: 5, sortedBy: >),
       range.prefix(5).reversed())
 
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       input.max(count: 500, sortedBy: <),
       range.suffix(500))
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       input.max(count: 500, sortedBy: >),
       range.prefix(500).reversed())
 
-    XCTAssertEqualSequences(input.max(count: 1000, sortedBy: <), range)
-    XCTAssertEqualSequences(
+    expectEqualSequences(input.max(count: 1000, sortedBy: <), range)
+    expectEqualSequences(
       input.max(count: 1000, sortedBy: >),
       range.reversed())
   }

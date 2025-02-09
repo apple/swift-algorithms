@@ -16,36 +16,36 @@ final class StridingTests: XCTestCase {
 
   func testStride() {
     let a = 0...10
-    XCTAssertEqualSequences(a.striding(by: 1), (0...10))
-    XCTAssertEqualSequences(a.striding(by: 2), [0, 2, 4, 6, 8, 10])
-    XCTAssertEqualSequences(a.striding(by: 3), [0, 3, 6, 9])
-    XCTAssertEqualSequences(a.striding(by: 4), [0, 4, 8])
-    XCTAssertEqualSequences(a.striding(by: 5), [0, 5, 10])
-    XCTAssertEqualSequences(a.striding(by: 10), [0, 10])
-    XCTAssertEqualSequences(a.striding(by: 11), [0])
+    expectEqualSequences(a.striding(by: 1), (0...10))
+    expectEqualSequences(a.striding(by: 2), [0, 2, 4, 6, 8, 10])
+    expectEqualSequences(a.striding(by: 3), [0, 3, 6, 9])
+    expectEqualSequences(a.striding(by: 4), [0, 4, 8])
+    expectEqualSequences(a.striding(by: 5), [0, 5, 10])
+    expectEqualSequences(a.striding(by: 10), [0, 10])
+    expectEqualSequences(a.striding(by: 11), [0])
 
     let s = (0...).prefix(11)
-    XCTAssertEqualSequences(s.striding(by: 1), (0...10))
-    XCTAssertEqualSequences(s.striding(by: 2), [0, 2, 4, 6, 8, 10])
-    XCTAssertEqualSequences(s.striding(by: 3), [0, 3, 6, 9])
-    XCTAssertEqualSequences(s.striding(by: 4), [0, 4, 8])
-    XCTAssertEqualSequences(s.striding(by: 5), [0, 5, 10])
-    XCTAssertEqualSequences(s.striding(by: 10), [0, 10])
-    XCTAssertEqualSequences(s.striding(by: 11), [0])
+    expectEqualSequences(s.striding(by: 1), (0...10))
+    expectEqualSequences(s.striding(by: 2), [0, 2, 4, 6, 8, 10])
+    expectEqualSequences(s.striding(by: 3), [0, 3, 6, 9])
+    expectEqualSequences(s.striding(by: 4), [0, 4, 8])
+    expectEqualSequences(s.striding(by: 5), [0, 5, 10])
+    expectEqualSequences(s.striding(by: 10), [0, 10])
+    expectEqualSequences(s.striding(by: 11), [0])
 
     let empty = (0...).prefix(0)
-    XCTAssertEqualSequences(empty.striding(by: 2), [])
+    expectEqualSequences(empty.striding(by: 2), [])
   }
 
   func testStrideString() {
     let s = "swift"
-    XCTAssertEqualSequences(s.striding(by: 2), ["s", "i", "t"])
+    expectEqualSequences(s.striding(by: 2), ["s", "i", "t"])
   }
 
   func testStrideReversed() {
     let a = [0, 1, 2, 3, 4, 5]
-    XCTAssertEqualSequences(a.striding(by: 3).reversed(), [3, 0])
-    XCTAssertEqualSequences(a.reversed().striding(by: 2), [5, 3, 1])
+    expectEqualSequences(a.striding(by: 3).reversed(), [3, 0])
+    expectEqualSequences(a.reversed().striding(by: 2), [5, 3, 1])
   }
 
   func testStrideIndexes() {
@@ -136,8 +136,8 @@ final class StridingTests: XCTestCase {
   }
 
   func testLazy() {
-    XCTAssertLazySequence(AnySequence(0..<100).lazy.striding(by: 3))
-    XCTAssertLazySequence((0..<100).lazy.striding(by: 3))
-    XCTAssertLazyCollection((0..<100).lazy.striding(by: 3))
+    requireLazySequence(AnySequence(0..<100).lazy.striding(by: 3))
+    requireLazySequence((0..<100).lazy.striding(by: 3))
+    requireLazyCollection((0..<100).lazy.striding(by: 3))
   }
 }

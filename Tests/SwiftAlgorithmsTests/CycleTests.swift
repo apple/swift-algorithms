@@ -15,7 +15,7 @@ import XCTest
 final class CycleTests: XCTestCase {
   func testCycle() {
     let cycle = (1...4).cycled()
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
       cycle.prefix(20)
     )
@@ -32,12 +32,12 @@ final class CycleTests: XCTestCase {
   }
 
   func testCycleLazy() {
-    XCTAssertLazySequence((1...4).lazy.cycled())
+    requireLazySequence((1...4).lazy.cycled())
   }
 
   func testRepeated() {
     let repeats = (1...4).cycled(times: 3)
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4],
       repeats)
   }
@@ -58,7 +58,7 @@ final class CycleTests: XCTestCase {
   }
 
   func testRepeatedLazy() {
-    XCTAssertLazySequence((1...4).lazy.cycled(times: 3))
+    requireLazySequence((1...4).lazy.cycled(times: 3))
   }
 
   func testRepeatedIndexMethods() {

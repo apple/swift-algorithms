@@ -22,16 +22,16 @@ final class CompactedTests: XCTestCase {
   func testCompactedCompacted() {
     for collection in self.tests {
       let seq = AnySequence(collection)
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         seq.compactMap({ $0 }), seq.compacted())
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         collection.compactMap({ $0 }), collection.compacted())
     }
   }
 
   func testCompactedBidirectionalCollection() {
     for array in self.tests {
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         array.compactMap({ $0 }).reversed(),
         array.compacted().reversed())
     }

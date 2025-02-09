@@ -15,57 +15,57 @@ import XCTest
 final class AdjacentPairsTests: XCTestCase {
   func testEmptySequence() {
     let pairs = (0...).prefix(0).adjacentPairs()
-    XCTAssertEqualSequences(pairs, [], by: ==)
+    expectEqualSequences(pairs, [], by: ==)
   }
 
   func testOneElementSequence() {
     let pairs = (0...).prefix(1).adjacentPairs()
-    XCTAssertEqualSequences(pairs, [], by: ==)
+    expectEqualSequences(pairs, [], by: ==)
   }
 
   func testTwoElementSequence() {
     let pairs = (0...).prefix(2).adjacentPairs()
-    XCTAssertEqualSequences(pairs, [(0, 1)], by: ==)
+    expectEqualSequences(pairs, [(0, 1)], by: ==)
   }
 
   func testThreeElementSequence() {
     let pairs = (0...).prefix(3).adjacentPairs()
-    XCTAssertEqualSequences(pairs, [(0, 1), (1, 2)], by: ==)
+    expectEqualSequences(pairs, [(0, 1), (1, 2)], by: ==)
   }
 
   func testManySequences() {
     for n in 4...100 {
       let pairs = (0...).prefix(n).adjacentPairs()
-      XCTAssertEqualSequences(pairs, zip(0..., 1...).prefix(n - 1), by: ==)
+      expectEqualSequences(pairs, zip(0..., 1...).prefix(n - 1), by: ==)
     }
   }
 
   func testZeroElements() {
     let pairs = (0..<0).adjacentPairs()
     XCTAssertEqual(pairs.startIndex, pairs.endIndex)
-    XCTAssertEqualSequences(pairs, [], by: ==)
+    expectEqualSequences(pairs, [], by: ==)
   }
 
   func testOneElement() {
     let pairs = (0..<1).adjacentPairs()
     XCTAssertEqual(pairs.startIndex, pairs.endIndex)
-    XCTAssertEqualSequences(pairs, [], by: ==)
+    expectEqualSequences(pairs, [], by: ==)
   }
 
   func testTwoElements() {
     let pairs = (0..<2).adjacentPairs()
-    XCTAssertEqualSequences(pairs, [(0, 1)], by: ==)
+    expectEqualSequences(pairs, [(0, 1)], by: ==)
   }
 
   func testThreeElements() {
     let pairs = (0..<3).adjacentPairs()
-    XCTAssertEqualSequences(pairs, [(0, 1), (1, 2)], by: ==)
+    expectEqualSequences(pairs, [(0, 1), (1, 2)], by: ==)
   }
 
   func testManyElements() {
     for n in 4...100 {
       let pairs = (0..<n).adjacentPairs()
-      XCTAssertEqualSequences(pairs, zip(0..., 1...).prefix(n - 1), by: ==)
+      expectEqualSequences(pairs, zip(0..., 1...).prefix(n - 1), by: ==)
     }
   }
 
@@ -78,7 +78,7 @@ final class AdjacentPairsTests: XCTestCase {
   }
 
   func testLaziness() {
-    XCTAssertLazySequence((0...).lazy.adjacentPairs())
-    XCTAssertLazyCollection((0..<100).lazy.adjacentPairs())
+    requireLazySequence((0...).lazy.adjacentPairs())
+    requireLazyCollection((0..<100).lazy.adjacentPairs())
   }
 }

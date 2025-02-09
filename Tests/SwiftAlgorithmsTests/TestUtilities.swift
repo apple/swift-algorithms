@@ -74,19 +74,19 @@ extension MutableCollection {
   }
 }
 
-func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
+func expectEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
   _ message: @autoclosure () -> String = "",
   file: StaticString = (#file), line: UInt = #line
 ) rethrows where S1.Element: Equatable, S1.Element == S2.Element {
-  try XCTAssertEqualSequences(
+  try expectEqualSequences(
     expression1(), expression2(), by: ==,
     message(), file: file, line: line)
 }
 
 // Two sequences contains exactly the same element but not necessarily in the same order.
-func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
+func expectUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
   file: StaticString = (#file), line: UInt = #line
@@ -113,7 +113,7 @@ func XCTAssertUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
   )
 }
 
-func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
+func expectEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
   by areEquivalent: (S1.Element, S1.Element) -> Bool,
@@ -150,11 +150,11 @@ func XCTAssertEqualSequences<S1: Sequence, S2: Sequence>(
   }
 }
 
-func XCTAssertLazySequence<S: LazySequenceProtocol>(_: S) {}
-func XCTAssertLazyCollection<S: LazyCollectionProtocol>(_: S) {}
+func requireLazySequence<S: LazySequenceProtocol>(_: S) {}
+func requireLazyCollection<S: LazyCollectionProtocol>(_: S) {}
 
 /// Asserts two collections are equal by using their indices to access elements.
-func XCTAssertEqualCollections<C1: Collection, C2: Collection>(
+func expectEqualCollections<C1: Collection, C2: Collection>(
   _ expression1: @autoclosure () throws -> C1,
   _ expression2: @autoclosure () throws -> C2,
   _ message: @autoclosure () -> String = "",

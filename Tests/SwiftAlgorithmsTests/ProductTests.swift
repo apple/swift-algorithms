@@ -15,23 +15,23 @@ import XCTest
 
 final class ProductTests: XCTestCase {
   func testProduct() {
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       [(1, "A" as Character), (1, "B"), (2, "A"), (2, "B")],
       product(1...2, "AB"),
       by: ==)
 
-    XCTAssertEqualSequences(product(1...10, ""), [], by: ==)
-    XCTAssertEqualSequences(product("", 1...10), [], by: ==)
+    expectEqualSequences(product(1...10, ""), [], by: ==)
+    expectEqualSequences(product("", 1...10), [], by: ==)
   }
 
   func testProductReversed() {
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       [(2, "B" as Character), (2, "A"), (1, "B"), (1, "A")],
       product(1...2, "AB").reversed(),
       by: ==)
 
-    XCTAssertEqualSequences(product(1...10, "").reversed(), [], by: ==)
-    XCTAssertEqualSequences(product("", 1...10).reversed(), [], by: ==)
+    expectEqualSequences(product(1...10, "").reversed(), [], by: ==)
+    expectEqualSequences(product("", 1...10).reversed(), [], by: ==)
   }
 
   func testProductDistanceFromTo() {

@@ -19,13 +19,13 @@ final class WindowsTests: XCTestCase {
     let w = s.windows(ofCount: 2)
     var i = w.startIndex
 
-    XCTAssertEqualSequences(w[i], "sw")
+    expectEqualSequences(w[i], "sw")
     w.formIndex(after: &i)
-    XCTAssertEqualSequences(w[i], "wi")
+    expectEqualSequences(w[i], "wi")
     w.formIndex(after: &i)
-    XCTAssertEqualSequences(w[i], "if")
+    expectEqualSequences(w[i], "if")
     w.formIndex(after: &i)
-    XCTAssertEqualSequences(w[i], "ft")
+    expectEqualSequences(w[i], "ft")
 
     //    w.index(after: w.endIndex) // ← Precondition failed: windows index is out of range
     //    w.index(before: w.startIndex) // ← Precondition failed: windows index is out of range
@@ -39,8 +39,8 @@ final class WindowsTests: XCTestCase {
 
     let w = a.windows(ofCount: 10)
 
-    XCTAssertEqualSequences(w.first!, 0..<10)
-    XCTAssertEqualSequences(w.last!, 91..<101)
+    expectEqualSequences(w.first!, 0..<10)
+    expectEqualSequences(w.last!, 91..<101)
   }
 
   func testWindowsOfInt() {
@@ -71,10 +71,10 @@ final class WindowsTests: XCTestCase {
     let a = [0, 1, 2, 3, 4, 5]
     let w = a.windows(ofCount: 4)
     let snd = w[w.index(after: w.startIndex)]
-    XCTAssertEqualSequences(snd, [1, 2, 3, 4])
+    expectEqualSequences(snd, [1, 2, 3, 4])
 
     let w2 = a.windows(ofCount: 3)
-    XCTAssertEqualSequences(w2.last!, [3, 4, 5])
+    expectEqualSequences(w2.last!, [3, 4, 5])
   }
 
   func testWindowsIndexAfterAndBefore() {
@@ -83,7 +83,7 @@ final class WindowsTests: XCTestCase {
     a.formIndex(after: &i)
     a.formIndex(after: &i)
     a.formIndex(before: &i)
-    XCTAssertEqualSequences(a[i], [1, 2])
+    expectEqualSequences(a[i], [1, 2])
   }
 
   func testWindowsIndexTraversals() {
@@ -107,6 +107,6 @@ final class WindowsTests: XCTestCase {
   }
 
   func testWindowsLazy() {
-    XCTAssertLazyCollection([0, 1, 2, 3].lazy.windows(ofCount: 2))
+    requireLazyCollection([0, 1, 2, 3].lazy.windows(ofCount: 2))
   }
 }

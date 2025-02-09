@@ -33,7 +33,7 @@ final class ChunkedTests: XCTestCase {
       fruits[18..<19],
       fruits[19..<22],
     ]
-    XCTAssertEqualSequences(expectedChunks, fruitChunks, by: ==)
+    expectEqualSequences(expectedChunks, fruitChunks, by: ==)
 
     XCTAssertEqual(fruits[19..<22], fruitChunks.last)
 
@@ -53,7 +53,7 @@ final class ChunkedTests: XCTestCase {
       ("K", ["Kyle", "Karoy"]),
       ("N", ["Nate"]),
     ]
-    XCTAssertEqualSequences(expected, chunks, by: ==)
+    expectEqualSequences(expected, chunks, by: ==)
 
     // Empty sequence
     XCTAssertEqual(0, names.prefix(0).chunked(on: { $0.first }).count)
@@ -80,15 +80,15 @@ final class ChunkedTests: XCTestCase {
   }
 
   func testChunkedByComparesConsecutiveElements() {
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       [1, 2, 3, 4, 6, 7, 8, 9].chunked(by: { $1 - $0 == 1 }),
       [[1, 2, 3, 4], [6, 7, 8, 9]])
 
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       [1, 2, 3, 4, 6, 7, 8, 9].lazy.chunked(by: { $1 - $0 == 1 }),
       [[1, 2, 3, 4], [6, 7, 8, 9]])
 
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       [1, 2, 3, 4, 6, 7, 8, 9].lazy.chunked(by: { $1 - $0 == 1 }).reversed(),
       [[6, 7, 8, 9], [1, 2, 3, 4]])
 
@@ -96,8 +96,8 @@ final class ChunkedTests: XCTestCase {
   }
 
   func testChunkedLazy() {
-    XCTAssertLazySequence(fruits.lazy.chunked(by: { $0.first == $1.first }))
-    XCTAssertLazySequence(fruits.lazy.chunked(on: { $0.first }))
+    requireLazySequence(fruits.lazy.chunked(by: { $0.first == $1.first }))
+    requireLazySequence(fruits.lazy.chunked(on: { $0.first }))
   }
 
   //===----------------------------------------------------------------------===//
@@ -105,25 +105,25 @@ final class ChunkedTests: XCTestCase {
   //===----------------------------------------------------------------------===//
 
   func testChunksOfCount() {
-    XCTAssertEqualSequences([Int]().chunks(ofCount: 1), [])
-    XCTAssertEqualSequences([Int]().chunks(ofCount: 5), [])
+    expectEqualSequences([Int]().chunks(ofCount: 1), [])
+    expectEqualSequences([Int]().chunks(ofCount: 5), [])
 
     let collection1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       collection1.chunks(ofCount: 1),
       [[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]])
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       collection1.chunks(ofCount: 3),
       [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       collection1.chunks(ofCount: 5),
       [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       collection1.chunks(ofCount: 11),
       [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
 
     let collection2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       collection2.chunks(ofCount: 3),
       [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11]])
   }
@@ -131,21 +131,21 @@ final class ChunkedTests: XCTestCase {
   func testChunksOfCountBidirectional() {
     let collection1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       collection1.chunks(ofCount: 1).reversed(),
       [[10], [9], [8], [7], [6], [5], [4], [3], [2], [1]])
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       collection1.chunks(ofCount: 3).reversed(),
       [[10], [7, 8, 9], [4, 5, 6], [1, 2, 3]])
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       collection1.chunks(ofCount: 5).reversed(),
       [[6, 7, 8, 9, 10], [1, 2, 3, 4, 5]])
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       collection1.chunks(ofCount: 11).reversed(),
       [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
 
     let collection2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       collection2.chunks(ofCount: 3).reversed(),
       [[10, 11], [7, 8, 9], [4, 5, 6], [1, 2, 3]])
   }
@@ -183,19 +183,19 @@ final class ChunkedTests: XCTestCase {
   }
 
   func testEvenChunks() {
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       (0..<10).evenlyChunked(in: 4),
       [0..<3, 3..<6, 6..<8, 8..<10])
 
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       (0..<3).evenlyChunked(in: 5),
       [0..<1, 1..<2, 2..<3, 3..<3, 3..<3])
 
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       "".evenlyChunked(in: 0),
       [])
 
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       "".evenlyChunked(in: 1),
       [""])
   }

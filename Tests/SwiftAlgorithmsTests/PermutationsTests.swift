@@ -38,7 +38,7 @@ final class PermutationsTests: XCTestCase {
       let p2 = c.permutations(ofCount: count)
 
       XCTAssertEqual(p.count, p2.count)
-      XCTAssertEqualSequences(p, Array(p2))
+      expectEqualSequences(p, Array(p2))
     }
 
     t(count: 0)
@@ -103,14 +103,14 @@ final class PermutationsTests: XCTestCase {
   }
 
   func testPermutationsLazy() {
-    XCTAssertLazySequence("ABCD".lazy.permutations(ofCount: 2))
+    requireLazySequence("ABCD".lazy.permutations(ofCount: 2))
   }
 
   func testDocumentationExample1() {
     // From Guides/Permutations.md
     let numbers = [10, 20, 30]
     let permutations = numbers.permutations()
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       permutations,
       [
         [10, 20, 30],
@@ -126,7 +126,7 @@ final class PermutationsTests: XCTestCase {
     // From Guides/Permutations.md
     let numbers = [10, 20, 30]
     let permutations = numbers.permutations(ofCount: 2)
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       permutations,
       [
         [10, 20],
@@ -142,7 +142,7 @@ final class PermutationsTests: XCTestCase {
     // From Guides/Permutations.md
     let numbers2 = [20, 10, 10]
     let permutations = numbers2.permutations()
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       permutations,
       [
         [20, 10, 10],
@@ -158,7 +158,7 @@ final class PermutationsTests: XCTestCase {
     // From Guides/Permutations.md
     let numbers = [10, 20, 30]
     let permutations = numbers.permutations(ofCount: 0...)
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       permutations,
       [
         [],
@@ -184,7 +184,7 @@ final class PermutationsTests: XCTestCase {
     // From Permutations.swift
     let names = ["Alex", "Celeste", "Davide"]
     let permutations = names.permutations(ofCount: 2)
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       permutations,
       [
         ["Alex", "Celeste"],
@@ -200,7 +200,7 @@ final class PermutationsTests: XCTestCase {
     // From Permutations.swift
     let names = ["Alex", "Celeste", "Davide"]
     let permutations = names.permutations(ofCount: 1...2)
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       permutations,
       [
         ["Alex"],

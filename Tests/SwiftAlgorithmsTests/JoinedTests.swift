@@ -28,16 +28,16 @@ final class JoinedTests: XCTestCase {
 
     for (strings, expected) in zip(stringArrays, expected) {
       // regular sequence
-      XCTAssertEqualSequences(AnySequence(strings).joined(), expected)
+      expectEqualSequences(AnySequence(strings).joined(), expected)
 
       // lazy sequence
-      XCTAssertEqualSequences(AnySequence(strings).lazy.joined(), expected)
+      expectEqualSequences(AnySequence(strings).lazy.joined(), expected)
 
       // regular collection
-      XCTAssertEqualSequences(strings.joined(), expected)
+      expectEqualSequences(strings.joined(), expected)
 
       // lazy collection
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         strings.lazy.joined() as FlattenCollection, expected)
     }
   }
@@ -47,12 +47,12 @@ final class JoinedTests: XCTestCase {
     let expected = ["", "", " ", "foo", "foo bar", "  foo  bar baz "]
 
     for (strings, expected) in zip(stringArrays, expected) {
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         AnySequence(strings).joined(by: separator), expected)
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         AnySequence(strings).lazy.joined(by: separator), expected)
-      XCTAssertEqualSequences(strings.joined(by: separator), expected)
-      XCTAssertEqualSequences(strings.lazy.joined(by: separator), expected)
+      expectEqualSequences(strings.joined(by: separator), expected)
+      expectEqualSequences(strings.lazy.joined(by: separator), expected)
     }
   }
 
@@ -61,12 +61,12 @@ final class JoinedTests: XCTestCase {
     let expected = ["", "", ", ", "foo", "foo, bar", ", , foo, , bar, baz, "]
 
     for (strings, expected) in zip(stringArrays, expected) {
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         AnySequence(strings).joined(by: separator), expected)
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         AnySequence(strings).lazy.joined(by: separator), expected)
-      XCTAssertEqualSequences(strings.joined(by: separator), expected)
-      XCTAssertEqualSequences(strings.lazy.joined(by: separator), expected)
+      expectEqualSequences(strings.joined(by: separator), expected)
+      expectEqualSequences(strings.lazy.joined(by: separator), expected)
     }
   }
 
@@ -78,12 +78,12 @@ final class JoinedTests: XCTestCase {
     let expected = ["", "", " ", "foo", "foo-bar", "  foo  bar-baz "]
 
     for (strings, expected) in zip(stringArrays, expected) {
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         AnySequence(strings).joined(by: separator), expected)
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         AnySequence(strings).lazy.joined(by: separator), expected)
-      XCTAssertEqualSequences(strings.joined(by: separator), expected)
-      XCTAssertEqualSequences(strings.lazy.joined(by: separator), expected)
+      expectEqualSequences(strings.joined(by: separator), expected)
+      expectEqualSequences(strings.lazy.joined(by: separator), expected)
     }
   }
 
@@ -102,23 +102,23 @@ final class JoinedTests: XCTestCase {
     ]
 
     for (strings, expected) in zip(stringArrays, expected) {
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         AnySequence(strings).joined(by: separator), expected)
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         AnySequence(strings).lazy.joined(by: separator), expected)
-      XCTAssertEqualSequences(strings.joined(by: separator), expected)
-      XCTAssertEqualSequences(strings.lazy.joined(by: separator), expected)
+      expectEqualSequences(strings.joined(by: separator), expected)
+      expectEqualSequences(strings.lazy.joined(by: separator), expected)
     }
   }
 
   func testJoinedLazy() {
-    XCTAssertLazySequence(AnySequence([[1], [2]]).lazy.joined())
-    XCTAssertLazySequence(AnySequence([[1], [2]]).lazy.joined(by: 1))
-    XCTAssertLazySequence(
+    requireLazySequence(AnySequence([[1], [2]]).lazy.joined())
+    requireLazySequence(AnySequence([[1], [2]]).lazy.joined(by: 1))
+    requireLazySequence(
       AnySequence([[1], [2]]).lazy.joined(by: { _, _ in 1 }))
-    XCTAssertLazyCollection([[1], [2]].lazy.joined())
-    XCTAssertLazyCollection([[1], [2]].lazy.joined(by: 1))
-    XCTAssertLazyCollection([[1], [2]].lazy.joined(by: { _, _ in 1 }))
+    requireLazyCollection([[1], [2]].lazy.joined())
+    requireLazyCollection([[1], [2]].lazy.joined(by: 1))
+    requireLazyCollection([[1], [2]].lazy.joined(by: { _, _ in 1 }))
   }
 
   func testJoinedIndexTraversals() {

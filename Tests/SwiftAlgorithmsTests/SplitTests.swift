@@ -480,11 +480,11 @@ final class SplitTests: XCTestCase {
 
   func testLaziness() {
     let splitSequence = AnySequence([1, 2, 42, 3]).lazy.split(separator: 42)
-    XCTAssertLazySequence(splitSequence)
+    requireLazySequence(splitSequence)
 
     let splitCollection = "foo.bar".lazy.split(separator: ".")
-    XCTAssertLazySequence(splitCollection)
-    XCTAssertLazyCollection(splitCollection)
+    requireLazySequence(splitCollection)
+    requireLazyCollection(splitCollection)
   }
 
   // TODO: Need a version of `validateIndexTraversals` that doesn't require
@@ -567,7 +567,7 @@ final class SplitTests: XCTestCase {
       case .element(let element):
         let expected = s.split(separator: element).map { Array($0) }
         let actual = s.lazy.split(separator: element)
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -577,7 +577,7 @@ final class SplitTests: XCTestCase {
       case .closure(let closure):
         let expected = s.split(whereSeparator: closure).map { Array($0) }
         let actual = s.lazy.split(whereSeparator: closure)
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -597,7 +597,7 @@ final class SplitTests: XCTestCase {
           separator: element,
           maxSplits: maxSplits
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -613,7 +613,7 @@ final class SplitTests: XCTestCase {
           maxSplits: maxSplits,
           whereSeparator: closure
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -633,7 +633,7 @@ final class SplitTests: XCTestCase {
           separator: element,
           omittingEmptySubsequences: false
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -649,7 +649,7 @@ final class SplitTests: XCTestCase {
           omittingEmptySubsequences: false,
           whereSeparator: closure
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -671,7 +671,7 @@ final class SplitTests: XCTestCase {
           maxSplits: maxSplits,
           omittingEmptySubsequences: false
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -689,7 +689,7 @@ final class SplitTests: XCTestCase {
           omittingEmptySubsequences: false,
           whereSeparator: closure
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -705,7 +705,7 @@ final class SplitTests: XCTestCase {
       case .element(let element):
         let expected = c.split(separator: element)
         let actual = c.lazy.split(separator: element)
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -715,7 +715,7 @@ final class SplitTests: XCTestCase {
       case .closure(let closure):
         let expected = c.split(whereSeparator: closure)
         let actual = c.lazy.split(whereSeparator: closure)
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -735,7 +735,7 @@ final class SplitTests: XCTestCase {
           separator: element,
           maxSplits: maxSplits
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -751,7 +751,7 @@ final class SplitTests: XCTestCase {
           maxSplits: maxSplits,
           whereSeparator: closure
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -771,7 +771,7 @@ final class SplitTests: XCTestCase {
           separator: element,
           omittingEmptySubsequences: false
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -787,7 +787,7 @@ final class SplitTests: XCTestCase {
           omittingEmptySubsequences: false,
           whereSeparator: closure
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -809,7 +809,7 @@ final class SplitTests: XCTestCase {
           maxSplits: maxSplits,
           omittingEmptySubsequences: false
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(
@@ -827,7 +827,7 @@ final class SplitTests: XCTestCase {
           omittingEmptySubsequences: false,
           whereSeparator: closure
         )
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           expected,
           actual,
           failureMessage(

@@ -30,17 +30,17 @@ final class PartitionTests: XCTestCase {
 
             var b = a
             var r = b[p..<q].stablePartition(by: f)
-            XCTAssertEqualSequences(b[..<p], prefix)
-            XCTAssertEqualSequences(b[q...], suffix)
-            XCTAssertEqualSequences(b[p..<r], subrange.filter(notf))
-            XCTAssertEqualSequences(b[r..<q], subrange.filter(f))
+            expectEqualSequences(b[..<p], prefix)
+            expectEqualSequences(b[q...], suffix)
+            expectEqualSequences(b[p..<r], subrange.filter(notf))
+            expectEqualSequences(b[r..<q], subrange.filter(f))
 
             b = a
             r = b[p..<q].stablePartition(by: notf)
-            XCTAssertEqualSequences(b[..<p], prefix)
-            XCTAssertEqualSequences(b[q...], suffix)
-            XCTAssertEqualSequences(b[p..<r], subrange.filter(f))
-            XCTAssertEqualSequences(b[r..<q], subrange.filter(notf))
+            expectEqualSequences(b[..<p], prefix)
+            expectEqualSequences(b[q...], suffix)
+            expectEqualSequences(b[p..<r], subrange.filter(f))
+            expectEqualSequences(b[r..<q], subrange.filter(notf))
           }
         }
 
@@ -49,13 +49,13 @@ final class PartitionTests: XCTestCase {
           let notf = { !f($0) }
           var b = a
           var r = b.stablePartition(by: f)
-          XCTAssertEqualSequences(b[..<r], a.filter(notf))
-          XCTAssertEqualSequences(b[r...], a.filter(f))
+          expectEqualSequences(b[..<r], a.filter(notf))
+          expectEqualSequences(b[r...], a.filter(f))
 
           b = a
           r = b.stablePartition(by: notf)
-          XCTAssertEqualSequences(b[..<r], a.filter(f))
-          XCTAssertEqualSequences(b[r...], a.filter(notf))
+          expectEqualSequences(b[..<r], a.filter(f))
+          expectEqualSequences(b[r...], a.filter(notf))
         }
       }
     }
@@ -72,10 +72,10 @@ final class PartitionTests: XCTestCase {
           let p = b.stablePartition(subrange: partitionRange, by: condition)
 
           XCTAssertEqual(p, partitionRange.count == 0 ? j : j + 1)
-          XCTAssertEqualSequences(
+          expectEqualSequences(
             b[partitionRange.lowerBound..<p],
             a[partitionRange].filter { !condition($0) })
-          XCTAssertEqualSequences(
+          expectEqualSequences(
             b[p..<partitionRange.upperBound],
             a[partitionRange].filter(condition))
         }
@@ -127,10 +127,10 @@ final class PartitionTests: XCTestCase {
           let p = b.partition(subrange: partitionRange, by: condition)
 
           XCTAssertEqual(p, partitionRange.count == 0 ? j : j + 1)
-          XCTAssertEqualSequences(
+          expectEqualSequences(
             b[partitionRange.lowerBound..<p],
             a[partitionRange].filter { !condition($0) })
-          XCTAssertUnorderedEqualSequences(
+          expectUnorderedEqualSequences(
             b[p..<partitionRange.upperBound],
             a[partitionRange].filter(condition))
         }
@@ -151,18 +151,18 @@ final class PartitionTests: XCTestCase {
           let bdcp = bdc.partition(subrange: partitionRange, by: condition)
 
           XCTAssertEqual(p, partitionRange.count == 0 ? j : j + 1)
-          XCTAssertEqualSequences(
+          expectEqualSequences(
             b[partitionRange.lowerBound..<p],
             a[partitionRange].filter { !condition($0) })
-          XCTAssertUnorderedEqualSequences(
+          expectUnorderedEqualSequences(
             b[p..<partitionRange.upperBound],
             a[partitionRange].filter(condition))
 
           // Must produce the same result as the `BidirectionalCollection` specialized overload.
-          XCTAssertEqualSequences(
+          expectEqualSequences(
             b[partitionRange.lowerBound..<p],
             bdc[partitionRange.lowerBound..<bdcp])
-          XCTAssertUnorderedEqualSequences(
+          expectUnorderedEqualSequences(
             b[p..<partitionRange.upperBound],
             bdc[bdcp..<partitionRange.upperBound])
         }

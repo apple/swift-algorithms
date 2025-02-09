@@ -20,10 +20,10 @@ final class UniqueTests: XCTestCase {
     XCTAssertEqual(10, Array(b).count)
 
     let c: [Int] = []
-    XCTAssertEqualSequences(c.uniqued(), [])
+    expectEqualSequences(c.uniqued(), [])
 
     let d = Array(repeating: 1, count: 10)
-    XCTAssertEqualSequences(d.uniqued(), [1])
+    expectEqualSequences(d.uniqued(), [1])
   }
 
   func testUniqueOn() {
@@ -37,7 +37,7 @@ final class UniqueTests: XCTestCase {
     XCTAssertEqual(c.uniqued(on: { $0.bitWidth }), [])
 
     let d = Array(repeating: "Andromeda", count: 10)
-    XCTAssertEqualSequences(d.uniqued(on: { $0.first }), ["Andromeda"])
+    expectEqualSequences(d.uniqued(on: { $0.first }), ["Andromeda"])
   }
 
   func testLazyUniqueOn() {
@@ -45,13 +45,13 @@ final class UniqueTests: XCTestCase {
       "Albemarle", "Abeforth", "Astrology", "Brandywine", "Beatrice", "Axiom",
     ]
     let b = a.lazy.uniqued(on: { $0.first })
-    XCTAssertEqualSequences(b, ["Albemarle", "Brandywine"])
-    XCTAssertLazySequence(b)
+    expectEqualSequences(b, ["Albemarle", "Brandywine"])
+    requireLazySequence(b)
 
     let c: [Int] = []
-    XCTAssertEqualSequences(c.lazy.uniqued(on: { $0.bitWidth }), [])
+    expectEqualSequences(c.lazy.uniqued(on: { $0.bitWidth }), [])
 
     let d = Array(repeating: "Andromeda", count: 10)
-    XCTAssertEqualSequences(d.lazy.uniqued(on: { $0.first }), ["Andromeda"])
+    expectEqualSequences(d.lazy.uniqued(on: { $0.first }), ["Andromeda"])
   }
 }

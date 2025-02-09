@@ -16,14 +16,14 @@ import XCTest
 final class ChainTests: XCTestCase {
   func testChainSequences() {
     let run = chain((1...).prefix(10), 20...)
-    XCTAssertEqualSequences(run.prefix(20), Array(1...10) + (20..<30))
+    expectEqualSequences(run.prefix(20), Array(1...10) + (20..<30))
   }
 
   func testChainForwardCollection() {
     let s1 = Set(0...10)
     let s2 = Set(20...30)
     let c = chain(s1, s2)
-    XCTAssertEqualSequences(c, Array(s1) + Array(s2))
+    expectEqualSequences(c, Array(s1) + Array(s2))
   }
 
   func testChainBidirectionalCollection() {
@@ -31,9 +31,9 @@ final class ChainTests: XCTestCase {
     let s2 = "klmnopqrstuv"
     let c = chain(s1, s2)
 
-    XCTAssertEqualSequences(c, "ABCDEFGHIJklmnopqrstuv")
-    XCTAssertEqualSequences(c.reversed(), "ABCDEFGHIJklmnopqrstuv".reversed())
-    XCTAssertEqualSequences(chain(s1.reversed(), s2), "JIHGFEDCBAklmnopqrstuv")
+    expectEqualSequences(c, "ABCDEFGHIJklmnopqrstuv")
+    expectEqualSequences(c.reversed(), "ABCDEFGHIJklmnopqrstuv".reversed())
+    expectEqualSequences(chain(s1.reversed(), s2), "JIHGFEDCBAklmnopqrstuv")
   }
 
   func testChainIndexTraversals() {

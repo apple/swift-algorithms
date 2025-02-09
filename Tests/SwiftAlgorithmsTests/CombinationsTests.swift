@@ -132,23 +132,23 @@ final class CombinationsTests: XCTestCase {
 
   func testEmpty() {
     // `k == 0` results in one zero-length combination
-    XCTAssertEqualSequences([[]], "".combinations(ofCount: 0))
-    XCTAssertEqualSequences([[]], "".combinations(ofCount: 0...0))
-    XCTAssertEqualSequences([[]], "ABCD".combinations(ofCount: 0))
-    XCTAssertEqualSequences([[]], "ABCD".combinations(ofCount: 0...0))
+    expectEqualSequences([[]], "".combinations(ofCount: 0))
+    expectEqualSequences([[]], "".combinations(ofCount: 0...0))
+    expectEqualSequences([[]], "ABCD".combinations(ofCount: 0))
+    expectEqualSequences([[]], "ABCD".combinations(ofCount: 0...0))
 
     // `k` greater than element count results in zero combinations
-    XCTAssertEqualSequences([], "".combinations(ofCount: 5))
-    XCTAssertEqualSequences([], "".combinations(ofCount: 5...10))
-    XCTAssertEqualSequences([], "ABCD".combinations(ofCount: 5))
-    XCTAssertEqualSequences([], "ABCD".combinations(ofCount: 5...10))
+    expectEqualSequences([], "".combinations(ofCount: 5))
+    expectEqualSequences([], "".combinations(ofCount: 5...10))
+    expectEqualSequences([], "ABCD".combinations(ofCount: 5))
+    expectEqualSequences([], "ABCD".combinations(ofCount: 5...10))
   }
 
   func testCombinationsLazy() {
-    XCTAssertLazySequence("ABC".lazy.combinations(ofCount: 1))
-    XCTAssertLazySequence("ABC".lazy.combinations(ofCount: 1...3))
-    XCTAssertLazySequence("ABC".lazy.combinations(ofCount: 1...))
-    XCTAssertLazySequence("ABC".lazy.combinations(ofCount: ...3))
-    XCTAssertLazySequence("ABC".lazy.combinations(ofCount: 0...))
+    requireLazySequence("ABC".lazy.combinations(ofCount: 1))
+    requireLazySequence("ABC".lazy.combinations(ofCount: 1...3))
+    requireLazySequence("ABC".lazy.combinations(ofCount: 1...))
+    requireLazySequence("ABC".lazy.combinations(ofCount: ...3))
+    requireLazySequence("ABC".lazy.combinations(ofCount: 0...))
   }
 }

@@ -18,15 +18,15 @@ final class ReductionsTests: XCTestCase {
   // MARK: - Exclusive Reductions
 
   func testExclusiveLazy() {
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       (1...).prefix(4).lazy.reductions(0, +), [0, 1, 3, 6, 10])
-    XCTAssertEqualSequences((1...).prefix(1).lazy.reductions(0, +), [0, 1])
-    XCTAssertEqualSequences((1...).prefix(0).lazy.reductions(0, +), [0])
+    expectEqualSequences((1...).prefix(1).lazy.reductions(0, +), [0, 1])
+    expectEqualSequences((1...).prefix(0).lazy.reductions(0, +), [0])
 
-    XCTAssertEqualCollections(
+    expectEqualCollections(
       [1, 2, 3, 4].lazy.reductions(0, +), [0, 1, 3, 6, 10])
-    XCTAssertEqualCollections([1].lazy.reductions(0, +), [0, 1])
-    XCTAssertEqualCollections(EmptyCollection<Int>().lazy.reductions(0, +), [0])
+    expectEqualCollections([1].lazy.reductions(0, +), [0, 1])
+    expectEqualCollections(EmptyCollection<Int>().lazy.reductions(0, +), [0])
 
     XCTAssertEqual(
       [1, 2, 3, 4].lazy.reductions(into: 0, +=), [0, 1, 3, 6, 10])
@@ -35,9 +35,9 @@ final class ReductionsTests: XCTestCase {
 
     XCTAssertEqual(EmptyCollection<Int>().lazy.reductions(into: 0, +=), [0])
 
-    XCTAssertLazySequence((1...).prefix(1).lazy.reductions(0, +))
-    XCTAssertLazySequence([1].lazy.reductions(0, +))
-    XCTAssertLazyCollection([1].lazy.reductions(0, +))
+    requireLazySequence((1...).prefix(1).lazy.reductions(0, +))
+    requireLazySequence([1].lazy.reductions(0, +))
+    requireLazyCollection([1].lazy.reductions(0, +))
   }
 
   func testExclusiveEager() {
@@ -67,17 +67,17 @@ final class ReductionsTests: XCTestCase {
   // MARK: - Inclusive Reductions
 
   func testInclusiveLazy() {
-    XCTAssertEqualSequences((1...).prefix(4).lazy.reductions(+), [1, 3, 6, 10])
-    XCTAssertEqualSequences((1...).prefix(1).lazy.reductions(+), [1])
-    XCTAssertEqualSequences((1...).prefix(0).lazy.reductions(+), [])
+    expectEqualSequences((1...).prefix(4).lazy.reductions(+), [1, 3, 6, 10])
+    expectEqualSequences((1...).prefix(1).lazy.reductions(+), [1])
+    expectEqualSequences((1...).prefix(0).lazy.reductions(+), [])
 
-    XCTAssertEqualCollections([1, 2, 3, 4].lazy.reductions(+), [1, 3, 6, 10])
-    XCTAssertEqualCollections([1].lazy.reductions(+), [1])
-    XCTAssertEqualCollections(EmptyCollection<Int>().lazy.reductions(+), [])
+    expectEqualCollections([1, 2, 3, 4].lazy.reductions(+), [1, 3, 6, 10])
+    expectEqualCollections([1].lazy.reductions(+), [1])
+    expectEqualCollections(EmptyCollection<Int>().lazy.reductions(+), [])
 
-    XCTAssertLazySequence((1...).prefix(1).lazy.reductions(+))
-    XCTAssertLazySequence([1].lazy.reductions(+))
-    XCTAssertLazyCollection([1].lazy.reductions(+))
+    requireLazySequence((1...).prefix(1).lazy.reductions(+))
+    requireLazySequence([1].lazy.reductions(+))
+    requireLazyCollection([1].lazy.reductions(+))
   }
 
   func testInclusiveEager() {

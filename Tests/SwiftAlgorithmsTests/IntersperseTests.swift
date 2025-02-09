@@ -16,32 +16,32 @@ import XCTest
 final class IntersperseTests: XCTestCase {
   func testSequence() {
     let interspersed = (1...).prefix(5).interspersed(with: 0)
-    XCTAssertEqualSequences(interspersed, [1, 0, 2, 0, 3, 0, 4, 0, 5])
+    expectEqualSequences(interspersed, [1, 0, 2, 0, 3, 0, 4, 0, 5])
   }
 
   func testSequenceEmpty() {
     let interspersed = (1...).prefix(0).interspersed(with: 0)
-    XCTAssertEqualSequences(interspersed, [])
+    expectEqualSequences(interspersed, [])
   }
 
   func testString() {
     let interspersed = "ABCDE".interspersed(with: "-")
-    XCTAssertEqualSequences(interspersed, "A-B-C-D-E")
+    expectEqualSequences(interspersed, "A-B-C-D-E")
   }
 
   func testStringEmpty() {
     let interspersed = "".interspersed(with: "-")
-    XCTAssertEqualSequences(interspersed, "")
+    expectEqualSequences(interspersed, "")
   }
 
   func testArray() {
     let interspersed = [1, 2, 3, 4].interspersed(with: 0)
-    XCTAssertEqualSequences(interspersed, [1, 0, 2, 0, 3, 0, 4])
+    expectEqualSequences(interspersed, [1, 0, 2, 0, 3, 0, 4])
   }
 
   func testArrayEmpty() {
     let interspersed = [].interspersed(with: 0)
-    XCTAssertEqualSequences(interspersed, [])
+    expectEqualSequences(interspersed, [])
   }
 
   func testCollection() {
@@ -51,7 +51,7 @@ final class IntersperseTests: XCTestCase {
 
   func testBidirectionalCollection() {
     let reversed = "ABCDE".interspersed(with: "-").reversed()
-    XCTAssertEqualSequences(reversed, "E-D-C-B-A")
+    expectEqualSequences(reversed, "E-D-C-B-A")
   }
 
   func testIndexTraversals() {
@@ -63,28 +63,28 @@ final class IntersperseTests: XCTestCase {
   }
 
   func testIntersperseLazy() {
-    XCTAssertLazySequence((1...).prefix(0).lazy.interspersed(with: 0))
-    XCTAssertLazyCollection("ABCDE".lazy.interspersed(with: "-"))
+    requireLazySequence((1...).prefix(0).lazy.interspersed(with: 0))
+    requireLazyCollection("ABCDE".lazy.interspersed(with: "-"))
   }
 
   func testInterspersedMap() {
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       [])
 
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       (0..<1).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       [0])
 
-    XCTAssertEqualSequences(
+    expectEqualSequences(
       (0..<5).lazy.interspersedMap({ $0 }, with: { $0 + $1 + 100 }),
       [0, 101, 1, 103, 2, 105, 3, 107, 4])
   }
 
   func testInterspersedMapLazy() {
-    XCTAssertLazySequence(
+    requireLazySequence(
       AnySequence([]).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
-    XCTAssertLazyCollection(
+    requireLazyCollection(
       (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
   }
 

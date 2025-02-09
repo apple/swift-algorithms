@@ -20,7 +20,7 @@ func validateRandomSamples<S: Sequence>(
   file: StaticString = (#file), line: UInt = #line
 ) where S.Element == Int {
   let expectedRange = ((expectedValue / 3) * 2)...((expectedValue / 3) * 4)
-  XCTAssertEqualSequences(
+  expectEqualSequences(
     samples.keys.sorted(), elements,
     file: file, line: line)
   for v in samples.values {
@@ -69,16 +69,16 @@ final class RandomSampleTests: XCTestCase {
 
   func testRandomSampleEdgeCases() {
     XCTAssert(c.randomStableSample(count: 0).isEmpty)
-    XCTAssertEqualSequences(c.randomStableSample(count: n), c)
-    XCTAssertEqualSequences(c.randomStableSample(count: n * 2), c)
+    expectEqualSequences(c.randomStableSample(count: n), c)
+    expectEqualSequences(c.randomStableSample(count: n * 2), c)
 
     XCTAssert(c.randomSample(count: 0).isEmpty)
-    XCTAssertEqualSequences(c.randomSample(count: n).sorted(), c)
-    XCTAssertEqualSequences(c.randomSample(count: n * 2).sorted(), c)
+    expectEqualSequences(c.randomSample(count: n).sorted(), c)
+    expectEqualSequences(c.randomSample(count: n * 2).sorted(), c)
 
     XCTAssert(s.randomSample(count: 0).isEmpty)
-    XCTAssertEqualSequences(s.randomSample(count: n).sorted(), c)
-    XCTAssertEqualSequences(s.randomSample(count: n * 2).sorted(), c)
+    expectEqualSequences(s.randomSample(count: n).sorted(), c)
+    expectEqualSequences(s.randomSample(count: n * 2).sorted(), c)
   }
 
   func testRandomSampleRepeatable() {

@@ -89,7 +89,7 @@ final class RotateTests: XCTestCase {
       var b = a
       for j in 0..<length {
         let i = b.rotate(toStartAt: j)
-        XCTAssertEqualSequences(a[j...] + a[..<j], b)
+        expectEqualSequences(a[j...] + a[..<j], b)
         b.rotate(toStartAt: i)
         XCTAssertEqual(a, b)
       }

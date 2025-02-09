@@ -15,13 +15,13 @@ import XCTest
 final class SuffixTests: XCTestCase {
   func testSuffix() {
     let a = 0...10
-    XCTAssertEqualSequences(a.suffix(while: { $0 > 5 }), (6...10))
-    XCTAssertEqualSequences(a.suffix(while: { $0 > 10 }), [])
-    XCTAssertEqualSequences(a.suffix(while: { $0 > 9 }), [10])
-    XCTAssertEqualSequences(a.suffix(while: { $0 > -1 }), (0...10))
+    expectEqualSequences(a.suffix(while: { $0 > 5 }), (6...10))
+    expectEqualSequences(a.suffix(while: { $0 > 10 }), [])
+    expectEqualSequences(a.suffix(while: { $0 > 9 }), [10])
+    expectEqualSequences(a.suffix(while: { $0 > -1 }), (0...10))
 
     let empty: [Int] = []
-    XCTAssertEqualSequences(empty.suffix(while: { $0 > 10 }), [])
+    expectEqualSequences(empty.suffix(while: { $0 > 10 }), [])
   }
 
   func testEndOfPrefix() {
