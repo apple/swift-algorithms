@@ -9,8 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class GroupedTests: XCTestCase {
   private final class SampleError: Error {}

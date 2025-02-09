@@ -112,7 +112,7 @@ final class SplitTests: XCTestCase {
 
   func testAllEEES() {
     let permutations = [
-      [1, 1, 1, 0], [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1]
+      [1, 1, 1, 0], [1, 1, 0, 1], [1, 0, 1, 1], [0, 1, 1, 1],
     ]
 
     for permutation in permutations {
@@ -564,7 +564,7 @@ final class SplitTests: XCTestCase {
     where T.Element == C.Element {
       // Default max splits, omitting empty sequences
       switch separator {
-      case let .element(element):
+      case .element(let element):
         let expected = s.split(separator: element).map { Array($0) }
         let actual = s.lazy.split(separator: element)
         XCTAssertEqualSequences(
@@ -574,7 +574,7 @@ final class SplitTests: XCTestCase {
             actual: actual, expected: expected, maxSplits: .defaultValue,
             omittingEmptySubsequences: .defaultValue)
         )
-      case let .closure(closure):
+      case .closure(let closure):
         let expected = s.split(whereSeparator: closure).map { Array($0) }
         let actual = s.lazy.split(whereSeparator: closure)
         XCTAssertEqualSequences(
@@ -588,7 +588,7 @@ final class SplitTests: XCTestCase {
 
       // Provided max splits, omitting empty sequences
       switch separator {
-      case let .element(element):
+      case .element(let element):
         let expected = s.split(
           separator: element,
           maxSplits: maxSplits
@@ -604,7 +604,7 @@ final class SplitTests: XCTestCase {
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
             omittingEmptySubsequences: .defaultValue)
         )
-      case let .closure(closure):
+      case .closure(let closure):
         let expected = s.split(
           maxSplits: maxSplits,
           whereSeparator: closure
@@ -624,7 +624,7 @@ final class SplitTests: XCTestCase {
 
       // Default max splits, including empty sequences
       switch separator {
-      case let .element(element):
+      case .element(let element):
         let expected = s.split(
           separator: element,
           omittingEmptySubsequences: false
@@ -640,7 +640,7 @@ final class SplitTests: XCTestCase {
             actual: actual, expected: expected, maxSplits: .defaultValue,
             omittingEmptySubsequences: .provided(false))
         )
-      case let .closure(closure):
+      case .closure(let closure):
         let expected = s.split(
           omittingEmptySubsequences: false,
           whereSeparator: closure
@@ -660,7 +660,7 @@ final class SplitTests: XCTestCase {
 
       // Provided max splits, including empty sequences
       switch separator {
-      case let .element(element):
+      case .element(let element):
         let expected = s.split(
           separator: element,
           maxSplits: maxSplits,
@@ -678,7 +678,7 @@ final class SplitTests: XCTestCase {
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
             omittingEmptySubsequences: .provided(false))
         )
-      case let .closure(closure):
+      case .closure(let closure):
         let expected = s.split(
           maxSplits: maxSplits,
           omittingEmptySubsequences: false,
@@ -702,7 +702,7 @@ final class SplitTests: XCTestCase {
     private func _validateAsCollection(_ c: C) {
       // Default max splits, omitting empty sequences
       switch separator {
-      case let .element(element):
+      case .element(let element):
         let expected = c.split(separator: element)
         let actual = c.lazy.split(separator: element)
         XCTAssertEqualSequences(
@@ -712,7 +712,7 @@ final class SplitTests: XCTestCase {
             actual: actual, expected: expected, maxSplits: .defaultValue,
             omittingEmptySubsequences: .defaultValue)
         )
-      case let .closure(closure):
+      case .closure(let closure):
         let expected = c.split(whereSeparator: closure)
         let actual = c.lazy.split(whereSeparator: closure)
         XCTAssertEqualSequences(
@@ -726,7 +726,7 @@ final class SplitTests: XCTestCase {
 
       // Provided max splits, omitting empty sequences
       switch separator {
-      case let .element(element):
+      case .element(let element):
         let expected = c.split(
           separator: element,
           maxSplits: maxSplits
@@ -742,7 +742,7 @@ final class SplitTests: XCTestCase {
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
             omittingEmptySubsequences: .defaultValue)
         )
-      case let .closure(closure):
+      case .closure(let closure):
         let expected = c.split(
           maxSplits: maxSplits,
           whereSeparator: closure
@@ -762,7 +762,7 @@ final class SplitTests: XCTestCase {
 
       // Default max splits, including empty sequences
       switch separator {
-      case let .element(element):
+      case .element(let element):
         let expected = c.split(
           separator: element,
           omittingEmptySubsequences: false
@@ -778,7 +778,7 @@ final class SplitTests: XCTestCase {
             actual: actual, expected: expected, maxSplits: .defaultValue,
             omittingEmptySubsequences: .provided(false))
         )
-      case let .closure(closure):
+      case .closure(let closure):
         let expected = c.split(
           omittingEmptySubsequences: false,
           whereSeparator: closure
@@ -798,7 +798,7 @@ final class SplitTests: XCTestCase {
 
       // Provided max splits, including empty sequences
       switch separator {
-      case let .element(element):
+      case .element(let element):
         let expected = c.split(
           separator: element,
           maxSplits: maxSplits,
@@ -816,7 +816,7 @@ final class SplitTests: XCTestCase {
             actual: actual, expected: expected, maxSplits: .provided(maxSplits),
             omittingEmptySubsequences: .provided(false))
         )
-      case let .closure(closure):
+      case .closure(let closure):
         let expected = c.split(
           maxSplits: maxSplits,
           omittingEmptySubsequences: false,

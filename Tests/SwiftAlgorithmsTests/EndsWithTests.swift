@@ -9,17 +9,17 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class EndsWithTests: XCTestCase {
   func testEndsWithCorrectSuffix() {
     let a = 8...10
     let b = 1...10
-    
+
     XCTAssertTrue(b.ends(with: a))
   }
-  
+
   func testDoesntEndWithWrongSuffix() {
     let a = 8...9
     let b = 1...10
@@ -33,12 +33,12 @@ final class EndsWithTests: XCTestCase {
 
   func testEndsWithEmpty() {
     let a = 8...10
-    let empty = [Int]()
+    let empty: [Int] = []
     XCTAssertTrue(a.ends(with: empty))
   }
-  
+
   func testEmptyEndsWithEmpty() {
-    let empty = [Int]()
+    let empty: [Int] = []
     XCTAssertTrue(empty.ends(with: empty))
   }
 
@@ -68,24 +68,26 @@ final class EndsWithNonEquatableTests: XCTestCase {
 
   func testEndsWithEmpty() {
     let a = nonEq(8...10)
-    let empty = [NotEquatable<Int>]()
+    let empty: [NotEquatable<Int>] = []
     XCTAssertTrue(a.ends(with: empty, by: areEquivalent))
   }
 
   func testEmptyEndsWithEmpty() {
-    let empty = [NotEquatable<Int>]()
+    let empty: [NotEquatable<Int>] = []
     XCTAssertTrue(empty.ends(with: empty, by: areEquivalent))
   }
 
   func testEmptyDoesNotEndWithNonempty() {
     XCTAssertFalse([].ends(with: nonEq(1...10), by: areEquivalent))
   }
-  
-  private func nonEq(_ range: ClosedRange<Int>) -> Array<NotEquatable<Int>> {
+
+  private func nonEq(_ range: ClosedRange<Int>) -> [NotEquatable<Int>] {
     range.map(NotEquatable.init)
   }
 
-  private func areEquivalent<T: Equatable>(lhs: NotEquatable<T>, rhs: NotEquatable<T>) -> Bool {
+  private func areEquivalent<T: Equatable>(
+    lhs: NotEquatable<T>, rhs: NotEquatable<T>
+  ) -> Bool {
     lhs.value == rhs.value
   }
 
@@ -93,4 +95,3 @@ final class EndsWithNonEquatableTests: XCTestCase {
     let value: T
   }
 }
-

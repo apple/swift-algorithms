@@ -10,12 +10,13 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
+
 @testable import Algorithms
 
 final class IntersperseTests: XCTestCase {
   func testSequence() {
     let interspersed = (1...).prefix(5).interspersed(with: 0)
-    XCTAssertEqualSequences(interspersed, [1,0,2,0,3,0,4,0,5])
+    XCTAssertEqualSequences(interspersed, [1, 0, 2, 0, 3, 0, 4, 0, 5])
   }
 
   func testSequenceEmpty() {
@@ -34,8 +35,8 @@ final class IntersperseTests: XCTestCase {
   }
 
   func testArray() {
-    let interspersed = [1,2,3,4].interspersed(with: 0)
-    XCTAssertEqualSequences(interspersed, [1,0,2,0,3,0,4])
+    let interspersed = [1, 2, 3, 4].interspersed(with: 0)
+    XCTAssertEqualSequences(interspersed, [1, 0, 2, 0, 3, 0, 4])
   }
 
   func testArrayEmpty() {
@@ -44,7 +45,7 @@ final class IntersperseTests: XCTestCase {
   }
 
   func testCollection() {
-    let interspersed = ["A","B","C","D"].interspersed(with: "-")
+    let interspersed = ["A", "B", "C", "D"].interspersed(with: "-")
     XCTAssertEqual(interspersed.count, 7)
   }
 
@@ -52,7 +53,7 @@ final class IntersperseTests: XCTestCase {
     let reversed = "ABCDE".interspersed(with: "-").reversed()
     XCTAssertEqualSequences(reversed, "E-D-C-B-A")
   }
-  
+
   func testIndexTraversals() {
     let validator = IndexValidator<InterspersedSequence<String>>()
     validator.validate("".interspersed(with: "-"), expectedCount: 0)
@@ -65,39 +66,41 @@ final class IntersperseTests: XCTestCase {
     XCTAssertLazySequence((1...).prefix(0).lazy.interspersed(with: 0))
     XCTAssertLazyCollection("ABCDE".lazy.interspersed(with: "-"))
   }
-  
+
   func testInterspersedMap() {
     XCTAssertEqualSequences(
       (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       [])
-    
+
     XCTAssertEqualSequences(
       (0..<1).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       [0])
-    
+
     XCTAssertEqualSequences(
       (0..<5).lazy.interspersedMap({ $0 }, with: { $0 + $1 + 100 }),
       [0, 101, 1, 103, 2, 105, 3, 107, 4])
   }
-  
+
   func testInterspersedMapLazy() {
-    XCTAssertLazySequence(AnySequence([]).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
-    XCTAssertLazyCollection((0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
+    XCTAssertLazySequence(
+      AnySequence([]).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
+    XCTAssertLazyCollection(
+      (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }))
   }
-    
+
   func testInterspersedMapIndexTraversals() {
     let validator = IndexValidator<InterspersedMapSequence<Range<Int>, Int>>()
     validator.validate(
-      (0..<0).lazy.interspersedMap({ $0 }, with: {_, _ in 100 }),
+      (0..<0).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       expectedCount: 0)
     validator.validate(
-      (0..<1).lazy.interspersedMap({ $0 }, with: {_, _ in 100 }),
+      (0..<1).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       expectedCount: 1)
     validator.validate(
-      (0..<2).lazy.interspersedMap({ $0 }, with: {_, _ in 100 }),
+      (0..<2).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       expectedCount: 3)
     validator.validate(
-      (0..<5).lazy.interspersedMap({ $0 }, with: {_, _ in 100 }),
+      (0..<5).lazy.interspersedMap({ $0 }, with: { _, _ in 100 }),
       expectedCount: 9)
   }
 }

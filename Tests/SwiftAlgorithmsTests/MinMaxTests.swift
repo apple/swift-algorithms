@@ -9,8 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class SortedPrefixTests: XCTestCase {
   func testMinCount() {
@@ -25,7 +25,7 @@ final class SortedPrefixTests: XCTestCase {
       .max(count: 5, sortedBy: { $0.element < $1.element })
     XCTAssertEqualSequences(maxZeroes.map { $0.offset }, 95..<100)
   }
-  
+
   func testMaxCount() {
     // Replacement at start and end
     let input = [0, 11, 12, 1, 13, 2, 14, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -38,12 +38,12 @@ final class SortedPrefixTests: XCTestCase {
       .max(count: 5, sortedBy: { $0.element < $1.element })
     XCTAssertEqualSequences(maxZeroes.map { $0.offset }, 95..<100)
   }
-  
+
   func testEmpty() {
-    let array = [Int]()
+    let array: [Int] = []
     XCTAssertEqual(array.min(count: 0), [])
     XCTAssertEqual(array.min(count: 100), [])
-    
+
     XCTAssertEqual(array.max(count: 0), [])
     XCTAssertEqual(array.max(count: 100), [])
   }
@@ -51,14 +51,14 @@ final class SortedPrefixTests: XCTestCase {
   func testMinMaxSequences() {
     let input = (1...100).shuffled().interspersed(with: 50)
     let seq = AnySequence(input)
-    
+
     XCTAssertEqualSequences(seq.min(count: 0), [])
     XCTAssertEqualSequences(seq.min(count: 5), 1...5)
-    
+
     XCTAssertEqualSequences(seq.max(count: 0), [])
     XCTAssertEqualSequences(seq.max(count: 5), 96...100)
   }
-  
+
   func testSortedPrefixComparable() {
     let array: [Int] = [20, 1, 4, 70, 100, 2, 3, 7, 90]
 
@@ -67,7 +67,7 @@ final class SortedPrefixTests: XCTestCase {
     XCTAssertEqualSequences(array.min(count: 5), array.sorted().prefix(5))
     XCTAssertEqual(array.min(count: 10), array.sorted())
   }
-  
+
   func testMinMaxWithHugeCount() {
     XCTAssertEqual([4, 2, 1, 3].min(count: .max), [1, 2, 3, 4])
     XCTAssertEqual([4, 2, 1, 3].max(count: .max), [1, 2, 3, 4])
@@ -130,33 +130,41 @@ final class SortedPrefixTests: XCTestCase {
   }
 
   func testStability() {
-    assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withCount: 3)
-    assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withCount: 6)
-    assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withCount: 20)
-    assertStability([1,1,1,2,5,7,3,6,2,5,7,3,6], withCount: 1000)
+    assertStability([1, 1, 1, 2, 5, 7, 3, 6, 2, 5, 7, 3, 6], withCount: 3)
+    assertStability([1, 1, 1, 2, 5, 7, 3, 6, 2, 5, 7, 3, 6], withCount: 6)
+    assertStability([1, 1, 1, 2, 5, 7, 3, 6, 2, 5, 7, 3, 6], withCount: 20)
+    assertStability([1, 1, 1, 2, 5, 7, 3, 6, 2, 5, 7, 3, 6], withCount: 1000)
     assertStability(Array(repeating: 0, count: 100), withCount: 0)
     assertStability(Array(repeating: 0, count: 100), withCount: 1)
     assertStability(Array(repeating: 0, count: 100), withCount: 2)
     assertStability(Array(repeating: 0, count: 100), withCount: 5)
     assertStability(Array(repeating: 0, count: 100), withCount: 20)
     assertStability(Array(repeating: 0, count: 100), withCount: 100)
-    assertStability(Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50), withCount: 2)
-    assertStability(Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50), withCount: 5)
-    assertStability(Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50), withCount: 20)
-    assertStability(Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50), withCount: 50)
-    assertStability([0,0], withCount: 1)
-    assertStability([0,0], withCount: 2)
-    assertStability([0,1,0,1,0,1], withCount: 2)
-    assertStability([0,1,0,1,0,1], withCount: 6)
-    assertStability([0,0,0,1,1,1], withCount: 1)
-    assertStability([0,0,0,1,1,1], withCount: 3)
-    assertStability([0,0,0,1,1,1], withCount: 4)
-    assertStability([0,0,0,1,1,1], withCount: 6)
-    assertStability([1,1,1,0,0,0], withCount: 1)
-    assertStability([1,1,1,0,0,0], withCount: 3)
-    assertStability([1,1,1,0,0,0], withCount: 4)
-    assertStability([1,1,1,0,0,0], withCount: 6)
-    assertStability([1,1,1,0,0,0], withCount: 5)
+    assertStability(
+      Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50),
+      withCount: 2)
+    assertStability(
+      Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50),
+      withCount: 5)
+    assertStability(
+      Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50),
+      withCount: 20)
+    assertStability(
+      Array(repeating: 1, count: 50) + Array(repeating: 0, count: 50),
+      withCount: 50)
+    assertStability([0, 0], withCount: 1)
+    assertStability([0, 0], withCount: 2)
+    assertStability([0, 1, 0, 1, 0, 1], withCount: 2)
+    assertStability([0, 1, 0, 1, 0, 1], withCount: 6)
+    assertStability([0, 0, 0, 1, 1, 1], withCount: 1)
+    assertStability([0, 0, 0, 1, 1, 1], withCount: 3)
+    assertStability([0, 0, 0, 1, 1, 1], withCount: 4)
+    assertStability([0, 0, 0, 1, 1, 1], withCount: 6)
+    assertStability([1, 1, 1, 0, 0, 0], withCount: 1)
+    assertStability([1, 1, 1, 0, 0, 0], withCount: 3)
+    assertStability([1, 1, 1, 0, 0, 0], withCount: 4)
+    assertStability([1, 1, 1, 0, 0, 0], withCount: 6)
+    assertStability([1, 1, 1, 0, 0, 0], withCount: 5)
   }
 
   func assertStability(
@@ -165,19 +173,19 @@ final class SortedPrefixTests: XCTestCase {
   ) {
     func stableOrder(
       a: (offset: Int, element: Int),
-      b: (offset: Int, element: Int)) -> Bool
-    {
+      b: (offset: Int, element: Int)
+    ) -> Bool {
       a.element == b.element
         ? a.offset < b.offset
         : a.element < b.element
     }
-    
+
     do {
       let sorted = actual.enumerated()
         .min(count: count) { $0.element < $1.element }
       XCTAssert(sorted.isSorted(by: stableOrder))
     }
-    
+
     do {
       let sorted = actual.enumerated()
         .max(count: count) { $0.element < $1.element }

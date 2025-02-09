@@ -9,8 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class ReductionsTests: XCTestCase {
   struct TestError: Error {}
@@ -18,15 +18,18 @@ final class ReductionsTests: XCTestCase {
   // MARK: - Exclusive Reductions
 
   func testExclusiveLazy() {
-    XCTAssertEqualSequences((1...).prefix(4).lazy.reductions(0, +), [0, 1, 3, 6, 10])
+    XCTAssertEqualSequences(
+      (1...).prefix(4).lazy.reductions(0, +), [0, 1, 3, 6, 10])
     XCTAssertEqualSequences((1...).prefix(1).lazy.reductions(0, +), [0, 1])
     XCTAssertEqualSequences((1...).prefix(0).lazy.reductions(0, +), [0])
 
-    XCTAssertEqualCollections([1, 2, 3, 4].lazy.reductions(0, +), [0, 1, 3, 6, 10])
+    XCTAssertEqualCollections(
+      [1, 2, 3, 4].lazy.reductions(0, +), [0, 1, 3, 6, 10])
     XCTAssertEqualCollections([1].lazy.reductions(0, +), [0, 1])
     XCTAssertEqualCollections(EmptyCollection<Int>().lazy.reductions(0, +), [0])
 
-    XCTAssertEqual([1, 2, 3, 4].lazy.reductions(into: 0, +=), [0, 1, 3, 6, 10])
+    XCTAssertEqual(
+      [1, 2, 3, 4].lazy.reductions(into: 0, +=), [0, 1, 3, 6, 10])
 
     XCTAssertEqual([1].lazy.reductions(into: 0, +=), [0, 1])
 
@@ -51,9 +54,11 @@ final class ReductionsTests: XCTestCase {
     XCTAssertNoThrow(try [].reductions(0) { _, _ in throw TestError() })
     XCTAssertThrowsError(try [1].reductions(0) { _, _ in throw TestError() })
   }
-  
+
   func testExclusiveIndexTraversals() {
-    let validator = IndexValidator<ExclusiveReductionsSequence<Range<Int>, Int>>()
+    let validator = IndexValidator<
+      ExclusiveReductionsSequence<Range<Int>, Int>
+    >()
     validator.validate((0..<0).lazy.reductions(0, +), expectedCount: 1)
     validator.validate((0..<1).lazy.reductions(0, +), expectedCount: 2)
     validator.validate((0..<4).lazy.reductions(0, +), expectedCount: 5)
@@ -84,7 +89,7 @@ final class ReductionsTests: XCTestCase {
     XCTAssertNoThrow(try [1].reductions { _, _ in throw TestError() })
     XCTAssertThrowsError(try [1, 1].reductions { _, _ in throw TestError() })
   }
-  
+
   func testInclusiveIndexTraversals() {
     let validator = IndexValidator<InclusiveReductionsSequence<Range<Int>>>()
     validator.validate((0..<0).lazy.reductions(+), expectedCount: 0)

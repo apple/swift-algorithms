@@ -9,8 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class CycleTests: XCTestCase {
   func testCycle() {
@@ -73,8 +73,9 @@ final class CycleTests: XCTestCase {
     nextIndex = cycle.index(nextIndex, offsetBy: 2, limitedBy: cycle.endIndex)!
     XCTAssertEqual(cycle.distance(from: startIndex, to: nextIndex), 8)
 
-    let outOfBounds = cycle.index(nextIndex, offsetBy: 1,
-                                  limitedBy: cycle.endIndex)
+    let outOfBounds = cycle.index(
+      nextIndex, offsetBy: 1,
+      limitedBy: cycle.endIndex)
     XCTAssertNil(outOfBounds)
 
     let previousIndex = cycle.index(before: nextIndex)

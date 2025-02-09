@@ -9,8 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class IndexedTests: XCTestCase {
   func testIndexed() {
@@ -27,7 +27,7 @@ final class IndexedTests: XCTestCase {
     let indexOfI = si.last(where: { $0.element == "I" })!.index
     XCTAssertEqual("I", s[indexOfI])
   }
-  
+
   func testIndexedLazy() {
     XCTAssertLazyCollection("ABCD".lazy.indexed())
   }

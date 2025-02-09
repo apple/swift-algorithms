@@ -9,16 +9,16 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class CompactedTests: XCTestCase {
 
   let tests: [[Int?]] =
     [nil, nil, nil, 0, 1, 2]
-        .uniquePermutations(ofCount: 0...)
-        .map(Array.init)
-  
+    .uniquePermutations(ofCount: 0...)
+    .map(Array.init)
+
   func testCompactedCompacted() {
     for collection in self.tests {
       let seq = AnySequence(collection)
@@ -31,11 +31,12 @@ final class CompactedTests: XCTestCase {
 
   func testCompactedBidirectionalCollection() {
     for array in self.tests {
-      XCTAssertEqualSequences(array.compactMap({ $0 }).reversed(),
-                              array.compacted().reversed())
+      XCTAssertEqualSequences(
+        array.compactMap({ $0 }).reversed(),
+        array.compacted().reversed())
     }
   }
-  
+
   func testCollectionTraversals() {
     let validator = IndexValidator<CompactedCollection<[Int?], Int>>()
     for array in self.tests {

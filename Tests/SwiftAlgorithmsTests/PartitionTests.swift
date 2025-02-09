@@ -9,8 +9,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class PartitionTests: XCTestCase {
   func testStablePartition() {
@@ -60,7 +60,7 @@ final class PartitionTests: XCTestCase {
       }
     }
   }
-  
+
   func testStablePartitionWithSubrange() {
     for length in 10...20 {
       let a = Array(0..<length)
@@ -72,13 +72,17 @@ final class PartitionTests: XCTestCase {
           let p = b.stablePartition(subrange: partitionRange, by: condition)
 
           XCTAssertEqual(p, partitionRange.count == 0 ? j : j + 1)
-          XCTAssertEqualSequences(b[partitionRange.lowerBound..<p], a[partitionRange].filter { !condition($0) })
-          XCTAssertEqualSequences(b[p..<partitionRange.upperBound], a[partitionRange].filter(condition))
+          XCTAssertEqualSequences(
+            b[partitionRange.lowerBound..<p],
+            a[partitionRange].filter { !condition($0) })
+          XCTAssertEqualSequences(
+            b[p..<partitionRange.upperBound],
+            a[partitionRange].filter(condition))
         }
       }
     }
   }
-  
+
   func testPartitioningIndex() {
     for i in 0..<7 {
       for j in i..<11 {
@@ -91,27 +95,27 @@ final class PartitionTests: XCTestCase {
       }
     }
   }
-  
+
   func testPartitioningIndexWithEmptyInput() {
     let input: [Int] = []
-    
-    let a = input.partitioningIndex(where: { _ in return true })
+
+    let a = input.partitioningIndex(where: { _ in true })
     XCTAssertEqual(a, input.startIndex)
-    
-    let b = input.partitioningIndex(where: { _ in return false })
+
+    let b = input.partitioningIndex(where: { _ in false })
     XCTAssertEqual(b, input.endIndex)
   }
-  
+
   func testPartitioningIndexWithOneEmptyPartition() {
-    let input: Range<Int> = (0 ..< 10)
-    
+    let input: Range<Int> = (0..<10)
+
     let a = input.partitioningIndex(where: { $0 > 10 })
     XCTAssertEqual(a, input.endIndex)
-    
+
     let b = input.partitioningIndex(where: { $0 >= 0 })
     XCTAssertEqual(b, input.startIndex)
   }
-  
+
   func testPartitionWithSubrangeBidirectionalCollection() {
     for length in 10...20 {
       let a = Array(0..<length)
@@ -121,10 +125,14 @@ final class PartitionTests: XCTestCase {
           let partitionRange = j..<i
           let condition = { $0 < i - 1 }
           let p = b.partition(subrange: partitionRange, by: condition)
-          
+
           XCTAssertEqual(p, partitionRange.count == 0 ? j : j + 1)
-          XCTAssertEqualSequences(b[partitionRange.lowerBound..<p], a[partitionRange].filter { !condition($0) })
-          XCTAssertUnorderedEqualSequences(b[p..<partitionRange.upperBound], a[partitionRange].filter(condition))
+          XCTAssertEqualSequences(
+            b[partitionRange.lowerBound..<p],
+            a[partitionRange].filter { !condition($0) })
+          XCTAssertUnorderedEqualSequences(
+            b[p..<partitionRange.upperBound],
+            a[partitionRange].filter(condition))
         }
       }
     }
@@ -141,28 +149,36 @@ final class PartitionTests: XCTestCase {
           let condition = { $0 < i - 1 }
           let p = b.partition(subrange: partitionRange, by: condition)
           let bdcp = bdc.partition(subrange: partitionRange, by: condition)
-          
+
           XCTAssertEqual(p, partitionRange.count == 0 ? j : j + 1)
-          XCTAssertEqualSequences(b[partitionRange.lowerBound..<p], a[partitionRange].filter { !condition($0) })
-          XCTAssertUnorderedEqualSequences(b[p..<partitionRange.upperBound], a[partitionRange].filter(condition))
-          
+          XCTAssertEqualSequences(
+            b[partitionRange.lowerBound..<p],
+            a[partitionRange].filter { !condition($0) })
+          XCTAssertUnorderedEqualSequences(
+            b[p..<partitionRange.upperBound],
+            a[partitionRange].filter(condition))
+
           // Must produce the same result as the `BidirectionalCollection` specialized overload.
-          XCTAssertEqualSequences(b[partitionRange.lowerBound..<p], bdc[partitionRange.lowerBound..<bdcp])
-          XCTAssertUnorderedEqualSequences(b[p..<partitionRange.upperBound], bdc[bdcp..<partitionRange.upperBound])
+          XCTAssertEqualSequences(
+            b[partitionRange.lowerBound..<p],
+            bdc[partitionRange.lowerBound..<bdcp])
+          XCTAssertUnorderedEqualSequences(
+            b[p..<partitionRange.upperBound],
+            bdc[bdcp..<partitionRange.upperBound])
         }
       }
     }
   }
-  
+
   func testPartitionedWithEmptyInput() {
     let input: [Int] = []
-    
-    let s0 = input.partitioned(by: { _ in return true })
-    
+
+    let s0 = input.partitioned(by: { _ in true })
+
     XCTAssertTrue(s0.0.isEmpty)
     XCTAssertTrue(s0.1.isEmpty)
   }
-  
+
   /// Test the example given in the `partitioned(by:)` documentation
   func testPartitionedExample() throws {
     let cast = ["Vivien", "Marlon", "Kim", "Karl"]
@@ -170,22 +186,22 @@ final class PartitionTests: XCTestCase {
     XCTAssertEqual(longNames, ["Vivien", "Marlon"])
     XCTAssertEqual(shortNames, ["Kim", "Karl"])
   }
-  
+
   func testPartitionedWithPredicate() throws {
     let s0 = ["A", "B", "C", "D"].partitioned(by: { $0 == $0.lowercased() })
     let s1 = ["a", "B", "C", "D"].partitioned(by: { $0 == $0.lowercased() })
     let s2 = ["a", "B", "c", "D"].partitioned(by: { $0 == $0.lowercased() })
     let s3 = ["a", "B", "c", "d"].partitioned(by: { $0 == $0.lowercased() })
-    
+
     XCTAssertEqual(s0.0, ["A", "B", "C", "D"])
     XCTAssertEqual(s0.1, [])
-    
+
     XCTAssertEqual(s1.0, ["B", "C", "D"])
     XCTAssertEqual(s1.1, ["a"])
-    
+
     XCTAssertEqual(s2.0, ["B", "D"])
     XCTAssertEqual(s2.1, ["a", "c"])
-    
+
     XCTAssertEqual(s3.0, ["B"])
     XCTAssertEqual(s3.1, ["a", "c", "d"])
   }
