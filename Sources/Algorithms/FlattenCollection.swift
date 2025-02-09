@@ -45,6 +45,10 @@ extension FlattenCollection: Collection {
     @inlinable
     internal static func < (lhs: Self, rhs: Self) -> Bool {
       guard lhs.outer == rhs.outer else { return lhs.outer < rhs.outer }
+      // swift-format-ignore: NeverForceUnwrap
+      // `inner` is nil iff `outer` is `base.endIndex`, and the
+      // previous line established that the two outer indices are equal.
+      // Thus, either both inner indices are nil or neither are.
       return lhs.inner == nil ? false : lhs.inner! < rhs.inner!
     }
   }
@@ -81,12 +85,18 @@ extension FlattenCollection: Collection {
   @inlinable
   internal func index(after index: Index) -> Index {
     let element = base[index.outer]
+    // swift-format-ignore: NeverForceUnwrap
+    // This unwrap, like the unchecked subscript above, enforces the
+    // precondition that you can't advance past `endIndex`.
     let nextInner = element.index(after: index.inner!)
     return normalizeIndex(outer: index.outer, inner: nextInner)
   }
 
   @inlinable
   internal subscript(position: Index) -> Base.Element.Element {
+    // swift-format-ignore: NeverForceUnwrap
+    // This unwrap, along with the unchecked subscript, enforces the
+    // precondition that you can't subscript at `endIndex`.
     base[position.outer][position.inner!]
   }
 
@@ -98,6 +108,9 @@ extension FlattenCollection: Collection {
     else { return 0 }
     guard start.outer != end.outer
     else {
+      // swift-format-ignore: NeverForceUnwrap
+      // Established via guards that outer indices are equal and `start.inner`
+      // is non-nil, so `end.inner` must also be non-`nil`.
       return base[start.outer].distance(from: startInner, to: end.inner!)
     }
 
@@ -170,6 +183,7 @@ extension FlattenCollection: Collection {
         .map { inner in Index(outer: index.outer, inner: inner) }
     }
 
+    // swift-format-ignore: NeverForceUnwrap
     // `index <= limit` and `index.outer != limit.outer`, so `index != endIndex`
     let indexInner = index.inner!
     let element = base[index.outer]
@@ -200,16 +214,16 @@ extension FlattenCollection: Collection {
       base.formIndex(after: &outer)
     }
 
-    guard let limitInner = limit.inner else {
-      return nil
+    if let limitInner = limit.inner {
+      let element = base[outer]
+      return element.index(
+        element.startIndex,
+        offsetBy: remainder,
+        limitedBy: limitInner
+      )
+      .map { inner in Index(outer: outer, inner: inner) }
     }
-    let element = base[outer]
-    return element.index(
-      element.startIndex,
-      offsetBy: remainder,
-      limitedBy: limitInner
-    )
-    .map { inner in Index(outer: outer, inner: inner) }
+    return nil
   }
 
   @inlinable
@@ -265,6 +279,9 @@ extension FlattenCollection: Collection {
     }
 
     let element = base[outer]
+    // swift-format-ignore: NeverForceUnwrap
+    // At start of function, `limit <= index`, and checked for
+    // `limit == endIndex`.
     return element.index(
       element.endIndex,
       offsetBy: -remainder,
@@ -286,7 +303,12 @@ where Base: BidirectionalCollection, Base.Element: BidirectionalCollection {
       }
     }
 
-    let previousOuter = base[..<index.outer].lastIndex(where: { !$0.isEmpty })!
+    guard
+      let previousOuter = base[..<index.outer]
+        .lastIndex(where: { !$0.isEmpty })
+    else {
+      fatalError("Can't move before startIndex.")
+    }
     let element = base[previousOuter]
     let previousInner = element.index(before: element.endIndex)
     return Index(outer: previousOuter, inner: previousInner)

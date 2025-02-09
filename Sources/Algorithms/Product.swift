@@ -65,6 +65,8 @@ extension Product2Sequence: Sequence {
       // Get the next element from the second sequence, if not
       // at end.
       if let element2 = i2.next() {
+        // swift-format-ignore: NeverForceUnwrap
+        // `element1` has a nil check above.
         return (element1!, element2)
       }
 
@@ -73,8 +75,9 @@ extension Product2Sequence: Sequence {
       // 2) Restart iteration of the second sequence
       // 3) Get the first element of the second sequence, if exists
       element1 = i1.next()
-      guard let element1 = element1
-      else { return nil }
+      guard let element1 else {
+        return nil
+      }
 
       i2 = base2.makeIterator()
       guard let element2 = i2.next() else {

@@ -176,6 +176,8 @@ extension ChunkedOnCollection: Collection {
   @inlinable
   public subscript(position: Index) -> (Subject, Base.SubSequence) {
     let subsequence = chunked[position]
+    // swift-format-ignore: NeverForceUnwrap
+    // Chunks are never empty, so `.first!` is safe.
     let subject = chunked.projection(subsequence.first!)
     return (subject, subsequence)
   }

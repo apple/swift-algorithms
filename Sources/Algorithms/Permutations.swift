@@ -43,6 +43,7 @@ where Self: BidirectionalCollection, Element: Comparable {
       // Find the last ascending pair (ie. ..., a, b, ... where a < b)
       if self[i] < self[ip1] {
         // Find the last element greater than self[i]
+        // swift-format-ignore: NeverForceUnwrap
         // This is _always_ at most `ip1` due to if statement above
         let j = lastIndex(where: { self[i] < $0 })!
 

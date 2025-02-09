@@ -342,7 +342,10 @@ extension Collection {
     let elements = try [Element](
       unsafeUninitializedCapacity: count,
       initializingWith: { buffer, initializedCount in
-        var lhs = buffer.baseAddress!
+        // swift-format-ignore: NeverForceUnwrap
+        // Non-empty check above.
+        let bufferStart = buffer.baseAddress!
+        var lhs = bufferStart
         var rhs = lhs + buffer.count
         do {
           for element in self {
@@ -362,15 +365,15 @@ extension Collection {
             """
           )
 
-          let rhsIndex = rhs - buffer.baseAddress!
+          let rhsIndex = rhs - bufferStart
           buffer[rhsIndex...].reverse()
           initializedCount = buffer.count
 
           midPoint = rhsIndex
         } catch {
-          let lhsCount = lhs - buffer.baseAddress!
-          let rhsCount = (buffer.baseAddress! + buffer.count) - rhs
-          buffer.baseAddress!.deinitialize(count: lhsCount)
+          let lhsCount = lhs - bufferStart
+          let rhsCount = (bufferStart + buffer.count) - rhs
+          bufferStart.deinitialize(count: lhsCount)
           rhs.deinitialize(count: rhsCount)
           throw error
         }

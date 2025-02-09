@@ -26,8 +26,8 @@ extension Sequence {
     try result.sort(by: areInIncreasingOrder)
 
     while let e = iterator.next() {
-      // To be part of `result`, `e` must be strictly less than `result.last`.
-      guard try areInIncreasingOrder(e, result.last!) else { continue }
+      // To be part of `result`, `e` must be strictly less than `result[count - 1]`.
+      guard try areInIncreasingOrder(e, result[count - 1]) else { continue }
       result.removeLast()
       let insertionIndex =
         try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
@@ -53,8 +53,8 @@ extension Sequence {
     try result.sort(by: areInIncreasingOrder)
 
     while let e = iterator.next() {
-      // To be part of `result`, `e` must be greater/equal to `result.first`.
-      guard try !areInIncreasingOrder(e, result.first!) else { continue }
+      // To be part of `result`, `e` must be greater/equal to `result[0]`.
+      guard try !areInIncreasingOrder(e, result[0]) else { continue }
       let insertionIndex =
         try result.partitioningIndex { try areInIncreasingOrder(e, $0) }
 

@@ -263,10 +263,11 @@ extension StridingCollection: Collection {
       distance >= 0 || i.base != base.startIndex,
       "Incrementing past start index")
     let limit = distance > 0 ? endIndex : startIndex
-    let idx = index(i, offsetBy: distance, limitedBy: limit)
-    precondition(
-      idx != nil, "The distance \(distance) is not valid for this collection")
-    return idx!
+    guard let idx = index(i, offsetBy: distance, limitedBy: limit) else {
+      preconditionFailure(
+        "The distance \(distance) is not valid for this collection")
+    }
+    return idx
   }
 }
 

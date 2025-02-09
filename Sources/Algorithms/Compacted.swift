@@ -105,6 +105,8 @@ where Base.Element == Element? {
 
   @inlinable
   public subscript(position: Index) -> Element {
+    // swift-format-ignore: NeverForceUnwrap
+    // All indices are only for non-`nil` elements.
     base[position.base]!
   }
 
