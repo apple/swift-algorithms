@@ -172,7 +172,9 @@ extension WindowsOfCountCollection: Collection {
 
   @inlinable
   internal func offsetForward(
-    _ i: Index, by distance: Int, limitedBy limit: Index
+    _ i: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance > 0)
     assert(limit > i)
@@ -244,7 +246,9 @@ extension WindowsOfCountCollection: Collection {
 
   @inlinable
   internal func offsetBackward(
-    _ i: Index, by distance: Int, limitedBy limit: Index
+    _ i: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance > 0)
     assert(limit < i)

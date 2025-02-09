@@ -248,7 +248,9 @@ extension Product2Sequence: Collection where Base1: Collection {
 
   @inlinable
   internal func offsetForward(
-    _ i: Index, by distance: Int, limitedBy limit: Index
+    _ i: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance >= 0)
     assert(limit >= i)
@@ -336,7 +338,9 @@ extension Product2Sequence: Collection where Base1: Collection {
 
   @inlinable
   internal func offsetBackward(
-    _ i: Index, by distance: Int, limitedBy limit: Index
+    _ i: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance >= 0)
     assert(limit <= i)
@@ -512,7 +516,8 @@ where Base1.Index: Hashable, Base2.Index: Hashable {}
 /// - Complexity: O(1)
 @inlinable
 public func product<Base1: Sequence, Base2: Collection>(
-  _ s1: Base1, _ s2: Base2
+  _ s1: Base1,
+  _ s2: Base2
 ) -> Product2Sequence<Base1, Base2> {
   Product2Sequence(s1, s2)
 }

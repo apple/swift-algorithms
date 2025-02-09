@@ -218,7 +218,9 @@ extension AdjacentPairsCollection: Collection {
 
   @inlinable
   public func index(
-    _ i: Index, offsetBy distance: Int, limitedBy limit: Index
+    _ i: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     guard distance != 0 else { return i }
     guard limit != i else { return nil }
@@ -234,13 +236,17 @@ extension AdjacentPairsCollection: Collection {
 
   @inlinable
   internal func offsetForward(
-    _ i: Index, by distance: Int, limitedBy limit: Index
+    _ i: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance > 0)
     assert(limit > i)
 
     let newFirst = base.index(
-      i.second, offsetBy: distance - 1, limitedBy: limit.first)
+      i.second,
+      offsetBy: distance - 1,
+      limitedBy: limit.first)
     guard let newFirst, newFirst != base.endIndex
     else { return nil }
 
@@ -254,14 +260,18 @@ extension AdjacentPairsCollection: Collection {
 
   @inlinable
   internal func offsetBackward(
-    _ i: Index, by distance: Int, limitedBy limit: Index
+    _ i: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance > 0)
     assert(limit < i)
 
     let offset = i == endIndex ? 0 : 1
     let newSecond = base.index(
-      i.first, offsetBy: -(distance - offset), limitedBy: limit.second)
+      i.first,
+      offsetBy: -(distance - offset),
+      limitedBy: limit.second)
     guard let newSecond
     else { return nil }
 

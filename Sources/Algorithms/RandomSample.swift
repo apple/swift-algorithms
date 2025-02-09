@@ -56,7 +56,8 @@ extension Collection {
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
   public func randomStableSample<G: RandomNumberGenerator>(
-    count k: Int, using rng: inout G
+    count k: Int,
+    using rng: inout G
   ) -> [Element] {
     guard k > 0 else { return [] }
 
@@ -110,14 +111,16 @@ extension Collection {
 
 @usableFromInline
 internal func nextW<G: RandomNumberGenerator>(
-  k: Int, using rng: inout G
+  k: Int,
+  using rng: inout G
 ) -> Double {
   Double.root(.random(in: 0..<1, using: &rng), k)
 }
 
 @usableFromInline
 internal func nextOffset<G: RandomNumberGenerator>(
-  w: Double, using rng: inout G
+  w: Double,
+  using rng: inout G
 ) -> Int {
   let offset = Double.log(.random(in: 0..<1, using: &rng)) / .log(onePlus: -w)
   return offset < Double(Int.max) ? Int(offset) : Int.max
@@ -138,7 +141,8 @@ extension Collection {
   ///   where *n* is the length of the collection.
   @inlinable
   public func randomSample<G: RandomNumberGenerator>(
-    count k: Int, using rng: inout G
+    count k: Int,
+    using rng: inout G
   ) -> [Element] {
     guard k > 0 else { return [] }
 
@@ -207,7 +211,8 @@ extension Sequence {
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   @inlinable
   public func randomSample<G: RandomNumberGenerator>(
-    count k: Int, using rng: inout G
+    count k: Int,
+    using rng: inout G
   ) -> [Element] {
     guard k > 0 else { return [] }
 

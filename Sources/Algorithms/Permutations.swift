@@ -117,7 +117,8 @@ public struct PermutationsSequence<Base: Collection> {
   ///   iterate over all permutations of the same size as the base collection.
   @inlinable
   internal init<R: RangeExpression>(
-    _ base: Base, kRange: R?
+    _ base: Base,
+    kRange: R?
   ) where R.Bound == Int {
     self.base = base
     let baseCount = base.count

@@ -91,9 +91,9 @@ where Base1: Collection, Base2: Collection {
         return true
       case (.second, .first):
         return false
-      case let (.first(l), .first(r)):
+      case (.first(let l), .first(let r)):
         return l < r
-      case let (.second(l), .second(r)):
+      case (.second(let l), .second(let r)):
         return l < r
       }
     }
@@ -121,9 +121,9 @@ where Base1: Collection, Base2: Collection {
   @inlinable
   public subscript(i: Index) -> Base1.Element {
     switch i.position {
-    case let .first(i):
+    case .first(let i):
       return base1[i]
-    case let .second(i):
+    case .second(let i):
       return base2[i]
     }
   }
@@ -131,10 +131,10 @@ where Base1: Collection, Base2: Collection {
   @inlinable
   public func index(after i: Index) -> Index {
     switch i.position {
-    case let .first(i):
+    case .first(let i):
       assert(i != base1.endIndex)
       return normalizeIndex(base1.index(after: i))
-    case let .second(i):
+    case .second(let i):
       return Index(second: base2.index(after: i))
     }
   }
@@ -181,17 +181,19 @@ where Base1: Collection, Base2: Collection {
 
   @inlinable
   internal func offsetForward(
-    _ i: Index, by distance: Int, limitedBy limit: Index
+    _ i: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance >= 0)
     assert(limit >= i)
 
     switch (i.position, limit.position) {
-    case let (.first(i), .first(limit)):
+    case (.first(let i), .first(let limit)):
       return base1.index(i, offsetBy: distance, limitedBy: limit)
         .map(Index.init(first:))
 
-    case let (.first(i), .second(limit)):
+    case (.first(let i), .second(let limit)):
       guard
         let j = base1.index(i, offsetBy: distance, limitedBy: base1.endIndex)
       else {
@@ -209,7 +211,7 @@ where Base1: Collection, Base2: Collection {
       // impossible because `limit >= i`
       fatalError()
 
-    case let (.second(i), .second(limit)):
+    case (.second(let i), .second(let limit)):
       return base2.index(i, offsetBy: distance, limitedBy: limit)
         .map(Index.init(second:))
     }
@@ -217,13 +219,15 @@ where Base1: Collection, Base2: Collection {
 
   @inlinable
   internal func offsetBackward(
-    _ i: Index, by distance: Int, limitedBy limit: Index
+    _ i: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance >= 0)
     assert(limit <= i)
 
     switch (i.position, limit.position) {
-    case let (.first(i), .first(limit)):
+    case (.first(let i), .first(let limit)):
       return base1.index(i, offsetBy: -distance, limitedBy: limit)
         .map(Index.init(first:))
 
@@ -231,7 +235,7 @@ where Base1: Collection, Base2: Collection {
       // impossible because `limit <= i`
       fatalError()
 
-    case let (.second(i), .first(limit)):
+    case (.second(let i), .first(let limit)):
       guard
         let j = base2.index(i, offsetBy: -distance, limitedBy: base2.startIndex)
       else {
@@ -245,7 +249,7 @@ where Base1: Collection, Base2: Collection {
       // the offset stays within the bounds of `base2`
       return Index(second: j)
 
-    case let (.second(i), .second(limit)):
+    case (.second(let i), .second(let limit)):
       // `limit` is relevant, so `base1` cannot be reached
       return base2.index(i, offsetBy: -distance, limitedBy: limit)
         .map(Index.init(second:))
@@ -255,14 +259,14 @@ where Base1: Collection, Base2: Collection {
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     switch (start.position, end.position) {
-    case let (.first(i), .first(j)):
+    case (.first(let i), .first(let j)):
       return base1.distance(from: i, to: j)
-    case let (.second(i), .second(j)):
+    case (.second(let i), .second(let j)):
       return base2.distance(from: i, to: j)
-    case let (.first(i), .second(j)):
+    case (.first(let i), .second(let j)):
       return base1.distance(from: i, to: base1.endIndex)
         + base2.distance(from: base2.startIndex, to: j)
-    case let (.second(i), .first(j)):
+    case (.second(let i), .first(let j)):
       return base2.distance(from: i, to: base2.startIndex)
         + base1.distance(from: base1.endIndex, to: j)
     }
@@ -275,9 +279,9 @@ where Base1: BidirectionalCollection, Base2: BidirectionalCollection {
   public func index(before i: Index) -> Index {
     assert(i != startIndex, "Can't advance before startIndex")
     switch i.position {
-    case let .first(i):
+    case .first(let i):
       return Index(first: base1.index(before: i))
-    case let .second(i):
+    case .second(let i):
       return i == base2.startIndex
         ? Index(first: base1.index(before: base1.endIndex))
         : Index(second: base2.index(before: i))

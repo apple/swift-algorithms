@@ -34,7 +34,8 @@ extension MutableCollection where Self: BidirectionalCollection {
   @inlinable
   @discardableResult
   internal mutating func _reverse(
-    subrange: Range<Index>, until limit: Index
+    subrange: Range<Index>,
+    until limit: Index
   ) -> (Index, Index) {
     var lower = subrange.lowerBound
     var upper = subrange.upperBound
@@ -100,7 +101,8 @@ extension MutableCollection {
   ///   - p == lhs.upperBound || q == rhs.upperBound
   @inlinable
   internal mutating func _swapNonemptySubrangePrefixes(
-    _ lhs: Range<Index>, _ rhs: Range<Index>
+    _ lhs: Range<Index>,
+    _ rhs: Range<Index>
   ) -> (Index, Index) {
     assert(!lhs.isEmpty)
     assert(!rhs.isEmpty)

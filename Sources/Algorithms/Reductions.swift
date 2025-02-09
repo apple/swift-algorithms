@@ -319,11 +319,11 @@ extension ExclusiveReductionsSequence: Collection where Base: Collection {
   @inlinable
   public func distance(from start: Index, to end: Index) -> Int {
     switch (start.representation, end.representation) {
-    case let (.base(start, _), .base(end, _)):
+    case (.base(let start, _), .base(let end, _)):
       return base.distance(from: start, to: end)
-    case let (.base(index, _), .end):
+    case (.base(let index, _), .end):
       return base.distance(from: index, to: base.endIndex) + 1
-    case let (.end, .base(index, _)):
+    case (.end, .base(let index, _)):
       return base.distance(from: base.endIndex, to: index) - 1
     case (.end, .end):
       return 0

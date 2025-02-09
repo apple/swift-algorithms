@@ -153,7 +153,9 @@ extension FlattenCollection: Collection {
 
   @inlinable
   internal func offsetForward(
-    _ index: Index, by distance: Int, limitedBy limit: Index
+    _ index: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance > 0)
     assert(limit >= index)
@@ -212,7 +214,9 @@ extension FlattenCollection: Collection {
 
   @inlinable
   internal func offsetBackward(
-    _ index: Index, by distance: Int, limitedBy limit: Index
+    _ index: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance > 0)
     assert(limit <= index)

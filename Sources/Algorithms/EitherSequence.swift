@@ -24,9 +24,9 @@ extension Either: Equatable where Left: Equatable, Right: Equatable {
   @usableFromInline
   internal static func == (lhs: Self, rhs: Self) -> Bool {
     switch (lhs, rhs) {
-    case let (.left(lhs), .left(rhs)):
+    case (.left(let lhs), .left(let rhs)):
       return lhs == rhs
-    case let (.right(lhs), .right(rhs)):
+    case (.right(let lhs), .right(let rhs)):
       return lhs == rhs
     case (.left, .right), (.right, .left):
       return false
@@ -38,9 +38,9 @@ extension Either: Comparable where Left: Comparable, Right: Comparable {
   @usableFromInline
   internal static func < (lhs: Self, rhs: Self) -> Bool {
     switch (lhs, rhs) {
-    case let (.left(lhs), .left(rhs)):
+    case (.left(let lhs), .left(let rhs)):
       return lhs < rhs
-    case let (.right(lhs), .right(rhs)):
+    case (.right(let lhs), .right(let rhs)):
       return lhs < rhs
     case (.left, .right):
       return true
@@ -116,9 +116,9 @@ where Left: Collection, Right: Collection, Left.Element == Right.Element {
   @inlinable
   internal subscript(position: Index) -> Element {
     switch (self, position) {
-    case let (.left(s), .left(i)):
+    case (.left(let s), .left(let i)):
       return s[i]
-    case let (.right(s), .right(i)):
+    case (.right(let s), .right(let i)):
       return s[i]
     default:
       fatalError()
@@ -128,9 +128,9 @@ where Left: Collection, Right: Collection, Left.Element == Right.Element {
   @inlinable
   internal func index(after i: Index) -> Index {
     switch (self, i) {
-    case let (.left(s), .left(i)):
+    case (.left(let s), .left(let i)):
       return .left(s.index(after: i))
-    case let (.right(s), .right(i)):
+    case (.right(let s), .right(let i)):
       return .right(s.index(after: i))
     default:
       fatalError()
@@ -144,9 +144,9 @@ where Left: Collection, Right: Collection, Left.Element == Right.Element {
     limitedBy limit: Index
   ) -> Index? {
     switch (self, i, limit) {
-    case let (.left(s), .left(i), .left(limit)):
+    case (.left(let s), .left(let i), .left(let limit)):
       return s.index(i, offsetBy: distance, limitedBy: limit).map { .left($0) }
-    case let (.right(s), .right(i), .right(limit)):
+    case (.right(let s), .right(let i), .right(let limit)):
       return s.index(i, offsetBy: distance, limitedBy: limit).map { .right($0) }
     default:
       fatalError()
@@ -156,9 +156,9 @@ where Left: Collection, Right: Collection, Left.Element == Right.Element {
   @inlinable
   internal func index(_ i: Index, offsetBy distance: Int) -> Index {
     switch (self, i) {
-    case let (.left(s), .left(i)):
+    case (.left(let s), .left(let i)):
       return .left(s.index(i, offsetBy: distance))
-    case let (.right(s), .right(i)):
+    case (.right(let s), .right(let i)):
       return .right(s.index(i, offsetBy: distance))
     default:
       fatalError()
@@ -168,9 +168,9 @@ where Left: Collection, Right: Collection, Left.Element == Right.Element {
   @inlinable
   internal func distance(from start: Index, to end: Index) -> Int {
     switch (self, start, end) {
-    case let (.left(s), .left(i), .left(j)):
+    case (.left(let s), .left(let i), .left(let j)):
       return s.distance(from: i, to: j)
-    case let (.right(s), .right(i), .right(j)):
+    case (.right(let s), .right(let i), .right(let j)):
       return s.distance(from: i, to: j)
     default:
       fatalError()
@@ -183,9 +183,9 @@ where Left: BidirectionalCollection, Right: BidirectionalCollection {
   @inlinable
   internal func index(before i: Index) -> Index {
     switch (self, i) {
-    case let (.left(s), .left(i)):
+    case (.left(let s), .left(let i)):
       return .left(s.index(before: i))
-    case let (.right(s), .right(i)):
+    case (.right(let s), .right(let i)):
       return .right(s.index(before: i))
     default:
       fatalError()

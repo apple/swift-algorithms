@@ -44,7 +44,8 @@ public struct CombinationsSequence<Base: Collection> {
   ///   - kRange: The range of accepted sizes of combinations.
   @inlinable
   internal init<R: RangeExpression>(
-    _ base: Base, kRange: R
+    _ base: Base,
+    kRange: R
   ) where R.Bound == Int {
     let range = kRange.relative(to: 0 ..< .max)
     self.base = base
@@ -303,7 +304,8 @@ extension Collection {
   @inlinable
   public func combinations(ofCount k: Int) -> CombinationsSequence<Self> {
     precondition(
-      k >= 0, "Can't have combinations with a negative number of elements.")
+      k >= 0,
+      "Can't have combinations with a negative number of elements.")
     return CombinationsSequence(self, k: k)
   }
 }
