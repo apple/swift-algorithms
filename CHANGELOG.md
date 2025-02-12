@@ -8,7 +8,26 @@ This project follows semantic versioning.
 
 ## [Unreleased]
 
-*No new changes.*
+### Additions
+
+- Bidirectional collections have a new `ends(with:)` method that matches
+  the behavior of the standard library's `starts(with:)` method. ([#224])
+
+<!-- *No new changes.* -->
+
+## [1.2.1] - 2025-02-10
+
+### Changes
+
+- The package now has a minimum Swift version of Swift 5.7. ([#240])
+- Adds a project for building with Xcode. ([#246])
+
+### Fixes
+
+- Fix for Swift 6 language mode errors. ([#230])
+- Minor improvements to documentation and performance. ([#220], [#222], [#223], [#225], [#227], [#228])
+
+The 1.2.1 release includes contributions from [b1ackturtle], [CheATSlark], [dabrahams], [glessard], [j-f1], [marcosgriselli], [mrs1669], [natecook1000], [rex4539], and [schlagelk]. Thank you!
 
 ## [1.2.0] - 2023-11-14
 
@@ -338,7 +357,8 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for releases -->
 
-[Unreleased]: https://github.com/apple/swift-algorithms/compare/1.2.0...HEAD
+[Unreleased]: https://github.com/apple/swift-algorithms/compare/1.2.1...HEAD
+[1.2.0]: https://github.com/apple/swift-algorithms/compare/1.2.0...1.2.1
 [1.2.0]: https://github.com/apple/swift-algorithms/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/apple/swift-algorithms/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/apple/swift-algorithms/compare/0.2.1...1.0.0
@@ -385,33 +405,50 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#202]: https://github.com/apple/swift-algorithms/pull/202
 [#210]: https://github.com/apple/swift-algorithms/pull/210
 [#211]: https://github.com/apple/swift-algorithms/pull/211
+[#224]: https://github.com/apple/swift-algorithms/pull/224
+[#220]: https://github.com/apple/swift-algorithms/pull/220
+[#222]: https://github.com/apple/swift-algorithms/pull/222
+[#223]: https://github.com/apple/swift-algorithms/pull/223
+[#225]: https://github.com/apple/swift-algorithms/pull/225
+[#227]: https://github.com/apple/swift-algorithms/pull/227
+[#228]: https://github.com/apple/swift-algorithms/pull/228
+[#230]: https://github.com/apple/swift-algorithms/pull/230
+[#240]: https://github.com/apple/swift-algorithms/pull/240
+[#246]: https://github.com/apple/swift-algorithms/pull/246
 
 <!-- Link references for contributors -->
 
 [amomchilov]: https://github.com/apple/swift-algorithms/commits?author=amomchilov
 [AustinConlon]: https://github.com/apple/swift-algorithms/commits?author=AustinConlon
+[b1ackturtle]: https://github.com/apple/swift-algorithms/commits?author=b1ackturtle
 [benrimmington]: https://github.com/apple/swift-algorithms/commits?author=benrimmington
 [bjhomer]: https://github.com/apple/swift-algorithms/commits?author=bjhomer
+[CheATSlark]: https://github.com/apple/swift-algorithms/commits?author=CheATSlark
 [CTMacUser]: https://github.com/apple/swift-algorithms/commits?author=CTMacUser
+[dabrahams]: https://github.com/apple/swift-algorithms/commits?author=dabrahams
 [danielctull]: https://github.com/apple/swift-algorithms/commits?author=danielctull
 [dhruvshah8]: https://github.com/apple/swift-algorithms/commits?author=dhruvshah8
 [dickoff]: https://github.com/apple/swift-algorithms/commits?author=dickoff
 [egorzhdan]: https://github.com/apple/swift-algorithms/commits?author=egorzhdan
 [fedeci]: https://github.com/apple/swift-algorithms/commits?author=fedeci
+[glessard]: https://github.com/apple/swift-algorithms/commits?author=glessard
 [gwynne]: https://github.com/apple/swift-algorithms/commits?author=gwynne
 [hashemi]: https://github.com/apple/swift-algorithms/commits?author=hashemi
 [iainsmith]: https://github.com/apple/swift-algorithms/commits?author=iainsmith
 [IanKeen]: https://github.com/apple/swift-algorithms/commits?author=IanKeen
 [iSame7]: https://github.com/apple/swift-algorithms/commits?author=iSame7
+[j-f1]: https://github.com/apple/swift-algorithms/commits?author=j-f1
 [karwa]: https://github.com/apple/swift-algorithms/commits?author=karwa
 [kylemacomber]: https://github.com/apple/swift-algorithms/commits?author=kylemacomber
 [LemonSpike]: https://github.com/apple/swift-algorithms/commits?author=LemonSpike
 [LucianoPAlmeida]: https://github.com/apple/swift-algorithms/commits?author=LucianoPAlmeida
+[marcosgriselli]: https://github.com/apple/swift-algorithms/commits?author=marcosgriselli
 [markuswntr]: https://github.com/apple/swift-algorithms/commits?author=markuswntr
 [mattyoung]: https://github.com/apple/swift-algorithms/commits?author=mattyoung
 [mdznr]: https://github.com/apple/swift-algorithms/commits?author=mdznr
 [michiboo]: https://github.com/apple/swift-algorithms/commits?author=michiboo
 [mpangburn]: https://github.com/apple/swift-algorithms/commits?author=mpangburn
+[mrs1669]: https://github.com/apple/swift-algorithms/commits?author=mrs1669
 [natecook1000]: https://github.com/apple/swift-algorithms/commits?author=natecook1000
 [nordicio]: https://github.com/apple/swift-algorithms/commits?author=nordicio
 [ole]: https://github.com/apple/swift-algorithms/commits?author=ole
@@ -419,6 +456,7 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [pmtao]: https://github.com/apple/swift-algorithms/commits?author=pmtao
 [Qata]: https://github.com/apple/swift-algorithms/commits?author=Qata
 [rakaramos]: https://github.com/apple/swift-algorithms/commits?author=rakaramos
+[rex4539]: https://github.com/apple/swift-algorithms/commits?author=rex4539
 [rockbruno]: https://github.com/apple/swift-algorithms/commits?author=rockbruno
 [Roshankumar350]: https://github.com/apple/swift-algorithms/commits?author=Roshankumar350
 [schlagelk]: https://github.com/apple/swift-algorithms/commits?author=schlagelk
