@@ -40,3 +40,4 @@ Explore more chunking methods and the remainder of the Algorithms package, group
 - <doc:Filtering>
 - <doc:Reductions>
 - <doc:Partitioning>
+- <doc:Merging>
