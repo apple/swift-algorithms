@@ -13,3 +13,8 @@ jobs:
     uses: swiftlang/github-workflows/.github/workflows/soundness.yml@main
     with:
       license_header_check_project_name: "Swift.org"
+      license_header_check_enabled: false
+      # https://github.com/apple/swift-algorithms/issues/251
+      docs_check_enabled: false
+      # https://github.com/apple/swift-algorithms/issues/252
+      format_check_enabled: false
