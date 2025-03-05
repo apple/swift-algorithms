@@ -13,23 +13,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-algorithms",
-    products: [
-        .library(
-            name: "Algorithms",
-            targets: ["Algorithms"]),
-    ],
-    dependencies: [
-        .package(url: "https://github.com/apple/swift-numerics.git", from: "1.0.0"),
-    ],
-    targets: [
-        .target(
-            name: "Algorithms",
-            dependencies: [
-              .product(name: "RealModule", package: "swift-numerics"),
-            ]),
-        .testTarget(
-            name: "SwiftAlgorithmsTests",
-            dependencies: ["Algorithms"]),
-    ]
+  name: "swift-algorithms",
+  products: [
+    .library(
+      name: "Algorithms",
+      targets: ["Algorithms"])
+  ],
+  dependencies: [
+    .package(url: "https://github.com/apple/swift-numerics.git", from: "1.0.0")
+  ],
+  targets: [
+    .target(
+      name: "Algorithms",
+      dependencies: [
+        .product(name: "RealModule", package: "swift-numerics")
+      ]),
+    .testTarget(
+      name: "SwiftAlgorithmsTests",
+      dependencies: ["Algorithms"]),
+  ]
 )

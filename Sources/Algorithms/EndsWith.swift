@@ -14,8 +14,6 @@
 //===----------------------------------------------------------------------===//
 
 extension BidirectionalCollection where Element: Equatable {
-
-
   /// Returns a Boolean value indicating whether the final elements of the
   /// collection are the same as the elements in another collection.
   ///
@@ -45,7 +43,7 @@ extension BidirectionalCollection where Element: Equatable {
   public func ends<PossibleSuffix: BidirectionalCollection>(
     with possibleSuffix: PossibleSuffix
   ) -> Bool where PossibleSuffix.Element == Element {
-    return self.ends(with: possibleSuffix, by: ==)
+    self.ends(with: possibleSuffix, by: ==)
   }
 }
 
@@ -78,7 +76,8 @@ extension BidirectionalCollection {
     with possibleSuffix: PossibleSuffix,
     by areEquivalent: (Element, PossibleSuffix.Element) throws -> Bool
   ) rethrows -> Bool {
-    try self.reversed().starts(with: possibleSuffix.reversed(), by: areEquivalent)
+    try self
+      .reversed()
+      .starts(with: possibleSuffix.reversed(), by: areEquivalent)
   }
 }
-

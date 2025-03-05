@@ -33,8 +33,9 @@ extension MutableCollection {
         ? subrange.lowerBound
         : subrange.upperBound
     }
-    
-    let h = n / 2, i = index(subrange.lowerBound, offsetBy: h)
+
+    let h = n / 2
+    let i = index(subrange.lowerBound, offsetBy: h)
     let j = try stablePartition(
       count: h,
       subrange: subrange.lowerBound..<i,
@@ -45,7 +46,7 @@ extension MutableCollection {
       by: belongsInSecondPartition)
     return rotate(subrange: j..<k, toStartAt: i)
   }
-  
+
   /// Moves all elements satisfying the given predicate into a suffix of the
   /// given range, preserving the relative order of the elements in both
   /// partitions, and returns the start of the resulting suffix.
@@ -55,19 +56,23 @@ extension MutableCollection {
   ///   - belongsInSecondPartition: A predicate used to partition the
   ///     collection. All elements satisfying this predicate are ordered after
   ///     all elements not satisfying it.
+  /// - Returns: The pivot index `p`, which is the index of the first element
+  ///   in the reordered collection that matches `belongsInSecondPartition`.
+  ///   If no elements in the collection match `belongsInSecondPartition`, the
+  ///   returned index is equal to the collection's `endIndex`.
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
   @inlinable
   public mutating func stablePartition(
     subrange: Range<Index>,
-    by belongsInSecondPartition: (Element) throws-> Bool
+    by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     try stablePartition(
       count: distance(from: subrange.lowerBound, to: subrange.upperBound),
       subrange: subrange,
       by: belongsInSecondPartition)
   }
-  
+
   /// Moves all elements satisfying the given predicate into a suffix of this
   /// collection, preserving the relative order of the elements in both
   /// partitions, and returns the start of the resulting suffix.
@@ -75,11 +80,15 @@ extension MutableCollection {
   /// - Parameter belongsInSecondPartition: A predicate used to partition the
   ///   collection. All elements satisfying this predicate are ordered after
   ///   all elements not satisfying it.
+  /// - Returns: The pivot index `p`, which is the index of the first element
+  ///   in the reordered collection that matches `belongsInSecondPartition`.
+  ///   If no elements in the collection match `belongsInSecondPartition`, the
+  ///   returned index is equal to the collection's `endIndex`.
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
   @inlinable
   public mutating func stablePartition(
-    by belongsInSecondPartition: (Element) throws-> Bool
+    by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
     try stablePartition(
       subrange: startIndex..<endIndex,
@@ -92,8 +101,24 @@ extension MutableCollection {
 //===----------------------------------------------------------------------===//
 
 extension MutableCollection {
-  /// Moves all elements satisfying `isSuffixElement` into a suffix of the
+  /// Moves all elements satisfying the given closure into a suffix of the
   /// collection, returning the start position of the resulting suffix.
+  ///
+  /// After partitioning a collection, there is a pivot index `p` where no
+  /// element before `p` satisfies the `belongsInSecondPartition` predicate and
+  /// every element at or after `p` satisfies `belongsInSecondPartition`. This
+  /// operation isn't guaranteed to be stable, so the relative ordering of
+  /// elements within the partitions might change.
+  ///
+  /// - Parameters:
+  ///   - subrange: The range of elements within this collection to partition.
+  ///   - belongsInSecondPartition: A predicate used to partition the
+  ///     collection. All elements satisfying this predicate are ordered after
+  ///     all elements not satisfying it.
+  /// - Returns: The pivot index `p`, which is the index of the first element
+  ///   in the reordered collection that matches `belongsInSecondPartition`.
+  ///   If no elements in the collection match `belongsInSecondPartition`, the
+  ///   returned index is equal to the collection's `endIndex`.
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
   @inlinable
@@ -104,8 +129,8 @@ extension MutableCollection {
     // This version of `partition(subrange:)` is half stable; the elements in
     // the first partition retain their original relative order.
     guard var i = try self[subrange].firstIndex(where: belongsInSecondPartition)
-      else { return subrange.upperBound }
-    
+    else { return subrange.upperBound }
+
     var j = index(after: i)
     while j != subrange.upperBound {
       if try !belongsInSecondPartition(self[j]) {
@@ -114,14 +139,30 @@ extension MutableCollection {
       }
       formIndex(after: &j)
     }
-    
+
     return i
   }
 }
 
 extension MutableCollection where Self: BidirectionalCollection {
-  /// Moves all elements satisfying `isSuffixElement` into a suffix of the
+  /// Moves all elements satisfying the given closure into a suffix of the
   /// collection, returning the start position of the resulting suffix.
+  ///
+  /// After partitioning a collection, there is a pivot index `p` where no
+  /// element before `p` satisfies the `belongsInSecondPartition` predicate and
+  /// every element at or after `p` satisfies `belongsInSecondPartition`. This
+  /// operation isn't guaranteed to be stable, so the relative ordering of
+  /// elements within the partitions might change.
+  ///
+  /// - Parameters:
+  ///   - subrange: The range of elements within this collection to partition.
+  ///   - belongsInSecondPartition: A predicate used to partition the
+  ///     collection. All elements satisfying this predicate are ordered after
+  ///     all elements not satisfying it.
+  /// - Returns: The pivot index `p`, which is the index of the first element
+  ///   in the reordered collection that matches `belongsInSecondPartition`.
+  ///   If no elements in the collection match `belongsInSecondPartition`, the
+  ///   returned index is equal to the collection's `endIndex`.
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
   @inlinable
@@ -190,7 +231,7 @@ extension Collection {
   ) rethrows -> Index {
     var n = count
     var l = startIndex
-    
+
     while n > 0 {
       let half = n / 2
       let mid = index(l, offsetBy: half)
@@ -224,24 +265,23 @@ extension Sequence {
   ///     // Prints "["Kim", "Karl"]"
   ///
   /// - Parameter predicate: A closure that takes an element of the sequence as
-  /// its argument and returns a Boolean value indicating whether the element
-  /// should be included in the second returned array. Otherwise, the element
-  /// will appear in the first returned array.
-  ///
+  ///   its argument and returns a Boolean value indicating whether the element
+  ///   should be included in the second returned array. Otherwise, the element
+  ///   will appear in the first returned array.
   /// - Returns: Two arrays with all of the elements of the receiver. The
-  /// first array contains all the elements that `predicate` didn’t allow, and
-  /// the second array contains all the elements that `predicate` allowed. The
-  /// order of the elements in the arrays matches the order of the elements in
-  /// the original sequence.
+  ///   first array contains all the elements that `predicate` didn’t allow, and
+  ///   the second array contains all the elements that `predicate` allowed. The
+  ///   order of the elements in the arrays matches the order of the elements in
+  ///   the original sequence.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the sequence.
   @inlinable
   public func partitioned(
     by predicate: (Element) throws -> Bool
   ) rethrows -> (falseElements: [Element], trueElements: [Element]) {
-    var lhs = [Element]()
-    var rhs = [Element]()
-    
+    var lhs: [Element] = []
+    var rhs: [Element] = []
+
     for element in self {
       if try predicate(element) {
         rhs.append(element)
@@ -249,7 +289,7 @@ extension Sequence {
         lhs.append(element)
       }
     }
-    
+
     return (lhs, rhs)
   }
 }
@@ -269,15 +309,14 @@ extension Collection {
   ///     // Prints "["Kim", "Karl"]"
   ///
   /// - Parameter predicate: A closure that takes an element of the collection
-  /// as its argument and returns a Boolean value indicating whether the element
-  /// should be included in the second returned array. Otherwise, the element
-  /// will appear in the first returned array.
-  ///
+  ///   as its argument and returns a Boolean value indicating whether the
+  ///   element should be included in the second returned array. Otherwise, the
+  ///   element will appear in the first returned array.
   /// - Returns: Two arrays with all of the elements of the receiver. The
-  /// first array contains all the elements that `predicate` didn’t allow, and
-  /// the second array contains all the elements that `predicate` allowed. The
-  /// order of the elements in the arrays matches the order of the elements in
-  /// the original collection.
+  ///   first array contains all the elements that `predicate` didn’t allow, and
+  ///   the second array contains all the elements that `predicate` allowed. The
+  ///   order of the elements in the arrays matches the order of the elements in
+  ///   the original collection.
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
@@ -287,23 +326,26 @@ extension Collection {
     guard !self.isEmpty else {
       return ([], [])
     }
-    
+
     // Since collections have known sizes, we can allocate one array of size
     // `self.count`, then insert items at the beginning or end of that contiguous
     // block. This way, we don’t have to do any dynamic array resizing. Since we
     // insert the right elements on the right side in reverse order, we need to
     // reverse them back to the original order at the end.
-    
+
     let count = self.count
-    
+
     // Inside of the `initializer` closure, we set what the actual mid-point is.
     // We will use this to partition the single array into two.
     var midPoint: Int = 0
-    
+
     let elements = try [Element](
       unsafeUninitializedCapacity: count,
       initializingWith: { buffer, initializedCount in
-        var lhs = buffer.baseAddress!
+        // swift-format-ignore: NeverForceUnwrap
+        // Non-empty check above.
+        let bufferStart = buffer.baseAddress!
+        var lhs = bufferStart
         var rhs = lhs + buffer.count
         do {
           for element in self {
@@ -315,26 +357,28 @@ extension Collection {
               lhs += 1
             }
           }
-          
-          precondition(lhs == rhs, """
+
+          precondition(
+            lhs == rhs,
+            """
             Collection's `count` differed from the number of elements iterated.
             """
           )
-          
-          let rhsIndex = rhs - buffer.baseAddress!
+
+          let rhsIndex = rhs - bufferStart
           buffer[rhsIndex...].reverse()
           initializedCount = buffer.count
-          
+
           midPoint = rhsIndex
         } catch {
-          let lhsCount = lhs - buffer.baseAddress!
-          let rhsCount = (buffer.baseAddress! + buffer.count) - rhs
-          buffer.baseAddress!.deinitialize(count: lhsCount)
+          let lhsCount = lhs - bufferStart
+          let rhsCount = (bufferStart + buffer.count) - rhs
+          bufferStart.deinitialize(count: lhsCount)
           rhs.deinitialize(count: rhsCount)
           throw error
         }
       })
-    
+
     let lhs = elements[..<midPoint]
     let rhs = elements[midPoint...]
     return (

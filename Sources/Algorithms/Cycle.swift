@@ -14,7 +14,7 @@ public struct CycledSequence<Base: Collection> {
   /// The collection to repeat.
   @usableFromInline
   internal let base: Base
-  
+
   @inlinable
   internal init(base: Base) {
     self.base = base
@@ -26,29 +26,29 @@ extension CycledSequence: Sequence {
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal let base: Base
-    
+
     @usableFromInline
     internal var current: Base.Index
-    
+
     @inlinable
     internal init(base: Base) {
       self.base = base
       self.current = base.startIndex
     }
-    
+
     @inlinable
     public mutating func next() -> Base.Element? {
       guard !base.isEmpty else { return nil }
-      
+
       if current == base.endIndex {
         current = base.startIndex
       }
-      
+
       defer { base.formIndex(after: &current) }
       return base[current]
     }
   }
-  
+
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(base: base)
@@ -56,7 +56,7 @@ extension CycledSequence: Sequence {
 }
 
 extension CycledSequence: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 /// A collection wrapper that repeats the elements of a base collection for a
 /// finite number of times.
@@ -134,10 +134,11 @@ extension CycledTimesCollection: Collection {
     offsetBy distance: Int,
     limitedBy limit: Index
   ) -> Index? {
-    guard let productIndex = product.index(
-      i.productIndex,
-      offsetBy: distance,
-      limitedBy: limit.productIndex)
+    guard
+      let productIndex = product.index(
+        i.productIndex,
+        offsetBy: distance,
+        limitedBy: limit.productIndex)
     else { return nil }
     return Index(productIndex)
   }
@@ -149,7 +150,7 @@ extension CycledTimesCollection: Collection {
 }
 
 extension CycledTimesCollection: BidirectionalCollection
-  where Base: BidirectionalCollection {
+where Base: BidirectionalCollection {
   @inlinable
   public func index(before i: Index) -> Index {
     let productIndex = product.index(before: i.productIndex)
@@ -158,10 +159,10 @@ extension CycledTimesCollection: BidirectionalCollection
 }
 
 extension CycledTimesCollection: RandomAccessCollection
-  where Base: RandomAccessCollection {}
+where Base: RandomAccessCollection {}
 
 extension CycledTimesCollection: LazySequenceProtocol, LazyCollectionProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // cycled()
@@ -197,7 +198,7 @@ extension Collection {
   public func cycled() -> CycledSequence<Self> {
     CycledSequence(base: self)
   }
-  
+
   /// Returns a sequence that repeats the elements of this collection the
   /// specified number of times.
   ///
