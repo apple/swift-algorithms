@@ -5,9 +5,23 @@ on:
     types: [opened, reopened, synchronize]
 
 jobs:
+  validate_format_config:
+    name: Validate Format Config
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Install apt dependencies
+        run: sudo apt-get -qq update && sudo apt-get -qq -y install curl
+      - name: Compare against swift-mmio swift-format config
+        run: |
+          curl -sL https://raw.githubusercontent.com/apple/swift-mmio/refs/heads/main/.swift-format -o .swift-format-mmio
+          diff .swift-format .swift-format-mmio
+
   tests:
     name: Test
     uses: swiftlang/github-workflows/.github/workflows/swift_package_test.yml@main
+
   soundness:
     name: Soundness
     uses: swiftlang/github-workflows/.github/workflows/soundness.yml@main
@@ -16,5 +30,3 @@ jobs:
       license_header_check_enabled: false
       # https://github.com/apple/swift-algorithms/issues/251
       docs_check_enabled: false
-      # https://github.com/apple/swift-algorithms/issues/252
-      format_check_enabled: false
