@@ -13,16 +13,6 @@
 // PartitionMapResult2
 //===----------------------------------------------------------------------===//
 
-// `PartitionMapResult` Types are needed because of current generic limitations.
-// It is separated into public struct and internal enum. Such design has benefits
-// in comparison to plain enum:
-// - prevent its usage as a general purpose Either / OneOf Type – there are no
-// public properties which makes it useless outside
-// the library anywhere except with `partitionMap()` function.
-// - allows to rename `first`, `second` and `third` without source breakage .
-// If something more suitable will be found then old static initializers can be
-// deprecated with introducing new ones.
-
 public struct PartitionMapResult2<A, B> {
   @usableFromInline
   internal let oneOf: _PartitionMapResult2<A, B>
@@ -100,20 +90,32 @@ extension Sequence {
   /// The closure returns a `PartitionMapResult`, which indicates whether the result should be
   /// included in the first group or in the second.
   ///
-  /// In this example, `partitionMap(_:)` is used to separate an array  of `any Error` elements into
-  /// two arrays while also transforming the type from
-  /// `any Error` to `URLSessionError` for the first group.
+  /// Example 1:
   /// ```
-  /// func handle(errors: [any Error]) {
-  ///   let (recoverableErrors, unrecoverableErrors) = errors
-  ///     .partitionMap { error -> PartitionMapResult2<URLSessionError, any Error> in
-  ///       switch error {
-  ///       case let urlError as URLSessionError: return .first(urlError)
-  ///       default: return .second(error)
+  /// func process(results: [Result<Response, any Error>]) {
+  ///   let (successes, failures) = results
+  ///     .partitionMap { result -> PartitionMapResult2<Response, any Error> in
+  ///       switch result {
+  ///       case .success(let value): .first(value)
+  ///       case .failure(let error): .second(error)
   ///       }
   ///     }
-  ///   // recoverableErrors Type is Array<URLSessionError>
-  ///   // unrecoverableErrors Type is Array<any Error>
+  ///  }
+  /// ```
+  /// Example 2:
+  /// `partitionMap(_:)` is used to separate an array  of `any Error` elements into two arrays while
+  /// also transforming the type from `any Error` to `URLSessionError` for the first group.
+  /// ```
+  /// func handle(errors: [any Error]) {
+  ///   let (urlSessionErrors, unknownErrors) = errors
+  ///     .partitionMap { error -> PartitionMapResult2<URLSessionError, any Error> in
+  ///       switch error {
+  ///       case let urlError as URLSessionError: .first(urlError)
+  ///       default: .second(error)
+  ///       }
+  ///     }
+  ///   // `urlSessionErrors` Type is `Array<URLSessionError>`
+  ///   // `unknownErrors` Type is `Array<any Error>`
   ///  }
   /// ```
   ///
@@ -128,9 +130,9 @@ extension Sequence {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
-  public func partitionMap<A, B>(
-    _ transform: (Element) throws -> PartitionMapResult2<A, B>
-  ) rethrows -> ([A], [B]) {
+  public func partitionMap<A, B, Error>(
+    _ transform: (Element) throws(Error) -> PartitionMapResult2<A, B>
+  ) throws(Error) -> ([A], [B]) {
     var groupA: [A] = []
     var groupB: [B] = []
     
@@ -153,24 +155,38 @@ extension Sequence {
   /// results into distinct groups based on the transformation's output.
   /// The closure returns a `PartitionMapResult`, which indicates whether the result should be
   /// included in the first , second or third group.
-  ///
-  /// In this example, `partitionMap(_:)` is used to separate an array  of `any Error` elements into
-  /// three arrays while also transforming the type from
+  /// - Example 1:
+  /// ```
+  /// func process(results: [Result<Product, any Error>]) {
+  ///   let (successes, failures) = results
+  ///     .partitionMap { result -> PartitionMapResult2<Response, any Error> in
+  ///       switch result {
+  ///       case .success(let value): .first(value)
+  ///       case .failure(let error): .second(error)
+  ///     }
+  ///   }
+  /// }
+  /// ```
+  /// - Example 2:
+  /// `partitionMap(_:)` is used to separate an array  of `any Error` elements into three arrays
+  /// while also transforming the type from
   /// `any Error` to `URLSessionError` for the first and second groups.
   /// ```
   /// func handle(errors: [any Error]) {
-  ///   let (recoverableErrors, unrecoverableErrors, unknownErrors) = errors
+  ///   let (urlSessionErrors, httpErrors, unknownErrors) = errors
   ///     .partitionMap { error -> PartitionMapResult3<URLSessionError, any Error> in
   ///       switch error {
   ///       case let urlError as URLSessionError:
-  ///         return recoverableURLErrorCodes.contains(urlError.code) ? .first(urlError) : .second(urlError)
+  ///         .first(urlError)
+  ///       case let httpError as HTTPError:
+  ///         .second(urlError)
   ///       default:
-  ///         return .third(error)
+  ///         .third(error)
   ///       }
   ///     }
-  ///   // recoverableErrors Type is Array<URLSessionError>
-  ///   // unrecoverableErrors Type is Array<URLSessionError>
-  ///   // unknownErrors Type is Array<any Error>
+  ///   // `urlSessionErrors` Type `is Array<URLSessionError>`
+  ///   // `httpErrors` Type is `Array<URLSessionError>`
+  ///   // `unknownErrors` Type is `Array<any Error>`
   ///  }
   /// ```
   ///
@@ -185,9 +201,9 @@ extension Sequence {
   ///
   /// - Complexity: O(*n*), where *n* is the length of the collection.
   @inlinable
-  public func partitionMap<A, B, C>(
-    _ transform: (Element) throws -> PartitionMapResult3<A, B, C>
-  ) rethrows -> ([A], [B], [C]) {
+  public func partitionMap<A, B, C, Error>(
+    _ transform: (Element) throws(Error) -> PartitionMapResult3<A, B, C>
+  ) throws(Error) -> ([A], [B], [C]) {
     var groupA: [A] = []
     var groupB: [B] = []
     var groupC: [C] = []
