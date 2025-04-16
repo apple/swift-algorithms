@@ -4,6 +4,7 @@
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/PartitionMapTests.swift)]
  
 Groups up elements of a sequence into two Arrays while applying a transform closure for each element.
+This method is a partition with an added map step baked in for ergonomic reasons.
 
 ```swift
 func process(results: [Result<Response, any Error>]) {
