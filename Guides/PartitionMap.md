@@ -21,7 +21,7 @@ It is similar to some other grouping functions, but achives another goals.
 - in comparison to `partitioned(by:)` it allows to make to make a transform for each element of the source sequence 
 independently for groups. Also it is possible to make more then 2 groups.
 - in comparison to `grouped(by:)` & `split(whereSeparator:)` it has exact number of groups defined at compile time.
-For `grouped(by:)` & `split(whereSeparator:)` number of groups is dynamicaly defined while program executiin.
+For `grouped(by:)` & `split(whereSeparator:)` number of groups is dynamicaly defined while program execution.
 
 ## Detailed Design
 
