@@ -86,7 +86,7 @@ extension SplitSequence: Sequence {
       self.omittingEmptySubsequences = omittingEmptySubsequences
     }
   }
-  
+
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(
@@ -101,25 +101,25 @@ extension SplitSequence: Sequence {
 extension SplitSequence.Iterator: IteratorProtocol {
   @inlinable
   public mutating func next() -> Element? {
-    var currentElement = base.next()
+    var nextElement = base.next()
     var subsequence: Element = []
 
     // Add the next elements of the base sequence to this subsequence, until we
     // reach a separator, unless we've already split the maximum number of
     // times. In all cases, stop at the end of the base sequence.
-    while currentElement != nil {
-      if splitCount < maxSplits && isSeparator(currentElement!) {
+    while let currentElement = nextElement {
+      if splitCount < maxSplits && isSeparator(currentElement) {
         if omittingEmptySubsequences && subsequence.isEmpty {
           // Keep going if we don't want to return an empty subsequence.
-          currentElement = base.next()
+          nextElement = base.next()
           continue
         } else {
           splitCount += 1
           break
         }
       } else {
-        subsequence.append(currentElement!)
-        currentElement = base.next()
+        subsequence.append(currentElement)
+        nextElement = base.next()
       }
     }
 
@@ -127,7 +127,7 @@ extension SplitSequence.Iterator: IteratorProtocol {
     // and we've either returned the maximum number of subsequences (one more
     // than the number of separators), or the only subsequence left to return is
     // empty and we're omitting those.
-    if currentElement == nil
+    if nextElement == nil
       && (sequenceLength == splitCount + 1
         || omittingEmptySubsequences && subsequence.isEmpty)
     {
@@ -219,7 +219,7 @@ extension LazySequenceProtocol {
   ///     satisfying the `isSeparator` predicate and for each element at the
   ///     start or end of the sequence satisfying the `isSeparator`
   ///     predicate. The default value is `true`.
-  ///   - whereSeparator: A closure that takes an element as an argument and
+  ///   - isSeparator: A closure that takes an element as an argument and
   ///     returns a Boolean value indicating whether the sequence should be
   ///     split at that element.
   /// - Returns: A lazy sequence of subsequences, split from this sequence's
@@ -512,7 +512,7 @@ extension SplitCollection: Collection {
     var subsequenceStart = i.baseRange.upperBound
     if subsequenceStart < base.endIndex {
       // If we're not already at the end of the base collection, the previous
-      // susequence ended with a separator. Start searching for the next
+      // subsequence ended with a separator. Start searching for the next
       // subsequence at the following element.
       subsequenceStart = base.index(after: i.baseRange.upperBound)
     }
@@ -634,7 +634,7 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
   ///     satisfying the `isSeparator` predicate and for each element at the
   ///     start or end of the collection satisfying the `isSeparator`
   ///     predicate. The default value is `true`.
-  ///   - whereSeparator: A closure that takes an element as an argument and
+  ///   - isSeparator: A closure that takes an element as an argument and
   ///     returns a Boolean value indicating whether the collection should be
   ///     split at that element.
   /// - Returns: A lazy collection of subsequences, split from this collection's
@@ -659,8 +659,7 @@ extension LazySequenceProtocol where Self: Collection, Elements: Collection {
 }
 
 extension LazySequenceProtocol
-  where Self: Collection, Elements: Collection, Element: Equatable
-{
+where Self: Collection, Elements: Collection, Element: Equatable {
   /// Lazily returns the longest possible subsequences of the collection, in
   /// order, around elements equal to the given element.
   ///

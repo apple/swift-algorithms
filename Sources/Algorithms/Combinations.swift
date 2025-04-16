@@ -14,17 +14,17 @@ public struct CombinationsSequence<Base: Collection> {
   /// The collection to iterate over for combinations.
   @usableFromInline
   internal let base: Base
-  
+
   @usableFromInline
   internal let baseCount: Int
-  
+
   /// The range of accepted sizes of combinations.
   ///
   /// - Note: This may be `nil` if the attempted range entirely exceeds the
   /// upper bounds of the size of the `base` collection.
   @usableFromInline
   internal let kRange: Range<Int>?
-  
+
   /// Initializes a `CombinationsSequence` for all combinations of `base` of
   /// size `k`.
   ///
@@ -35,7 +35,7 @@ public struct CombinationsSequence<Base: Collection> {
   internal init(_ base: Base, k: Int) {
     self.init(base, kRange: k...k)
   }
-  
+
   /// Initializes a `CombinationsSequence` for all combinations of `base` of
   /// sizes within a given range.
   ///
@@ -44,27 +44,29 @@ public struct CombinationsSequence<Base: Collection> {
   ///   - kRange: The range of accepted sizes of combinations.
   @inlinable
   internal init<R: RangeExpression>(
-    _ base: Base, kRange: R
+    _ base: Base,
+    kRange: R
   ) where R.Bound == Int {
     let range = kRange.relative(to: 0 ..< .max)
     self.base = base
     let baseCount = base.count
     self.baseCount = baseCount
     let upperBound = baseCount + 1
-    self.kRange = range.lowerBound < upperBound
-      ? range.clamped(to: 0 ..< upperBound)
+    self.kRange =
+      range.lowerBound < upperBound
+      ? range.clamped(to: 0..<upperBound)
       : nil
   }
-  
+
   /// The total number of combinations.
   @inlinable
   public var count: Int {
     guard let k = self.kRange else { return 0 }
     let n = baseCount
-    if k == 0 ..< (n + 1) {
+    if k == 0..<(n + 1) {
       return 1 << n
     }
-    
+
     func binomial(n: Int, k: Int) -> Int {
       switch k {
       case n, 0: return 1
@@ -73,11 +75,15 @@ public struct CombinationsSequence<Base: Collection> {
       default: return n * binomial(n: n - 1, k: k - 1) / k
       }
     }
-    
+
     return k.map {
       binomial(n: n, k: $0)
     }.reduce(0, +)
   }
+
+  /// The total number of combinations.
+  @inlinable
+  public var underestimatedCount: Int { count }
 }
 
 extension CombinationsSequence: Sequence {
@@ -85,7 +91,7 @@ extension CombinationsSequence: Sequence {
   public struct Iterator: IteratorProtocol {
     @usableFromInline
     internal let base: Base
-    
+
     /// The current range of accepted sizes of combinations.
     ///
     /// - Note: The range is contracted until empty while iterating over
@@ -93,23 +99,23 @@ extension CombinationsSequence: Sequence {
     /// finished.
     @usableFromInline
     internal var kRange: Range<Int>
-    
+
     /// Whether or not iteration is finished (`kRange` is empty)
     @inlinable
     internal var isFinished: Bool {
-      return kRange.isEmpty
+      kRange.isEmpty
     }
-    
+
     @usableFromInline
     internal var indexes: [Base.Index]
-    
+
     @inlinable
     internal init(_ combinations: CombinationsSequence) {
       self.base = combinations.base
       self.kRange = combinations.kRange ?? 0..<0
       self.indexes = Array(combinations.base.indices.prefix(kRange.lowerBound))
     }
-    
+
     /// Advances the current indices to the next set of combinations. If
     /// `indexes.count == 3` and `base.count == 5`, the indices advance like
     /// this:
@@ -135,12 +141,12 @@ extension CombinationsSequence: Sequence {
       func advanceKRange() {
         if kRange.lowerBound < kRange.upperBound {
           let advancedLowerBound = kRange.lowerBound + 1
-          kRange = advancedLowerBound ..< kRange.upperBound
+          kRange = advancedLowerBound..<kRange.upperBound
           indexes.removeAll(keepingCapacity: true)
           indexes.append(contentsOf: base.indices.prefix(kRange.lowerBound))
         }
       }
-      
+
       guard !indexes.isEmpty else {
         // Initial state for combinations of 0 elements is an empty array with
         // `finished == false`. Even though no indexes are involved, advancing
@@ -148,11 +154,11 @@ extension CombinationsSequence: Sequence {
         advanceKRange()
         return
       }
-      
+
       let i = indexes.count - 1
       base.formIndex(after: &indexes[i])
       if indexes[i] != base.endIndex { return }
-      
+
       var j = i
       while indexes[i] == base.endIndex {
         j -= 1
@@ -161,7 +167,7 @@ extension CombinationsSequence: Sequence {
           advanceKRange()
           return
         }
-        
+
         base.formIndex(after: &indexes[j])
         for k in indexes.indices[(j + 1)...] {
           indexes[k] = base.index(after: indexes[k - 1])
@@ -171,7 +177,7 @@ extension CombinationsSequence: Sequence {
         }
       }
     }
-    
+
     @inlinable
     public mutating func next() -> [Base.Element]? {
       guard !isFinished else { return nil }
@@ -179,7 +185,7 @@ extension CombinationsSequence: Sequence {
       return indexes.map { i in base[i] }
     }
   }
-  
+
   @inlinable
   public func makeIterator() -> Iterator {
     Iterator(self)
@@ -187,7 +193,7 @@ extension CombinationsSequence: Sequence {
 }
 
 extension CombinationsSequence: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 //===----------------------------------------------------------------------===//
 // combinations(ofCount:)
@@ -251,6 +257,8 @@ extension Collection {
   ///
   /// - Parameter kRange: The range of numbers of elements to include in each
   ///   combination.
+  /// - Returns: A sequence of the combinations of this collection's
+  ///   elements, for all sizes in `kRange`, from smallest to largest.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
   ///   is the number of elements in the base collection, since
@@ -261,7 +269,7 @@ extension Collection {
   ) -> CombinationsSequence<Self> where R.Bound == Int {
     CombinationsSequence(self, kRange: kRange)
   }
-  
+
   /// Returns a collection of combinations of this collection's elements, with
   /// each combination having the specified number of elements.
   ///
@@ -287,13 +295,17 @@ extension Collection {
   /// the resulting sequence has no elements.
   ///
   /// - Parameter k: The number of elements to include in each combination.
+  /// - Returns: A sequence of the combinations of this collection's
+  ///   elements.
   ///
   /// - Complexity: O(1) for random-access base collections. O(*n*) where *n*
   ///   is the number of elements in the base collection, since
   ///   `CombinationsSequence` accesses the `count` of the base collection.
   @inlinable
   public func combinations(ofCount k: Int) -> CombinationsSequence<Self> {
-    precondition(k >= 0, "Can't have combinations with a negative number of elements.")
+    precondition(
+      k >= 0,
+      "Can't have combinations with a negative number of elements.")
     return CombinationsSequence(self, k: k)
   }
 }

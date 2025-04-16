@@ -10,16 +10,18 @@
 //===----------------------------------------------------------------------===//
 
 import XCTest
+
 @testable import Algorithms
 
 func validateRandomSamples<S: Sequence>(
   _ samples: [Int: Int],
   elements: S,
   expectedValue: Int,
-  file: StaticString = #file, line: UInt = #line
+  file: StaticString = (#file), line: UInt = #line
 ) where S.Element == Int {
-  let expectedRange = ((expectedValue / 3) * 2) ... ((expectedValue / 3) * 4)
-  XCTAssertEqualSequences(samples.keys.sorted(), elements,
+  let expectedRange = ((expectedValue / 3) * 2)...((expectedValue / 3) * 4)
+  expectEqualSequences(
+    samples.keys.sorted(), elements,
     file: file, line: line)
   for v in samples.values {
     XCTAssert(expectedRange.contains(v), file: file, line: line)
@@ -41,41 +43,44 @@ final class RandomSampleTests: XCTestCase {
         result[x, default: 0] += 1
       }
     }
-    validateRandomSamples(samples, elements: c, expectedValue: (k * iterations) / n)
+    validateRandomSamples(
+      samples, elements: c, expectedValue: (k * iterations) / n)
   }
-  
+
   func testRandomSampleCollection() {
     let samples: [Int: Int] = (0..<iterations).reduce(into: [:]) { result, _ in
       for x in c.randomSample(count: k) {
         result[x, default: 0] += 1
       }
     }
-    validateRandomSamples(samples, elements: c, expectedValue: (k * iterations) / n)
+    validateRandomSamples(
+      samples, elements: c, expectedValue: (k * iterations) / n)
   }
-  
+
   func testRandomSampleSequence() {
     let samples: [Int: Int] = (0..<iterations).reduce(into: [:]) { result, _ in
       for x in s.randomSample(count: k) {
         result[x, default: 0] += 1
       }
     }
-    validateRandomSamples(samples, elements: s, expectedValue: (k * iterations) / n)
+    validateRandomSamples(
+      samples, elements: s, expectedValue: (k * iterations) / n)
   }
-  
+
   func testRandomSampleEdgeCases() {
     XCTAssert(c.randomStableSample(count: 0).isEmpty)
-    XCTAssertEqualSequences(c.randomStableSample(count: n), c)
-    XCTAssertEqualSequences(c.randomStableSample(count: n * 2), c)
+    expectEqualSequences(c.randomStableSample(count: n), c)
+    expectEqualSequences(c.randomStableSample(count: n * 2), c)
 
     XCTAssert(c.randomSample(count: 0).isEmpty)
-    XCTAssertEqualSequences(c.randomSample(count: n).sorted(), c)
-    XCTAssertEqualSequences(c.randomSample(count: n * 2).sorted(), c)
-    
+    expectEqualSequences(c.randomSample(count: n).sorted(), c)
+    expectEqualSequences(c.randomSample(count: n * 2).sorted(), c)
+
     XCTAssert(s.randomSample(count: 0).isEmpty)
-    XCTAssertEqualSequences(s.randomSample(count: n).sorted(), c)
-    XCTAssertEqualSequences(s.randomSample(count: n * 2).sorted(), c)
+    expectEqualSequences(s.randomSample(count: n).sorted(), c)
+    expectEqualSequences(s.randomSample(count: n * 2).sorted(), c)
   }
-  
+
   func testRandomSampleRepeatable() {
     var generator = SplitMix64(seed: 0)
     let sample1a = c.randomSample(count: k, using: &generator)
@@ -88,7 +93,7 @@ final class RandomSampleTests: XCTestCase {
     generator = SplitMix64(seed: 0)
     let sample2b = s.randomSample(count: k, using: &generator)
     XCTAssertEqual(sample1b, sample2b)
-    
+
     generator = SplitMix64(seed: 0)
     let sample1c = c.randomStableSample(count: k, using: &generator)
     generator = SplitMix64(seed: 0)
@@ -101,7 +106,7 @@ final class RandomSampleTests: XCTestCase {
       mutating func next() -> UInt64 { 0 }
     }
     var zero = ZeroGenerator()
-    _ = nextOffset(w: 1, using: &zero) // must not crash
+    _ = nextOffset(w: 1, using: &zero)  // must not crash
 
     struct AlmostAllZeroGenerator: RandomNumberGenerator {
       private var forward: SplitMix64
@@ -119,8 +124,8 @@ final class RandomSampleTests: XCTestCase {
     }
 
     var almostAllZero = AlmostAllZeroGenerator(seed: 0)
-    _ = s.randomSample(count: k, using: &almostAllZero) // must not crash
+    _ = s.randomSample(count: k, using: &almostAllZero)  // must not crash
     almostAllZero = AlmostAllZeroGenerator(seed: 0)
-    _ = c.randomSample(count: k, using: &almostAllZero) // must not crash
+    _ = c.randomSample(count: k, using: &almostAllZero)  // must not crash
   }
 }

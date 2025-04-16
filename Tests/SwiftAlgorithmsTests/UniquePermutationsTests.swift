@@ -9,12 +9,12 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class UniquePermutationsTests: XCTestCase {
   static let numbers = [1, 1, 1, 2, 3]
-  
+
   static let numbersPermutations: [[[Int]]] = [
     // k = 0
     [[]],
@@ -23,64 +23,70 @@ final class UniquePermutationsTests: XCTestCase {
     // 2
     [[1, 1], [1, 2], [1, 3], [2, 1], [2, 3], [3, 1], [3, 2]],
     // 3
-    [[1, 1, 1], [1, 1, 2], [1, 1, 3],
-     [1, 2, 1], [1, 2, 3], [1, 3, 1], [1, 3, 2],
-     [2, 1, 1], [2, 1, 3], [2, 3, 1],
-     [3, 1, 1], [3, 1, 2], [3, 2, 1]],
+    [
+      [1, 1, 1], [1, 1, 2], [1, 1, 3],
+      [1, 2, 1], [1, 2, 3], [1, 3, 1], [1, 3, 2],
+      [2, 1, 1], [2, 1, 3], [2, 3, 1],
+      [3, 1, 1], [3, 1, 2], [3, 2, 1],
+    ],
     // 4
-    [[1, 1, 1, 2], [1, 1, 1, 3],
-     [1, 1, 2, 1], [1, 1, 2, 3],
-     [1, 1, 3, 1], [1, 1, 3, 2],
-     [1, 2, 1, 1], [1, 2, 1, 3], [1, 2, 3, 1],
-     [1, 3, 1, 1], [1, 3, 1, 2], [1, 3, 2, 1],
-     [2, 1, 1, 1], [2, 1, 1, 3], [2, 1, 3, 1], [2, 3, 1, 1],
-     [3, 1, 1, 1], [3, 1, 1, 2], [3, 1, 2, 1], [3, 2, 1, 1]],
+    [
+      [1, 1, 1, 2], [1, 1, 1, 3],
+      [1, 1, 2, 1], [1, 1, 2, 3],
+      [1, 1, 3, 1], [1, 1, 3, 2],
+      [1, 2, 1, 1], [1, 2, 1, 3], [1, 2, 3, 1],
+      [1, 3, 1, 1], [1, 3, 1, 2], [1, 3, 2, 1],
+      [2, 1, 1, 1], [2, 1, 1, 3], [2, 1, 3, 1], [2, 3, 1, 1],
+      [3, 1, 1, 1], [3, 1, 1, 2], [3, 1, 2, 1], [3, 2, 1, 1],
+    ],
     // 5
-    [[1, 1, 1, 2, 3], [1, 1, 1, 3, 2],
-     [1, 1, 2, 1, 3], [1, 1, 2, 3, 1],
-     [1, 1, 3, 1, 2], [1, 1, 3, 2, 1],
-     [1, 2, 1, 1, 3], [1, 2, 1, 3, 1], [1, 2, 3, 1, 1],
-     [1, 3, 1, 1, 2], [1, 3, 1, 2, 1], [1, 3, 2, 1, 1],
-     [2, 1, 1, 1, 3], [2, 1, 1, 3, 1], [2, 1, 3, 1, 1], [2, 3, 1, 1, 1],
-     [3, 1, 1, 1, 2], [3, 1, 1, 2, 1], [3, 1, 2, 1, 1], [3, 2, 1, 1, 1]]
+    [
+      [1, 1, 1, 2, 3], [1, 1, 1, 3, 2],
+      [1, 1, 2, 1, 3], [1, 1, 2, 3, 1],
+      [1, 1, 3, 1, 2], [1, 1, 3, 2, 1],
+      [1, 2, 1, 1, 3], [1, 2, 1, 3, 1], [1, 2, 3, 1, 1],
+      [1, 3, 1, 1, 2], [1, 3, 1, 2, 1], [1, 3, 2, 1, 1],
+      [2, 1, 1, 1, 3], [2, 1, 1, 3, 1], [2, 1, 3, 1, 1], [2, 3, 1, 1, 1],
+      [3, 1, 1, 1, 2], [3, 1, 1, 2, 1], [3, 1, 2, 1, 1], [3, 2, 1, 1, 1],
+    ],
   ]
 }
 
 extension UniquePermutationsTests {
   func testEmpty() {
-    XCTAssertEqualSequences(([] as [Int]).uniquePermutations(), [[]])
-    XCTAssertEqualSequences(([] as [Int]).uniquePermutations(ofCount: 0), [[]])
-    XCTAssertEqualSequences(([] as [Int]).uniquePermutations(ofCount: 1), [])
-    XCTAssertEqualSequences(
+    expectEqualSequences(([] as [Int]).uniquePermutations(), [[]])
+    expectEqualSequences(([] as [Int]).uniquePermutations(ofCount: 0), [[]])
+    expectEqualSequences(([] as [Int]).uniquePermutations(ofCount: 1), [])
+    expectEqualSequences(
       ([] as [Int]).uniquePermutations(ofCount: 1...3), [])
   }
-  
+
   func testSingleCounts() {
     for (k, expectation) in Self.numbersPermutations.enumerated() {
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         expectation,
         Self.numbers.uniquePermutations(ofCount: k))
     }
-    
-    XCTAssertEqualSequences(
+
+    expectEqualSequences(
       Self.numbersPermutations[5],
       Self.numbers.uniquePermutations())
   }
-  
+
   func testRanges() {
     for lower in Self.numbersPermutations.indices {
       // upper bounded
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         Self.numbersPermutations[...lower].joined(),
         Self.numbers.uniquePermutations(ofCount: ...lower))
-      
+
       // lower bounded
-      XCTAssertEqualSequences(
+      expectEqualSequences(
         Self.numbersPermutations[lower...].joined(),
         Self.numbers.uniquePermutations(ofCount: lower...))
 
       for upper in lower..<Self.numbersPermutations.count {
-        XCTAssertEqualSequences(
+        expectEqualSequences(
           Self.numbersPermutations[lower..<upper].joined(),
           Self.numbers.uniquePermutations(ofCount: lower..<upper))
       }
@@ -91,11 +97,11 @@ extension UniquePermutationsTests {
 extension UniquePermutationsTests {
   private final class IntBox: Hashable {
     var value: Int
-    
+
     init(_ value: Int) {
       self.value = value
     }
-    
+
     static func == (lhs: IntBox, rhs: IntBox) -> Bool {
       lhs.value == rhs.value
     }
@@ -111,12 +117,13 @@ extension UniquePermutationsTests {
     let numbers = Self.numbers.map(IntBox.init)
     for k in 0...numbers.count {
       for p in numbers.uniquePermutations(ofCount: k) {
-        XCTAssertTrue(p.filter { $0.value == 1 }.allSatisfy { $0 === numbers[0] })
+        XCTAssertTrue(
+          p.filter { $0.value == 1 }.allSatisfy { $0 === numbers[0] })
       }
     }
   }
-  
+
   func testLaziness() {
-    XCTAssertLazySequence("ABCD".lazy.uniquePermutations())
+    requireLazySequence("ABCD".lazy.uniquePermutations())
   }
 }

@@ -126,7 +126,7 @@ extension AdjacentPairsSequence: Sequence {
 }
 
 extension AdjacentPairsSequence: LazySequenceProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 /// A collection of adjacent pairs of elements built from an underlying
 /// collection.
@@ -143,7 +143,8 @@ public struct AdjacentPairsCollection<Base: Collection> {
   @inlinable
   internal init(base: Base) {
     self.base = base
-    self.secondBaseIndex = base.isEmpty
+    self.secondBaseIndex =
+      base.isEmpty
       ? base.endIndex
       : base.index(after: base.startIndex)
   }
@@ -154,7 +155,7 @@ extension AdjacentPairsCollection {
   public struct Index: Comparable {
     @usableFromInline
     internal var first: Base.Index
-    
+
     @usableFromInline
     internal var second: Base.Index
 
@@ -168,7 +169,7 @@ extension AdjacentPairsCollection {
     public static func == (lhs: Index, rhs: Index) -> Bool {
       lhs.first == rhs.first
     }
-    
+
     @inlinable
     public static func < (lhs: Index, rhs: Index) -> Bool {
       lhs.first < rhs.first
@@ -183,7 +184,7 @@ extension AdjacentPairsCollection: Collection {
       first: secondBaseIndex == base.endIndex ? base.endIndex : base.startIndex,
       second: secondBaseIndex)
   }
-  
+
   @inlinable
   public var endIndex: Index {
     Index(first: base.endIndex, second: base.endIndex)
@@ -207,20 +208,23 @@ extension AdjacentPairsCollection: Collection {
   public func index(_ i: Index, offsetBy distance: Int) -> Index {
     guard distance != 0 else { return i }
 
-    guard let result = distance > 0
-      ? offsetForward(i, by: distance, limitedBy: endIndex)
-      : offsetBackward(i, by: -distance, limitedBy: startIndex)
+    guard
+      let result = distance > 0
+        ? offsetForward(i, by: distance, limitedBy: endIndex)
+        : offsetBackward(i, by: -distance, limitedBy: startIndex)
     else { fatalError("Index out of bounds") }
     return result
   }
 
   @inlinable
   public func index(
-    _ i: Index, offsetBy distance: Int, limitedBy limit: Index
+    _ i: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     guard distance != 0 else { return i }
     guard limit != i else { return nil }
-    
+
     if distance > 0 {
       let limit = limit > i ? limit : endIndex
       return offsetForward(i, by: distance, limitedBy: limit)
@@ -229,38 +233,48 @@ extension AdjacentPairsCollection: Collection {
       return offsetBackward(i, by: -distance, limitedBy: limit)
     }
   }
-  
+
   @inlinable
   internal func offsetForward(
-    _ i: Index, by distance: Int, limitedBy limit: Index
+    _ i: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance > 0)
     assert(limit > i)
-    
-    guard let newFirst = base.index(i.second, offsetBy: distance - 1, limitedBy: limit.first),
-          newFirst != base.endIndex
+
+    let newFirst = base.index(
+      i.second,
+      offsetBy: distance - 1,
+      limitedBy: limit.first)
+    guard let newFirst, newFirst != base.endIndex
     else { return nil }
+
     let newSecond = base.index(after: newFirst)
-    
+
     precondition(newSecond <= base.endIndex, "Can't advance beyond endIndex")
     return newSecond == base.endIndex
       ? endIndex
       : Index(first: newFirst, second: newSecond)
   }
-  
+
   @inlinable
   internal func offsetBackward(
-    _ i: Index, by distance: Int, limitedBy limit: Index
+    _ i: Index,
+    by distance: Int,
+    limitedBy limit: Index
   ) -> Index? {
     assert(distance > 0)
     assert(limit < i)
-        
+
     let offset = i == endIndex ? 0 : 1
-    guard let newSecond = base.index(
+    let newSecond = base.index(
       i.first,
       offsetBy: -(distance - offset),
       limitedBy: limit.second)
+    guard let newSecond
     else { return nil }
+
     let newFirst = base.index(newSecond, offsetBy: -1)
     precondition(newFirst >= base.startIndex, "Can't move before startIndex")
     return Index(first: newFirst, second: newSecond)
@@ -282,12 +296,12 @@ extension AdjacentPairsCollection: Collection {
 }
 
 extension AdjacentPairsCollection: BidirectionalCollection
-  where Base: BidirectionalCollection
-{
+where Base: BidirectionalCollection {
   @inlinable
   public func index(before i: Index) -> Index {
     precondition(i != startIndex, "Can't offset before startIndex")
-    let second = i == endIndex
+    let second =
+      i == endIndex
       ? base.index(before: base.endIndex)
       : i.first
     let first = base.index(before: second)
@@ -296,10 +310,10 @@ extension AdjacentPairsCollection: BidirectionalCollection
 }
 
 extension AdjacentPairsCollection: RandomAccessCollection
-  where Base: RandomAccessCollection {}
+where Base: RandomAccessCollection {}
 
 extension AdjacentPairsCollection: LazySequenceProtocol, LazyCollectionProtocol
-  where Base: LazySequenceProtocol {}
+where Base: LazySequenceProtocol {}
 
 extension AdjacentPairsCollection.Index: Hashable where Base.Index: Hashable {
   @inlinable

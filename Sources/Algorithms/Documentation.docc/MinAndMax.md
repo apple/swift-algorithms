@@ -16,7 +16,7 @@ or a specific number of elements at the minimum and maximum.
 - ``Swift/Sequence/max(count:sortedBy:)``
 - ``Swift/Collection/max(count:sortedBy:)``
 
-### Finding the Minimum and Maximum Elements Simulataneously
+### Finding the Minimum and Maximum Elements Simultaneously
 
 - ``Swift/Sequence/minAndMax()``
 - ``Swift/Sequence/minAndMax(by:)``

@@ -71,7 +71,7 @@ Calling `keyed(by:)` is an O(_n_) operation.
 
 #### Alternative names
 
-Kotlin's `associatedBy` naming is a good alterative, and matches the past tense of [Swift's API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/), though perhaps we'd spell it `associated(by:)`.
+Kotlin's `associatedBy` naming is a good alternative, and matches the past tense of [Swift's API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/), though perhaps we'd spell it `associated(by:)`.
 
 #### Customization points
 

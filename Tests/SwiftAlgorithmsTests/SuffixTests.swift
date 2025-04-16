@@ -9,40 +9,40 @@
 //
 //===----------------------------------------------------------------------===//
 
-import XCTest
 import Algorithms
+import XCTest
 
 final class SuffixTests: XCTestCase {
   func testSuffix() {
     let a = 0...10
-    XCTAssertEqualSequences(a.suffix(while: { $0 > 5 }), (6...10))
-    XCTAssertEqualSequences(a.suffix(while: { $0 > 10 }), [])
-    XCTAssertEqualSequences(a.suffix(while: { $0 > 9 }), [10])
-    XCTAssertEqualSequences(a.suffix(while: { $0 > -1 }), (0...10))
-    
+    expectEqualSequences(a.suffix(while: { $0 > 5 }), (6...10))
+    expectEqualSequences(a.suffix(while: { $0 > 10 }), [])
+    expectEqualSequences(a.suffix(while: { $0 > 9 }), [10])
+    expectEqualSequences(a.suffix(while: { $0 > -1 }), (0...10))
+
     let empty: [Int] = []
-    XCTAssertEqualSequences(empty.suffix(while: { $0 > 10 }), [])
+    expectEqualSequences(empty.suffix(while: { $0 > 10 }), [])
   }
-  
+
   func testEndOfPrefix() {
     let array = Array(0..<10)
     XCTAssertEqual(array.endOfPrefix(while: { $0 < 3 }), 3)
     XCTAssertEqual(array.endOfPrefix(while: { _ in false }), array.startIndex)
     XCTAssertEqual(array.endOfPrefix(while: { _ in true }), array.endIndex)
-    
-    let empty = [Int]()
+
+    let empty: [Int] = []
     XCTAssertEqual(empty.endOfPrefix(while: { $0 < 3 }), 0)
     XCTAssertEqual(empty.endOfPrefix(while: { _ in false }), empty.startIndex)
     XCTAssertEqual(empty.endOfPrefix(while: { _ in true }), empty.endIndex)
   }
-  
+
   func testStartOfSuffix() {
     let array = Array(0..<10)
     XCTAssertEqual(array.startOfSuffix(while: { $0 >= 3 }), 3)
     XCTAssertEqual(array.startOfSuffix(while: { _ in false }), array.endIndex)
     XCTAssertEqual(array.startOfSuffix(while: { _ in true }), array.startIndex)
-    
-    let empty = [Int]()
+
+    let empty: [Int] = []
     XCTAssertEqual(empty.startOfSuffix(while: { $0 < 3 }), 0)
     XCTAssertEqual(empty.startOfSuffix(while: { _ in false }), empty.endIndex)
     XCTAssertEqual(empty.startOfSuffix(while: { _ in true }), empty.startIndex)
