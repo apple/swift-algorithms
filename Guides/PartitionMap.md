@@ -1,4 +1,4 @@
-# Grouped
+# PartitionMap
 
 [[Source](https://github.com/apple/swift-algorithms/blob/main/Sources/Algorithms/PartitionMap.swift) | 
  [Tests](https://github.com/apple/swift-algorithms/blob/main/Tests/SwiftAlgorithmsTests/PartitionMapTests.swift)]
