@@ -32,6 +32,7 @@ These guides describe the design and intention behind the APIs included in the `
 - [`suffix(while:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Suffix.md): Returns the suffix of a collection where all element pass a given predicate.
 - [`trimmingPrefix(while:)`, `trimmingSuffix(while)`, `trimming(while:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Trim.md): Returns a slice by trimming elements from a collection's start, end, or both. The mutating `trim...` methods trim a collection in place.
 - [`uniqued()`, `uniqued(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Unique.md): The unique elements of a collection, preserving their order.
+- [`withoutSortedDuplicates()`, `withoutSortedDuplicates(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SortedDuplicates.md): Given an already-sorted sequence and the sorting predicate, reduce all runs of a unique value to a single element each. Has eager and lazy variants.
 - [`minAndMax()`, `minAndMax(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/MinMax.md): Returns the smallest and largest elements of a sequence.
 
 #### Partial sorting
@@ -42,6 +43,7 @@ These guides describe the design and intention behind the APIs included in the `
 
 - [`adjacentPairs()`](https://github.com/apple/swift-algorithms/blob/main/Guides/AdjacentPairs.md): Lazily iterates over tuples of adjacent elements.
 - [`chunked(by:)`, `chunked(on:)`, `chunks(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chunked.md): Eager and lazy operations that break a collection into chunks based on either a binary predicate or when the result of a projection changes or chunks of a given count.
+- [`countSortedDuplicates()`, `countSortedDuplicates(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SortedDuplicates.md): Given an already-sorted sequence and the sorting predicate, return each unique value, pairing each with the number of occurances. Has eager and lazy variants.
 - [`firstNonNil(_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/FirstNonNil.md): Returns the first non-`nil` result from transforming a sequence's elements.
 - [`grouped(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Grouped.md): Group up elements using the given closure, returning a Dictionary of those groups, keyed by the results of the closure.
 - [`indexed()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Indexed.md): Iterate over tuples of a collection's indices and elements. 
