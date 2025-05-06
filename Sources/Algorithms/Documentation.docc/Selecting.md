@@ -18,24 +18,8 @@ or iterate of elements with their indices.
 
 - ``Swift/Collection/indexed()``
 
-### Counting each Element in a Sorted Sequence
-
-- ``Swift/Sequence/countSortedDuplicates(by:)``
-- ``Swift/Sequence/countSortedDuplicates()``
-- ``Swift/LazySequenceProtocol/countSortedDuplicates(by:)``
-- ``Swift/LazySequenceProtocol/countSortedDuplicates()``
-
-### Removing Duplicates from a Sorted Sequence
-
-- ``Swift/Sequence/withoutSortedDuplicates(by:)``
-- ``Swift/Sequence/withoutSortedDuplicates()``
-- ``Swift/LazySequenceProtocol/withoutSortedDuplicates(by:)``
-- ``Swift/LazySequenceProtocol/withoutSortedDuplicates()``
-
 ### Supporting Types
 
 - ``IndexedCollection``
 - ``StridingSequence``
 - ``StridingCollection``
-- ``LazyCountDuplicatesSequence``
-- ``CountDuplicatesIterator``

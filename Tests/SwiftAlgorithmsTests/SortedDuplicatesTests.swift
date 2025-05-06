@@ -79,4 +79,13 @@ final class SortedDuplicatesTests: XCTestCase {
     expectEqualSequences(lazySampleCounts.map(\.count), expected.map(\.1))
     expectEqualSequences(sample.lazy.deduplicateSorted(), "Xacdfxz")
   }
+
+  /// Test the example code from the Overview.
+  func testOverviewExample() {
+    let numbers = [0, 1, 2, 2, 2, 3, 5, 6, 6, 9, 10, 10]
+    let deduplicated = numbers.withoutSortedDuplicates()
+    // Array(deduplicated) == [0, 1, 2, 3, 5, 6, 9, 10]
+
+    expectEqualSequences(deduplicated, [0, 1, 2, 3, 5, 6, 9, 10])
+  }
 }
