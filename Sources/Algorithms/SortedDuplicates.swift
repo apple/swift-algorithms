@@ -18,9 +18,8 @@ extension Sequence {
   /// - Precondition: This sequence must be finite,
   ///   and be sorted according to the given predicate.
   ///
-  /// - Parameters:
-  ///   - type: A reference to the returned collection's type.
-  ///   - areInIncreasingOrder: The sorting predicate.
+  /// - Parameter type: A reference to the returned collection's type.
+  /// - Parameter areInIncreasingOrder: The sorting predicate.
   /// - Returns: A collection of pairs,
   ///   one for each element equivalence class present in this sequence,
   ///   in order of appearance.
@@ -56,8 +55,7 @@ extension Sequence {
   /// - Precondition: This sequence must be finite,
   ///   and be sorted according to the given predicate.
   ///
-  /// - Parameters:
-  ///   - areInIncreasingOrder: The sorting predicate.
+  /// - Parameter areInIncreasingOrder: The sorting predicate.
   /// - Returns: An array of pairs,
   ///   one for each element equivalence class present in this sequence,
   ///   in order of appearance.
@@ -80,8 +78,7 @@ extension Sequence {
   /// - Precondition: This sequence must be finite,
   ///   and be sorted according to the given predicate.
   ///
-  /// - Parameters:
-  ///   - areInIncreasingOrder: The sorting predicate.
+  /// - Parameter areInIncreasingOrder: The sorting predicate.
   ///
   /// - Returns: An array with the earliest element in this sequence for
   ///   each equivalence class.
@@ -137,8 +134,7 @@ extension LazySequenceProtocol {
   /// - Precondition: This squence is sorted according to the given predicate,
   ///   and cannot end with an infinite run of a single equivalence class.
   ///
-  /// - Parameters:
-  ///   - areInIncreasingOrder: The sorting predicate.
+  /// - Parameter areInIncreasingOrder: The sorting predicate.
   ///
   /// - Returns: A sequence that lazily generates the first element of
   ///   each equivalence class present in this sequence paired with
@@ -156,8 +152,7 @@ extension LazySequenceProtocol {
   /// - Precondition: This squence is sorted according to the given predicate,
   ///   and cannot end with an infinite run of a single equivalence class.
   ///
-  /// - Parameters:
-  ///   - areInIncreasingOrder: The sorting predicate.
+  /// - Parameter areInIncreasingOrder: The sorting predicate.
   ///
   /// - Returns: A sequence that lazily generates the first element of
   ///   each equivalence class present in this sequence.
@@ -260,6 +255,8 @@ public struct CountDuplicatesIterator<Base: IteratorProtocol> {
 
 extension CountDuplicatesIterator: IteratorProtocol {
   public mutating func next() -> (value: Base.Element, count: Int)? {
+    // NOTE: This method is called only when the predicate isn't `throw`-ing,
+    // so the forced `try` is OK.
     try! throwingNext()
   }
 
