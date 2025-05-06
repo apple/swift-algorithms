@@ -119,9 +119,6 @@ extension Sequence where Element: Comparable {
   ///
   /// - Precondition: This sequence must be finite and sorted.
   ///
-  /// - Parameters:
-  ///   - areInIncreasingOrder: The sorting predicate.
-  ///
   /// - Returns: An array with the earliest element in this sequence for
   ///   each value.
   ///
