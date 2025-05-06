@@ -13,7 +13,7 @@ This project follows semantic versioning.
 - Bidirectional collections have a new `ends(with:)` method that matches
   the behavior of the standard library's `starts(with:)` method. ([#224])
 - Sequences that are already sorted can use the `countSortedDuplicates` and
-  `withoutSortedDuplicates` methods, with eager and lazy versions.
+  `deduplicateSorted` methods, with eager and lazy versions.
   The former returns each unique value paired with the count of
   that value's occurances.
   The latter returns each unique value,

@@ -21,7 +21,7 @@ extension Sequence {
         by areInIncreasingOrder: (Element, Element) throws -> Bool
     ) rethrows -> [(value: Element, count: Int)]
 
-    public func withoutSortedDuplicates(
+    public func deduplicateSorted(
         by areInIncreasingOrder: (Element, Element) throws -> Bool
     ) rethrows -> [Element]
 }
@@ -29,7 +29,7 @@ extension Sequence {
 extension Sequence where Self.Element : Comparable {
     public func countSortedDuplicates() -> [(value: Element, count: Int)]
 
-    public func withoutSortedDuplicates() -> [Element]
+    public func deduplicateSorted() -> [Element]
 }
 
 extension LazySequenceProtocol {
@@ -37,7 +37,7 @@ extension LazySequenceProtocol {
         by areInIncreasingOrder: @escaping (Element, Element) -> Bool
     ) -> LazyCountDuplicatesSequence<Elements>
 
-    public func withoutSortedDuplicates(
+    public func deduplicateSorted(
         by areInIncreasingOrder: @escaping (Element, Element) -> Bool
     ) -> some (Sequence<Element> & LazySequenceProtocol)
 }
@@ -46,7 +46,7 @@ extension LazySequenceProtocol where Self.Element : Comparable {
     public func countSortedDuplicates()
      -> LazyCountDuplicatesSequence<Elements>
 
-    public func withoutSortedDuplicates()
+    public func deduplicateSorted()
      -> some (Sequence<Element> & LazySequenceProtocol)
 }
 

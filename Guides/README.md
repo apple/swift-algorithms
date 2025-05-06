@@ -25,6 +25,7 @@ These guides describe the design and intention behind the APIs included in the `
 #### Subsetting operations
 
 - [`compacted()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Compacted.md): Drops the `nil`s from a sequence or collection, unwrapping the remaining elements.
+- [`deduplicateSorted()`, `deduplicateSorted(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SortedDuplicates.md): Given an already-sorted sequence and the sorting predicate, reduce all runs of a unique value to a single element each. Has eager and lazy variants.
 - [`partitioned(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Partition.md): Returns the elements in a sequence or collection that do and do not match a given predicate.
 - [`randomSample(count:)`, `randomSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection.
 - [`randomStableSample(count:)`, `randomStableSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection, preserving their original relative order.
@@ -32,7 +33,6 @@ These guides describe the design and intention behind the APIs included in the `
 - [`suffix(while:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Suffix.md): Returns the suffix of a collection where all element pass a given predicate.
 - [`trimmingPrefix(while:)`, `trimmingSuffix(while)`, `trimming(while:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Trim.md): Returns a slice by trimming elements from a collection's start, end, or both. The mutating `trim...` methods trim a collection in place.
 - [`uniqued()`, `uniqued(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Unique.md): The unique elements of a collection, preserving their order.
-- [`withoutSortedDuplicates()`, `withoutSortedDuplicates(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SortedDuplicates.md): Given an already-sorted sequence and the sorting predicate, reduce all runs of a unique value to a single element each. Has eager and lazy variants.
 - [`minAndMax()`, `minAndMax(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/MinMax.md): Returns the smallest and largest elements of a sequence.
 
 #### Partial sorting
