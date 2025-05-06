@@ -85,7 +85,7 @@ extension Sequence {
   ///
   /// - Complexity: O(`n`), where *n* is the length of this sequence.
   @inlinable
-  public func withoutSortedDuplicates(
+  public func deduplicateSorted(
     by areInIncreasingOrder: (Element, Element) throws -> Bool
   ) rethrows -> [Element] {
     try countSortedDuplicates(by: areInIncreasingOrder).map(\.value)
@@ -121,8 +121,8 @@ extension Sequence where Element: Comparable {
   ///
   /// - Complexity: O(`n`), where *n* is the length of this sequence.
   @inlinable
-  public func withoutSortedDuplicates() -> [Element] {
-    withoutSortedDuplicates(by: <)
+  public func deduplicateSorted() -> [Element] {
+    deduplicateSorted(by: <)
   }
 }
 
@@ -157,7 +157,7 @@ extension LazySequenceProtocol {
   /// - Returns: A sequence that lazily generates the first element of
   ///   each equivalence class present in this sequence.
   @inlinable
-  public func withoutSortedDuplicates(
+  public func deduplicateSorted(
     by areInIncreasingOrder: @escaping (Element, Element) -> Bool
   ) -> some (Sequence<Element> & LazySequenceProtocol) {
     countSortedDuplicates(by: areInIncreasingOrder).lazy.map(\.value)
@@ -188,10 +188,10 @@ extension LazySequenceProtocol where Element: Comparable {
   /// - Returns: A sequence that lazily generates the first element of
   ///   each value.
   @inlinable
-  public func withoutSortedDuplicates() -> some (
+  public func deduplicateSorted() -> some (
     Sequence<Element> & LazySequenceProtocol
   ) {
-    withoutSortedDuplicates(by: <)
+    deduplicateSorted(by: <)
   }
 }
 
