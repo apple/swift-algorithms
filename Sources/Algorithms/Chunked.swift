@@ -162,6 +162,7 @@ public struct ChunkedOnCollection<Base: Collection, Subject: Equatable> {
 
 extension ChunkedOnCollection: Collection {
   public typealias Index = ChunkedByCollection<Base, Subject>.Index
+  public typealias Element = (subject: Subject, chunk: Base.SubSequence)
 
   @inlinable
   public var startIndex: Index {
@@ -174,7 +175,7 @@ extension ChunkedOnCollection: Collection {
   }
 
   @inlinable
-  public subscript(position: Index) -> (Subject, Base.SubSequence) {
+  public subscript(position: Index) -> Element {
     let subsequence = chunked[position]
     // swift-format-ignore: NeverForceUnwrap
     // Chunks are never empty, so `.first!` is safe.
@@ -509,7 +510,7 @@ extension Collection {
   @inlinable
   public func chunked<Subject: Equatable>(
     on projection: (Element) throws -> Subject
-  ) rethrows -> [(Subject, SubSequence)] {
+  ) rethrows -> [ChunkedOnCollection<Self, Subject>.Element] {
     guard !isEmpty else { return [] }
     var result: [(Subject, SubSequence)] = []
 
