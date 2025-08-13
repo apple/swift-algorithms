@@ -23,11 +23,7 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-numerics.git", from: "1.0.0")
   ],
   targets: [
-    .target(
-      name: "Algorithms",
-      dependencies: [
-        .product(name: "RealModule", package: "swift-numerics")
-      ]),
+    .target(name: "Algorithms"),
     .testTarget(
       name: "SwiftAlgorithmsTests",
       dependencies: ["Algorithms"]),
