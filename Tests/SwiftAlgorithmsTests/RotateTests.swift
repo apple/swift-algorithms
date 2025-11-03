@@ -14,7 +14,7 @@ import XCTest
 @testable import Algorithms
 
 final class RotateTests: XCTestCase {
-  /// Tests the example given in `_reverse(subrange:until:)`’s documentation
+  /// Tests the example given in the `_reverse(subrange:until:)` documentation.
   func testUnderscoreReverse() {
     var input = [
       "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
@@ -33,23 +33,23 @@ final class RotateTests: XCTestCase {
     XCTAssertEqual(upper, input.endIndex.advanced(by: -limit))
   }
 
-  /// Tests the example given in `reverse(subrange:)`’s documentation
+  /// Tests the example given in the `reverse(subrange:)` documentation.
   func testReverse() {
     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
     numbers.reverse(subrange: 0..<4)
     XCTAssertEqual(numbers, [40, 30, 20, 10, 50, 60, 70, 80])
   }
 
-  /// Tests `rotate(subrange:toStartAt:)` with an empty subrange
-  /// The order of elements are unchanged
+  /// Tests `rotate(subrange:toStartAt:)` with an empty subrange.
   func testRotateEmptySubrange() {
     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
     let oldStart = numbers.rotate(subrange: 3..<3, toStartAt: 3)
+    // The order of elements are unchanged
     XCTAssertEqual(numbers, [10, 20, 30, 40, 50, 60, 70, 80])
     XCTAssertEqual(numbers[oldStart], 40)
   }
 
-  /// Tests `rotate(subrange:toStartAt:)` with an empty collection
+  /// Tests `rotate(subrange:toStartAt:)` with an empty collection.
   func testRotateSubrangeOnEmptyCollection() {
     var numbers: [Int] = []
     let oldStart = numbers.rotate(subrange: 0..<0, toStartAt: 0)
@@ -57,7 +57,7 @@ final class RotateTests: XCTestCase {
     XCTAssertEqual(oldStart, numbers.startIndex)
   }
 
-  /// Tests `rotate(subrange:toStartAt:)` with the full range of the collection
+  /// Tests `rotate(subrange:toStartAt:)` with the full range of the collection.
   func testRotateFullRange() {
     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
     let oldStart = numbers.rotate(subrange: 0..<8, toStartAt: 1)
@@ -65,7 +65,8 @@ final class RotateTests: XCTestCase {
     XCTAssertEqual(numbers[oldStart], 10)
   }
 
-  /// Tests the example given in `rotate(subrange:toStartAt:)`’s documentation
+  /// Tests the example given in the `rotate(subrange:toStartAt:)`
+  /// documentation.
   func testRotateSubrange() {
     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
     let oldStart = numbers.rotate(subrange: 0..<4, toStartAt: 2)
@@ -73,7 +74,7 @@ final class RotateTests: XCTestCase {
     XCTAssertEqual(numbers[oldStart], 10)
   }
 
-  /// Tests the example given in `rotate(toStartAt:)`’s documentation
+  /// Tests the example given in the `rotate(toStartAt:)` documentation.
   func testRotateExample() {
     var numbers = [10, 20, 30, 40, 50, 60, 70, 80]
     let oldStart = numbers.rotate(toStartAt: 3)
@@ -81,8 +82,8 @@ final class RotateTests: XCTestCase {
     XCTAssertEqual(numbers[oldStart], 10)
   }
 
-  /// Tests `rotate(toStartAt:)` on collections of varying lengths, at different
-  /// starting points
+  /// Tests `rotate(toStartAt:)` on collections of varying lengths, at
+  /// different starting points.
   func testRotate() {
     for length in 0...15 {
       let a = Array(0..<length)

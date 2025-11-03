@@ -155,7 +155,7 @@ extension PermutationsSequence: Sequence {
     @usableFromInline
     internal var kRange: Range<Int>
 
-    /// Whether or not iteration is finished (`kRange` is empty)
+    /// Whether or not iteration is finished (`kRange` is empty).
     @inlinable
     internal var isFinished: Bool {
       kRange.isEmpty
