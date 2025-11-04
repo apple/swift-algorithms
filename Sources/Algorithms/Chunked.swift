@@ -288,9 +288,10 @@ extension EvenlyChunkedCollection: Collection {
     @usableFromInline
     internal var baseRange: Range<Base.Index>
 
-    /// The offset corresponding to the chunk at this position. The first chunk
-    /// has offset `0` and all other chunks have an offset `1` greater than the
-    /// previous.
+    /// The offset corresponding to the chunk at this position.
+    ///
+    /// The first chunk has offset `0` and all other chunks have an offset
+    /// `1` greater than the previous.
     @usableFromInline
     internal var offset: Int
 

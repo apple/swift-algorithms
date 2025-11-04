@@ -179,7 +179,7 @@ final class PartitionTests: XCTestCase {
     XCTAssertTrue(s0.1.isEmpty)
   }
 
-  /// Test the example given in the `partitioned(by:)` documentation
+  /// Test the example given in the `partitioned(by:)` documentation.
   func testPartitionedExample() throws {
     let cast = ["Vivien", "Marlon", "Kim", "Karl"]
     let (longNames, shortNames) = cast.partitioned(by: { $0.count < 5 })
