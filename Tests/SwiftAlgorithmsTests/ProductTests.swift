@@ -37,6 +37,13 @@ final class ProductTests: XCTestCase {
   func testProductDistanceFromTo() {
     let p = product([1, 2], "abc")
     XCTAssertEqual(p.distance(from: p.startIndex, to: p.endIndex), 6)
+    XCTAssertLessThanOrEqual(p.underestimatedCount, 6)
+  }
+
+  func testOverflowingUnderestimatedCount() {
+    let p = product(repeatElement(true, count: .max / 2),
+                    repeatElement(false, count: .max / 2))
+    XCTAssertLessThanOrEqual(p.underestimatedCount, .max)
   }
 
   func testProductIndexTraversals() {

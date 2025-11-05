@@ -29,6 +29,15 @@ public struct Product2Sequence<Base1: Sequence, Base2: Collection> {
 extension Product2Sequence: Sequence {
   public typealias Element = (Base1.Element, Base2.Element)
 
+  public var underestimatedCount: Int {
+    // Watch out if at least one source doesn't actually implement their
+    // `underestimatedCount` in constant time
+    // (which `Collection` can permit, unlike `Sequence`).
+    let (product, overflow) = base1.underestimatedCount
+      .multipliedReportingOverflow(by: base2.underestimatedCount)
+    return overflow ? .max : product
+  }
+
   /// The iterator for a `Product2Sequence` sequence.
   public struct Iterator: IteratorProtocol {
     @usableFromInline
