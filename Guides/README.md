@@ -12,6 +12,7 @@ These guides describe the design and intention behind the APIs included in the `
 
 #### Mutating algorithms
 
+- [`mergePartitions(across:)`, `mergePartitions(across:sortedBy:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/MergedSorted.md): In-place merger of sorted partitions.
 - [`rotate(toStartAt:)`, `rotate(subrange:toStartAt:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Rotate.md): In-place rotation of elements.
 - [`stablePartition(by:)`, `stablePartition(subrange:by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Partition.md): A partition that preserves the relative order of the resulting prefix and suffix.
 
@@ -20,6 +21,7 @@ These guides describe the design and intention behind the APIs included in the `
 - [`chain(_:_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chain.md): Concatenates two collections with the same element type. 
 - [`cycled()`, `cycled(times:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Cycle.md): Repeats the elements of a collection forever or a set number of times.
 - [`joined(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Joined.md): Concatenate sequences of sequences, using an element or sequence as a separator, or using a closure to generate each separator. 
+- [`lazilyMerge(_:_:keeping:sortedBy:)`, `lazilyMerge(_:_:keeping:)`, `merge(_:_:keeping:sortedBy:)`, `merge(_:_:keeping:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Merge.md): Merge two sorted sequences together.
 - [`product(_:_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Product.md): Iterates over all the pairs of two collections; equivalent to nested `for`-`in` loops.
 
 #### Subsetting operations
