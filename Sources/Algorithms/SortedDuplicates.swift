@@ -18,8 +18,9 @@ extension Sequence {
   /// - Precondition: This sequence must be finite,
   ///   and be sorted according to the given predicate.
   ///
-  /// - Parameter type: A reference to the returned collection's type.
-  /// - Parameter areInIncreasingOrder: The sorting predicate.
+  /// - Parameters:
+  ///   - type: A reference to the returned collection's type.
+  ///   - areInIncreasingOrder: The sorting predicate.
   /// - Returns: A collection of pairs,
   ///   one for each element equivalence class present in this sequence,
   ///   in order of appearance.
