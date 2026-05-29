@@ -63,6 +63,7 @@ extension MutableCollection {
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
   @inlinable
+  @discardableResult
   public mutating func stablePartition(
     subrange: Range<Index>,
     by belongsInSecondPartition: (Element) throws -> Bool
@@ -87,6 +88,7 @@ extension MutableCollection {
   ///
   /// - Complexity: O(*n* log *n*), where *n* is the length of this collection.
   @inlinable
+  @discardableResult
   public mutating func stablePartition(
     by belongsInSecondPartition: (Element) throws -> Bool
   ) rethrows -> Index {
@@ -122,6 +124,7 @@ extension MutableCollection {
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
   @inlinable
+  @discardableResult
   public mutating func partition(
     subrange: Range<Index>,
     by belongsInSecondPartition: (Element) throws -> Bool
@@ -166,6 +169,7 @@ extension MutableCollection where Self: BidirectionalCollection {
   ///
   /// - Complexity: O(*n*) where n is the length of the collection.
   @inlinable
+  @discardableResult
   public mutating func partition(
     subrange: Range<Index>,
     by belongsInSecondPartition: (Element) throws -> Bool
