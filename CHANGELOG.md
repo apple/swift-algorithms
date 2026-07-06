@@ -241,7 +241,7 @@ The 0.2.0 release includes contributions from [CTMacUser], [LemonSpike],
 - The base collections of the sequence and collection wrapper types are no
   longer public ([#85], [#125]), and the wrapper types no longer conform to the
   `Equatable` or `Hashable` protocols ([#124]). If you need those conformances,
-  convert the wrapper type to an `Array` or other collection currrency type
+  convert the wrapper type to an `Array` or other collection currency type
   before storing. Please file an issue if these changes pose a problem for your
   use case.
 
@@ -335,7 +335,7 @@ The 0.0.3 release includes contributions from [benrimmington], [danielctull],
 ### Fixes
 
 - `Algorithms` now builds under SwiftPM on Windows.
-- A wide variety of errors, misspellings, and ommissions in the documentation
+- A wide variety of errors, misspellings, and omissions in the documentation
   and guides have been fixed. 
 - Index/distance calculations for the `Product2` and `Chain` types have been
   corrected.
