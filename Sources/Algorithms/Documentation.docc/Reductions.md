@@ -16,8 +16,21 @@ print(inclusiveRunningTotal)
 // prints [1, 3, 6, 10, 15]
 ```
 
+If you only need the final value, but the combining operation has no natural
+initial result, use the `reduce(_:)` method, which seeds the operation with the
+first element and returns `nil` for an empty sequence:
+
+```swift
+let total = (1...5).reduce(+)
+// total == 15
+
+let none = EmptyCollection<Int>().reduce(+)
+// none == nil
+```
+
 ## Topics
 
+- ``Swift/Sequence/reduce(_:)``
 - ``Swift/Sequence/reductions(_:)``
 - ``Swift/Sequence/reductions(_:_:)``
 - ``Swift/Sequence/reductions(into:_:)``
