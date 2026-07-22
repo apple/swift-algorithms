@@ -67,7 +67,7 @@ Calling `keyed(by:)` is an O(_n_) operation.
 
 1. Java's `toMap` is referring to `Map`/`HashMap`, their naming for Dictionaries and other associative collections. It's easy to confuse with the transformation function, `Sequence.map(_:)`.
 2. C#'s `toXXX()` naming doesn't suite Swift well, which tends to prefer `Foo.init` over `toFoo()` methods.
-3. Ruby's `index_by` naming doesn't fit Swift well, where "index" is a specific term (e.g. the `associatedtype Index` on `Collection`). There is also a [`index(by:)`](Index.md) method in swift-algorithms, is specifically to do with matching elements up with their indices, and not any arbitrary derived value.
+3. Ruby's `index_by` naming doesn't fit Swift well, where "index" is a specific term (e.g. the `associatedtype Index` on `Collection`). There is also a [`indexed()`](Indexed.md) method in swift-algorithms, is specifically to do with matching elements up with their indices, and not any arbitrary derived value.
 
 #### Alternative names
 
