@@ -79,7 +79,7 @@ extension Sequence where Element: Comparable {
 The algorithm used for minimal- or maximal-ordered subsets is based on 
 [Soroush Khanlou's research on this matter](https://khanlou.com/2018/12/analyzing-complexity/). 
 The total complexity is `O(k log k + nk)`, which will result in a runtime close 
-to `O(n)` if *k* is a small amount. If *k* is a large amount (more than 10% of 
+to `O(n)` if *k* is a small amount. If *k* is a large amount (more than log n of 
 the collection), we fall back to sorting the entire array. Realistically, this 
 means the worst case is actually `O(n log n)`.
 
