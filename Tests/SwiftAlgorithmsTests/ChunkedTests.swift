@@ -71,6 +71,16 @@ final class ChunkedTests: XCTestCase {
     IndexValidator().validate(lazyChunks)
   }
 
+  func testChunkedOnLabels() {
+    let arrayChunks: Array = fruits.chunked(on: { $0.first })
+    XCTAssert(arrayChunks.first!.0 == arrayChunks.first!.subject)
+    XCTAssert(arrayChunks.first!.1 == arrayChunks.first!.chunk)
+
+    let lazyChunks = fruits.lazy.chunked(on: { $0.first })
+    XCTAssert(lazyChunks.first!.0 == lazyChunks.first!.subject)
+    XCTAssert(lazyChunks.first!.1 == lazyChunks.first!.chunk)
+  }
+
   func testChunkedBy() {
     validateFruitChunks(fruits.chunked(by: { $0.first == $1.first }))
 
