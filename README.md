@@ -1,5 +1,6 @@
 # Swift Algorithms
 
+
 **Swift Algorithms** is an open-source package of sequence and collection algorithms, along with their related types.
 
 ## Overview
