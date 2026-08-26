@@ -64,3 +64,4 @@ We'd like this package to quickly embrace Swift language and toolchain improveme
 [docs]: https://swiftpackageindex.com/apple/swift-algorithms/documentation/algorithms
 [announcement]: https://swift.org/blog/swift-algorithms/
 [guides]: https://github.com/apple/swift-algorithms/tree/main/Guides
+
