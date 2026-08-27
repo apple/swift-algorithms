@@ -70,4 +70,21 @@ final class ChainTests: XCTestCase {
       XCTAssertNil(j)
     }
   }
+
+  func testChainMutableCollection() {
+    let a = [1, 2, 3]
+    let b = [4, 5, 6]
+    var c = chain(a, b)
+
+    c[c.startIndex] = 10
+    let secondStart = c.index(c.startIndex, offsetBy: 3)
+    c[secondStart] = 40
+
+    expectEqualSequences(c, [10, 2, 3, 40, 5, 6])
+
+    for i in c.indices {
+      c[i] *= 2
+    }
+    expectEqualSequences(c, [20, 4, 6, 80, 10, 12])
+  }
 }

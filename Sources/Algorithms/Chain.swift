@@ -14,11 +14,11 @@ public struct Chain2Sequence<Base1: Sequence, Base2: Sequence>
 where Base1.Element == Base2.Element {
   /// The first sequence in this chain.
   @usableFromInline
-  internal let base1: Base1
+  internal var base1: Base1
 
   /// The second sequence in this chain.
   @usableFromInline
-  internal let base2: Base2
+  internal var base2: Base2
 
   @inlinable
   internal init(base1: Base1, base2: Base2) {
@@ -291,6 +291,37 @@ where Base1: BidirectionalCollection, Base2: BidirectionalCollection {
 
 extension Chain2Sequence: RandomAccessCollection
 where Base1: RandomAccessCollection, Base2: RandomAccessCollection {}
+
+extension Chain2Sequence: MutableCollection
+where Base1: MutableCollection, Base2: MutableCollection {
+  @inlinable
+  public subscript(i: Index) -> Base1.Element {
+    get {
+      switch i.position {
+      case .first(let i):
+        return base1[i]
+      case .second(let i):
+        return base2[i]
+      }
+    }
+    set {
+      switch i.position {
+      case .first(let i):
+        base1[i] = newValue
+      case .second(let i):
+        base2[i] = newValue
+      }
+    }
+    _modify {
+      switch i.position {
+      case .first(let i):
+        yield &base1[i]
+      case .second(let i):
+        yield &base2[i]
+      }
+    }
+  }
+}
 
 //===----------------------------------------------------------------------===//
 // chain(_:_:)
