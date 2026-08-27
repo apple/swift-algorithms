@@ -30,8 +30,8 @@ public func chain<S1, S2>(_ s1: S1, _ s2: S2) -> Chain2Sequence<S1, S2>
 ```
 
 The resulting `Chain2Sequence` type is a sequence, with conditional conformance
-to `Collection`, `BidirectionalCollection`, and `RandomAccessCollection` when
-both the first and second arguments conform.
+to `Collection`, `BidirectionalCollection`, `RandomAccessCollection`, and
+`MutableCollection` when both the first and second arguments conform.
 
 ### Naming
 
