@@ -63,15 +63,18 @@ The `partitioningIndex(where:)` method is available on any `Collection` type.
 
 ```swift
 extension MutableCollection {
+    @discardableResult
     mutating func stablePartition(
         by belongsInSecondPartition: (Element) throws -> Bool
     ) rethrows -> Index
 
+    @discardableResult
     mutating func stablePartition(
         subrange: Range<Index>,
         by belongsInSecondPartition: (Element) throws -> Bool
     ) rethrows -> Index
 
+    @discardableResult
     mutating func partition(
         subrange: Range<Index>,
         by belongsInSecondPartition: (Element) throws -> Bool
