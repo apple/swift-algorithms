@@ -85,7 +85,43 @@ func expectEqualSequences<S1: Sequence, S2: Sequence>(
     message(), file: file, line: line)
 }
 
-// Two sequences contains exactly the same element but not necessarily in the same order.
+// Two sequences contain exactly the same elements but not necessarily in the same order.
+func expectUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
+  _ expression1: @autoclosure () throws -> S1,
+  _ expression2: @autoclosure () throws -> S2,
+  file: StaticString = (#file), line: UInt = #line
+) rethrows where S1.Element: Hashable, S1.Element == S2.Element {
+  var counts: [S1.Element: Int] = [:]
+  for elt in try expression1() {
+    counts[elt, default: 0] += 1
+  }
+  var missing: [S1.Element] = []
+  for elt in try expression2() {
+    if let count = counts[elt], count > 0 {
+      if count == 1 {
+        counts.removeValue(forKey: elt)
+      } else {
+        counts[elt] = count - 1
+      }
+    } else {
+      missing.append(elt)
+    }
+  }
+
+  XCTAssertTrue(
+    missing.isEmpty,
+    "first sequence missing '\(missing)' elements from second sequence",
+    file: file, line: line
+  )
+
+  let remaining = counts.flatMap { elt, count in repeatElement(elt, count: count) }
+  XCTAssertTrue(
+    counts.isEmpty, "first sequence contains \(remaining) missing from second sequence",
+    file: file, line: line
+  )
+}
+
+// Two sequences contain exactly the same elements but not necessarily in the same order (fallback for non-Hashable Equatable elements).
 func expectUnorderedEqualSequences<S1: Sequence, S2: Sequence>(
   _ expression1: @autoclosure () throws -> S1,
   _ expression2: @autoclosure () throws -> S2,
