@@ -35,8 +35,8 @@ extension Sequence {
     _ transform: (Element) throws -> Result?
   ) rethrows -> Result? {
     for value in self {
-      if let value = try transform(value) {
-        return value
+      if let result = try transform(value) {
+        return result
       }
     }
     return nil
