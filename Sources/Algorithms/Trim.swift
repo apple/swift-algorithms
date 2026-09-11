@@ -80,7 +80,7 @@ extension Collection where Self == Self.SubSequence {
   ///     myString.trimPrefix(while: \.isWhitespace)
   ///     print(myString) // "hello, world  "
   ///
-  /// - Parameters predicate: A closure that determines if the element should
+  /// - Parameter predicate: A closure that determines if the element should
   ///   be removed from the string.
   ///
   /// - Complexity: O(*n*), where *n* is the length of this collection.
