@@ -124,6 +124,65 @@ extension Sequence {
     }
     return result
   }
+
+  /// Returns an array with the unique elements of this sequence (as determined
+  /// by the given projection), using the provided closure to combine or resolve
+  /// duplicate elements.
+  ///
+  /// As the sequence is iterated, the `combine` closure is called with the
+  /// current accumulated value and the newly encountered value for any duplicate
+  /// projection keys. The return value replaces the previous element in the
+  /// resulting array while preserving the position of its first occurrence.
+  ///
+  /// - Parameters:
+  ///   - projection: A closure that transforms an element into the value to use
+  ///     for uniqueness.
+  ///   - combine: A closure called when two elements produce the same projection
+  ///     key. The closure takes the existing element and the duplicate element,
+  ///     returning the combined element to retain.
+  ///
+  /// - Returns: An array with the unique elements in first-occurrence order.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  @inlinable
+  public func uniqued<Subject: Hashable>(
+    on projection: (Element) throws -> Subject,
+    uniquingWith combine: (Element, Element) throws -> Element
+  ) rethrows -> [Element] {
+    var seenIndices: [Subject: Int] = [:]
+    var result: [Element] = []
+
+    for element in self {
+      let key = try projection(element)
+      if let existingIndex = seenIndices[key] {
+        result[existingIndex] = try combine(result[existingIndex], element)
+      } else {
+        seenIndices[key] = result.count
+        result.append(element)
+      }
+    }
+
+    return result
+  }
+}
+
+extension Sequence where Element: Hashable {
+  /// Returns an array with the unique elements of this sequence, using the
+  /// provided closure to combine or resolve duplicate elements.
+  ///
+  /// - Parameter combine: A closure called when two duplicate elements are
+  ///   encountered. The closure takes the existing element and the duplicate
+  ///   element, returning the combined element to retain.
+  ///
+  /// - Returns: An array with the unique elements in first-occurrence order.
+  ///
+  /// - Complexity: O(*n*), where *n* is the length of the sequence.
+  @inlinable
+  public func uniqued(
+    uniquingWith combine: (Element, Element) throws -> Element
+  ) rethrows -> [Element] {
+    try uniqued(on: { $0 }, uniquingWith: combine)
+  }
 }
 
 //===----------------------------------------------------------------------===//
