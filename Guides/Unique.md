@@ -26,10 +26,20 @@ the elements. `uniqued(on:)` has a matching lazy version that is added to
 ```swift
 extension Sequence where Element: Hashable {
     func uniqued() -> UniquedSequence<Self, Element>
+
+    func uniqued(
+        uniquingWith combine: (Element, Element) throws -> Element
+    ) rethrows -> [Element]
 }
 
 extension Sequence {
     func uniqued<Subject>(on projection: (Element) throws -> Subject) rethrows -> [Element]
+        where Subject: Hashable
+
+    func uniqued<Subject>(
+        on projection: (Element) throws -> Subject,
+        uniquingWith combine: (Element, Element) throws -> Element
+    ) rethrows -> [Element]
         where Subject: Hashable
 }
 

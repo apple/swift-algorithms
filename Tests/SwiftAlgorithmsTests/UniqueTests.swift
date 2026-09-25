@@ -54,4 +54,50 @@ final class UniqueTests: XCTestCase {
     let d = Array(repeating: "Andromeda", count: 10)
     expectEqualSequences(d.lazy.uniqued(on: { $0.first }), ["Andromeda"])
   }
+
+  func testUniqueOnUniquingWith() {
+    struct Person: Equatable {
+      let id: Int
+      var score: Int
+    }
+
+    let people = [
+      Person(id: 1, score: 10),
+      Person(id: 2, score: 20),
+      Person(id: 1, score: 30),
+      Person(id: 3, score: 5),
+      Person(id: 2, score: 15),
+    ]
+
+    // Accumulate scores while preserving first occurrence order (id: 1, 2, 3)
+    let combined = people.uniqued(on: \.id) { current, incoming in
+      Person(id: current.id, score: current.score + incoming.score)
+    }
+    XCTAssertEqual(combined, [
+      Person(id: 1, score: 40),
+      Person(id: 2, score: 35),
+      Person(id: 3, score: 5),
+    ])
+
+    // Empty sequence
+    let empty: [Person] = []
+    XCTAssertEqual(empty.uniqued(on: \.id, uniquingWith: { _, incoming in incoming }), [])
+
+    // Throwing projection and combine
+    struct CustomError: Error, Equatable {}
+    XCTAssertThrowsError(
+      try [1, 2, 3].uniqued(on: { (_: Int) -> Int in throw CustomError() }, uniquingWith: { a, _ in a })
+    )
+    XCTAssertThrowsError(
+      try [1, 1].uniqued(on: { $0 }, uniquingWith: { _, _ in throw CustomError() })
+    )
+  }
+
+  func testUniqueUniquingWith() {
+    let numbers = [1, 2, 3, 1, 2, 4]
+    let result = numbers.uniqued { current, incoming in
+      current * 10 + incoming
+    }
+    XCTAssertEqual(result, [11, 22, 3, 4])
+  }
 }
