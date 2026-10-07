@@ -30,7 +30,7 @@ These guides describe the design and intention behind the APIs included in the `
 - [`randomStableSample(count:)`, `randomStableSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection, preserving their original relative order.
 - [`striding(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Stride.md): Returns every nth element of a collection.
 - [`suffix(while:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Suffix.md): Returns the suffix of a collection where all element pass a given predicate.
-- [`trimmingPrefix(while:)`, `trimmingSuffix(while)`, `trimming(while:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Trim.md): Returns a slice by trimming elements from a collection's start, end, or both. The mutating `trim...` methods trim a collection in place.
+- [`trimmingPrefix(while:)`, `trimmingSuffix(while:)`, `trimming(while:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Trim.md): Returns a slice by trimming elements from a collection's start, end, or both. The mutating `trim...` methods trim a collection in place.
 - [`uniqued()`, `uniqued(on:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Unique.md): The unique elements of a collection, preserving their order.
 - [`minAndMax()`, `minAndMax(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/MinMax.md): Returns the smallest and largest elements of a sequence.
 
