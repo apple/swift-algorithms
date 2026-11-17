@@ -102,6 +102,53 @@ final class PermutationsTests: XCTestCase {
     XCTAssertEqual([1, 2, 3, 4, 5, 6, 7], numbers)
   }
 
+  func testNextPermutationUpperBound() {
+    final class Counter {
+      var comparisons = 0
+    }
+
+    struct CountedInt: Comparable {
+      var value: Int
+      var counter: Counter
+
+      static func == (lhs: CountedInt, rhs: CountedInt) -> Bool {
+        lhs.value == rhs.value
+      }
+
+      static func < (lhs: CountedInt, rhs: CountedInt) -> Bool {
+        lhs.counter.comparisons += 1
+        return lhs.value < rhs.value
+      }
+    }
+
+    let counter = Counter()
+    var numbers = (1...8).map { CountedInt(value: $0, counter: counter) }
+
+    // With an upper bound, each call moves to the next ordering of the
+    // elements before `upperBound` and leaves the rest in ascending order.
+    var prefixes = [numbers.prefix(2).map(\.value)]
+    while numbers.nextPermutation(upperBound: 2) {
+      XCTAssertTrue(numbers[2...].map(\.value).isSorted())
+      prefixes.append(numbers.prefix(2).map(\.value))
+    }
+    let expectedPrefixes = (1...8).flatMap { a in
+      (1...8).filter { $0 != a }.map { b in [a, b] }
+    }
+    XCTAssertEqual(expectedPrefixes, prefixes)
+    XCTAssertEqual(Array(1...8), numbers.map(\.value))
+
+    // Each call is O(n); it must not step through the orderings of the
+    // elements after `upperBound`.
+    XCTAssertLessThanOrEqual(
+      counter.comparisons, 3 * numbers.count * prefixes.count)
+
+    // With an empty prefix there is nothing to permute.
+    counter.comparisons = 0
+    XCTAssertFalse(numbers.nextPermutation(upperBound: 0))
+    XCTAssertEqual(Array(1...8), numbers.map(\.value))
+    XCTAssertLessThanOrEqual(counter.comparisons, 3 * numbers.count)
+  }
+
   func testPermutationsLazy() {
     requireLazySequence("ABCD".lazy.permutations(ofCount: 2))
   }

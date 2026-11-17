@@ -22,6 +22,12 @@ where Self: BidirectionalCollection, Element: Comparable {
   /// collection will be back in sorted order and this method will return
   /// `false`.
   ///
+  /// When `upperBound` is given, only the elements before `upperBound` are
+  /// permuted: each call moves to the next lexical ordering of the prefix
+  /// `..<upperBound`, skipping the orderings that differ only after
+  /// `upperBound`. The elements from `upperBound` on must be in ascending
+  /// order, which is true after each call.
+  ///
   /// - Returns: A Boolean value indicating whether the collection still has
   ///   remaining permutations. When this method returns `false`, the collection
   ///   is in ascending order according to `areInIncreasingOrder`.
@@ -35,6 +41,14 @@ where Self: BidirectionalCollection, Element: Comparable {
     if i == startIndex { return false }
 
     let upperBound = upperBound ?? endIndex
+
+    // Put the elements from `upperBound` on in descending order, which is the
+    // last ordering of that suffix, so that the step below changes the prefix
+    // before `upperBound` instead of stepping through every ordering of the
+    // suffix.
+    if upperBound != endIndex {
+      self.reverse(subrange: upperBound..<endIndex)
+    }
 
     while true {
       let ip1 = i
@@ -54,13 +68,9 @@ where Self: BidirectionalCollection, Element: Comparable {
         swapAt(i, j)
         self.reverse(subrange: ip1..<endIndex)
 
-        // Only return if we've made a change within ..<upperBound region
-        if i < upperBound {
-          return true
-        } else {
-          i = index(before: endIndex)
-          continue
-        }
+        // The suffix from `upperBound` on has no ascending pair, so `i` is
+        // always before `upperBound` here.
+        return true
       }
 
       if i == startIndex {
