@@ -45,7 +45,7 @@ let remaining = names.chunks(ofCount: 3)
 // equivalent to [["David", "Kyle", "Karoy"], ["Nate"]]
 ```
 
-The `chunks(ofCount:)` method was previously [proposed](proposal) for inclusion
+The `chunks(ofCount:)` method was previously [proposed][proposal] for inclusion
 in the standard library.
 
 The `evenlyChunked(in:)` method takes a `count` parameter and divides the
