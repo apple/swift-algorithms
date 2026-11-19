@@ -12,3 +12,15 @@ Convert a sequence to a dictionary, providing keys to individual elements or to 
 ### Grouping Elements by Key
 
 - ``Swift/Sequence/grouped(by:)``
+
+### Counting each Element in a Sorted Sequence
+
+- ``Swift/Sequence/countSortedDuplicates(by:)``
+- ``Swift/Sequence/countSortedDuplicates()``
+- ``Swift/LazySequenceProtocol/countSortedDuplicates(by:)``
+- ``Swift/LazySequenceProtocol/countSortedDuplicates()``
+
+### Supporting Types
+
+- ``LazyCountDuplicatesSequence``
+- ``CountDuplicatesIterator``

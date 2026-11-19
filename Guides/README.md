@@ -25,6 +25,7 @@ These guides describe the design and intention behind the APIs included in the `
 #### Subsetting operations
 
 - [`compacted()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Compacted.md): Drops the `nil`s from a sequence or collection, unwrapping the remaining elements.
+- [`deduplicateSorted()`, `deduplicateSorted(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SortedDuplicates.md): Given an already-sorted sequence and the sorting predicate, reduce all runs of a unique value to a single element each. Has eager and lazy variants.
 - [`partitioned(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Partition.md): Returns the elements in a sequence or collection that do and do not match a given predicate.
 - [`randomSample(count:)`, `randomSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection.
 - [`randomStableSample(count:)`, `randomStableSample(count:using:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/RandomSampling.md): Randomly selects a specific number of elements from a collection, preserving their original relative order.
@@ -42,6 +43,7 @@ These guides describe the design and intention behind the APIs included in the `
 
 - [`adjacentPairs()`](https://github.com/apple/swift-algorithms/blob/main/Guides/AdjacentPairs.md): Lazily iterates over tuples of adjacent elements.
 - [`chunked(by:)`, `chunked(on:)`, `chunks(ofCount:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Chunked.md): Eager and lazy operations that break a collection into chunks based on either a binary predicate or when the result of a projection changes or chunks of a given count.
+- [`countSortedDuplicates()`, `countSortedDuplicates(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/SortedDuplicates.md): Given an already-sorted sequence and the sorting predicate, return each unique value, pairing each with the number of occurances. Has eager and lazy variants.
 - [`firstNonNil(_:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/FirstNonNil.md): Returns the first non-`nil` result from transforming a sequence's elements.
 - [`grouped(by:)`](https://github.com/apple/swift-algorithms/blob/main/Guides/Grouped.md): Group up elements using the given closure, returning a Dictionary of those groups, keyed by the results of the closure.
 - [`indexed()`](https://github.com/apple/swift-algorithms/blob/main/Guides/Indexed.md): Iterate over tuples of a collection's indices and elements. 
