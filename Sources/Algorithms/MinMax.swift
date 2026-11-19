@@ -270,9 +270,9 @@ extension Collection {
       return []
     }
 
-    // If we're attempting to prefix more than 10% of the collection, it's
+    // If we're attempting to prefix more than log n of the collection, it's
     // faster to sort everything.
-    guard prefixCount < (self.count / 10) else {
+    guard prefixCount <= self.count._binaryLogarithm() else {
       return Array(try sorted(by: areInIncreasingOrder).prefix(prefixCount))
     }
 
@@ -326,9 +326,9 @@ extension Collection {
       return []
     }
 
-    // If we're attempting to prefix more than 10% of the collection, it's
+    // If we're attempting to suffix more than log n of the collection, it's
     // faster to sort everything.
-    guard suffixCount < (self.count / 10) else {
+    guard suffixCount <= self.count._binaryLogarithm() else {
       return Array(try sorted(by: areInIncreasingOrder).suffix(suffixCount))
     }
 
