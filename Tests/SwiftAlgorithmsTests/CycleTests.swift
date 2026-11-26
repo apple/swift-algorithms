@@ -53,8 +53,13 @@ final class CycleTests: XCTestCase {
   }
 
   func testRepeatedZeroTimesCycle() {
-    let empty2 = Array("Hello".cycled(times: 0))
+    let empty1 = Array("Hello".cycled(times: 0))
+    XCTAssert(empty1.isEmpty)
+    let empty2 = Array([1, 2, 3].cycled(times: 0))
     XCTAssert(empty2.isEmpty)
+    let empty3 = Array((1...5).cycled(times: 0))
+    XCTAssert(empty3.isEmpty)
+    XCTAssertEqual([1, 2, 3].cycled(times: 0).count, 0)
   }
 
   func testRepeatedLazy() {

@@ -67,6 +67,7 @@ public struct CycledTimesCollection<Base: Collection> {
 
   @inlinable
   internal init(base: Base, times: Int) {
+    precondition(times >= 0, "Cannot cycle with a negative number of times")
     self.product = Product2Sequence(0..<times, base)
   }
 }
