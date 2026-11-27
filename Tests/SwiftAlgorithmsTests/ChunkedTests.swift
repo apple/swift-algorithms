@@ -95,6 +95,18 @@ final class ChunkedTests: XCTestCase {
     IndexValidator().validate([1, 2, 3].lazy.chunked(by: { $1 - $0 == 1 }))
   }
 
+  func testChunkedByNegativeOffsetsThroughGenericWrapper() {
+    // `LazyMapCollection` calls `index(_:offsetBy:)` and `distance(from:to:)`
+    // on its base through the base's `Collection` conformance.
+    let chunks = [1, 2, 4, 5, 7].lazy.chunked(by: { $1 - $0 == 1 })
+    IndexValidator().validate(chunks.lazy.map { $0.count }, expectedCount: 3)
+    expectEqualSequences(chunks.lazy.map { $0.count }.suffix(2), [2, 1])
+
+    let chunksOn = [1, 2, 4, 5, 7].lazy.chunked(on: { $0 / 3 })
+    IndexValidator().validate(chunksOn.lazy.map { $0.0 }, expectedCount: 3)
+    expectEqualSequences(chunksOn.lazy.map { $0.0 }.suffix(2), [1, 2])
+  }
+
   func testChunkedLazy() {
     requireLazySequence(fruits.lazy.chunked(by: { $0.first == $1.first }))
     requireLazySequence(fruits.lazy.chunked(on: { $0.first }))

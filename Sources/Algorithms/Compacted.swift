@@ -119,21 +119,77 @@ where Base.Element == Element? {
     else { return endIndex }
     return Index(base: idx)
   }
+
+  // `index(_:offsetBy:)`, `index(_:offsetBy:limitedBy:)` and
+  // `distance(from:to:)` are implemented in the unconditional `Collection`
+  // conformance so that these implementations are also used when the
+  // collection is accessed generically as a `BidirectionalCollection`.
+  // Otherwise the default `Collection` implementations are used there, and
+  // they trap for negative offsets. Stepping backward uses
+  // `base.index(_:offsetBy: -1)`, which still traps if `Base` is not
+  // bidirectional.
+
+  @inlinable
+  internal func indexBefore(_ i: Index) -> Index {
+    precondition(i != startIndex, "Index out of bounds")
+    // `startIndex` is the first non-`nil` element, so this stops at or after it.
+    var baseIdx = i.base
+    repeat {
+      baseIdx = base.index(baseIdx, offsetBy: -1)
+    } while base[baseIdx] == nil
+    return Index(base: baseIdx)
+  }
+
+  @inlinable
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    var i = i
+    if distance >= 0 {
+      for _ in 0..<distance { formIndex(after: &i) }
+    } else {
+      for _ in 0..<(-distance) { i = indexBefore(i) }
+    }
+    return i
+  }
+
+  @inlinable
+  public func index(
+    _ i: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    var i = i
+    if distance >= 0 {
+      for _ in 0..<distance {
+        guard i != limit else { return nil }
+        formIndex(after: &i)
+      }
+    } else {
+      for _ in 0..<(-distance) {
+        guard i != limit else { return nil }
+        i = indexBefore(i)
+      }
+    }
+    return i
+  }
+
+  @inlinable
+  public func distance(from start: Index, to end: Index) -> Int {
+    guard start <= end else { return -distance(from: end, to: start) }
+    var i = start
+    var count = 0
+    while i != end {
+      formIndex(after: &i)
+      count += 1
+    }
+    return count
+  }
 }
 
 extension CompactedCollection: BidirectionalCollection
 where Base: BidirectionalCollection {
-
   @inlinable
   public func index(before i: Index) -> Index {
-    precondition(i != startIndex, "Index out of bounds")
-
-    guard
-      let idx =
-        base[startIndex.base..<i.base]
-        .lastIndex(where: { $0 != nil })
-    else { fatalError("Index out of bounds") }
-    return Index(base: idx)
+    indexBefore(i)
   }
 }
 

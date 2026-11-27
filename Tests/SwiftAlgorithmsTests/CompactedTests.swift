@@ -37,6 +37,14 @@ final class CompactedTests: XCTestCase {
     }
   }
 
+  func testNegativeOffsetsThroughGenericWrapper() {
+    // `LazyMapCollection` calls `index(_:offsetBy:)` and `distance(from:to:)`
+    // on its base through the base's `Collection` conformance.
+    let compacted = [nil, 1, nil, 2, 3, nil, nil, 4].compacted()
+    IndexValidator().validate(compacted.lazy.map { $0 }, expectedCount: 4)
+    expectEqualSequences(compacted.lazy.map { $0 }.suffix(2), [3, 4])
+  }
+
   func testCollectionTraversals() {
     let validator = IndexValidator<CompactedCollection<[Int?], Int>>()
     for array in self.tests {
