@@ -110,31 +110,91 @@ extension ChunkedByCollection: Collection {
     precondition(position != endIndex, "Can't subscript using endIndex")
     return base[position.baseRange]
   }
+
+  // `index(_:offsetBy:)`, `index(_:offsetBy:limitedBy:)` and
+  // `distance(from:to:)` are implemented in the unconditional `Collection`
+  // conformance so that these implementations are also used when the
+  // collection is accessed generically as a `BidirectionalCollection`.
+  // Otherwise the default `Collection` implementations are used there, and
+  // they trap for negative offsets. Stepping backward uses
+  // `base.index(_:offsetBy: -1)`, which still traps if `Base` is not
+  // bidirectional.
+
+  /// Returns the index in the base collection of the start of the chunk ending
+  /// at the given index.
+  @inlinable
+  internal func startOfChunk(endingAt end: Base.Index) -> Base.Index {
+    var start = base.index(end, offsetBy: -1)
+    var subject = projection(base[start])
+    while start != base.startIndex {
+      let previous = base.index(start, offsetBy: -1)
+      let previousSubject = projection(base[previous])
+      guard belongInSameGroup(previousSubject, subject) else { break }
+      start = previous
+      subject = previousSubject
+    }
+    return start
+  }
+
+  @inlinable
+  internal func indexBefore(_ i: Index) -> Index {
+    precondition(i != startIndex, "Can't advance before startIndex")
+    let start = startOfChunk(endingAt: i.baseRange.lowerBound)
+    return Index(start..<i.baseRange.lowerBound)
+  }
+
+  @inlinable
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    var i = i
+    if distance >= 0 {
+      for _ in 0..<distance { formIndex(after: &i) }
+    } else {
+      for _ in 0..<(-distance) { i = indexBefore(i) }
+    }
+    return i
+  }
+
+  @inlinable
+  public func index(
+    _ i: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    var i = i
+    if distance >= 0 {
+      for _ in 0..<distance {
+        guard i != limit else { return nil }
+        formIndex(after: &i)
+      }
+    } else {
+      for _ in 0..<(-distance) {
+        guard i != limit else { return nil }
+        i = indexBefore(i)
+      }
+    }
+    return i
+  }
+
+  @inlinable
+  public func distance(from start: Index, to end: Index) -> Int {
+    guard start <= end else { return -distance(from: end, to: start) }
+    var i = start
+    var count = 0
+    while i != end {
+      formIndex(after: &i)
+      count += 1
+    }
+    return count
+  }
 }
 
 extension ChunkedByCollection.Index: Hashable where Base.Index: Hashable {}
 
 extension ChunkedByCollection: BidirectionalCollection
 where Base: BidirectionalCollection {
-  /// Returns the index in the base collection of the start of the chunk ending
-  /// at the given index.
-  @inlinable
-  internal func startOfChunk(endingAt end: Base.Index) -> Base.Index {
-    let indexBeforeEnd = base.index(before: end)
-    var subject = projection(base[indexBeforeEnd])
-
-    return base[..<indexBeforeEnd].startOfSuffix(while: { element in
-      let nextSubject = projection(element)
-      defer { subject = nextSubject }
-      return belongInSameGroup(nextSubject, subject)
-    })
-  }
-
   @inlinable
   public func index(before i: Index) -> Index {
-    precondition(i != startIndex, "Can't advance before startIndex")
-    let start = startOfChunk(endingAt: i.baseRange.lowerBound)
-    return Index(start..<i.baseRange.lowerBound)
+    indexBefore(i)
   }
 }
 
@@ -185,6 +245,25 @@ extension ChunkedOnCollection: Collection {
   @inlinable
   public func index(after i: Index) -> Index {
     chunked.index(after: i)
+  }
+
+  @inlinable
+  public func index(_ i: Index, offsetBy distance: Int) -> Index {
+    chunked.index(i, offsetBy: distance)
+  }
+
+  @inlinable
+  public func index(
+    _ i: Index,
+    offsetBy distance: Int,
+    limitedBy limit: Index
+  ) -> Index? {
+    chunked.index(i, offsetBy: distance, limitedBy: limit)
+  }
+
+  @inlinable
+  public func distance(from start: Index, to end: Index) -> Int {
+    chunked.distance(from: start, to: end)
   }
 }
 
